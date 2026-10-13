@@ -1,4 +1,4 @@
-/* MTP-F26 Team C - portable nRF24L01+ packet driver (Ebyte E01-ML01DP5).
+/* MTP-F26 Team C - portable nRF24L01+ packet driver (Ebyte E01-ML01SP4).
  *
  * Micro-agnostic: the board supplies an nrf24_hal_t (SPI mode 0, <= 10 MHz, CSN,
  * CE, delays, microsecond clock). Register profiles come from nrf24_config.h,
@@ -10,6 +10,10 @@
  * radios can share the NM channel. The E01 module switches its PA/LNA from the
  * chip itself, so the MCU only needs SPI + CSN + CE (+ IRQ, optional: polling
  * works without it).
+ *
+ * Power is capped: the E01 PA follows the chip, so RF_PWR above
+ * NRF24_RF_PWR_MAX_BITS would break the 10 mW e.i.r.p. limit. nrf24_init refuses
+ * such a profile and nrf24_write_reg clamps any RF_SETUP write.
  */
 #ifndef NRF24_H
 #define NRF24_H
@@ -39,6 +43,7 @@ typedef enum {
     NRF24_ERR_LEN,
     NRF24_ERR_CH,
     NRF24_ERR_NODATA,
+    NRF24_ERR_POWER,     /* profile asks for more than NRF24_RF_PWR_MAX_BITS */
 } nrf24_status_t;
 
 typedef struct {

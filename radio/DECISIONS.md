@@ -13,6 +13,47 @@ session and no later than Fri 16-Oct.
 > They are kept for the report (why 868 was the better link and what 2.4 GHz costs). Numbers:
 > `python3 radio/linkbudget.py`, scenarios S16–S20 of the workbook.
 
+> **13-Oct-26: antenna and module decided** (Santiago, with Marcos): **one omni per box on an Ebyte
+> E01-ML01SP4** (D-R2c, D-R5c). Antennas cannot change between competition modes, and the patches'
+> NM risks (aiming, the rim corner, tuning) outweighed their +1 dB on MRM. D-R2b and D-R5b are superseded.
+
+## D-R2c — Module: Ebyte E01-ML01SP4 (genuine nRF24L01P + PA/LNA, SMD, IPEX)
+
+**Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **Owner:** RT → handed to ET
+
+- Same radio as the DP5 (genuine Nordic nRF24L01P, PA + LNA, FCC/CE), SMD **14.85 × 18 mm, 10 pads at
+  1.27 mm**: 1 VCC, 2 CE, 3 CSN, 4 SCK, 5 MOSI, 6 MISO, 7 IRQ, 8–10 GND. Supply 2.0–3.6 V (abs. max 3.6 V).
+  TX 120 mA, RX 26 mA. Max output +20 dBm. **Sensitivity −96 dBm typ at 250 kbps** (datasheet).
+- **IPEX (U.FL) socket on the module**: the omni's cable plugs in directly, so no SMA adapter and its loss.
+- Why not the DP5 (SMA): it would need an SMA-male to U.FL-jack adapter (~0.5 dB) for the flex omni.
+  Why not the 2G4M27D: its ~+9 dBm floor behind a ~3 dBi antenna is ~12 dBm e.i.r.p., over the limit.
+- **Power:** RF_PWR −18 dBm only. Output +2..+7 dBm at the IPEX (PA gain 20–25 dB, ESTIMATE) → ≤ 9.5 dBm
+  e.i.r.p. with the 3 dBi datasheet peak gain. The driver refuses any profile above −18 dBm and clamps
+  direct RF_SETUP writes (`NRF24_RF_PWR_MAX_BITS`). T0 measures the real output; if it is only ~+2 dBm,
+  every margin below drops by ~5 dB.
+- **SMD consequence:** modules shown at Quick Mode are final, so the SP4 needs a breakout (lab-made or the
+  carrier PCB) from the first bench test. No breadboard stage with a different module.
+- **Shopping (order by Fri 16-Oct; price and EU lead time to verify):** 6 × E01-ML01SP4 (2 boxes, 2 bench,
+  2 spare), 4 × Molex 146153-0100, 2 × U.FL-plug to SMA-female pigtails (for T0/T13 on the spectrum
+  analyser). Not needed any more: E01-ML01DP5, SMA pads, SMA whips.
+
+## D-R5c — Antenna: one flex omni per box (Molex 146153-0100)
+
+**Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **Owner:** RT
+
+- Molex 146153-0100: flex dipole (2.4/5 GHz), 34.9 × 9 mm, 0.1 mm, adhesive, 100 mm cable, U.FL/MHF
+  (check the part is MHF, not MHF4). Datasheet peak gain 2.4–3.0 dBi (distributors disagree), efficiency
+  > 66 % at 2.4 GHz. Backup: Taoglas FXP73.07.0100A (47 × 7 mm, 2.5 dBi, 50 %).
+- Mounting: **vertical** (vertical polarisation, as agreed for NM), as high as possible on a side wall,
+  ≥ 1–2 cm from the battery, PCB copper and metal, same orientation in every box.
+- Model: 2 dBi in the box (container −1 dB separate), 0.5 dB cable, sensitivity −96 dBm. Margins at
+  h = 0.75 m: **SRI 70 m +26.0 dB · MRM 260 m +3.4 dB (+8.3 at 1.0 m) · NM 100 m hop (−10 dB) +9.9 dB**
+  (workbook S21–S23). MRM is the thin link: antenna height and Atenea Q3 (100 mW FHSS, +10 dB) are the levers.
+- No sideways rejection: the MRM channel plan's ≥ 10 m between teams' boxes still holds (8 MHz pair:
+  41 dB near-far at 10 m vs −50 dB selectivity), but there is no extra isolation from the antenna.
+- Quick Mode: the same flex antenna (simplest; the rules would allow a different one).
+- T5 measures the in-box gain (whip reference vs flex, box open vs closed).
+
 ## D-R1b — Band: 2.4 GHz ISM (2400–2483.5 MHz), all modes, 250 kbps
 
 **Status:** Agreed between the teams (reported by Santiago, 9-Oct-26) · details Proposed · **Owner:** RT
@@ -33,7 +74,7 @@ session and no later than Fri 16-Oct.
 
 **Reverse if:** never for the band (the teams agreed). Revisit the rate if T2 shows 250 kbps PER problems.
 
-## D-R2b — Module: Ebyte E01-ML01DP5 (genuine nRF24L01P + PA/LNA, SMA)
+## D-R2b — Module: Ebyte E01-ML01DP5 (genuine nRF24L01P + PA/LNA, SMA) — *superseded 13-Oct-26 by D-R2c*
 
 **Status:** Proposed (RT pick 9-Oct-26, Santiago delegated the choice) · **Owner:** RT → handed to ET
 
@@ -72,7 +113,7 @@ session and no later than Fri 16-Oct.
 - Final channel numbers after the campus 2.4 GHz survey (Andrian): if eduroam is not on 1/6/11 there,
   shift the plan.
 
-## D-R5b — Antennas: two FR4 patches per box, vertical, front and back
+## D-R5b — Antennas: two FR4 patches per box, vertical, front and back — *superseded 13-Oct-26 by D-R5c*
 
 **Status:** Proposed (9-Oct-26; two antennas per box are allowed, per Santiago) · **Owner:** RT
 
@@ -206,4 +247,4 @@ Fallback: Si4463 (same band, same link budget, more effort).
 |---|---|---|
 | D-R3 | NM PHY shared by all teams: redo `NM_PHY_PROPOSAL.md` for nRF24 (250 kbps, common address, CRC-16, no auto-ACK) | draft 16-Oct, frozen by week 6 |
 | D-R4 | MRM channel plan (draft above: RF_CH 24/49/74/82); agree with the 3 other teams after the WiFi survey | inter-team meeting, then week 8–9 |
-| D-R5b | Patch tuning coupon + VNA, patch vs whip in T5 | week 8 |
+| D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |

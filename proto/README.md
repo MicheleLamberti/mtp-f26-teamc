@@ -66,6 +66,5 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 
 - MRM scenario with 4 teams on their own channels (near-far: adjacent-channel leakage), plus
   listen-before-talk with `nrf24_carrier()`.
-- Two-radio boxes (D-R5b): receive on both E01s, send on the one facing the peer.
 - Board port: implement `proto_env_t` on the Pico (`nrf24_send`, `time_us_64`, an alarm),
   call `*_on_frame` from the RX poll loop and `*_on_tx_idle` after `nrf24_send` returns.

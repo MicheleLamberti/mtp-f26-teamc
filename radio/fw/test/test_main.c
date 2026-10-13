@@ -17,7 +17,7 @@ static int failures, checks;
     } while (0)
 
 static const nrf24_profile_t *const PROFILES[] = {&NRF24_PROFILE_TEAM_250K, &NRF24_PROFILE_TEAM_1M,
-                                                  &NRF24_PROFILE_NM_COMMON, &NRF24_PROFILE_BENCH_WHIP};
+                                                  &NRF24_PROFILE_NM_COMMON};
 #define N_PROFILES (sizeof PROFILES / sizeof PROFILES[0])
 
 typedef struct {
@@ -221,6 +221,32 @@ static void test_tx_timeout(void)
     CHECK(a.m.tx_n == 0);              /* TX FIFO flushed */
 }
 
+static void test_power_limit(void)
+{
+    /* Every generated profile stays at or below the limit (RF_PWR -18 dBm). */
+    for (unsigned k = 0; k < N_PROFILES; k++)
+        for (unsigned i = 0; i < PROFILES[k]->n_regs; i++)
+            if (PROFILES[k]->regs[i].addr == 0x06)
+                CHECK(((PROFILES[k]->regs[i].value >> 1) & 3u) <= NRF24_RF_PWR_MAX_BITS);
+
+    /* A profile asking for 0 dBm at the chip is refused before anything is written. */
+    nrf24_reg_t regs[sizeof NRF24_REGS_TEAM_250K / sizeof NRF24_REGS_TEAM_250K[0]];
+    memcpy(regs, NRF24_REGS_TEAM_250K, sizeof regs);
+    for (unsigned i = 0; i < sizeof regs / sizeof regs[0]; i++)
+        if (regs[i].addr == 0x06)
+            regs[i].value = (uint8_t)(regs[i].value | 0x06u);
+    nrf24_profile_t hot = NRF24_PROFILE_TEAM_250K;
+    hot.regs = regs;
+    node_t n;
+    CHECK(node_up(&n, &hot) == NRF24_ERR_POWER);
+    CHECK((n.m.regs[0x00] & 0x02u) == 0);   /* never powered up */
+
+    /* A direct register write is clamped. */
+    CHECK(node_up(&n, &NRF24_PROFILE_TEAM_250K) == NRF24_OK);
+    nrf24_write_reg(&n.dev, 0x06, 0x26);
+    CHECK(n.m.regs[0x06] == (uint8_t)(0x20u | (NRF24_RF_PWR_MAX_BITS << 1)));
+}
+
 static void test_carrier(void)
 {
     node_t a;
@@ -242,6 +268,7 @@ int main(void)
     test_isolation();
     test_limits();
     test_tx_timeout();
+    test_power_limit();
     test_carrier();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;

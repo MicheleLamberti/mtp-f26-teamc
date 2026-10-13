@@ -66,9 +66,11 @@ def style_range(ws, ref, font=None, fill=None, border=None, align=None, fmt=None
 # ---------------------------------------------------------------------------
 # Per-scenario extra inputs not held in linkbudget.Link
 RX_BW_KHZ = [125, 200, 200, 100, 1000, 2000, 125, 200, 500, 500, 125, 500, 200, 200, 200,
-             500, 1000, 500, 500, 500]
+             500, 1000, 500, 500, 500,
+             500, 500, 500]
 NF_DB = [7, 7, 7, 7, 10, 10, 7, 7, 10, 10, 7, 10, 7, 7, 7,
-         10, 10, 10, 10, 10]  # E01: chip NF kept (LNA ignored, conservative)
+         10, 10, 10, 10, 10,
+         10, 10, 10]  # E01: chip NF kept (LNA ignored, conservative)
 REG = {  # (round, radio, limit type, limit dBm, sensitivity source)
     lb.F868: ("ERP", 27.0),   # 500 mW e.r.p., 869.40-869.65 MHz, UN-39
     lb.F24: ("EIRP", 10.0),   # 10 mW e.i.r.p., UN-85 b)
@@ -86,6 +88,8 @@ def sens_source(s: lb.Link) -> str:
         return "Si4463 datasheet: -104 dBm typ @100 kbps GFSK (BER 0.1 %)"
     if "CC1101" in s.name:
         return "CC1101 datasheet: -104 dBm @38.4 kBaud GFSK, 100 kHz filter (PER 1 %)"
+    if "E01-ML01SP4" in s.name:
+        return "E01-ML01SP4 datasheet: -96 dBm typ @250 kbps (module with LNA). Measure in T2."
     if "E01-ML01DP5" in s.name:
         return (f"nRF24L01+ chip datasheet: {s.sens_dbm:.0f} dBm @{s.rate_kbps:g} kbps; module LNA ignored "
                 "(Ebyte quotes ~-96 @250k for the sister E01-ML01SP4). Measure in T2.")
@@ -446,7 +450,7 @@ def build_candidates(wb):
          "32 B max payload; auto-ACK/retransmit in hardware (Enhanced ShockBurst). Many clones on the market - buy from a distributor.",
          "Enhanced ShockBurst is Nordic-proprietary - LOW-MEDIUM risk; confirm on Atenea", "Speed for SRI; weak margin at 260 m",
          "TO VERIFY", SRC_NRF24],
-        ["PICK 9-Oct-26: Ebyte E01-ML01DP5 (genuine nRF24L01P + PA/LNA, SMA-K, DIP 2.54 mm)", "2.400-2.525 GHz (use <=2483.5)",
+        ["Not chosen 13-Oct-26 (was the 9-Oct pick): Ebyte E01-ML01DP5 (genuine nRF24L01P + PA/LNA, SMA-K, DIP 2.54 mm)", "2.400-2.525 GHz (use <=2483.5)",
          "+20 dBm; ~+7 dBm at RF_PWR -18 (ESTIMATE, PA ~25 dB gain, no bypass)", "~120 mA (sister SP4)", "~26 mA (sister SP4)",
          "chip -94 dBm @250k / -85 @1M; Ebyte ~-96 @250k for the SP4 (LNA 12 dB, NF 2.5 dB)", "2 Mbps",
          "Lowest setting ~+7 dBm: with a 4.5 dBi patch needs ~0.5-3 dB pad for 10 dBm e.i.r.p.; measure (T0). "
@@ -454,9 +458,12 @@ def build_candidates(wb):
          "Proprietary (Enhanced ShockBurst) - LOW-MEDIUM risk; confirm on Atenea", "2.4 GHz baseline, all modes",
          "~US$3.9 (Tindie, EBYTE store) - VERIFY lead time to Spain",
          "https://www.cdebyte.com/products/E01-ML01DP5 ; https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf"],
-        ["BACKUP: Ebyte E01-ML01SP4 (same radio, SMD 14.85 x 18 mm, IPEX/u.FL)", "2.4 GHz", "+20 dBm", "120 mA", "26 mA",
-         "-96 dBm typ @250k (datasheet)", "2 Mbps", "1.27 mm pitch SMD: solder to the carrier PCB; u.FL to the patch.",
-         "As above", "Carrier-PCB option", "VERIFY", "https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf"],
+        ["DECIDED 13-Oct-26: Ebyte E01-ML01SP4 (genuine nRF24L01P + PA/LNA, SMD 14.85 x 18 mm, IPEX)", "2.4 GHz",
+         "+20 dBm max; ~+2..+7 dBm at RF_PWR -18 (ESTIMATE, T0)", "120 mA", "26 mA",
+         "-96 dBm typ @250k (datasheet)", "2 Mbps",
+         "10 pads, 1.27 mm pitch: VCC, CE, CSN, SCK, MOSI, MISO, IRQ, 3x GND. 2.0-3.6 V. IPEX: the Molex flex omni plugs in directly. Needs a breakout from the first bench test (QM module = final).",
+         "Proprietary (Enhanced ShockBurst) - LOW-MEDIUM risk; confirm on Atenea", "2.4 GHz baseline with one omni",
+         "VERIFY", "https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf"],
         ["EXCLUDE: Ebyte E01C-* and no-name 'nRF24L01+PA+LNA' boards", "2.4 GHz", "", "", "", "", "",
          "Ebyte's own E01C manual states the chip is a Si24R1 clone (worse receiver, selectivity unknown)", "",
          "Do not buy (bench only)", "",

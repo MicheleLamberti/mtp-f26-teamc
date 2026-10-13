@@ -1,6 +1,6 @@
-"""MTP-F26 Team C - nRF24L01+ (Ebyte E01-ML01DP5) physical-layer profiles and register generator.
+"""MTP-F26 Team C - nRF24L01+ (Ebyte E01-ML01SP4) physical-layer profiles and register generator.
 
-Turns the radio decisions (D-R1b band, D-R2b module, D-R4 channel plan, D-R5b antennas; see
+Turns the radio decisions (D-R1b band, D-R2c module, D-R4 channel plan, D-R5c antenna; see
 radio/DECISIONS.md) into nRF24L01+ register values, checks them against CNAF UN-85 b)
 (2400-2483.5 MHz, 10 mW e.i.r.p.) and the nRF24L01+ Product Specification v1.0, and writes
 radio/fw/nrf24_config.h for the firmware.
@@ -14,9 +14,11 @@ Register facts (nRF24L01+ PS v1.0):
     retries are 0 and every frame goes out with W_TX_PAYLOAD_NOACK (FEATURE.EN_DYN_ACK):
     no Enhanced-ShockBurst ACKs on air, our own ARQ (proto/src/link.c) does the job.
 
-Module (Ebyte E01-ML01DP5): PA ~25 dB gain after the chip, always in line [ESTIMATE from the
-RFX2401C datasheet; Ebyte publishes no table], so RF_PWR -18 dBm gives ~+7 dBm at the SMA.
-Test T0 replaces E01_PA_GAIN_DB with a measurement.
+Module (Ebyte E01-ML01SP4): PA after the chip, always in line; datasheet max +20 dBm. Its gain is
+20-25 dB [ESTIMATE], so RF_PWR -18 dBm gives +2..+7 dBm at the IPEX. The checks use 25 dB (worst case
+for the e.i.r.p. limit). Test T0 replaces E01_PA_GAIN_DB with a measurement. Every profile is held at
+RF_PWR -18 dBm and the driver refuses anything higher (NRF24_RF_PWR_MAX_BITS): at 0 dBm the module
+would radiate ~+23 dBm e.i.r.p., 20x the limit.
 
 Occupied bandwidth uses Carson's rule 2 (fdev + BR/2) with the datasheet deviation
 (160 kHz at 250 kbps/1 Mbps, 320 kHz at 2 Mbps); the bench spectrum test T13 replaces it.
@@ -34,14 +36,16 @@ from linkbudget import MRM_CHANNELS, NRF24_CI_250K
 BAND = (2400.0e6, 2483.5e6)   # CNAF UN-85 b)
 EIRP_MAX_DBM = 10.0           # 10 mW e.i.r.p.
 XTAL_PPM = 60.0               # nRF24L01+ crystal requirement: +-60 ppm per box
-E01_PA_GAIN_DB = 25.0         # module PA after the chip [ESTIMATE, measure in T0]
+E01_PA_GAIN_DB = 25.0         # module PA after the chip [ESTIMATE 20-25 dB, measure in T0]
 E01_PSAT_DBM = 20.0           # module saturates around +20 dBm
 MAX_PAYLOAD = 32
 
-# Antenna paths (D-R5b): gain dBi, cable/connector dB, pad dB. Same path for TX and RX.
+MAX_CHIP_DBM = -18            # hard limit: the driver refuses higher RF_PWR settings
+
+# Antenna path (D-R5c): gain dBi, cable/connector dB, pad dB. Same path for TX and RX. The e.i.r.p.
+# check uses the datasheet PEAK gain (worst case); linkbudget.py uses 2 dBi for the antenna in the box.
 ANTENNAS = {
-    "patch": (4.5, -1.0, -0.5),   # FR4 patch on a wall board, 10 cm pigtail, 0.5 dB SMA pad
-    "omni": (2.0, -1.0, 0.0),     # 2 dBi omni (QM whip, or single-omni option), no pad
+    "omni": (3.0, -0.5, 0.0),     # Molex 146153-0100 flex dipole (2.4-3.0 dBi), 10 cm cable, IPEX on the SP4
 }
 
 RATES = {250_000: 0b100000, 1_000_000: 0b000000, 2_000_000: 0b001000}
@@ -65,7 +69,7 @@ class Profile:
     bitrate: int = 250_000
     chip_dbm: int = -18
     address: bytes = TEAM_ADDR
-    antenna: str = "patch"
+    antenna: str = "omni"
     crc_bytes: int = 2
     plan: list[int] = field(default_factory=lambda: list(MRM_CHANNELS))
 
@@ -104,8 +108,9 @@ class Profile:
             (f"emission inside {BAND[0] / 1e6:.1f}-{BAND[1] / 1e6:.1f} MHz incl. drift", lo >= BAND[0] and hi <= BAND[1],
              f"{lo / 1e6:.3f}-{hi / 1e6:.3f} MHz, guard {min(lo - BAND[0], BAND[1] - hi) / 1e3:.0f} kHz"),
             (f"e.i.r.p. <= {EIRP_MAX_DBM:.0f} dBm ({self.antenna})", self.eirp_dbm <= EIRP_MAX_DBM,
-             f"{self.conducted_dbm:+.1f} dBm at SMA -> {self.eirp_dbm:.1f} dBm e.i.r.p."),
+             f"<= {self.conducted_dbm:+.1f} dBm at the IPEX -> <= {self.eirp_dbm:.1f} dBm e.i.r.p."),
             ("RF_PWR is a chip setting", self.chip_dbm in RF_PWR, f"{self.chip_dbm} dBm"),
+            (f"RF_PWR <= {MAX_CHIP_DBM} dBm (driver hard limit)", self.chip_dbm <= MAX_CHIP_DBM, f"{self.chip_dbm} dBm"),
             ("5 B address, no 0x00/0xFF/0x55/0xAA first byte", len(self.address) == 5
              and self.address[0] not in (0x00, 0xFF, 0x55, 0xAA), self.address.hex(" ").upper()),
             ("CRC-16 in hardware", self.crc_bytes == 2, f"{self.crc_bytes} B"),
@@ -134,10 +139,7 @@ class Profile:
 PROFILES = [
     Profile("TEAM_250K", "SRI/QM/MRM team link: our channel (D-R4), 250 kbps", rf_ch=TEAM_CH),
     Profile("TEAM_1M", "SRI option at 1 Mbps (teams sequential, +18 dB at 70 m)", rf_ch=TEAM_CH, bitrate=1_000_000),
-    Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)", rf_ch=NM_CH, address=NM_ADDR,
-            antenna="omni"),
-    Profile("BENCH_WHIP", "bench / QM with the 2 dBi whip straight on the SMA (no pad)", rf_ch=TEAM_CH,
-            antenna="omni"),
+    Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)", rf_ch=NM_CH, address=NM_ADDR),
 ]
 
 
@@ -162,11 +164,15 @@ def header_text() -> str:
         "    uint8_t max_len;          /* largest payload (dynamic payload length) */",
         "} nrf24_profile_t;",
         "",
+        f"/* Highest RF_PWR the driver accepts: {MAX_CHIP_DBM} dBm at the chip. The E01 PA follows it, so a",
+        " * higher setting would break the 10 mW e.i.r.p. limit (CNAF UN-85 b). */",
+        f"#define NRF24_RF_PWR_MAX_BITS {RF_PWR[MAX_CHIP_DBM]}u",
+        "",
     ]
     for p in PROFILES:
         out.append(f"/* {p.name}: {p.purpose}")
         out.append(f" * RF_CH {p.rf_ch} = {p.f / 1e6:.0f} MHz, {p.bitrate // 1000} kbps, RF_PWR {p.chip_dbm} dBm "
-                   f"(~{p.conducted_dbm:+.0f} dBm at the E01 SMA), {p.antenna}: {p.eirp_dbm:.1f} dBm e.i.r.p. */")
+                   f"(<= {p.conducted_dbm:+.0f} dBm at the E01 IPEX), {p.antenna}: {p.eirp_dbm:.1f} dBm e.i.r.p. */")
         out.append(f"static const nrf24_reg_t NRF24_REGS_{p.name}[] = {{")
         for name, addr, val in p.registers():
             out.append(f"    {{0x{addr:02X}, 0x{val:02X}}},  /* {name} */")

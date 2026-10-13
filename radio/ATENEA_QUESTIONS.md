@@ -3,7 +3,7 @@
 For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
 
 1. **Allowed chips.** Are proprietary GFSK packet transceivers allowed, specifically the Nordic
-   nRF24L01+ on the Ebyte E01-ML01DP5 module (with a PA/LNA)? Its Enhanced ShockBurst packet
+   nRF24L01+ on the Ebyte E01-ML01SP4 module (with a PA/LNA)? Its Enhanced ShockBurst packet
    format is Nordic-proprietary, not a standard wireless protocol, and it has no Bluetooth.
 2. *(Obsolete 9-Oct-26: all teams moved to 2.4 GHz, which has no duty-cycle limit. Do not post.)*
    **Duty cycle and the schedule.** In 869.40–869.65 MHz (CNAF UN-39) each transmitter is
@@ -14,7 +14,7 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    2.4 GHz. If our nRF24-based radio hops over ≥ 15 channels (FHSS in the sense of EN 300 328) with
    listen-before-talk, may it use the 100 mW e.i.r.p. of CNAF UN-85 a)? Or must every team stay at
    the 10 mW e.i.r.p. of UN-85 b)? (A non-hopping narrowband radio is held to 10 mW/MHz under UN-85 a)
-   anyway.) Also: is the Ebyte E01-ML01DP5 (Nordic nRF24L01P, proprietary Enhanced ShockBurst) fine
+   anyway.) Also: is the Ebyte E01-ML01SP4 (Nordic nRF24L01P, proprietary Enhanced ShockBurst) fine
    under the standard-protocol ban (see Q1)?
 4. **Support height.** Is the support fixed at 70 cm, or "about 70 cm" with some tolerance?
    May the antenna sit anywhere inside the box (e.g. under the lid)? May the box stand on its
@@ -32,5 +32,5 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    both. May each device have a TX/RX role switch? It does not indicate network position.
 9. **Encoding and output name.** Is "UNICODE .txt" UTF-8 or UTF-16? And what file name should the
    received file have on the USB stick (the original name, or a fixed one)?
-10. **Two antennas.** Please confirm that a device may use two antennas (we plan one patch on the
-    front wall and one on the back wall, inside the box).
+10. *(Not needed since 13-Oct-26: we use one antenna per box. Do not post.)* **Two antennas.** Please confirm
+    that a device may use two antennas inside the box.

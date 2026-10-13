@@ -164,6 +164,14 @@ E01_250k = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-1.5, l_con_rx=-
                 notes="E01-ML01DP5 @RF_PWR -18 (~+7 dBm, est.), 1 dB pigtail + 0.5 dB pad, 4.5 dBi FR4 patch")
 E01_1M = dict(E01_250k, sens_dbm=-85, rate_kbps=1000)
 
+# DECIDED 13-Oct-26 (Santiago with Marcos): ONE omni per box on an Ebyte E01-ML01SP4 (SMD, IPEX on the
+# module). RF_PWR -18 -> +2..+7 dBm at the IPEX [ESTIMATE: PA 20-25 dB; T0 measures; model uses +7].
+# Molex 146153-0100 flex dipole plugged straight in: ~0.5 dB cable, 2.4-3.0 dBi datasheet peak; the model
+# uses 2 dBi for the in-box antenna (container -1 dB is separate). Sensitivity: SP4 datasheet -96 dBm typ.
+SP4_OMNI = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-0.5, l_con_rx=-0.5,
+                g_tx_dbi=2.0, g_rx_dbi=2.0, sens_dbm=-96, rate_kbps=250,
+                notes="E01-ML01SP4 @RF_PWR -18 (~+7 dBm, est.), Molex 146153 flex omni 2 dBi in box, 0.5 dB cable")
+
 SCENARIOS = [
     Link("SRI 70 m | RFM69HCW 868 | 38.4 kbps", d_m=70, **RFM69_38k),
     Link("SRI 70 m | RFM69HCW 868 | 100 kbps", d_m=70, **RFM69_100k),
@@ -187,15 +195,20 @@ SCENARIOS = [
     Link("Bench 70 m | RFM69HCW 869.85 | 100 kbps, +9 dBm (BENCH_5MW)", d_m=70,
          **dict(RFM69_100k, f_mhz=869.85, p_pa_dbm=9,
                 notes="869.70-870.00 MHz: 5 mW e.r.p., no duty-cycle limit; for repeated tests")),
-    # 2.4 GHz baseline (9-Oct-26): E01-ML01DP5, 250 kbps everywhere, FR4 patches, see DECISIONS.md D-R1b
-    Link("SRI 70 m | E01-ML01DP5 2.4G | 250 kbps, patches (2.4 baseline)", d_m=70, **E01_250k),
+    # 9-Oct-26 proposal (not chosen 13-Oct): E01-ML01DP5 + FR4 patches, see DECISIONS.md D-R5b
+    Link("SRI 70 m | E01-ML01DP5 2.4G | 250 kbps, patches (not chosen)", d_m=70, **E01_250k),
     Link("SRI 70 m | E01-ML01DP5 2.4G | 1 Mbps, patches", d_m=70, **E01_1M),
-    Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, patches (2.4 baseline)", d_m=260, **E01_250k),
-    Link("NM hop 100 m | E01-ML01DP5 2.4G | 250 kbps, -10 dB obstr. (2.4 baseline)",
+    Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, patches (not chosen)", d_m=260, **E01_250k),
+    Link("NM hop 100 m | E01-ML01DP5 2.4G | 250 kbps, -10 dB obstr. (patches, not chosen)",
          d_m=100, l_obstruction=-10, **E01_250k),
     Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, 100 mW FHSS (if Atenea Q3 = yes)", d_m=260,
          **dict(E01_250k, f_mhz=F24_FHSS, p_pa_dbm=17,
                 notes="UN-85 a) FHSS: 100 mW e.i.r.p.; needs >=15 hop channels + EN 300 328 adaptivity")),
+    # 2.4 GHz baseline, DECIDED 13-Oct-26: E01-ML01SP4 + one Molex flex omni, 250 kbps, DECISIONS.md D-R2c/D-R5c
+    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni (2.4 baseline)", d_m=70, **SP4_OMNI),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni (2.4 baseline)", d_m=260, **SP4_OMNI),
+    Link("NM hop 100 m | E01-ML01SP4 2.4G | 250 kbps, -10 dB obstr., omni (2.4 baseline)",
+         d_m=100, l_obstruction=-10, **SP4_OMNI),
 ]
 
 # nRF24L01+ RX selectivity, C/I in dB at 250 kbps (Product Spec v1.0 table 8; negative = interferer
@@ -260,8 +273,8 @@ def report() -> None:
     print(f"  nRF24 C/I at 250 kbps by offset (MHz): {NRF24_CI_250K}")
     for r in (2, 5, 10, 20):
         aligned, side = near_far(mrm, r), near_far(mrm, r, isolation_db=20)
-        print(f"  r = {r:3d} m: interferer {aligned:5.1f} dB above wanted (patches aligned), "
-              f"{side:5.1f} dB (side-on, ~10 dB rejection per patch)")
+        print(f"  r = {r:3d} m: interferer {aligned:5.1f} dB above wanted (omni, no rejection), "
+              f"{side:5.1f} dB (if both antennas rejected ~10 dB sideways; an omni does not)")
     chans = MRM_CHANNELS
     print(f"  channel plan RF_CH {chans} = {[2400 + c for c in chans]} MHz")
     for a, b in zip(chans, chans[1:]):

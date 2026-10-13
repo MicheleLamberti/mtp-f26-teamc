@@ -17,8 +17,12 @@ typedef struct {
     uint8_t max_len;          /* largest payload (dynamic payload length) */
 } nrf24_profile_t;
 
+/* Highest RF_PWR the driver accepts: -18 dBm at the chip. The E01 PA follows it, so a
+ * higher setting would break the 10 mW e.i.r.p. limit (CNAF UN-85 b). */
+#define NRF24_RF_PWR_MAX_BITS 0u
+
 /* TEAM_250K: SRI/QM/MRM team link: our channel (D-R4), 250 kbps
- * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -18 dBm (~+7 dBm at the E01 SMA), patch: 10.0 dBm e.i.r.p. */
+ * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_250K[] = {
     {0x01, 0x01},  /* EN_AA */
     {0x02, 0x01},  /* EN_RXADDR */
@@ -39,7 +43,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_250K = {
 };
 
 /* TEAM_1M: SRI option at 1 Mbps (teams sequential, +18 dB at 70 m)
- * RF_CH 74 = 2474 MHz, 1000 kbps, RF_PWR -18 dBm (~+7 dBm at the E01 SMA), patch: 10.0 dBm e.i.r.p. */
+ * RF_CH 74 = 2474 MHz, 1000 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_1M[] = {
     {0x01, 0x01},  /* EN_AA */
     {0x02, 0x01},  /* EN_RXADDR */
@@ -60,7 +64,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_1M = {
 };
 
 /* NM_COMMON: PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)
- * RF_CH 80 = 2480 MHz, 250 kbps, RF_PWR -18 dBm (~+7 dBm at the E01 SMA), omni: 8.0 dBm e.i.r.p. */
+ * RF_CH 80 = 2480 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_NM_COMMON[] = {
     {0x01, 0x01},  /* EN_AA */
     {0x02, 0x01},  /* EN_RXADDR */
@@ -78,27 +82,6 @@ static const nrf24_profile_t NRF24_PROFILE_NM_COMMON = {
     "NM_COMMON", NRF24_REGS_NM_COMMON,
     (uint8_t)(sizeof NRF24_REGS_NM_COMMON / sizeof NRF24_REGS_NM_COMMON[0]),
     80u, 250000u, {0xC2, 0x5A, 0x9D, 0x3E, 0x71}, 2u, 32u,
-};
-
-/* BENCH_WHIP: bench / QM with the 2 dBi whip straight on the SMA (no pad)
- * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -18 dBm (~+7 dBm at the E01 SMA), omni: 8.0 dBm e.i.r.p. */
-static const nrf24_reg_t NRF24_REGS_BENCH_WHIP[] = {
-    {0x01, 0x01},  /* EN_AA */
-    {0x02, 0x01},  /* EN_RXADDR */
-    {0x03, 0x03},  /* SETUP_AW */
-    {0x04, 0x00},  /* SETUP_RETR */
-    {0x05, 0x4A},  /* RF_CH */
-    {0x06, 0x20},  /* RF_SETUP */
-    {0x11, 0x20},  /* RX_PW_P0 */
-    {0x1D, 0x05},  /* FEATURE */
-    {0x1C, 0x01},  /* DYNPD */
-    {0x07, 0x70},  /* STATUS */
-    {0x00, 0x0E},  /* CONFIG */
-};
-static const nrf24_profile_t NRF24_PROFILE_BENCH_WHIP = {
-    "BENCH_WHIP", NRF24_REGS_BENCH_WHIP,
-    (uint8_t)(sizeof NRF24_REGS_BENCH_WHIP / sizeof NRF24_REGS_BENCH_WHIP[0]),
-    74u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
 };
 
 #endif /* NRF24_CONFIG_H */

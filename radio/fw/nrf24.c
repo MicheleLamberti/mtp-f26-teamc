@@ -23,6 +23,8 @@
 
 #define CONFIG_PRIM_RX 0x01u
 #define RF_DR_LOW 0x20u
+#define RF_PWR_MASK 0x06u
+#define RF_PWR_SHIFT 1u
 #define STATUS_RX_DR 0x40u
 #define STATUS_TX_DS 0x20u
 #define FIFO_RX_EMPTY 0x01u
@@ -52,8 +54,18 @@ uint8_t nrf24_read_reg(nrf24_t *dev, uint8_t addr)
     return v;
 }
 
+static uint8_t clamp_power(uint8_t rf_setup)
+{
+    uint8_t pwr = (uint8_t)((rf_setup & RF_PWR_MASK) >> RF_PWR_SHIFT);
+    if (pwr <= NRF24_RF_PWR_MAX_BITS)
+        return rf_setup;
+    return (uint8_t)((rf_setup & ~RF_PWR_MASK) | (NRF24_RF_PWR_MAX_BITS << RF_PWR_SHIFT));
+}
+
 void nrf24_write_reg(nrf24_t *dev, uint8_t addr, uint8_t value)
 {
+    if ((addr & 0x1Fu) == REG_RF_SETUP)
+        value = clamp_power(value);   /* never above the legal power, whoever asks */
     command(dev, (uint8_t)(CMD_W_REGISTER | (addr & 0x1Fu)), &value, NULL, 1);
 }
 
@@ -76,6 +88,11 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
     dev->rf_ch = profile->rf_ch;
     dev->rx_on = 0;
     dev->last_rpd = 0;
+
+    for (unsigned i = 0; i < profile->n_regs; i++)
+        if (profile->regs[i].addr == REG_RF_SETUP &&
+            ((profile->regs[i].value & RF_PWR_MASK) >> RF_PWR_SHIFT) > NRF24_RF_PWR_MAX_BITS)
+            return NRF24_ERR_POWER;
 
     hal->ce(hal->ctx, 0);
     hal->delay_us(hal->ctx, POWER_ON_RESET_US);
