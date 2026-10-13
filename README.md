@@ -4,18 +4,17 @@ Santiago's working repository for the **MTP F26** course project at UPC (Network
 Sustainability competition), shared with Team C. It holds the radio team's analysis and
 firmware, plus the starting protocol code and simulator handed to protocols & software.
 
-> **Status:** on 9-Oct-26 all four teams moved to **2.4 GHz**. The radio choices here (Ebyte
-> E01-ML01DP5 / nRF24L01+, 250 kbps, two patch antennas) are a **working baseline**, not yet
-> signed off by the team. See [`radio/DECISIONS.md`](radio/DECISIONS.md). Hardware and protocol
+> **Status:** on 9-Oct-26 all four teams moved to **2.4 GHz**. On 13-Oct-26 the radio team decided
+> the module and antenna: one **Ebyte E01-ML01SP4** (nRF24L01+) and one **flex omni** per box, 250 kbps. See [`radio/DECISIONS.md`](radio/DECISIONS.md). Hardware and protocol
 > pages are **suggestions** to the electronics and protocols teams, who own those decisions.
 
 ## Read first
 
 | Document | For |
 |---|---|
-| [`briefs/TeamC Radio Brief v0.4.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01DP5), antennas, MRM channel plan, what to buy, link budget, test plan |
-| [`briefs/TeamC Hardware Proposal v0.3.pdf`](briefs/) | Suggested board for electronics: Pico 2 + 2 × E01-ML01DP5, BoM, power |
-| [`briefs/TeamC Protocol Proposal v0.3.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
+| [`briefs/TeamC Radio Brief v0.5.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, what to buy, link budget, test plan |
+| [`briefs/TeamC Hardware Proposal v0.4.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power |
+| [`briefs/TeamC Protocol Proposal v0.3.1.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status and session log (kept up to date each session) |
 
 ## Layout
@@ -38,7 +37,7 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 Needs `gcc`, `make`, `zlib` (`sudo apt install build-essential zlib1g-dev`) and Python 3.
 
 ```sh
-make -C radio/fw test        # radio driver: 138 checks
+make -C radio/fw test        # radio driver: 124 checks
 make -C proto test           # protocol simulator: 11 scenarios in ~1 s
 python3 radio/phy_config.py  # radio profiles: channel, band edge, e.i.r.p. checks
 python3 radio/linkbudget.py  # link budget table

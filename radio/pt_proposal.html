@@ -127,8 +127,8 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3 · Fri 9 Oct 2026</span></div>
-  <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01DP5) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.1 · Tue 13 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01SP4, one per box, one omni antenna; decided 13 Oct) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
   <p class="lede">The radio team has fixed the physical layer: 2.4 GHz, nRF24L01+, 250 kbps, with a tested driver. Everything above it belongs to protocols &amp; software. This is a starting <b>proposal</b> built from the competition rules and our link numbers, to speed you up. It is not a decision. Please change whatever you see better.</p>
 </header>
 
@@ -327,7 +327,7 @@ sequenceDiagram
     </tbody>
   </table></div>
   <div class="callout"><b>It already caught a bug</b> (on the old 868 MHz radio). With fixed timeouts, the 38.4 kbps fallback delivered only 883 lines. One frame (15.2 ms) outlasted the receiver's 15 ms idle-ACK timer, so the receiver ACKed in the middle of bursts and went deaf. All timeouts are now derived from the bit rate.</div>
-  <p class="col sub">Still open in the simulator: an MRM scenario with four teams on their own channels, listen-before-talk, two radios per box, and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the bench: 1 ms turnaround, 0.3 ms gap between frames.</p>
+  <p class="col sub">Still open in the simulator: an MRM scenario with four teams on their own channels, listen-before-talk, and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the bench: 1 ms turnaround, 0.3 ms gap between frames.</p>
 </section>
 
 <section aria-labelledby="s-plan">
@@ -357,7 +357,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Related pages: Team C Radio Brief v0.4 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.3 (Pico 2 + 2 × E01-ML01DP5 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Related pages: Team C Radio Brief v0.5 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
 </footer>
 </div>

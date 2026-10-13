@@ -43,26 +43,27 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   live formulas (the hand-in artefact). Keep it in sync with `linkbudget.py`.
 - `radio/build_course_sheet.py` → `radio/AN5142_course_layout_869MHz.xlsx`: the course AN5142 sheet
   rebuilt row for row (Ground Multipath inlined), course example as a check + SRI/MRM/NM baseline sheets.
-- `radio/phy_config.py` — nRF24L01+/E01-ML01DP5 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`,
-  `BENCH_WHIP`), UN-85 b checks (channel, band edge, e.i.r.p. per antenna path, MRM plan spacing);
-  regenerates `radio/fw/nrf24_config.h`. `E01_PA_GAIN_DB` is an estimate until test T0.
+- `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`), UN-85 b
+  checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm, MRM plan spacing);
+  regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`). `E01_PA_GAIN_DB` is an estimate until T0.
 - `radio/fw/` — portable C99 nRF24L01+ driver behind a HAL (DPL + NOACK frames, RF_CH ≤ 83, RPD),
-  CRC-16, mock nRF24 with a simulated channel, host tests: `make -C radio/fw test` (138 checks).
+  CRC-16, power clamp (refuses/clamps RF_PWR above −18 dBm), mock nRF24 with a simulated channel, host tests:
+  `make -C radio/fw test` (124 checks).
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
-- `radio/DECISIONS.md` (D-R1b/D-R2b/D-R4 draft/D-R5b current; 868 records superseded), `HANDOFF_ET.md`
-  (E01 interface for electronics), `NM_PHY_PROPOSAL.md` (nRF24 NM PHY for other teams), `TEST_PLAN.md`
+- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c current; D-R2b/D-R5b and the 868 records superseded),
+  `HANDOFF_ET.md` (SP4 interface for electronics), `NM_PHY_PROPOSAL.md` (nRF24 NM PHY for other teams), `TEST_PLAN.md`
   (T0 gate, T2, T4, T5, T13–T16; PER-based, nRF24 has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.4 published 9-Oct: 2.4 GHz, E01, patches vs omni, MRM channel plan).
+  republish to the same URL (v0.5 published 13-Oct: SP4 + one omni decided, MRM channel plan, shopping list).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (v0.3 9-Oct: Pico 2 + 2 × E01-ML01DP5, radio LDO, patch boards, BoM, power).
+  — source `radio/hw_proposal.html` (v0.4 13-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip, codec) and the PC
   simulator (`sim/`): `make -C proto test` (11 scenarios, ~1 s). See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3 9-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results).
+  — source `radio/pt_proposal.html` (v0.3.1 13-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results).
 - PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, Chrome headless with
   mermaid from jsDelivr; the 9-Oct export script lived in the job scratch dir — recreate if needed).
 
@@ -94,44 +95,59 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - Limit 10 mW e.i.r.p. (UN-85 b). UN-85 a) gives a narrowband radio nothing (10 mW/MHz); only FHSS gets
   100 mW (+10 dB) → Atenea Q3. No duty-cycle limit.
 - MRM is simultaneous (rules), 4 teams → one channel each at 2.4 GHz (at 868 they'd share 250 kHz).
-- Margins at h 0.75 m: **SRI 70 m +27.0 · MRM 260 m +4.4 (thin; +9.3 at 1.0 m) · NM 100 m hop −10 dB obstr. +10.9 dB**.
+- Margins at h 0.75 m with SP4 + one omni (workbook S21–S23): **SRI 70 m +26.0 · MRM 260 m +3.4 (thin; +8.3 at
+  1.0 m) · NM 100 m hop −10 dB obstr. +9.9 dB**. If T0 measures only ~+2 dBm out, every margin drops ~5 dB.
 - NM round is **5 min** (SRI/MRM 2 min); NM file is 0.5 kB.
 
-**Working baseline (2.4 GHz; RT proposal, Santiago delegated the module pick):**
+**Baseline (2.4 GHz; module + antenna DECIDED 13-Oct by Santiago with Marcos):**
 - D-R1b 2400–2483.5 MHz, **250 kbps GFSK in every mode** (goodput ~159 kbps ≫ 67 needed).
-- D-R2b **Ebyte E01-ML01DP5** (genuine nRF24L01P + PA/LNA, SMA) at RF_PWR −18 (~+7 dBm est.) + ≥0.5 dB pad
-  → 10 dBm e.i.r.p.; backup E01-ML01SP4 (SMD, u.FL); never E01C-* (Si24R1 clone).
-- D-R5b **two vertical FR4 patches per box** (front + back walls, separate ~60 × 60 mm boards, vertical pol.),
-  one E01 per patch (selection diversity); patch 37.4 × 28.9 mm, needs a tuning coupon + VNA. QM: 2 dBi whip.
+- D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, 1.27 mm pads, IPEX), one per box,
+  RF_PWR −18 only (+2..+7 dBm est.) → ≤ 9.5 dBm e.i.r.p.; needs a breakout from the first bench test (QM module
+  = final). Not the DP5 (adapter loss), not the 2G4M27D (~12 dBm e.i.r.p.), never E01C-* (Si24R1 clone).
+- D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) plugged into the SP4, vertical, high
+  on a wall. Same antenna for SRI/MRM/NM and QM (antennas can't change between modes). Patches dropped.
 - D-R4 draft: MRM channels RF_CH 24/49/74/82; near-far up to 55 dB at 2 m → ≥10 m between teams' boxes.
 
 **Open decisions:**
-- [ ] RT + PM sign-off of D-R1b/D-R2b/D-R5b
 - [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
 - [ ] D-R3 NM common PHY: rewrite `NM_PHY_PROPOSAL.md` for nRF24
 - [ ] Atenea Q3 (FHSS 100 mW) — worth +10 dB on MRM
 
 **Next up:**
-- [ ] Order by 16-Oct (D-R2b shopping list): 10 × E01-ML01DP5, 2 × E01-ML01SP4, SMA pads 1/2/3 dB, pigtails, 2 whips.
-      Verify EU seller + lead time first. **Do not order the Adafruit RFM69 / Molex parts.**
-- [ ] T0: measure E01 output at RF_PWR −18 (power meter/SA) before any field test; T2 sensitivity at 250 kbps
+- [ ] Order by 16-Oct (D-R2c): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4), 2 × U.FL-to-SMA pigtails.
+      Verify EU seller + lead time first. Not needed: DP5, SMA pads, whips, Adafruit RFM69, 868 Molex.
+- [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
+- [ ] T0: measure SP4 output at RF_PWR −18 (U.FL-to-SMA pigtail into the SA) before any field test; T2 at 250 kbps
 - [ ] Andrian: campus 2.4 GHz survey (eduroam channels at the SRI/MRM/NM sites) — now decides D-R4
-- [ ] Decide the antenna build (D-R5b): two patches (proposed), one omni (−4 dB, MRM +0.4 dB), or patch + omni
-- [ ] Share brief v0.4 / hw v0.3 / pt v0.3 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM channel plan with the teams
-- [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team + two-radio sim scenarios
-- [ ] Patch: tuning-coupon board + VNA session with Prof. Santos; review with Prof. Puente
-- [ ] **ON HOLD (9-Oct):** CST MCP for the patch design. Santiago is asking the radio teacher which CST version
+- [ ] Share brief v0.5 / hw v0.4 / pt v0.3.1 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM channel plan with the teams
+- [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team sim scenario
+- [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is asking the radio teacher which CST version
       the team may install on laptops. Then: review the code of `teslawei/mcp-cst-studio` (live on Windows, or
       offline VBA from WSL) or `woson-L` CST-MCP (CST 2026 Python API) before installing; `mcp-openems` as a
       free cross-check. Nothing installed yet.
-- [ ] Measure the IKEA 365+ box inside dimensions (patch boards need ~62 mm inner height)
-- [ ] Marcos posts `ATENEA_QUESTIONS.md` (Q2 now obsolete; Q3, Q4, Q10 updated)
+- [ ] Measure the IKEA 365+ box inside dimensions (where the omni can sit highest; board outline)
+- [ ] Marcos posts `ATENEA_QUESTIONS.md` (Q2 and Q10 not needed; Q1, Q3, Q4 updated)
 - [ ] Share the protocol proposal with PT (Ibrahim, Guillem, Sofia); PT owner for NM gossip talks
 
 ## Session log
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-13 — Antenna + module decided: one omni on the E01-ML01SP4
+- Santiago and Marcos reviewed the 2.4 GHz options. Antennas can't change between competition modes.
+- Explained why antenna gain matters under the e.i.r.p. cap (RX gain is free; the E01 can't fill the cap
+  with a low-gain antenna; patches also reject neighbours sideways). Vistronica VIS1797 (generic
+  NRF24L01+PA+LNA, Colombian shop): drop-in but unverified chip and optimistic −104 dBm; not added.
+- Fixed-antenna comparison: patches risk NM (aiming, rim corner, tuning); one omni is simplest. The
+  E01-2G4M27D (−99 dBm) was rejected by Santiago: ~+9 dBm floor + 3 dBi antenna exceeds 10 dBm.
+- **Decided (Santiago, with Marcos): one Molex 146153-0100 flex omni + one Ebyte E01-ML01SP4 per box**
+  (D-R2c, D-R5c). SP4 datasheet: −96 dBm @250k, +20 dBm max, 120/26 mA, IPEX on the module.
+  Margins: SRI +26.0, MRM +3.4 (+8.3 at 1.0 m), NM +9.9 dB (S21–S23; workbook 0 diff).
+- Firmware: power clamp (init refuses, write_reg clamps RF_PWR above −18 dBm), 124 checks. phy_config: SP4 + omni
+  at 3 dBi peak ≤ 9.5 dBm e.i.r.p.; BENCH_WHIP dropped. Docs: HANDOFF_ET v0.3, KiCad brief (one SP4, no patches),
+  TEST_PLAN v0.3, Atenea Q10 not needed. Pages: brief v0.5, hw v0.4, pt v0.3.1 republished; PDFs re-exported.
+- **Start next session with:** order placed? who builds the SP4 breakout? CST answer from the radio teacher.
 
 ### 2026-10-09 (evening) — 2.4 GHz port finished
 - Santiago asked to finish the "Next up" and how a single omni for RX/TX would look.
