@@ -12,6 +12,7 @@ typedef struct {
     int present;            /* 0 = "stick unplugged" */
     int32_t fail_after;     /* < 0: never; else writes fail once this many more sectors were written */
     uint32_t writes, reads;
+    uint32_t offset;        /* expose only sectors from here on (to format one partition of a bigger image) */
 } ramdisk_t;
 
 int ramdisk_init(ramdisk_t *r, uint32_t sectors);

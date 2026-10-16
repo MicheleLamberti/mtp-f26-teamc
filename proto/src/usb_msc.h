@@ -5,6 +5,9 @@
  * received (and the NM relay log) back to a stick, within 3 minutes. The stick plugs into the box's
  * USB-A port; on the Pico 2 that port is a USB host (TinyUSB + Pico-PIO-USB, port/pico/usb_msc_pico.c).
  *
+ * Sticks from any computer: FAT12/16/32 and exFAT, MBR (Windows, most factory sticks) or GPT (macOS Disk
+ * Utility) partition tables, UTF-8 file names. NTFS, APFS and HFS+ are not readable: bring FAT32/exFAT sticks.
+ *
  * This file is the portable half: FAT/exFAT through ChaN's FatFs (third_party/fatfs, R0.15a), the
  * input-file choice, chunked transfers to/from a sink/source (the flash store on the Pico, a buffer in
  * the tests) and a read-back CRC check after every write. The block device is a small vtable
@@ -44,6 +47,7 @@ typedef enum {
     USBM_FULL,       /* the stick is full */
     USBM_IO,         /* read/write error, or the sink/source failed */
     USBM_VERIFY,     /* read-back CRC differs from what we wrote */
+    USBM_READ_ONLY,  /* the stick is write-protected */
 } usbm_status_t;
 
 const char *usbm_strerror(usbm_status_t st);

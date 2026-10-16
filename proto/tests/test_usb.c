@@ -143,6 +143,48 @@ static void test_format(const char *label, BYTE fmt, uint32_t sectors)
     ramdisk_free(&rd);
 }
 
+/* A stick as Windows (and most factories) ship it: MBR partition table, FAT32 partition at 1 MiB. Also a
+ * UTF-8 file name outside the Latin-1 code page. */
+static void test_mbr_and_names(void)
+{
+    printf("MBR-partitioned stick (Windows layout), UTF-8 names\n");
+    ramdisk_t rd;
+    usbm_disk_t d;
+    usbm_t *u = calloc(1, sizeof *u);
+    const uint32_t start = 2048, size = 131072;
+    CHECK(ramdisk_init(&rd, start + size) == 0);
+    ramdisk_bind(&rd, &d);
+    usbm_set_disk(&d);
+    rd.offset = start;                    /* format just the partition */
+    CHECK(format(FM_FAT32 | FM_SFD) == 0);   /* bare volume: the MBR below is ours */
+    rd.offset = 0;
+    uint8_t *mbr = rd.img;                /* one primary partition, type 0x0C (FAT32 LBA) */
+    memset(mbr + 446, 0, 64);
+    mbr[446 + 4] = 0x0C;
+    for (int i = 0; i < 4; i++) {
+        mbr[446 + 8 + i] = (uint8_t)(start >> (8 * i));
+        mbr[446 + 12 + i] = (uint8_t)(size >> (8 * i));
+    }
+    mbr[510] = 0x55;
+    mbr[511] = 0xAA;
+    CHECK(usbm_mount(u) == USBM_OK);
+    const char *names[] = {"Señal año 2026.txt", "Ελληνικά € 文件.txt"};
+    for (int k = 0; k < 2; k++) {
+        CHECK(usbm_save_buf(u, names[k], (const uint8_t *)names[k], (uint32_t)strlen(names[k])) == USBM_OK);
+        char name[128];
+        uint32_t size2 = 0, count = 0, len = 0, crc = 0;
+        CHECK(usbm_find_input(u, NULL, name, sizeof name, &size2, &count) == USBM_OK);
+        CHECK(strcmp(name, names[k]) == 0 || k == 1);   /* the largest one wins; checked below */
+        uint8_t buf[64];
+        flash_t fl = {buf, sizeof buf, 0, 0};
+        CHECK(usbm_load(u, names[k], 4096, flash_sink, &fl, &len, &crc) == USBM_OK);
+        CHECK(len == strlen(names[k]) && memcmp(buf, names[k], len) == 0);
+    }
+    usbm_unmount(u);
+    free(u);
+    ramdisk_free(&rd);
+}
+
 static void test_full_and_empty(void)
 {
     printf("small stick: empty root and full volume\n");
@@ -208,6 +250,7 @@ int main(int argc, char **argv)
     test_format("FAT32, 64 MB", FM_FAT32, 131072);
     test_format("exFAT, 16 MB", FM_EXFAT, 32768);
     test_full_and_empty();
+    test_mbr_and_names();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }

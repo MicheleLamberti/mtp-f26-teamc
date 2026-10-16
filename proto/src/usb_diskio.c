@@ -18,10 +18,15 @@ DSTATUS disk_status(BYTE pdrv)
 
 DSTATUS disk_initialize(BYTE pdrv) { return disk_status(pdrv); }
 
+/* FF_LBA64 is on for GPT sticks; our block devices address 32-bit LBAs (sticks up to 2 TB). */
+static int lba_ok(LBA_t sector, UINT count) { return (uint64_t)sector + count <= 0xFFFFFFFFull; }
+
 DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 {
     if (disk_status(pdrv))
         return RES_NOTRDY;
+    if (!lba_ok(sector, count))
+        return RES_PARERR;
     return disk->read(disk->ctx, buff, (uint32_t)sector, (uint32_t)count) ? RES_ERROR : RES_OK;
 }
 
@@ -29,6 +34,8 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
 {
     if (disk_status(pdrv))
         return RES_NOTRDY;
+    if (!lba_ok(sector, count))
+        return RES_PARERR;
     return disk->write(disk->ctx, buff, (uint32_t)sector, (uint32_t)count) ? RES_ERROR : RES_OK;
 }
 

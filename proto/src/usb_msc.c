@@ -25,6 +25,7 @@ const char *usbm_strerror(usbm_status_t st)
     case USBM_FULL: return "stick full";
     case USBM_IO: return "I/O error";
     case USBM_VERIFY: return "read-back mismatch";
+    case USBM_READ_ONLY: return "stick write-protected";
     }
     return "?";
 }
@@ -38,6 +39,7 @@ static usbm_status_t map(FRESULT fr)
     case FR_NO_FILE:
     case FR_NO_PATH: return USBM_NO_FILE;
     case FR_DENIED: return USBM_FULL;   /* f_write/f_open on a full volume or directory */
+    case FR_WRITE_PROTECTED: return USBM_READ_ONLY;
     default: return USBM_IO;
     }
 }

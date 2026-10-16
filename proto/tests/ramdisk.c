@@ -26,6 +26,7 @@ static int rd_ready(void *ctx) { return ((ramdisk_t *)ctx)->present; }
 static int rd_read(void *ctx, uint8_t *buf, uint32_t lba, uint32_t count)
 {
     ramdisk_t *r = ctx;
+    lba += r->offset;
     if (lba + count > r->sectors)
         return -1;
     memcpy(buf, r->img + (size_t)lba * 512u, (size_t)count * 512u);
@@ -36,6 +37,7 @@ static int rd_read(void *ctx, uint8_t *buf, uint32_t lba, uint32_t count)
 static int rd_write(void *ctx, const uint8_t *buf, uint32_t lba, uint32_t count)
 {
     ramdisk_t *r = ctx;
+    lba += r->offset;
     if (lba + count > r->sectors)
         return -1;
     if (r->fail_after >= 0) {
@@ -54,7 +56,7 @@ static int rd_sync(void *ctx)
     return 0;
 }
 
-static uint32_t rd_count(void *ctx) { return ((ramdisk_t *)ctx)->sectors; }
+static uint32_t rd_count(void *ctx) { return ((ramdisk_t *)ctx)->sectors - ((ramdisk_t *)ctx)->offset; }
 
 void ramdisk_bind(ramdisk_t *r, usbm_disk_t *d)
 {
