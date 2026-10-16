@@ -45,7 +45,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   rebuilt row for row (Ground Multipath inlined), course example as a check + SRI/MRM/NM baseline sheets.
 - `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`, and `TEAM_FHSS`
   = the SRI/MRM baseline since 16-Oct, D-R6), UN-85 b checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm,
-  MRM plan spacing) and EN 300 328 adaptive-FHSS checks for `TEAM_FHSS` (29-channel hop set, COT/idle/CCA, RPD
+  MRM plan spacing) and EN 300 328 adaptive-FHSS checks for `TEAM_FHSS` (27-channel hop set, COT/idle/CCA, RPD
   threshold vs the LBT level); regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`, `…_FHSS`, the
   hop order). `E01_PA_GAIN_DB` and `SP4_LNA_GAIN_DB` are estimates until T0/T17.
 - `radio/fw/` — portable C99 nRF24L01+ driver behind a HAL (DPL + NOACK frames, RF_CH ≤ 83, RPD),
