@@ -40,6 +40,19 @@ Check the pad drawing (1.27 mm pitch, pad 0.8 × 1.5 mm per the manual) before m
 - **D-R6 (baseline since 16-Oct):** SRI/MRM hop at up to 20 dBm e.i.r.p., so the same SP4 runs at RF_PWR −12
   or −6 and TX bursts move toward the datasheet's **120 mA**. Same parts; size the LDO,
   the bulk capacitor and the battery path for 120 mA peaks (they already are). No hardware change.
+- **Low battery (16-Oct): the LDO is fine, plus four countermeasures.** The LDO regulates 3.3 V down to a cell
+  of ~3.4 V (pick a part with **dropout ≤ 0.1 V at 150 mA**: AP2112K-3.3 and TLV75533 both qualify). Below that it
+  passes the cell through, ≥ 2.95 V at the cell's 3.0 V protection cutoff, still inside the SP4's 2.0–3.6 V. A Li-ion
+  cell spends ~90 % of its charge above 3.4 V at our load. An LDO after the 5 V boost (~60 % efficient overall, boost
+  ripple at the PA) or a 5 V battery (2S pack or power bank) would be worse.
+  1. **Battery sense:** use an **ideal diode** (e.g. LM66100) instead of the Schottky between the switched battery and
+     VSYS, so ADC3 (GP29 = VSYS/3) reads the cell directly. With a Schottky, firmware subtracts its ~0.3 V drop.
+  2. **Firmware thresholds** (cell voltage, radio idle): ≥ 3.5 V normal · 3.4–3.5 V status-LED warning "charge before
+     the next round" · < 3.4 V at setup: loud warning (never block or stop a round) · < 3.2 V during a round: write the
+     received data and progress to flash after every burst, so a brown-out loses nothing.
+  3. **T0** measures the SP4 output with its VCC at 3.6, 3.3 and 3.0 V (`TEST_PLAN.md`).
+  4. **Alternative if T0 shows > 2 dB less output at 3.0 V:** a buck-boost (TPS63001 / TPS63020) holds 3.3 V down to
+     ~2.5 V at 90–95 %, but needs a ferrite + 10 µF filter at the module and careful layout (switching ripple).
 
 ## What the micro needs (radio side only)
 

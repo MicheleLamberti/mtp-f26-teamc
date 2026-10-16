@@ -60,18 +60,18 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 = written confirmation of the 20 dBm the professor approved).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.7 published 16-Oct: 20 dBm hopping is the SRI/MRM baseline, ≥ 15 m near-far table).
+  republish to the same URL (v0.7.1 published 16-Oct: 20 dBm hopping is the SRI/MRM baseline, ≥ 15 m near-far table, low-battery note).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (v0.4.2 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
-  hopping at 20 dBm needs no hardware change, TX bursts toward 120 mA).
+  — source `radio/hw_proposal.html` (v0.4.3 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
+  hopping at 20 dBm needs no hardware change, TX bursts toward 120 mA; low-battery countermeasures).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip, codec) and the PC
   simulator (`sim/`, `--fhss BUSY` = the SRI/MRM hopping radio layer): `make -C proto test` (13 scenarios, ~1 s).
   See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3.3 16-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results;
-  SRI/MRM hop: slot clock + acquisition now required from PT).
+  — source `radio/pt_proposal.html` (v0.3.4 16-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results;
+  SRI/MRM hop: slot clock + acquisition now required from PT; battery check in ui/store).
 - PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, headless Chromium from
   `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the 16-Oct export
   script lived in the job scratch dir — recreate if needed). No poppler here: check PDFs with pypdf text.
@@ -92,7 +92,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   never present its choices as team decisions.
 - Treat anything not in the Project Definition or confirmed by Santiago as a proposal.
 - Git repo: https://github.com/SantiBarrios2002/mtp-f26-teamc (public, created 9-Oct-26). Early commits
-  may go straight to main (Santiago, 9-Oct); never force-push. `docs/` is
+  may go straight to main (Santiago, 9-Oct); never force-push. **Keep one branch, `main`** (Santiago, 16-Oct): a
+  session that works in a worktree branch fast-forwards `main` to it at the end and deletes the branch. `docs/` is
   git-ignored (copyrighted course material). Put PDF exports of the pages in `briefs/` too.
 
 ## Status (keep current)
@@ -114,6 +115,9 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). Written conf
 - **Near-far at MRM:** our 20 dBm box lands 51.9 dB over a 10 mW neighbour's partner at 10 m (selectivity −50 dB at
   our nearest hop, 6 MHz): **≥ 15 m between our boxes and theirs** (10 m OK at −12 or if they go to 20 dBm too).
 - NM round is **5 min** (SRI/MRM 2 min); NM file is 0.5 kB. No duty-cycle limit anywhere in 2.4 GHz.
+- Power: radio 3.3 V LDO straight from the 3.0–4.2 V cell is fine (dropout ≤ 0.1 V at 150 mA; below ~3.4 V it passes
+  the cell through, ≥ 2.95 V at cutoff). Countermeasures in `HANDOFF_ET.md`: ideal diode → ADC3 battery sense,
+  firmware thresholds (3.5 / 3.4 / 3.2 V), T0 at 3.6/3.3/3.0 V, buck-boost fallback. Not after the 5 V boost.
 
 **Baseline (2.4 GHz):**
 - D-R1b 2400–2483.5 MHz, **250 kbps GFSK in every mode**.
@@ -141,7 +145,7 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). Written conf
 - [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
 - [ ] T0: measure SP4 output at all four RF_PWR steps (U.FL-to-SMA pigtail, ≥ 30 dB pad) before any field test; T2
 - [ ] Andrian: campus 2.4 GHz survey (eduroam channels at the SRI/MRM/NM sites) — now decides D-R4
-- [ ] Share brief v0.7 / hw v0.4.2 / pt v0.3.3 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM plan (we hop) with the teams
+- [ ] Share brief v0.7.1 / hw v0.4.3 / pt v0.3.4 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM plan (we hop) with the teams
 - [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team sim scenario
 - [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is asking the radio teacher which CST version
       the team may install on laptops. Then: review the code of `teslawei/mcp-cst-studio` (live on Windows, or
@@ -155,6 +159,15 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). Written conf
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-16 (end) — low-battery countermeasures; everything on `main`
+- Santiago asked whether a 3.3 V LDO works from a 3.0–4.2 V cell, or should sit after the 5 V boost / use a 5 V
+  battery. Answer: LDO from the cell is right (after the boost ~60 % efficient + ripple at the PA; no 5 V cell).
+- Santiago: add the countermeasures to the docs anyway and keep one branch (`main`). Added to HANDOFF_ET (Power),
+  TEST_PLAN T0 (output at 3.6/3.3/3.0 V), KiCad brief (ideal diode LM66100, LDO dropout spec, low-battery row,
+  buck-boost option), pages brief v0.7.1 / hw v0.4.3 / pt v0.3.4 (battery check in ui/store); PDFs re-exported.
+- Branch `worktree-fhss-20dbm` fast-forwarded into `main` and deleted on GitHub.
+- **Start next session with:** written yes on Atenea? order placed? T0 at all four steps and at 3.0 V; teams told (≥ 15 m)?
 
 ### 2026-10-16 (later) — 20 dBm hopping made the SRI/MRM baseline
 - Santiago: a professor said yes to 20 dBm e.i.r.p. → make D-R6 the baseline (not a draft). Atenea Q3 now asks for

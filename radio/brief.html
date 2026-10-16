@@ -113,7 +113,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team</div>
   <h1>Radio brief: band, module and link budget</h1>
-  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.7 · Fri 16 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.7.1 · Fri 16 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
   <p class="lede"><b>New in v0.7 (16 Oct): 20 dBm e.i.r.p. is the baseline for SRI and MRM.</b> A professor said yes to 20 dBm. For our narrowband radio that is allowed only as a <b>frequency-hopping radio with listen-before-talk</b> (CNAF UN-85 a), EN 300 328 adaptive FHSS), so SRI and MRM now hop with the same SP4 and omni: <b>+10.5 dB on every link</b>, MRM 260 m <b>+13.9 dB</b>. NM stays at 10 mW on channel 80; Quick Mode uses the 10 mW channel too. Our hops now keep ≥ 6 MHz from the other teams, and our boxes need ≥ 15 m from theirs while they stay at 10 mW. See <a href="#s-fhss">20 dBm with frequency hopping</a>.</p>
   <p class="lede"><b>New in v0.5 (decided 13 Oct, Santiago with Marcos):</b> <b>one omni antenna per box on the Ebyte E01-ML01SP4</b>. Antennas cannot change between the competition modes, and the patches' risks in NM (aiming, the rim corner, tuning) outweighed their +1 dB on MRM. The SP4 has the antenna socket on the module, so the flex omni plugs straight in. Shopping list updated below.</p>
   <p class="lede"><b>New in v0.4:</b> all four teams agreed to run <b>every mode at 2.4 GHz</b>, so 868 MHz is dropped. The radio is now the <b>Ebyte E01-ML01DP5</b> (Nordic nRF24L01+ with PA and LNA) at 250 kbps, with <b>two patch antennas</b> per box and our own channel in MRM. <b>Do not order the Adafruit RFM69 or the Molex antennas</b>; the new shopping list is below. <b>Order by Fri 16 Oct.</b></p>
@@ -419,7 +419,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="tbl"><table>
     <thead><tr><th>Pin</th><th>At the micro</th><th>What matters</th></tr></thead>
     <tbody>
-      <tr><td class="mono">VCC, GND</td><td>supply</td><td><b>2.0–3.6 V only</b>, never the battery rail (a Li-ion cell reaches 4.2 V). Use a dedicated 3.3 V LDO for the radio (≥ 300 mA), and 100 µF + 10 µF + 100 nF at the module. 120 mA in TX, 26 mA in RX.</td></tr>
+      <tr><td class="mono">VCC, GND</td><td>supply</td><td><b>2.0–3.6 V only</b>, never the battery rail (a Li-ion cell reaches 4.2 V). Use a dedicated 3.3 V LDO for the radio (≥ 300 mA, dropout ≤ 0.1 V at 150 mA) straight from the cell: it regulates down to ~3.4 V and then passes the cell through (≥ 2.95 V at cutoff, fine for the SP4). Battery sense on ADC3 with an ideal diode into VSYS; firmware warns below 3.5 V, and 100 µF + 10 µF + 100 nF at the module. 120 mA in TX, 26 mA in RX.</td></tr>
       <tr><td class="mono">SCK MOSI MISO</td><td>SPI master</td><td>Mode 0, MSB first, ≤ 10 MHz.</td></tr>
       <tr><td class="mono">CSN</td><td>GPIO out</td><td>Chip select, active low.</td></tr>
       <tr><td class="mono">CE</td><td>GPIO out</td><td>High = receive; a ≥ 10 µs pulse sends one frame.</td></tr>

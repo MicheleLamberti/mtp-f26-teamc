@@ -15,9 +15,9 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 
 | Document | For |
 |---|---|
-| [`briefs/TeamC Radio Brief v0.7.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6), link budget, test plan |
-| [`briefs/TeamC Hardware Proposal v0.4.2.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power |
-| [`briefs/TeamC Protocol Proposal v0.3.3.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
+| [`briefs/TeamC Radio Brief v0.7.1.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6), link budget, test plan |
+| [`briefs/TeamC Hardware Proposal v0.4.3.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power |
+| [`briefs/TeamC Protocol Proposal v0.3.4.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status and session log (kept up to date each session) |
 
 ## Layout

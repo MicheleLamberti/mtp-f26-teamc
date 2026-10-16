@@ -121,7 +121,8 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.2 · Fri 16 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.3 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.4.3 (16 Oct):</b> low-battery countermeasures. The radio's 3.3 V LDO runs straight from the 3.0–4.2 V cell and that is fine (see <a href="#s-power">Power budget</a>); we added an ideal diode for battery sensing, firmware thresholds, a T0 check at 3.0 V and a buck-boost fallback.</p>
   <p class="lede"><b>New in v0.4.2 (16 Oct):</b> a professor approved <b>20 dBm e.i.r.p.</b>, so SRI and MRM now run as a frequency-hopping radio at up to 20 dBm (+10.5 dB on the links). <b>No hardware change</b>: same SP4, same omni. The radio's TX bursts move toward the datasheet's <b>120 mA</b> in every SRI/MRM round, which the radio LDO, the 100 µF at the module and the battery path below already cover. Keep them sized for 120 mA.</p>
   <p class="lede"><b>New in v0.4 (decided 13 Oct):</b> <b>one Ebyte E01-ML01SP4</b> per box (nRF24L01+ with PA and LNA, surface-mount, antenna socket on the module) and <b>one flex omni antenna</b> plugged straight into it. No patch boards, no second radio. The SP4 is SMD, so it needs a small breakout from the first bench test.</p>
   <p class="lede">The radio baseline is 2.4 GHz with the nRF24L01+. Under our split, the electronics team picks the micro and designs the board. This page is the radio team's <b>suggestion</b>, built around every hardware rule in the competition PDF, to save you time. It is not a decision. Please challenge it.</p>
@@ -217,7 +218,7 @@ flowchart LR
       <tr><td>Battery</td><td>1 × protected 18650 Li-ion (~2500 mAh) with solder tabs, or holder + strap</td><td>Steel can is robust in the drop test; rechargeable (sustainability report)</td><td class="num r">6–8</td></tr>
       <tr><td>Charger</td><td>MCP73831 (or TP4056) + USB-C receptacle, charge only</td><td>Charge between rounds without opening the box. Nothing is plugged in during operation</td><td class="num r">1.2</td></tr>
       <tr><td>Controls</td><td>Slide power switch, panel Tx/Rx pushbutton, optional mode switch, 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
-      <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533) + 100 µF / 10 µF / 100 nF at the module; 100 µF on USB VBUS</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts and stick inrush</td><td class="num r">1</td></tr>
+      <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533, dropout ≤ 0.1 V at 150 mA) + 100 µF / 10 µF / 100 nF at the module; 100 µF on USB VBUS</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts and stick inrush</td><td class="num r">1</td></tr>
       <tr><td>PCB</td><td>2-layer carrier, ≤ 100 × 80 mm</td><td>ETSETB lab = €15 in the BoM (rule); an external fab is ~€1 per board but adds 1–2 weeks</td><td class="num r">1–15</td></tr>
       <tr><td>Mechanics</td><td>M3 nylon standoffs, base plate, cable ties, hot glue, IKEA 365+ box</td><td>Drop test; the BoM must list them too</td><td class="num r">5–7</td></tr>
       <tr><td class="total" colspan="3">Total per device (verify with quotes)</td><td class="num r total">≈ 30–55</td></tr>
@@ -239,6 +240,14 @@ flowchart LR
     <div class="card"><h3>Battery sizing</h3>
       <p>A sending round averages about 150 mA. Idle with the radio listening is about 70 mA. A full competition day of ~4 hours powered on needs about <b>300–600 mAh</b>.</p>
       <p>One 2500 mAh 18650 covers that about four times over. A smaller LiPo would also do, but pouch cells are more fragile in the drop test.</p></div>
+    <div class="card"><h3>Low battery: the LDO is fine</h3>
+      <p>The LDO gives a clean 3.3 V down to a cell of about 3.4 V (dropout ≤ 0.1 V at 150 mA). Below that it passes the cell through: about 2.95 V at the 3.0 V cutoff, still inside the SP4's 2.0–3.6 V. The cell spends ~90 % of its charge above 3.4 V. An LDO after the 5 V boost (~60 % efficient, boost ripple at the radio) or a 5 V battery would be worse.</p>
+      <ul>
+        <li><b>Battery sense:</b> an ideal diode (e.g. LM66100) instead of the Schottky into VSYS, so ADC3 reads the cell.</li>
+        <li><b>Firmware:</b> ≥ 3.5 V normal; 3.4–3.5 V warning LED; below 3.4 V at setup a loud warning (never block a round); below 3.2 V write received data to flash after every burst.</li>
+        <li><b>T0</b> measures the radio output at 3.6, 3.3 and 3.0 V.</li>
+        <li><b>Fallback:</b> a buck-boost (TPS63001/TPS63020) if T0 shows more than 2 dB less output at 3.0 V; it needs a filter at the module.</li>
+      </ul></div>
     <div class="card"><h3>For the sustainability report</h3>
       <p>We can measure watts per round directly on this design. The parts are rechargeable and RoHS. The modules unsolder and can be reused, and the board shape lets you repair rather than replace.</p></div>
   </div>
@@ -264,7 +273,7 @@ flowchart LR
     <tbody>
       <tr><td>PIO-USB host fails with some USB sticks</td><td>Test 3–4 different sticks in stage 1. The RP2350's native USB can also be a host, so a second path exists on the same chip.</td></tr>
       <tr><td>The foil-wrapped setup makes the USB port hard to reach</td><td>Put the port on a side wall. Ask on Atenea whether the foil may be opened at the port during the 5-min setup.</td></tr>
-      <tr><td>Brown-out or noise during radio TX</td><td>Separate radio LDO and bulk capacitance at each module; check the battery at low charge (3.3 V) in stage 3.</td></tr>
+      <tr><td>Brown-out or noise during radio TX</td><td>Separate radio LDO and bulk capacitance at each module; battery sense on ADC3 with firmware thresholds; check the radio at 3.0 V in T0 and the box at low charge in stage 3.</td></tr>
       <tr><td>Clone radio chips (Si24R1)</td><td>Buy only the plain E01-ML01SP4 part number from Ebyte's store or a distributor; T0/T2 check the chip.</td></tr>
       <tr><td>SMD module needs a breakout before any PCB exists</td><td>A one-evening lab board (or careful wiring) in stage 1; the carrier PCB takes over in stage 3.</td></tr>
       <tr><td>Drop test breaks a joint or ejects the battery</td><td>No sockets; standoffs; strapped cell; drop rev A on purpose in week 9.</td></tr>
@@ -285,7 +294,7 @@ flowchart LR
 </section>
 
 <footer>
-  <p>Radio details (interface pins, channel plan, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.7. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Radio details (interface pins, channel plan, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.7.1. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>Sources checked 7 Oct 2026: <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> (USB host/device via PIO, RP2040 and RP2350) · <a href="https://www.cnx-software.com/2024/08/08/raspberry-pi-pico-2-raspberry-pi-rp2350-dual-core-risc-v-or-arm-cortex-m33-microcontroller/">Pico 2 specs</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>

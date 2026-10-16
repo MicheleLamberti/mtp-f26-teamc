@@ -127,7 +127,8 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.3 · Fri 16 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.4 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.3.4 (16 Oct):</b> a battery check for the <span class="mono">ui</span> and <span class="mono">store</span> modules: read the cell on ADC3, warn below 3.5 V, warn loudly below 3.4 V at setup (never block a round), and below 3.2 V write received data to flash after every burst so a brown-out loses nothing.</p>
   <p class="lede"><b>New in v0.3.3 (16 Oct): SRI and MRM hop.</b> A professor approved 20 dBm e.i.r.p., which our radio may use only while <b>hopping</b> every 25 ms over 27 channels and <b>listening before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things are now <b>required</b> on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop, and Quick Mode can stay on one fixed channel at 10 mW.</p>
   <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01SP4, one per box, one omni antenna; decided 13 Oct) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
   <p class="lede">The radio team has fixed the physical layer: 2.4 GHz, nRF24L01+, 250 kbps, with a tested driver. Everything above it belongs to protocols &amp; software. This is a starting <b>proposal</b> built from the competition rules and our link numbers, to speed you up. It is not a decision. Please change whatever you see better.</p>
@@ -295,10 +296,10 @@ sequenceDiagram
       <tr><td class="mono">link</td><td>core 1</td><td>Frames, bursts, ACK bitmap, timeouts</td><td>PT</td></tr>
       <tr><td class="mono">session</td><td>core 1</td><td>HELLO / resume / END, role from the switch</td><td>PT</td></tr>
       <tr><td class="mono">codec</td><td>core 0</td><td>miniz deflate at setup; inflate on the receiver</td><td>PT</td></tr>
-      <tr><td class="mono">store</td><td>core 0</td><td>Raw flash region (~3 MB) for the file sent and the file received, with a progress record</td><td>PT</td></tr>
+      <tr><td class="mono">store</td><td>core 0</td><td>Raw flash region (~3 MB) for the file sent and the file received, with a progress record; below 3.2 V flush after every burst</td><td>PT</td></tr>
       <tr><td class="mono">usb_msc</td><td>core 0</td><td>TinyUSB host + PIO-USB + FatFs: copy the stick's .txt to flash, write the result back</td><td>PT</td></tr>
       <tr><td class="mono">nm_gossip</td><td>core 1</td><td>Trickle timers, chunk store</td><td>PT</td></tr>
-      <tr><td class="mono">ui</td><td>core 0</td><td>Button, role and mode switches, LED patterns (the rules require a blinking pilot light)</td><td>PT</td></tr>
+      <tr><td class="mono">ui</td><td>core 0</td><td>Button, role and mode switches, LED patterns (the rules require a blinking pilot light); battery check on ADC3 (≥ 3.5 V ok, 3.4–3.5 V warning pattern, &lt; 3.4 V at setup loud warning, never block a round)</td><td>PT</td></tr>
     </tbody>
   </table></div>
   <div class="callout">Pico pitfall: erasing or writing flash stalls code that runs from flash on <b>both</b> cores. Keep the radio loop in RAM (<span class="mono">__not_in_flash_func</span>), buffer received data in RAM, and write flash in 4 KB sectors between bursts. Test this early, because it is the classic way to lose a round.</div>
@@ -360,7 +361,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Related pages: Team C Radio Brief v0.7 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.2 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Related pages: Team C Radio Brief v0.7.1 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.3 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
 </footer>
 </div>

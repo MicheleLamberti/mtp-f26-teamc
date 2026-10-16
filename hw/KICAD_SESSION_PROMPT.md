@@ -44,8 +44,9 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
 | 5 V for the stick | **TPS61023** boost (or equivalent) + current-limited switch **TPS2051B / AP2552** (≈500 mA), enabled by a GPIO; FAULT to a GPIO | Only on while loading or saving the file. 100 µF + 100 nF on VBUS |
 | Battery | 1 × **protected 18650** Li-ion in a holder with strap/zip-tie slots | Drop test |
 | Charger | **MCP73831-2** (4.2 V), RPROG for ~500 mA, from a **charge-only USB-C** receptacle (CC1/CC2 5.1 kΩ to GND, no data) | Charge LED; TVS on its VBUS |
-| Power path | Battery → **slide switch** (panel) → Schottky or ideal diode → Pico **VSYS** | Follow the Pico datasheet's "external supply on VSYS" guidance: the Pico has its own VBUS→VSYS diode for USB programming |
-| Radio supply | **Dedicated 3.3 V LDO** (AP2112K-3.3 or TLV75533, ≥ 300 mA) from the switched battery rail; **100 µF + 10 µF + 100 nF at the module** | SP4 VCC is 2.0–3.6 V, abs. max 3.6 V (never the 4.2 V battery). ~120 mA TX peak. PA/LNA modules are supply-noise sensitive: short, wide VCC/GND, keep away from the 5 V boost |
+| Power path | Battery → **slide switch** (panel) → **ideal diode (LM66100, preferred)** or Schottky → Pico **VSYS** | Follow the Pico datasheet's "external supply on VSYS" guidance: the Pico has its own VBUS→VSYS diode for USB programming. The ideal diode lets ADC3 read the cell directly (a Schottky drops ~0.3 V) |
+| Radio supply | **Dedicated 3.3 V LDO** (AP2112K-3.3 or TLV75533, ≥ 300 mA, **dropout ≤ 0.1 V at 150 mA**) from the switched battery rail; **100 µF + 10 µF + 100 nF at the module** | SP4 VCC is 2.0–3.6 V, abs. max 3.6 V (never the 4.2 V battery). ~120 mA TX peak. PA/LNA modules are supply-noise sensitive: short, wide VCC/GND, keep away from the 5 V boost |
+| Low battery | No extra parts: ADC3 battery sense + firmware thresholds (≥ 3.5 V ok, 3.4–3.5 V warn, < 3.2 V flush data to flash every burst) | Below ~3.4 V the LDO passes the cell through (≥ 2.95 V at cutoff, SP4 fine to 2.0 V). Leave room for a **buck-boost option** (TPS63001/TPS63020 + ferrite/10 µF at the module) in case T0 shows > 2 dB less output at 3.0 V |
 | UI | Tx/Rx pushbutton, TX/RX role switch, SRI/MRM↔NM mode switch, activity LED (blinks), status LED | Switches/button at the board edge; RC + ESD on button lines |
 | Debug | UART0 header (GP0/GP1 + GND), Pico SWD accessible, test points | Test points: VBAT, VSYS, 3V3, 5V_USB, GND |
 
@@ -68,7 +69,7 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
 | GP6 | Activity LED (blinks in Tx/Rx, rule) | |
 | GP7 | Status LED | |
 | GP27 | MCP73831 STAT | with pull-up |
-| GP29 / ADC3 | VSYS/3 (internal on the Pico) | battery voltage, no extra divider |
+| GP29 / ADC3 | VSYS/3 (internal on the Pico) | battery voltage: the cell with an ideal diode, cell − ~0.3 V with a Schottky; no extra divider |
 | GP0 / GP1 | UART0 TX/RX debug header | |
 
 The radio driver (`radio/fw/nrf24.h`) only needs SPI + CSN + CE (+ IRQ) + a microsecond clock, so

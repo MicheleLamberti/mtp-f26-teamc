@@ -29,7 +29,10 @@ pad, frames sent/received.
    the gain into `E01_PA_GAIN_DB` (`phy_config.py`) and `p_pa_dbm` (`linkbudget.py`). Fixed channel:
    output + cable + antenna peak gain ≤ 10 dBm at −18. **D-R6:** `phy_config.py` then picks the highest
    step with output − 0.5 + 3 ≤ 20 dBm (−6 if the gain is ≤ 23.5 dB, else −12). Also log the supply
-   current at each step (radio LDO budget) and repeat at 3.3 V supply (low battery).
+   current at each step (radio LDO budget). **Low battery:** repeat the highest legal step with the SP4's VCC at
+   3.6, 3.3 and 3.0 V from the bench supply (3.0 V ≈ the radio rail at the cell's cutoff through the LDO). If the
+   output drops > 2 dB at 3.0 V, raise the firmware low-battery threshold or switch to the buck-boost option
+   (`HANDOFF_ET.md`, Power).
 3. Clone check: the chip marking says nRF24L01P (Nordic), and the TX/RX current at the bench supply
    matches the E01 datasheet. A Si24R1 clone usually shows a different current and a weaker T2.
 4. Two boxes 1 m apart, `TEAM_250K`, flex antennas fitted: 1 000 frames of 32 B. Pass: ≥ 999 received.
