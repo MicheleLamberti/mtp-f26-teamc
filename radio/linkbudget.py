@@ -238,8 +238,9 @@ NRF24_CI_250K = {0: 12, 1: -12, 2: -33, 3: -38, 6: -50, 25: -60}
 # channels 1/6/11 at 25 MHz spacing, the fourth at the band edge, 8 MHz from its neighbour.
 MRM_CHANNELS = [24, 49, 74, 82]
 
-# D-R6: Team C hops in SRI/MRM and gives up its fixed channel (RF_CH 74, TEAM_CH in phy_config.py); the other
-# three teams keep 24/49/82. Our hop set avoids them by >= 6 MHz (C/I -50 dB or better).
+# D-R6: Team C hops in SRI/MRM (its fixed RF_CH 74, TEAM_CH in phy_config.py, stays for QM and the fallback).
+# Since 16-Oct every team uses 20 dBm, so every team hops: the fixed plan above is history and teams share the
+# band by LBT, with >= 10 m between boxes. The near-far printout estimates how often random hops collide.
 # The list and the EN 300 328 checks live in phy_config.py (FHSS_*); here only what the budget needs.
 FHSS_SLOT_MS = 25.0          # dwell per hop = one 16-frame SR-ARQ window (~22 ms) + guard
 FHSS_HOP_OVERHEAD_MS = 0.30  # PLL settle 130 us + RPD needs >= 170 us in RX (= the CCA) before TX
@@ -302,7 +303,7 @@ def report() -> None:
 
     mrm = next(s for s in SCENARIOS if s.name.startswith("MRM") and "10 mW fixed" in s.name)
     hop = next(s for s in SCENARIOS if s.name.startswith("MRM") and "FHSS 20 dBm (baseline)" in s.name)
-    print("\nMRM NEAR-FAR (4 teams simultaneous), all at 10 mW: other team's box r m from our receiver vs our 260 m link")
+    print("\nMRM NEAR-FAR (4 teams simultaneous, all at the same power): other team's box r m from our receiver vs our 260 m link")
     print(f"  nRF24 C/I at 250 kbps by offset (MHz): {NRF24_CI_250K}")
     for r in (2, 5, 10, 20):
         aligned, side = near_far(mrm, r), near_far(mrm, r, isolation_db=20)
@@ -314,15 +315,17 @@ def report() -> None:
         off = b - a
         print(f"    {2400 + a}/{2400 + b} MHz: {off} MHz apart -> selectivity {ci_needed(off)} dB "
               f"-> co-located boxes must keep I/W below {-ci_needed(off)} dB")
-    ci6 = -ci_needed(6)
-    print(f"  D-R6: we hop at 20 dBm, the others stay at 10 mW on {[c for c in chans if c != 74]}; "
-          f"nearest hop 6 MHz -> selectivity {ci_needed(6)} dB")
-    for r in (5, 10, 15, 20):
-        them = hop.p_rx_fs(r) - mrm.p_rx_fe()   # our box r m from their receiver vs their 10 mW 260 m link
-        us = mrm.p_rx_fs(r) - hop.p_rx_fe()     # their box r m from our receiver vs our 20 dBm 260 m link
-        print(f"    r = {r:3d} m: we land {them:5.1f} dB over their partner ({'OK' if them < ci6 else 'TOO CLOSE'}), "
-              f"they land {us:5.1f} dB over ours ({'OK' if us < ci6 else 'TOO CLOSE'})")
-
+    hop_set = list(range(2, 81, 2))
+    print(f"  D-R6, 16-Oct: every team hops at 20 dBm (same power everywhere, so the ratios above hold); the fixed plan is gone.")
+    print(f"  Another team's hop sits at a random offset from ours ({len(hop_set)} even RF_CH 2-80 each). Pessimistic: no CCA help.")
+    for r in (2, 5, 10, 20):
+        iw = near_far(hop, r)
+        bad = [o for o in range(0, 80, 2) if iw > -ci_needed(o)]
+        p_hit = sum(1 for x in hop_set for y in hop_set if abs(x - y) in bad) / len(hop_set) ** 2
+        ack = 1 - (1 - p_hit * 0.9) ** 3   # our sender hears ACKs next to 3 senders transmitting ~90 % of the time
+        dat = 1 - (1 - p_hit * 0.05) ** 3  # our receiver next to 3 receivers that send ACKs ~5 % of the time
+        print(f"    r = {r:3d} m: I/W {iw:5.1f} dB, harmful offsets <= {max(bad)} MHz -> {p_hit * 100:4.1f} % of hop pairs; "
+              f"lost ACKs ~{ack * 100:4.1f} %, lost DATA ~{dat * 100:4.1f} %")
     print("\nD-R6 BASELINE (16-Oct-26): SRI/MRM at <= 20 dBm e.i.r.p. via adaptive FHSS + LBT (UN-85 a)")
     base = {s.name.split("|")[0].strip(): s for s in SCENARIOS if "10 mW" in s.name and "SP4" in s.name}
     for s in (x for x in SCENARIOS if "FHSS 20 dBm (baseline)" in x.name or "until T0" in x.name):

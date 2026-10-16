@@ -287,12 +287,12 @@ static void test_fhss_profile(void)
     CHECK(node_up(&n, &fixed) == NRF24_ERR_POWER);
     CHECK((n.m.regs[0x00] & 0x02u) == 0);
 
-    /* Only hop-set channels; another team's channel is refused. */
+    /* Only hop-set channels; an odd channel (not in the even-channel hop set) is refused. */
     CHECK(node_up(&n, p) == NRF24_OK);
-    CHECK(nrf24_set_channel(&n.dev, 24) == NRF24_ERR_CH);
+    CHECK(nrf24_set_channel(&n.dev, 25) == NRF24_ERR_CH);
     CHECK(nrf24_set_channel(&n.dev, nrf24_fhss_channel(1)) == NRF24_OK);
     nrf24_profile_t off = *p;
-    off.rf_ch = 24;
+    off.rf_ch = 25;
     CHECK(node_up(&n, &off) == NRF24_ERR_CH);
 }
 

@@ -442,6 +442,16 @@ static int run_tests(void)
     print_sri("\nT13 FHSS + LBT, 25 % of hops busy, receiver reboots at 15 s (re-sync)", &r);
     expect(r.lines == r.total_lines && r.exact, "receiver re-syncs and resumes, all lines");
 
+    /* All four teams hop at 20 dBm in MRM, boxes 10 m apart: linkbudget.py estimates ~29 % lost ACKs at our
+     * sender (three senders next to it) and ~2 % lost DATA. Pessimistic: 30 % loss both ways. */
+    o.fhss_busy = 0.10;
+    o.rx_reboot = 0;
+    o.loss = 0.30;
+    run_sri(&o, &r);
+    print_sri("\nT14 MRM, all four teams hopping at 20 dBm: 30 % loss both ways, 10 % of hops busy", &r);
+    expect(r.lines == r.total_lines && r.exact, "all lines despite colliding hops");
+    expect(r.done_s >= 0 && r.done_s < 120, "whole file inside the 2-minute round");
+
     nm_result_t n;
     nm_opts_t no = nm_defaults();
     if (run_nm(&no, &n))

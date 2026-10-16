@@ -49,13 +49,14 @@ docs/ the sample generator falls back to repo text (2.62× deflate instead of 3.
 | UTF-16 file (2 MB, 4.23×), 5 % loss | 10 000 | 34.9 s |
 | NM, 10 nodes, 10 % / 70 % loss (1 / 2 hops) | all nodes | 12.0 s |
 | NM, 10 nodes, 30 % / 95 % loss | all nodes | 42.9 s |
-| **FHSS + LBT** (D-R6, SRI/MRM baseline), 5 % loss, 10 % of hops busy | 10 000 | 35.9 s |
-| **FHSS + LBT**, 25 % of hops busy, receiver reboot at 15 s | 10 000 | 53.8 s |
+| **FHSS + LBT** (D-R6, SRI/MRM baseline), 5 % loss, 10 % of hops busy | 10 000 | 36.9 s |
+| **FHSS + LBT**, 25 % of hops busy, receiver reboot at 15 s | 10 000 | 53.4 s |
+| **MRM, all four teams hopping at 20 dBm**: 30 % loss both ways, 10 % busy | 10 000 | 81.2 s |
 
 FHSS (16-Oct-26, `--fhss BUSY`, profile `TEAM_FHSS`): the protocol does not change; the simulated radio
-hops every 25 ms over the 27-channel hop order from `nrf24_config.h`, spends 300 µs per hop on PLL settling
+hops every 25 ms over the 40-channel hop order from `nrf24_config.h`, spends 300 µs per hop on PLL settling
 + CCA, never lets a frame cross a hop, skips hops whose CCA is busy (drawn per node and hop), and a node
-that starts or reboots cannot receive until it has re-found the hop timing (worst case one 0.675 s cycle).
+that starts or reboots cannot receive until it has re-found the hop timing (worst case one 1.0 s cycle).
 Higher power is not modelled here: the +10.5 dB shows up as lower loss on the real link.
 
 The 7-Oct RFM69 results (100 kbps, 64 B frames) are in git history. The simulator once caught a

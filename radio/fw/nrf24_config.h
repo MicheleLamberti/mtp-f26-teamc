@@ -31,11 +31,11 @@ typedef struct {
 #define NRF24_FHSS_COT_US 50000u   /* max TX time after one clear CCA (< 60 ms) */
 #define NRF24_FHSS_IDLE_US 2500u    /* idle before a new CCA on the same channel */
 #define NRF24_FHSS_CCA_US 170u     /* RX time before RPD is valid */
-#define NRF24_FHSS_N 27u
-/* Hop order: RF_CH 2..76 even, >= 6 MHz from the other teams (RF_CH [24, 49, 82]). */
+#define NRF24_FHSS_N 40u
+/* Hop order: RF_CH 2..80 even (40 channels); all teams hop at 20 dBm, so no fixed channels to avoid. */
 static const uint8_t NRF24_FHSS_HOPSEQ[NRF24_FHSS_N] = {
-    2u, 16u, 40u, 66u, 4u, 18u, 42u, 68u, 6u, 30u, 56u, 70u, 8u, 32u, 58u,
-    72u, 10u, 34u, 60u, 74u, 12u, 36u, 62u, 76u, 14u, 38u, 64u,
+    2u, 16u, 30u, 44u, 58u, 72u, 6u, 20u, 34u, 48u, 62u, 76u, 10u, 24u, 38u,
+    52u, 66u, 80u, 14u, 28u, 42u, 56u, 70u, 4u, 18u, 32u, 46u, 60u, 74u, 8u, 22u, 36u, 50u, 64u, 78u, 12u, 26u, 40u, 54u, 68u,
 };
 
 /* TEAM_250K: Quick Mode, bench and fallback: our fixed channel at 10 mW (UN-85 b), 250 kbps

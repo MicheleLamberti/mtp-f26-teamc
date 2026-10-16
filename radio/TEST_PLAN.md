@@ -111,10 +111,10 @@ corrected for the antenna gain).
 ## T18 — Hopping behaviour on the spectrum analyser (lab, D-R6) — **gate for TEAM_FHSS outdoors**
 
 `TEAM_FHSS` sender with a receiver following it, file transfer running.
-1. Max-hold, 2400–2483.5 MHz: 27 channels visible, none within ±5 MHz of RF_CH 24/49/82, whole emission
+1. Max-hold, 2400–2483.5 MHz: 40 channels visible (even RF_CH 2–80), whole emission
    inside the band. Peak e.i.r.p. per T13.
 2. Zero-span on one hop channel: dwell ≤ 25 ms, bursts ≤ 50 ms after each CCA, ≥ 2.5 ms idle before a re-CCA
-   on the same channel; each channel revisited every ~0.68 s.
+   on the same channel; each channel revisited every ~1.0 s.
 3. A CW interferer at −60 dBm on one hop channel: the sender skips that channel (no bursts on it) while the
    transfer goes on. Then a −35 dBm CW at 2395 MHz and at 2488.5 MHz (EN 300 328 table 2): CCA and link still
    work.
@@ -124,4 +124,4 @@ corrected for the antenna gain).
 
 T0 → T2 (before QM) → T14 (survey) → T13 + T17 + T18 (one lab booking) → T4 with `TEAM_FHSS` (260 m model
 +13.9 dB at RF_PWR −6, +8.4 dB at −12; `TEAM_250K` as the 10 mW reference) → T5 → T15 (with our hopping box
-≥ 15 m from the "other team") → T16.
+hopping at 20 dBm too, 10 m from ours) → T16.

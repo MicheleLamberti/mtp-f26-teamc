@@ -7,7 +7,7 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 > **Status:** on 9-Oct-26 all four teams moved to **2.4 GHz**. On 13-Oct-26 the radio team decided
 > the module and antenna: one **Ebyte E01-ML01SP4** (nRF24L01+) and one **flex omni** per box, 250 kbps. See [`radio/DECISIONS.md`](radio/DECISIONS.md). Hardware and protocol
 > pages are **suggestions** to the electronics and protocols teams, who own those decisions.
-> Since 16-Oct-26 (**D-R6**, a professor approved 20 dBm e.i.r.p.) SRI and MRM run the same hardware as a
+> Since 16-Oct-26 (**D-R6**, a professor approved 20 dBm e.i.r.p., confirmed on Atenea) SRI and MRM run the same hardware as a
 > hopping radio with listen-before-talk (CNAF UN-85 a), EN 300 328 adaptive FHSS) at up to **20 dBm e.i.r.p.**,
 > +10.5 dB on every link. NM stays at 10 mW on one channel; the 10 mW profile also serves Quick Mode.
 
@@ -15,9 +15,9 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 
 | Document | For |
 |---|---|
-| [`briefs/TeamC Radio Brief v0.7.1.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6), link budget, test plan |
+| [`briefs/TeamC Radio Brief v0.8.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6, all teams hop), link budget, test plan |
 | [`briefs/TeamC Hardware Proposal v0.4.3.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power |
-| [`briefs/TeamC Protocol Proposal v0.3.4.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
+| [`briefs/TeamC Protocol Proposal v0.3.5.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status and session log (kept up to date each session) |
 
 ## Layout
@@ -41,7 +41,7 @@ Needs `gcc`, `make`, `zlib` (`sudo apt install build-essential zlib1g-dev`) and 
 
 ```sh
 make -C radio/fw test        # radio driver: 194 checks
-make -C proto test           # protocol simulator: 13 scenarios in ~1 s
+make -C proto test           # protocol simulator: 14 scenarios in ~1 s
 python3 radio/phy_config.py  # radio profiles: channel, band edge, e.i.r.p. checks
 python3 radio/linkbudget.py  # link budget table
 ./proto/build/sim sri --loss 0.1 --blackout 20:30   # try your own scenario

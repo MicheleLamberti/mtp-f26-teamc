@@ -127,9 +127,10 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.4 · Fri 16 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.5 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.3.5 (16 Oct):</b> every team uses 20 dBm, so every team hops in MRM; no fixed channel plan. Our hop set grew to 40 channels (1.0 s cycle, the worst-case re-sync time). Random hop collisions with the other teams can cost about a third of our ACKs; new simulator test T14 (30 % loss both ways) still delivers all lines in 81 s.</p>
   <p class="lede"><b>New in v0.3.4 (16 Oct):</b> a battery check for the <span class="mono">ui</span> and <span class="mono">store</span> modules: read the cell on ADC3, warn below 3.5 V, warn loudly below 3.4 V at setup (never block a round), and below 3.2 V write received data to flash after every burst so a brown-out loses nothing.</p>
-  <p class="lede"><b>New in v0.3.3 (16 Oct): SRI and MRM hop.</b> A professor approved 20 dBm e.i.r.p., which our radio may use only while <b>hopping</b> every 25 ms over 27 channels and <b>listening before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things are now <b>required</b> on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop, and Quick Mode can stay on one fixed channel at 10 mW.</p>
+  <p class="lede"><b>New in v0.3.3 (16 Oct): SRI and MRM hop.</b> A professor approved 20 dBm e.i.r.p., which our radio may use only while <b>hopping</b> every 25 ms over 40 channels and <b>listening before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things are now <b>required</b> on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop, and Quick Mode can stay on one fixed channel at 10 mW.</p>
   <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01SP4, one per box, one omni antenna; decided 13 Oct) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
   <p class="lede">The radio team has fixed the physical layer: 2.4 GHz, nRF24L01+, 250 kbps, with a tested driver. Everything above it belongs to protocols &amp; software. This is a starting <b>proposal</b> built from the competition rules and our link numbers, to speed you up. It is not a decision. Please change whatever you see better.</p>
 </header>
@@ -278,9 +279,9 @@ sequenceDiagram
 
 <section aria-labelledby="s-mrm">
   <div class="col"><h2 id="s-mrm">MRM: one channel per team</h2>
-  <p>All teams transmit at the same time, 260 m apart. The other three teams keep fixed channels (RF_CH 24 / 49 / 82, D-R4); since 16 Oct we leave 74 and <b>hop</b> over 27 channels at least 6 MHz from theirs, at up to 20 dBm (D-R6).</p>
+  <p>All teams transmit at the same time, 260 m apart. Since 16 Oct every team uses 20 dBm, which narrowband radios may only do while hopping, so <b>every team hops</b> with listen-before-talk (D-R6). Ours uses the 40 even channels 2402–2480 MHz. There is no fixed channel plan any more.</p>
   <ul class="tight">
-    <li>The risk is a neighbouring team's box a few metres away. At 20 dBm we must keep ≥ 15 m from the other teams' 10 mW boxes; they reach us 25–37 dB above our partner, well inside the −50 dB selectivity (radio brief, MRM section).</li>
+    <li>The risk is a neighbouring team's box a few metres away: at 10 m it arrives 41 dB above our partner, so hops landing within 4 MHz of each other collide (about 12 % of hop pairs). Pessimistic cost: ~29 % lost ACKs at the sender end, ~2 % lost data at the receiver end. Keep ≥ 10 m between teams' boxes (radio brief, MRM section).</li>
     <li><b>Listen before talk</b> with the RPD bit is now mandatory in SRI/MRM: the driver refuses to transmit on a hop without a clear check, and a busy hop is skipped.</li>
   </ul>
   <p>Software ask: build the slot clock and hop acquisition early (bench by week 8), and keep the <b>fixed-channel mode</b> (Quick Mode, fallback) selectable at run time.</p></div>
@@ -313,7 +314,7 @@ sequenceDiagram
     <li>collisions, and random or bursty loss;</li>
     <li>a jamming blackout, and reboots.</li>
   </ul>
-  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 13 scenarios in about 1 second.</p></div>
+  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 14 scenarios in about 1 second.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>Scenario (1 MB sample, deflate 2.62×, 250 kbps, seed 1)</th><th class="r">Lines</th><th class="r">Whole file in</th></tr></thead>
     <tbody>
@@ -327,7 +328,8 @@ sequenceDiagram
       <tr><td>NM, 10 nodes, 10 % / 70 % loss at 1 / 2 hops</td><td class="num r">all nodes</td><td class="num r">12 s</td></tr>
       <tr><td>NM, 10 nodes, 30 % / 95 % loss</td><td class="num r">all nodes</td><td class="num r">43 s</td></tr>
       <tr class="hl"><td>Hopping + listen-before-talk (SRI/MRM baseline), 5 % loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">36 s</td></tr>
-      <tr><td>Hopping, 25 % of hops busy, receiver reboot at 15 s (re-sync one hop cycle)</td><td class="num r">10 000</td><td class="num r">54 s</td></tr>
+      <tr><td>Hopping, 25 % of hops busy, receiver reboot at 15 s (re-sync one hop cycle)</td><td class="num r">10 000</td><td class="num r">53 s</td></tr>
+      <tr><td>MRM, all four teams hopping at 20 dBm: 30 % loss both ways, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">81 s</td></tr>
     </tbody>
   </table></div>
   <div class="callout"><b>It already caught a bug</b> (on the old 868 MHz radio). With fixed timeouts, the 38.4 kbps fallback delivered only 883 lines. One frame (15.2 ms) outlasted the receiver's 15 ms idle-ACK timer, so the receiver ACKed in the middle of bursts and went deaf. All timeouts are now derived from the bit rate.</div>
@@ -361,7 +363,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Related pages: Team C Radio Brief v0.7.1 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.3 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Related pages: Team C Radio Brief v0.8 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.3 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
 </footer>
 </div>

@@ -56,7 +56,9 @@ MAX_CHIP_DBM = -18            # hard limit for fixed-channel profiles: the drive
 SP4_LNA_GAIN_DB = 12.0        # module LNA ahead of the chip [ESTIMATE; T17 measures the RPD trip level]
 RPD_CHIP_DBM = -64.0          # nRF24L01+ received power detector threshold at the chip (PS v1.0)
 FHSS_SELF_CH = 74             # our fixed MRM channel (TEAM_CH below), given up when we hop
-FHSS_OTHERS = [c for c in MRM_CHANNELS if c != FHSS_SELF_CH]   # the other three teams keep theirs (D-R4)
+# Since 16-Oct every team uses 20 dBm e.i.r.p., which a narrowband radio may only do while hopping (UN-85 a), so
+# the other teams hop too: no fixed MRM channels left to avoid. MRM sharing = LBT + >= 10 m between boxes.
+FHSS_OTHERS: list[int] = []   # fixed channels of other teams to keep clear of (none now)
 FHSS_GUARD_MHZ = 5            # skip RF_CH within +-5 MHz of another team (nearest hop >= 6 MHz: C/I <= -50 dB)
 FHSS_STRIDE = 7               # hop order = sorted set taken with this index stride (consecutive hops >= 14 MHz)
 FHSS_SLOT_US = 25_000         # dwell per hop: one 16-frame SR-ARQ window (~22 ms) + guard
@@ -183,7 +185,7 @@ class Profile:
         band = BAND[1] - BAND[0]
         acc_ms = 400 * N_MIN_FHSS / u                  # TX time per freq in the 400 ms x N window, 100 % duty
         seq_step = min(min(abs(a - b) for a, b in zip(FHSS_HOPSEQ, FHSS_HOPSEQ[1:] + FHSS_HOPSEQ[:1])), 99)
-        others = min(abs(c - x) for c in hs for x in FHSS_OTHERS)
+        others = min((abs(c - x) for c in hs for x in FHSS_OTHERS), default=99)
         g, cable, _ = ANTENNAS[self.antenna]
         p_mw = 10 ** (self.eirp_dbm / 10)
         tl = -70 + 10 * math.log10(100 / min(p_mw, 100))   # dBm/MHz at a 0 dBi antenna
@@ -210,8 +212,8 @@ class Profile:
             ("4.3.1.7.2 CCA threshold (RPD) <= TL at the port", rpd_port <= tl_port,
              f"RPD {rpd_port:.0f} dBm (LNA {SP4_LNA_GAIN_DB:.0f} dB est.) vs TL {tl_port:.1f} dBm "
              f"({tl:.1f} dBm/MHz at 0 dBi): {tl_port - rpd_port:.1f} dB spare -> T17"),
-            ("D-R6: hops >= 6 MHz from the other teams' channels", others >= FHSS_GUARD_MHZ + 1,
-             f"others RF_CH {FHSS_OTHERS}, nearest hop {others} MHz (C/I {NRF24_CI_250K[6]} dB or better)"),
+            ("D-R6: hops >= 6 MHz from any fixed channel of another team", others >= FHSS_GUARD_MHZ + 1,
+             f"others RF_CH {FHSS_OTHERS or 'none: all teams hop at 20 dBm'}"),
             ("D-R6: consecutive hops >= 10 MHz apart", seq_step >= 10, f"min {seq_step} MHz"),
         ]
 
@@ -279,8 +281,8 @@ def header_text() -> str:
         f"#define NRF24_FHSS_IDLE_US {FHSS_IDLE_US}u    /* idle before a new CCA on the same channel */",
         f"#define NRF24_FHSS_CCA_US {FHSS_CCA_US}u     /* RX time before RPD is valid */",
         f"#define NRF24_FHSS_N {len(FHSS_HOPSEQ)}u",
-        f"/* Hop order: RF_CH {min(FHSS_HOPSET)}..{max(FHSS_HOPSET)} even, >= {FHSS_GUARD_MHZ + 1} MHz from the other teams "
-        f"(RF_CH {FHSS_OTHERS}). */",
+        f"/* Hop order: RF_CH {min(FHSS_HOPSET)}..{max(FHSS_HOPSET)} even ({len(FHSS_HOPSET)} channels); all teams hop at 20 dBm, "
+        "so no fixed channels to avoid. */",
         "static const uint8_t NRF24_FHSS_HOPSEQ[NRF24_FHSS_N] = {",
         "    " + ", ".join(f"{c}u" for c in FHSS_HOPSEQ[:15]) + ",",
         "    " + ", ".join(f"{c}u" for c in FHSS_HOPSEQ[15:]) + ",",

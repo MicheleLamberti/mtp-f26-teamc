@@ -25,16 +25,15 @@ session and no later than Fri 16-Oct.
 
 ## D-R6 — SRI/MRM as adaptive FHSS + LBT at ≤ 20 dBm e.i.r.p. (CNAF UN-85 a)
 
-**Status:** **Baseline since 16-Oct-26** (Santiago; a professor approved 20 dBm e.i.r.p. orally) · written
-confirmation requested on Atenea (Q3) · **Owner:** RT (PHY, driver) + PT (hop sync)
+**Status:** **Baseline since 16-Oct-26, confirmed** (a professor approved 20 dBm e.i.r.p.; Atenea Q3 answered
+yes, reported by Santiago) · **Owner:** RT (PHY, driver) + PT (hop sync)
 
 - **Rule.** CNAF UN-85 a) ("wideband data transmission systems", EN 300 328): **100 mW e.i.r.p.**, density
   ≤ 100 mW/100 kHz for **FHSS** and ≤ 10 mW/MHz for any other modulation, with access/mitigation techniques
   mandatory. Our non-hopping 250 kbps signal is < 1 MHz wide, so without hopping a) gives ~10 dBm: nothing.
   UN-85 b) (generic SRD, EN 300 440) stays < 10 mW. The course rules require CNAF 2017 compliance and say
-  oral comments do not override the written rules, so Marcos asks on Atenea (Q3) for the professor's yes in
-  writing, cc Prof. Anna Umbert (spectrum-regulation consultant named in the rules). Keep the analyser plots
-  (T13, T17, T18) as evidence for the ANNEX.
+  oral comments do not override the written rules; the professor's yes was confirmed on Atenea (Q3, 16-Oct).
+  Keep the analyser plots (T13, T17, T18) as evidence for the ANNEX, and cite Q3 there.
 - **Which FHSS.** EN 300 328 V2.2.2 has two kinds:
   - *Non-adaptive* (cl. 4.3.1.3/4.3.1.6): bursts ≤ 5 ms, gaps ≥ 5 ms and medium utilisation
     MU = P/100 mW × duty ≤ 10 % → 10 % duty at 20 dBm = ~16 kbps goodput (2 380 lines raw). Too slow.
@@ -44,11 +43,11 @@ confirmation requested on Atenea (Q3) · **Owner:** RT (PHY, driver) + PT (hop s
     10·log(100 mW/P) below that, corrected for antenna gain); channel occupancy < 60 ms, then idle ≥ 5 %;
     busy channels are skipped; TX and RX follow the same hop pattern.
 - **Our design** (`phy_config.py` TEAM_FHSS, all checks OK):
-  - Hop set: even RF_CH 2…76 minus ±5 MHz around the other teams' D-R4 channels (24/49/82; we give up 74):
-    **27 channels, 74.6 MHz (89 % of the band)**, nearest hop 6 MHz from another team (C/I −50 dB). The guard
-    was widened from ±4 on 16-Oct: at 5 MHz (−38 dB) our 20 dBm would wipe out a 10 mW neighbour.
+  - Hop set: **all even RF_CH 2…80, 40 channels, 78.6 MHz (94 % of the band)**. Since 16-Oct every team uses
+    20 dBm, which a narrowband radio may only do while hopping, so the other teams hop too: there are no fixed
+    channels left to avoid (the ±5 MHz guard around 24/49/82 is kept in `phy_config.py`, empty).
   - Hop order: sorted set with index stride 7 → consecutive hops ≥ 14 MHz apart; each channel once per
-    0.675 s cycle. Slot (dwell) **25 ms** = one 16-frame SR-ARQ window; accumulated TX ≤ 222 ms per channel.
+    1.0 s cycle. Slot (dwell) **25 ms** = one 16-frame SR-ARQ window; accumulated TX ≤ 150 ms per channel.
   - CCA = the nRF24's RPD bit after 170 µs in RX (−64 dBm at the chip; ~−76 dBm at the SP4 port with an
     LNA of ~12 dB, ESTIMATE). Needed: ≤ −64 dBm at RF_PWR −12 (15.5 dBm e.i.r.p.), ≤ −68.5 dBm at 20 dBm.
     **T17 measures the RPD trip level**; if the LNA gives < ~5 dB, 20 dBm needs a lower step.
@@ -67,22 +66,22 @@ confirmation requested on Atenea (Q3) · **Owner:** RT (PHY, driver) + PT (hop s
   the current hop, ends the occupancy at 50 ms and waits the idle gap before a re-CCA on the same channel.
   Hop timing (`nrf24_fhss_channel(slot)`) and skipping a busy slot are the protocol's job.
 - **Protocol** (`proto/sim --fhss BUSY`): the link code is unchanged; the radio layer hops. T12: all
-  10 000 lines in 35.9 s with 5 % loss and 10 % of hops busy; T13: 53.8 s with 25 % busy and a receiver reboot
+  10 000 lines in 36.9 s with 5 % loss and 10 % of hops busy; T13: 53.4 s with 25 % busy and a receiver reboot
   (re-sync = one hop cycle). Still to design: hop acquisition on the Pico (RX parks on one channel until
   the sender's slot clock is heard; each frame carries the slot number).
 - **Margins** (h 0.75 m, workbook S24–S26): **SRI 70 m +36.5 · MRM 260 m +13.9 (+6.9 even at 0.5 m) ·
   MRM at the worst RF_PWR step +8.4 dB**, vs +26.0 / +3.4 at 10 mW. NM unchanged at +9.9.
-- **Other teams (MRM near-far, `linkbudget.py`):** we leave our D-R4 channel and stay ≥ 6 MHz from theirs
-  (−50 dB selectivity). If they stay at 10 mW, our 20 dBm box lands on their receiver 51.9 dB above their 260 m
-  partner at 10 m (too close), 48.4 dB at 15 m (OK): **keep ≥ 15 m between our boxes and theirs at each end**
-  (10 m is fine at RF_PWR −12, or if they also move to 20 dBm). Their 10 mW boxes land only 30.9 dB over ours
-  at 10 m. Tell them before MRM; the 20 dBm route is open to them too.
+- **Other teams (MRM near-far, `linkbudget.py`):** all four teams hop at 20 dBm, so the power ratios are the same
+  as when everyone was at 10 mW: another team's box at 10 m lands 41.4 dB above our 260 m partner. Hops at random
+  offsets collide when they are < 6 MHz apart (selectivity −38 dB or worse): **12 % of hop pairs at 5–10 m**, 7 %
+  at 20 m, 53 % at 2 m. Pessimistic estimate at 10 m (no help from CCA): ~29 % of our ACKs lost at the sender end
+  (three senders next to ours), ~2 % of DATA at the receiver end. Sim T14 with 30 % loss both ways: all 10 000
+  lines in 81 s. **Keep ≥ 10 m between teams' boxes at each MRM end** (never 2 m). Every team must use LBT.
 - **Quick Mode** keeps TEAM_250K (one fixed channel, 10 mW): one line in < 2 min doesn't need the margin, and
   the hop sync may not be on the Pico yet.
 
-**Reverse if:** the written answer on Atenea is no (back to TEAM_250K at RF_PWR −18 for SRI/MRM), T17 shows the
-RPD threshold cannot meet the CCA level at a useful power, or the hop sync is not working on the bench by the
-pretest (4-Dec).
+**Reverse if:** T17 shows the RPD threshold cannot meet the CCA level at a useful power, or the hop sync is not
+working on the bench by the pretest (4-Dec): then SRI/MRM fall back to TEAM_250K at RF_PWR −18.
 
 ## D-R2c — Module: Ebyte E01-ML01SP4 (genuine nRF24L01P + PA/LNA, SMD, IPEX)
 
@@ -181,9 +180,9 @@ pretest (4-Dec).
   teams' boxes** (or side-on placement). Ask the organisers for ≥ 10 m spacing at each end anyway.
 - Final channel numbers after the campus 2.4 GHz survey (Andrian): if eduroam is not on 1/6/11 there,
   shift the plan.
-- **D-R6 (baseline since 16-Oct):** Team C leaves 74 and hops over 27 channels ≥ 6 MHz away from the other
-  three (24/49/82); the 74/82 near-far problem disappears. Our boxes need ≥ 15 m from theirs at full 20 dBm
-  (see D-R6). The other teams may choose to hop too.
+- **Superseded for MRM on 16-Oct:** every team uses 20 dBm, so every team hops (D-R6): no fixed channel plan.
+  What the teams agree instead: LBT per EN 300 328, ≥ 10 m between boxes at each end, NM on RF_CH 80 at 10 mW.
+  The fixed plan stays as the 10 mW fallback (we would use 74).
 
 ## D-R5b — Antennas: two FR4 patches per box, vertical, front and back — *superseded 13-Oct-26 by D-R5c*
 
@@ -320,4 +319,4 @@ Fallback: Si4463 (same band, same link budget, more effort).
 | D-R3 | NM PHY shared by all teams: redo `NM_PHY_PROPOSAL.md` for nRF24 (250 kbps, common address, CRC-16, no auto-ACK) | draft 16-Oct, frozen by week 6 |
 | D-R4 | MRM channel plan (draft above: RF_CH 24/49/74/82); agree with the 3 other teams after the WiFi survey | inter-team meeting, then week 8–9 |
 | D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
-| D-R6 | 20 dBm hopping is the baseline: written yes on Atenea (Q3, cc Prof. Umbert); T0 all steps, T17, T18; hop sync on the Pico; ≥ 15 m from other teams at MRM | Q3 now; bench by week 8 |
+| D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pico; ≥ 10 m between teams' boxes at MRM | bench by week 8 |

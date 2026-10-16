@@ -558,7 +558,7 @@ def build_regulatory(wb):
         ["2400-2483.5 MHz", "UN-85 a)", "100 mW e.i.r.p.; 100 mW/100 kHz FHSS, 10 mW/MHz other", "mitigation techniques (EN 300 328) mandatory", "Yes, if mitigation implemented", "83.5 MHz",
          "SRI/MRM baseline since 16-Oct (D-R6, a professor approved 20 dBm): adaptive FHSS + LBT (EN 300 328 4.3.1.7.2: >= 15 hop channels over >= 70 % "
          "of the band, CCA at -70 dBm/MHz, COT < 60 ms). A non-hopping narrowband radio gets nothing here (10 mW/MHz "
-         "= 10 dBm in our < 1 MHz). Non-adaptive FHSS: MU <= 10 % (10 % duty at 20 dBm). Written confirmation requested on Atenea (Q3)."],
+         "= 10 dBm in our < 1 MHz). Non-adaptive FHSS: MU <= 10 % (10 % duty at 20 dBm). Confirmed: a professor approved it and Atenea Q3 answered yes (16-Oct)."],
         ["5725-5875 MHz", "UN-130", "25 mW e.i.r.p.", "none (generic SRD, EN 300 440)", "Yes", "150 MHz",
          "Few cheap non-WiFi modules; higher path loss and container loss. Not shortlisted."],
     ]
