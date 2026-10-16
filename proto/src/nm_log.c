@@ -50,7 +50,7 @@ size_t nm_log_format(const nm_t *n, const nm_log_info_t *info, char *buf, size_t
     if (cap == 0)
         return 0;
     buf[0] = '\0';
-    uint8_t file[NM_MAX_CHUNKS * NM_CHUNK];
+    static uint8_t file[NM_MAX_CHUNKS * NM_CHUNK];   /* static: keep it off the small Pico stack */
     uint32_t held = 0, len = nm_get_file(n, file, sizeof file);
     for (uint32_t i = 0; i < n->total; i++)
         held += (n->have >> i) & 1u;

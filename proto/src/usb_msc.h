@@ -61,6 +61,7 @@ typedef struct {
     FIL fil;
     int mounted;
     uint8_t buf[USBM_CHUNK];
+    char tmp[FF_MAX_LFN + 1];   /* "<name>.part" during usbm_save (kept off the 2 KB Pico stack) */
 } usbm_t;
 
 usbm_status_t usbm_mount(usbm_t *u);

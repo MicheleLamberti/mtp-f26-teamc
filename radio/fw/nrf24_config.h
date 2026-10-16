@@ -30,15 +30,15 @@ typedef struct {
  * (EN 300 328 V2.2.2 cl. 4.3.1.7.2). Only an lbt profile may use RF_PWR up to -12 dBm, the
  * highest step whose worst-case e.i.r.p. (PA 25 dB, omni 3 dBi peak) is <= 20 dBm. T0 may raise it. */
 #define NRF24_RF_PWR_MAX_BITS_FHSS 1u
-#define NRF24_FHSS_SLOT_US 25000u   /* dwell per hop */
+#define NRF24_FHSS_SLOT_US 30000u   /* dwell per hop */
 #define NRF24_FHSS_COT_US 50000u   /* max TX time after one clear CCA (< 60 ms) */
 #define NRF24_FHSS_IDLE_US 2500u    /* idle before a new CCA on the same channel */
 #define NRF24_FHSS_CCA_US 170u     /* RX time before RPD is valid */
-#define NRF24_FHSS_N 40u
-/* Hop order: RF_CH 2..80 even (40 channels); all teams hop at 20 dBm, so no fixed channels to avoid. */
+#define NRF24_FHSS_N 37u
+/* Hop order: RF_CH 4..78 even (37 channels); all teams hop at 20 dBm, so no fixed channels to avoid. */
 static const uint8_t NRF24_FHSS_HOPSEQ[NRF24_FHSS_N] = {
-    2u, 16u, 30u, 44u, 58u, 72u, 6u, 20u, 34u, 48u, 62u, 76u, 10u, 24u, 38u,
-    52u, 66u, 80u, 14u, 28u, 42u, 56u, 70u, 4u, 18u, 32u, 46u, 60u, 74u, 8u, 22u, 36u, 50u, 64u, 78u, 12u, 26u, 40u, 54u, 68u,
+    4u, 18u, 34u, 48u, 62u, 76u, 14u, 30u, 44u, 58u, 72u, 10u, 24u, 40u, 54u,
+    68u, 6u, 20u, 36u, 50u, 64u, 78u, 16u, 32u, 46u, 60u, 74u, 12u, 28u, 42u, 56u, 70u, 8u, 22u, 38u, 52u, 66u,
 };
 
 /* TEAM_250K: Quick Mode, bench and fallback: our fixed channel at 10 mW (UN-85 b), 250 kbps
@@ -86,13 +86,13 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_1M = {
 };
 
 /* NM_COMMON: PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)
- * RF_CH 80 = 2480 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
+ * RF_CH 77 = 2477 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_NM_COMMON[] = {
     {0x01, 0x01},  /* EN_AA */
     {0x02, 0x01},  /* EN_RXADDR */
     {0x03, 0x03},  /* SETUP_AW */
     {0x04, 0x00},  /* SETUP_RETR */
-    {0x05, 0x50},  /* RF_CH */
+    {0x05, 0x4D},  /* RF_CH */
     {0x06, 0x20},  /* RF_SETUP */
     {0x11, 0x20},  /* RX_PW_P0 */
     {0x1D, 0x05},  /* FEATURE */
@@ -103,18 +103,18 @@ static const nrf24_reg_t NRF24_REGS_NM_COMMON[] = {
 static const nrf24_profile_t NRF24_PROFILE_NM_COMMON = {
     "NM_COMMON", NRF24_REGS_NM_COMMON,
     (uint8_t)(sizeof NRF24_REGS_NM_COMMON / sizeof NRF24_REGS_NM_COMMON[0]),
-    80u, 250000u, {0xC2, 0x5A, 0x9D, 0x3E, 0x71}, 2u, 32u,
+    77u, 250000u, {0xC2, 0x5A, 0x9D, 0x3E, 0x71}, 2u, 32u,
     0u, 0u, 0u, 0u, 0u,
 };
 
 /* TEAM_FHSS: SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)
- * RF_CH 2 = 2402 MHz, 250 kbps, RF_PWR -12 dBm (<= +13 dBm at the E01 IPEX), omni: 15.5 dBm e.i.r.p. */
+ * RF_CH 4 = 2404 MHz, 250 kbps, RF_PWR -12 dBm (<= +13 dBm at the E01 IPEX), omni: 15.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_FHSS[] = {
     {0x01, 0x01},  /* EN_AA */
     {0x02, 0x01},  /* EN_RXADDR */
     {0x03, 0x03},  /* SETUP_AW */
     {0x04, 0x00},  /* SETUP_RETR */
-    {0x05, 0x02},  /* RF_CH */
+    {0x05, 0x04},  /* RF_CH */
     {0x06, 0x22},  /* RF_SETUP */
     {0x11, 0x20},  /* RX_PW_P0 */
     {0x1D, 0x05},  /* FEATURE */
@@ -125,7 +125,7 @@ static const nrf24_reg_t NRF24_REGS_TEAM_FHSS[] = {
 static const nrf24_profile_t NRF24_PROFILE_TEAM_FHSS = {
     "TEAM_FHSS", NRF24_REGS_TEAM_FHSS,
     (uint8_t)(sizeof NRF24_REGS_TEAM_FHSS / sizeof NRF24_REGS_TEAM_FHSS[0]),
-    2u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
+    4u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
     1u, 1u, 1u, 2500u, 50000u,
 };
 

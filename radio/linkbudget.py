@@ -119,10 +119,11 @@ class Framing:
     ack_b: float            # ACK frame size on air incl. its own overhead
     turnaround_ms: float    # one TX->RX or RX->TX switch (radio + MCU)
     sys_eff: float = 0.85   # SPI / FIFO servicing / USB-write losses [ASSUMPTION]
+    gap_ms: float = 0.0     # per-frame gap: nRF24 sends one frame per CE pulse (130 us settle + FIFO load)
 
     def goodput_kbps(self, rate_kbps: float) -> float:
         t_bit = 1.0 / (rate_kbps * 1e3)
-        t_frame = (self.payload_b + self.overhead_b) * 8 * t_bit
+        t_frame = (self.payload_b + self.overhead_b) * 8 * t_bit + self.gap_ms * 1e-3
         t_ack = self.ack_b * 8 * t_bit
         t_cycle = self.frames_per_ack * t_frame + t_ack + 2 * self.turnaround_ms * 1e-3
         payload_bits = self.frames_per_ack * self.payload_b * 8
@@ -252,7 +253,7 @@ MRM_CHANNELS = [24, 49, 74, 82]
 # Since 16-Oct every team uses 20 dBm, so every team hops: the fixed plan above is history and teams share the
 # band by LBT, with >= 10 m between boxes. The near-far printout estimates how often random hops collide.
 # The list and the EN 300 328 checks live in phy_config.py (FHSS_*); here only what the budget needs.
-FHSS_SLOT_MS = 25.0          # dwell per hop = one 16-frame SR-ARQ window (~22 ms) + guard
+FHSS_SLOT_MS = 30.0          # dwell per hop: 16 frames (~26 ms) + turnaround + ACK (~28.5 ms) + guard
 FHSS_HOP_OVERHEAD_MS = 0.30  # PLL settle 130 us + RPD needs >= 170 us in RX (= the CCA) before TX
 FHSS_BUSY = (0.0, 0.10, 0.25)  # share of slots skipped because the CCA found the channel busy
 
@@ -271,17 +272,35 @@ def ci_needed(offset_mhz: float) -> float:
     return best
 
 
-def near_far(wanted: "Link", r_m: float, isolation_db: float = 0.0) -> float:
-    """Interferer-over-wanted (dB) at our receiver for another team's box r_m away (free space,
-    same EIRP and antenna, inside the ground-bounce breakpoint so free space); isolation_db = pattern
+TWO_RAY_PEAK_DB = 6.0   # inside the breakpoint the ground bounce can ADD up to +6 dB to a close interferer
+
+
+def near_far(wanted: "Link", r_m: float, isolation_db: float = 0.0, two_ray: bool = False) -> float:
+    """Interferer-over-wanted (dB) at our receiver for another team's box r_m away (same EIRP and
+    antenna; free space, or free space + 6 dB for the constructive two-ray peak); isolation_db = pattern
     rejection of both antennas (side-on patches)."""
-    return wanted.p_rx_fs(r_m) - isolation_db - wanted.p_rx_fe()
+    return wanted.p_rx_fs(r_m) + (TWO_RAY_PEAK_DB if two_ray else 0.0) - isolation_db - wanted.p_rx_fe()
+
+
+# Conservative planning case (16-Oct review): datasheet sensitivity is "typical" at BER 0.1 % (a 329-bit frame
+# then loses ~28 %); 1 % PER needs ~3 dB more. The omni's in-box gain over azimuth can dip to ~0 dBi (battery,
+# PCB). People near the box or in the first Fresnel zone cost 5-15 dB. Not the hand-in budget: a check.
+PLAN_SENS_DB = 3.0      # 1 % PER vs datasheet "typical"
+PLAN_GAIN_DBI = 0.0     # worst azimuth in the box, each end
+PLAN_FADE_DB = -6.0     # body / fade margin
+
+
+def planning(link: "Link") -> "Link":
+    return replace(link, sens_dbm=link.sens_dbm + PLAN_SENS_DB, g_tx_dbi=min(link.g_tx_dbi, PLAN_GAIN_DBI),
+                   g_rx_dbi=min(link.g_rx_dbi, PLAN_GAIN_DBI), l_multipath=link.l_multipath + PLAN_FADE_DB)
 
 FRAMING = {
     # 4 B preamble + 2 B sync + 1 B len + 4 B header + 2 B CRC; ACK every 16 frames
     "sub-GHz FIFO radio (RFM69/Si4463/CC1101), 60 B payload": Framing(60, 13, 16, 20, 1.0),
-    # nRF24: 1 B preamble + 5 B address + 9-bit PCF + 2 B CRC; 32 B payload max; 130 us settling
-    "nRF24L01+, 32 B payload": Framing(32, 9.125, 16, 12, 0.25),
+    # nRF24: 28 B of file data per frame; overhead = 4 B DATA header + 1 B preamble + 5 B address + 9-bit PCF
+    # + 2 B CRC; ACK = 7 B body + 9.125 B; 1 ms turnaround and 0.3 ms per-frame gap as in the simulator
+    # (16-Oct review: the old 32 B "payload" counted the header as data and had no per-frame gap)
+    "nRF24L01+, 32 B payload": Framing(28, 13.125, 16, 16.125, 1.0, gap_ms=0.3),
 }
 
 
@@ -325,17 +344,27 @@ def report() -> None:
         off = b - a
         print(f"    {2400 + a}/{2400 + b} MHz: {off} MHz apart -> selectivity {ci_needed(off)} dB "
               f"-> co-located boxes must keep I/W below {-ci_needed(off)} dB")
-    hop_set = list(range(2, 81, 2))
+    hop_set = [c for c in range(2, 81, 2) if c not in (2, 26, 80)]   # phy_config FHSS_HOPSET (no BLE adv.)
     print(f"  D-R6, 16-Oct: every team hops at 20 dBm (same power everywhere, so the ratios above hold); the fixed plan is gone.")
-    print(f"  Another team's hop sits at a random offset from ours ({len(hop_set)} even RF_CH 2-80 each). Pessimistic: no CCA help.")
-    for r in (2, 5, 10, 20):
-        iw = near_far(hop, r)
+    print(f"  Another team's hop sits at a random offset from ours ({len(hop_set)} channels each). Pessimistic: no CCA "
+          f"help; I/W includes the +{TWO_RAY_PEAK_DB:.0f} dB two-ray peak possible inside the breakpoint.")
+    for r in (2, 5, 10, 20, 30):
+        iw = near_far(hop, r, two_ray=True)
         bad = [o for o in range(0, 80, 2) if iw > -ci_needed(o)]
         p_hit = sum(1 for x in hop_set for y in hop_set if abs(x - y) in bad) / len(hop_set) ** 2
         ack = 1 - (1 - p_hit * 0.9) ** 3   # our sender hears ACKs next to 3 senders transmitting ~90 % of the time
         dat = 1 - (1 - p_hit * 0.05) ** 3  # our receiver next to 3 receivers that send ACKs ~5 % of the time
         print(f"    r = {r:3d} m: I/W {iw:5.1f} dB, harmful offsets <= {max(bad)} MHz -> {p_hit * 100:4.1f} % of hop pairs; "
               f"lost ACKs ~{ack * 100:4.1f} %, lost DATA ~{dat * 100:4.1f} %")
+    co = 1 - (1 - 0.9 / len(hop_set)) ** 3
+    print(f"    co-channel floor at any spacing: ~{co * 100:.1f} % of ACKs (3 senders, CCA cannot see them while we "
+          f"listen); hence the POLL on ACK timeout (resend one short frame, not the burst)")
+
+    print("\nCONSERVATIVE PLANNING CASE (review 16-Oct): sensitivity +3 dB (1 % PER), 0 dBi worst azimuth each end, "
+          "-6 dB fade/body")
+    for s in SCENARIOS[20:]:
+        print(f"  {s.name:78} {s.margin_fe():6.1f} -> {planning(s).margin_fe():6.1f} dB")
+
     print("\nD-R6 BASELINE (16-Oct-26): SRI/MRM at <= 20 dBm e.i.r.p. via adaptive FHSS + LBT (UN-85 a)")
     base = {s.name.split("|")[0].strip(): s for s in SCENARIOS if "10 mW" in s.name and "SP4" in s.name}
     for s in (x for x in SCENARIOS if "FHSS 20 dBm (baseline)" in x.name or "until T0" in x.name):

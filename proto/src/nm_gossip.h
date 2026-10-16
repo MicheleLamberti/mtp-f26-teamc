@@ -15,7 +15,7 @@
 #include "frames.h"
 #include "proto_env.h"
 
-#define NM_MAX_CHUNKS 32u   /* 32 x 25 B = 800 B: room for the ~0.5 KB NM file */
+#define NM_MAX_CHUNKS 64u   /* 64 x 25 B = 1600 B: the ~0.5 KB NM file, or its 5 lines in UTF-16 */
 
 typedef struct {
     uint32_t imin_us, imax_us;
@@ -46,7 +46,7 @@ typedef struct {
     nm_cfg_t cfg;
     uint16_t file_id;
     uint8_t total;          /* 0 = nothing heard yet */
-    uint32_t have;          /* bit idx: chunk held */
+    uint64_t have;          /* bit idx: chunk held */
     uint8_t data[NM_MAX_CHUNKS][NM_CHUNK];
     uint8_t clen[NM_MAX_CHUNKS];
     uint8_t active, phase;

@@ -11,7 +11,7 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    competition schedule SRI, MRM and NM rounds (and rehearsals) so that teams stay within that?
    Is the 10 % assessed per transmitter?
 3. *(**Answered YES, 16-Oct-26:** 20 dBm e.i.r.p. confirmed for our hopping design (reported by Santiago).
-   Do not post again. Kept for the record.)* **2.4 GHz power: please confirm in writing the 20 dBm e.i.r.p. a
+   Do not post again. Kept for the record. Archive the written answer (link or screenshot) in the Drive folder.)* **2.4 GHz power: please confirm in writing the 20 dBm e.i.r.p. a
    professor approved for hopping radios (+10.5 dB on the 260 m link).** *A professor had said yes orally; the
    rules say oral comments don't override the written rules, so we asked here, cc Prof. Anna Umbert
    (spectrum regulations).* We read CNAF UN-85 a) as allowing 100 mW e.i.r.p.
@@ -19,7 +19,7 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    10 mW/MHz for other modulations, so a non-hopping narrowband radio like ours stays at ~10 mW.
    Our plan for SRI and MRM: the same Ebyte E01-ML01SP4 (nRF24L01P) as **adaptive FHSS with
    listen-before-talk** (EN 300 328 V2.2.2 cl. 4.3.1.7.2): 40 hop channels over 2402–2480 MHz (94 % of the
-   band), 25 ms per hop, an energy-detect check (≥ 170 µs, threshold ≤ −70 dBm/MHz scaled to our power)
+   band), 30 ms per hop, an energy-detect check (≥ 170 µs, threshold ≤ −70 dBm/MHz scaled to our power)
    before transmitting on each hop, busy channels skipped, ≤ 50 ms per channel occupancy, ≤ 20 dBm
    e.i.r.p. measured on the lab analyser. Network Mode stays on one channel at 10 mW (UN-85 b).
    (a) Please confirm that a student system designed and measured this way may use UN-85 a) at up to 20 dBm
@@ -51,3 +51,19 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
     ~0.6 MHz), with listen-before-talk before every ≤ 10 ms of transmission? We ask because EN 300 328 (and the EU
     SRD decision behind CNAF UN-85 a) limits non-hopping equipment to 10 mW/MHz, which such a narrow signal
     exceeds by 5–10 dB. If the answer is no, we stay with frequency hopping (already built and tested).
+
+Added 16-Oct-26 after the project review:
+
+12. **NM layout.** Approximate length of the South and East rims and spacing between nodes? May NM also use
+    20 dBm with frequency hopping if all teams agree?
+13. **MRM placement.** Minimum distance between different teams' boxes at each end? May teams choose positions?
+14. **"Attacks".** What do they consist of (jamming, power cut, shielding, moving the box), and how long?
+15. **Drop test.** Which device is dropped, what counts as a pass, and may it be repaired before MRM?
+16. **Scoring.** Does the "first continuous range" of correct lines have to start at line 1? Do extra bytes after
+    the last correct line disqualify the file?
+17. **File details.** Which line terminator (CR, LF or CRLF)? Is the USB stick ours or provided by the professors?
+18. **Quick Mode.** May a PC supply the file and receive it (Session #1 slide 15 says yes; the rules PDF is silent)?
+19. **Cost category.** Is the IKEA box included in the unit cost? Does a lab-made breakout count €15? Is the ranking on
+    the total with or without non-purchased items?
+20. **MRM etiquette.** Must every team use listen-before-talk in MRM (relevant to Q3(c))?
+21. **NM output.** Must every relay box also write the NM-file to USB after STOP, and under which file name?

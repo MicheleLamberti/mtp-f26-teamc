@@ -11,6 +11,7 @@
 #define FT_HELLO 0x03u
 #define FT_HELLO_ACK 0x04u
 #define FT_END 0x05u
+#define FT_POLL 0x06u   /* sender -> receiver: "repeat your ACK" after an ACK timeout (cheaper than a burst) */
 #define FT_TYPE_MASK 0x3Fu
 #define FF_RETX 0x40u
 #define FF_LAST 0x80u
@@ -23,6 +24,7 @@
  * HELLO:     [type][session][len:4][crc32:4][codec][name <= 21]
  * HELLO_ACK: [type][session][next_seq:2][crc32:4]
  * END:       [type][session]
+ * POLL:      [type][session]
  * NM_DATA:   [0x4E][file_id:2][idx][total][data <= 25][crc16:2]   (end-to-end software CRC) */
 #define DATA_HDR 4u
 #define DATA_PAYLOAD 28u
@@ -31,6 +33,7 @@
 #define HELLO_NAME_MAX 21u
 #define HELLO_ACK_LEN 8u
 #define END_LEN 2u
+#define POLL_LEN 2u
 #define NM_HDR 5u
 #define NM_CHUNK 25u
 

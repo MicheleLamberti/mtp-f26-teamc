@@ -21,9 +21,9 @@ without PA/LNA) can join with a few register writes, and no team has to share co
 | Polarisation | **vertical** | Mismatched polarisation costs 10–20 dB between teams |
 | Channel access | listen-before-talk with the RPD bit (> −64 dBm at the chip), random back-off | The nRF24 has no CCA in hardware; RPD needs ≥ 170 µs in RX |
 
-Register summary (write CONFIG last, it powers up the radio): `EN_AA 01, EN_RXADDR 01, SETUP_AW 03,
-SETUP_RETR 00, RF_CH 50, RF_SETUP 20 (| power bits), RX_PW_P0 20, FEATURE 05, DYNPD 01, CONFIG 0E`
-(PTX) / `0F` (PRX). Our generated header: `radio/fw/nrf24_config.h`, profile `NM_COMMON`.
+Register summary, **all values hexadecimal** (write CONFIG last, it powers up the radio): `EN_AA 0x01,
+EN_RXADDR 0x01, SETUP_AW 0x03, SETUP_RETR 0x00, RF_CH 0x50 (= 80 decimal, 2480 MHz), RF_SETUP 0x20 (| power
+bits), RX_PW_P0 0x20, FEATURE 0x05, DYNPD 0x01, CONFIG 0x0E` (PTX) / `0x0F` (PRX). Our generated header: `radio/fw/nrf24_config.h`, profile `NM_COMMON`.
 
 Above the PHY (frame header, relaying, timing) is a protocols-team discussion. Our suggestion:
 the first body byte is a frame type (`0x4E` 'N' for NM data), then file id, chunk index, chunk
@@ -38,6 +38,6 @@ count, ≤ 25 B of data and a software CRC-16/CCITT-FALSE over the body (end to 
 
 ## Interop test
 
-Before week 6, each team brings one box. Each box sends 1 000 frames to every other box at 10 m
+First interop test by Fri 6-Nov (week 7), full NM rehearsal on Fri 20-Nov. Each team brings one box. Each box sends 1 000 frames to every other box at 10 m
 on RF_CH 80. Pass: ≥ 99 % received with a valid software CRC. No duty-cycle limit at 2.4 GHz, so
 the test can be repeated freely.

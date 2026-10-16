@@ -5,6 +5,11 @@
  *   - the PC simulator (proto/sim) with a channel model and simulated time;
  *   - the Pico firmware with nrf24_send(), time_us_64() and a hardware alarm.
  * The platform then calls the module's on_frame / on_timer / on_tx_idle handlers.
+ *
+ * Contract (16-Oct review): on_tx_idle MUST be called each time the transmit queue has drained (the last
+ * queued frame is on air and done). The link arms its ACK timer and accepts ACKs only from then on, so a
+ * platform that never calls it stalls the link. send() must never drop a frame silently: if the queue is
+ * full, block until it drains (the PC simulator counts q_overflow and the tests require it to stay 0).
  */
 #ifndef PROTO_ENV_H
 #define PROTO_ENV_H

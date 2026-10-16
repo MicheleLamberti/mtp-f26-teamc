@@ -92,8 +92,10 @@ static void m_select(void *ctx, int active)
         uint8_t reg = c & 0x1Fu;
         if (reg == 0x0A && n >= 5)
             memcpy(m->rx_addr_p0, m->buf, 5);
-        else if (reg == 0x10 && n >= 5)
+        else if (reg == 0x10 && n >= 5) {
             memcpy(m->tx_addr, m->buf, 5);
+            m->aw_at_addr = m->regs[0x03];
+        }
         else if (reg == 0x07)
             m->regs[0x07] &= (uint8_t)~(m->buf[0] & 0x70u);
         else if (reg == 0x03)

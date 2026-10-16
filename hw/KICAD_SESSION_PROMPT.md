@@ -26,7 +26,8 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
   switches are allowed (e.g. a network-mode switch), but **no switch may indicate the position
   in the network**.
 - **Drop test** from table height to concrete before MRM: no sockets, nothing loose.
-- ESD-safe (IEC/EN rules cited in the PDF). Cost **≤ €150 per device**. A board made at the
+- ESD and RF-exposure compliance (the rules name IEEE C95.1 for RF exposure and EN 60825-1 / ANSI Z136.5
+  for lasers; ESD protection on every connector and button people touch). Cost **≤ €150 per device**. A board made at the
   ETSETB lab counts **€15** in the BoM, and every part (screws, wire, foam) must be in the BoM.
 - **Modules shown at Quick Mode are final:** the Pico 2 and the Ebyte E01-ML01SP4 radio must be
   the same parts on the bench, at Quick Mode and in the final board. The SP4 is SMD, so it needs a
@@ -38,7 +39,7 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
 |---|---|---|
 | Micro module | **Raspberry Pi Pico 2** (RP2350, **non-W**) | Solder flat via castellations (KiCad `MCU_RaspberryPi_and_Boards` has a Pico footprint; check it matches the Pico 2) |
 | Radio | **1 × Ebyte E01-ML01SP4** (nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, IPEX on the module) | 10 pads, **1.27 mm** pitch: 1 VCC, 2 CE, 3 CSN, 4 SCK, 5 MOSI, 6 MISO, 7 IRQ, 8–10 GND (Ebyte manual §3). **Draw the footprint from the manual's pad drawing.** No traces under the module on the top layer; ground pour under it. Also make a tiny **breakout** (SP4 → 2.54 mm header) for the bench |
-| Antenna | **Molex 146153-0100** flex dipole, cable plugs into the module's IPEX | No RF on our PCB. Leave clearance around the IPEX for the cable; module near the board edge facing the antenna wall |
+| Antenna | **Molex 146153-0100** flex dipole, cable plugs into the module's IPEX | No RF on our PCB. Leave clearance around the IPEX for the cable; module near the board edge facing the antenna wall. Drop test: room for a glue dot over the U.FL plug and a cable tie point |
 | USB stick port | Through-hole **USB-A receptacle** at the board edge | Host via **Pico-PIO-USB** on two GPIOs. Check the library README for the D+/D− pin rule (D− = D+ + 1) and any series resistors |
 | USB ESD | **USBLC6-2SC6** on D+/D−; TVS on VBUS | |
 | 5 V for the stick | **TPS61023** boost (or equivalent) + current-limited switch **TPS2051B / AP2552** (≈500 mA), enabled by a GPIO; FAULT to a GPIO | Only on while loading or saving the file. 100 µF + 100 nF on VBUS |

@@ -58,7 +58,7 @@ static void reset_trickle(nm_t *n)
 
 int nm_complete(const nm_t *n)
 {
-    return n->total > 0 && n->have == (n->total >= 32u ? 0xFFFFFFFFu : (1u << n->total) - 1u);
+    return n->total > 0 && n->have == (n->total >= 64u ? ~0ull : (1ull << n->total) - 1u);
 }
 
 int nm_set_file(nm_t *n, const uint8_t *file, uint32_t len)
@@ -67,12 +67,13 @@ int nm_set_file(nm_t *n, const uint8_t *file, uint32_t len)
     if (total == 0 || total > NM_MAX_CHUNKS)
         return -1;
     n->file_id = crc16_ccitt(file, len);
+    n->have = 0;   /* this file replaces anything heard before */
     n->total = (uint8_t)total;
     for (uint32_t i = 0; i < total; i++) {
         uint32_t off = i * NM_CHUNK, l = len - off < NM_CHUNK ? len - off : NM_CHUNK;
         memcpy(n->data[i], file + off, l);
         n->clen[i] = (uint8_t)l;
-        n->have |= 1u << i;
+        n->have |= 1ull << i;
         n->tr.chunk_ms[i] = ms_since_go(n);
     }
     n->tr.origin = 1;
@@ -168,7 +169,7 @@ void nm_on_frame(nm_t *n, const uint8_t *f, uint8_t len)
     uint32_t dlen = (uint32_t)len - NM_HDR - 2u;
     memcpy(n->data[idx], f + NM_HDR, dlen);
     n->clen[idx] = (uint8_t)dlen;
-    n->have |= 1u << idx;
+    n->have |= 1ull << idx;
     n->tr.chunk_ms[idx] = t;
     n->st.rx_new++;
     if (nm_complete(n) && n->complete_at == PROTO_NO_TIMER)

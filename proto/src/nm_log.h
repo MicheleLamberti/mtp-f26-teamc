@@ -14,7 +14,7 @@
 
 #include "nm_gossip.h"
 
-#define NM_LOG_MAX 2048u  /* worst case with 32 chunks fits comfortably */
+#define NM_LOG_MAX 3072u  /* worst case with 64 chunks fits comfortably */
 
 typedef struct {
     const char *team;       /* "Team C" */

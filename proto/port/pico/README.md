@@ -35,3 +35,16 @@ Atenea Q9.
 3. Save 1 MB back, pull the stick, open it on a laptop: identical file, no `.part` left.
 4. Pull the stick during a save: `usbm_save` returns an error within ~2 s, no final-name file appears.
 5. Short the stick's VBUS through a resistor: FAULT goes low, firmware turns the 5 V off.
+
+## Pico pitfalls found in the 16-Oct review
+
+- Stack: pico-sdk gives 2 KB per core. FatFs (exFAT + LFN), `vsnprintf` and the NM log need more: set
+  `PICO_STACK_SIZE` and `PICO_CORE1_STACK_SIZE` to 8 KB; `usbm_t`, codec buffers and the log buffer are static.
+- Flash erase stalls both cores *and* PIO-USB's 1 ms SOF: erase the file region before mounting the stick.
+- A timed-out USB transfer power-cycles the port (`reset_port`); the caller remounts and retries.
+- `PIO_USB_DEFAULT_CONFIG` takes DMA channel 0 and PIO0/PIO1: initialise USB before other DMA users.
+- Receive store: implement `link_rx_store_t.prepare` (erase the region when a new file is announced) and
+  `commit` (program 256 B pages); persist `committed` only after its pages are written.
+- `proto_env_t`: call `on_tx_idle` whenever the transmit queue drains; `send` must block, never drop.
+- Compression: miniz with `TDEFL_LESS_MEMORY=1` (~170 KB deflate, ~45 KB inflate), streaming flash → flash
+  through `codec_deflate_stream` / `codec_inflate_stream`.

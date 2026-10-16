@@ -390,6 +390,30 @@ static void test_fixed20(void)
     CHECK(nrf24_set_channel(&a.dev, 84) == NRF24_ERR_CH);
 }
 
+/* 16-Oct review fixes */
+static void test_review_fixes(void)
+{
+    node_t a;
+    CHECK(node_up(&a, &NRF24_PROFILE_TEAM_FHSS) == NRF24_OK);
+    CHECK(a.m.aw_at_addr == 0x03);                             /* 5-byte width set before the address */
+
+    nrf24_write_reg(&a.dev, 0x06, 0x20 | 0x90 | 0x02);         /* CONT_WAVE + PLL_LOCK requested */
+    CHECK((a.m.regs[0x06] & 0x90u) == 0);                      /* masked: no carrier test outside the lab */
+
+    nrf24_start_rx(&a.dev);                                    /* hop while receiving: via standby, back in RX */
+    uint32_t t0 = a.m.now_us;
+    CHECK(nrf24_set_channel(&a.dev, nrf24_fhss_channel(2)) == NRF24_OK);
+    CHECK(a.dev.rx_on == 1 && a.m.ce == 1 && a.m.now_us - t0 >= NRF24_TX_SETTLE_US);
+
+    uint8_t tx[8] = {0};
+    CHECK(nrf24_cca(&a.dev) == 1);
+    nrf24_start_rx(&a.dev);                                    /* listening ends the occupancy */
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_ERR_LBT);
+    CHECK(nrf24_cca(&a.dev) == 1);
+    a.dev.cot_start_us = a.m.now_us - 0xFFFFFF00u;             /* 71 min ago: used + need would wrap */
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_ERR_LBT);
+}
+
 static void test_carrier(void)
 {
     node_t a;
@@ -416,6 +440,7 @@ int main(void)
     test_fhss_profile();
     test_fhss_lbt();
     test_fixed20();
+    test_review_fixes();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }

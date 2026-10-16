@@ -189,7 +189,7 @@ usbm_status_t usbm_save(usbm_t *u, const char *name, uint32_t len, usbm_source_f
 {
     /* Write "<name>.part", verify it, then rename: the final name only ever holds a complete, verified file,
      * even if the stick fails or is pulled half-way. */
-    char tmp[FF_MAX_LFN + 1];
+    char *tmp = u->tmp;
     size_t nl = strlen(name);
     if (nl + 5 > FF_MAX_LFN)
         return USBM_IO;

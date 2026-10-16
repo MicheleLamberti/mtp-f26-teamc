@@ -29,7 +29,7 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (TinyUSB MSC on the Pico, a RAM disk in the tests). |
 | `third_party/fatfs/` | ChaN FatFs R0.15a (BSD-style licence in `ff.c`); `ffconf.h` is ours: LFN, exFAT, code page 850, no RTC. |
 | `port/pico/` | Pico 2 glue. `usb_msc_pico.c` (TinyUSB host + Pico-PIO-USB) is a **skeleton, not compiled here**. |
-| `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks (96 checks); `--image` mode for `tools/fat_xcheck.py`. |
+| `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks, a Windows-style MBR stick and UTF-8 names (109 checks); `--image` mode for `tools/fat_xcheck.py`. |
 | `src/codec.c` | deflate/inflate via the zlib API (miniz offers the same API on the Pico). |
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
@@ -56,14 +56,15 @@ docs/ the sample generator falls back to repo text (2.62× deflate instead of 3.
 | UTF-16 file (2 MB, 4.23×), 5 % loss | 10 000 | 34.9 s |
 | NM, 10 nodes, 10 % / 70 % loss (1 / 2 hops) | all nodes | 12.0 s |
 | NM, 10 nodes, 30 % / 95 % loss | all nodes | 42.9 s |
-| **FHSS + LBT** (D-R6, SRI/MRM baseline), 5 % loss, 10 % of hops busy | 10 000 | 36.9 s |
-| **FHSS + LBT**, 25 % of hops busy, receiver reboot at 15 s | 10 000 | 53.4 s |
-| **MRM, all four teams hopping at 20 dBm**: 30 % loss both ways, 10 % busy | 10 000 | 81.2 s |
+| **FHSS + LBT** (D-R6, MRM baseline), 5 % loss, 10 % of hops busy | 10 000 | 37.9 s |
+| **FHSS + LBT**, 25 % of hops busy, receiver reboot at 15 s | 10 000 | 57.2 s |
+| **MRM, all four teams hopping at 20 dBm**: 30 % loss both ways, 10 % busy | 10 000 | 83.4 s |
 
 FHSS (16-Oct-26, `--fhss BUSY`, profile `TEAM_FHSS`): the protocol does not change; the simulated radio
-hops every 25 ms over the 40-channel hop order from `nrf24_config.h`, spends 300 µs per hop on PLL settling
+hops every 30 ms over the 40-channel hop order from `nrf24_config.h`, spends 300 µs per hop on PLL settling
 + CCA, never lets a frame cross a hop, skips hops whose CCA is busy (drawn per node and hop), and a node
-that starts or reboots cannot receive until it has re-found the hop timing (worst case one 1.0 s cycle).
+that starts or reboots cannot receive until it has re-found the hop timing (worst case one 1.2 s cycle). The simulated link does not align its bursts with the hops (the Pico
+design will: one 16-frame burst + ACK per 30 ms hop), so these times are slightly pessimistic.
 Higher power is not modelled here: the +10.5 dB shows up as lower loss on the real link.
 
 The 7-Oct RFM69 results (100 kbps, 64 B frames) are in git history. The simulator once caught a
@@ -85,6 +86,11 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 - FHSS on the Pico (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
   sender, every frame carries the slot number) and the slot clock; `nrf24_cca()` and the hop order are in
   `radio/fw` already.
+- Compression on the Pico: measure miniz deflate RAM and time for 1 MB at level 9 during setup (drop the level if
+  slow); send raw (codec = none) when a file compresses less than ~1.05×. No 32 KB restart points: the receiver
+  keeps its in-order prefix in flash, which already covers resume.
+- USB sticks: FAT12/16/32 and exFAT, MBR or GPT (macOS) tables, UTF-8 names all work; NTFS/APFS/HFS+ sticks do not.
+  The team brings its own FAT32/exFAT sticks.
 - `usb_msc` on the Pico: compile and bench-test `port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT); the flash
   store sink/source; output file name and encoding (Atenea Q9).
 - Board port: implement `proto_env_t` on the Pico (`nrf24_send`, `time_us_64`, an alarm),

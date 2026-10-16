@@ -71,15 +71,17 @@ breadboard-friendly variant of the same part.
 ## Firmware
 
 `radio/fw/` is a portable C99 driver (no Arduino or vendor dependencies) with host tests
-(`make -C radio/fw test`, 194 checks against a mock nRF24). The board only has to implement
+(`make -C radio/fw test`, 235 checks against a mock nRF24). The board only has to implement
 `nrf24_hal_t`: select, transfer, ce, delay_us, micros. Register profiles come from
 `radio/phy_config.py`. The driver refuses any power setting above RF_PWR −18 dBm (10 mW e.i.r.p. limit),
-except for the hopping profile `TEAM_FHSS` (D-R6, the SRI/MRM baseline), which may use −12 but must pass a listen-before-talk
+except for the hopping profile `TEAM_FHSS` (D-R6, the SRI/MRM baseline), which may use −12 (or −6 once T0 shows the PA gain allows it) but must pass a listen-before-talk
 check (`nrf24_cca`) before every burst. It needs the 100 ms power-on wait and nothing else from the board.
 
 ## Placement and antenna
 
 - Module near the wall that carries the antenna, so the 100 mm cable reaches without strain.
+- **Drop test:** secure the U.FL plug on the SP4 (a dot of glue or Kapton tape over it) and tie the cable down
+  near the module; a 100 mm cable with a loose box wall can pull the plug off on impact.
 - Antenna vertical, **as high in the box as possible** (antenna height is our biggest link-budget lever),
   ≥ 1–2 cm from the battery, the PCB copper, the USB cable and the 5 V boost.
 

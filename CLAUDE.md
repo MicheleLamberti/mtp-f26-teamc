@@ -114,7 +114,8 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
 - 10 mW fixed-channel fallback (S21–S22, also Quick Mode): SRI +26.0, MRM +3.4. If T0 measures only ~+2 dBm at
   −18, the 10 mW margins drop ~5 dB (hopping picks the highest legal step anyway).
 - Non-adaptive FHSS would be capped at MU 10 % (10 % duty at 20 dBm, ~16 kbps): too slow → adaptive with LBT.
-- Hopping goodput 141 kbps with 10 % of hops busy (≫ 67 needed); sim T12 36.9 s, T13 53.4 s, T14 81.2 s (14/14 pass).
+- Hopping goodput 141 kbps with 10 % of hops busy (≫ 67 needed); sim T12 37.9 s, T13 57.2 s, T14 83.4 s (14/14 pass).
+- **SRI runs on `TEAM_250K`** (10 mW fixed, +26 dB, 159 kbps, no hop-sync dependency; 16-Oct review). 20 dBm is for MRM.
 - **Every team uses 20 dBm (Santiago, 16-Oct) → every team hops; no fixed MRM plan.** Near-far at 10 m: 41.4 dB; hops
   < 6 MHz apart collide (12 % of pairs at 5–10 m) → ~29 % lost ACKs at the sender end (pessimistic), sim T14 (30 %
   loss both ways): all lines in 81 s. **≥ 10 m between teams' boxes** (never 2 m: 53 % of pairs collide).
@@ -130,7 +131,7 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
   breakout from the first bench test (QM module = final). Not the DP5, not the 2G4M27D (can't do 10 mW), never E01C-*.
 - D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) in the SP4, vertical, high on a wall.
   Same antenna for SRI/MRM/NM and QM.
-- **D-R6 SRI/MRM: `TEAM_FHSS`** — 40 hops, even RF_CH 2–80 (all teams hop, nothing to avoid), 25 ms slots, RPD as
+- **D-R6 MRM: `TEAM_FHSS`** — 40 hops, even RF_CH 2–80 (all teams hop, nothing to avoid), 30 ms slots, RPD as
   the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`** (RF_CH 80,
   10 mW). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
 - D-R4: superseded for MRM (all teams hop at 20 dBm); agree LBT + ≥ 10 m between boxes; fixed plan = 10 mW fallback.
@@ -143,9 +144,17 @@ consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended
 
 **Open decisions:**
 - [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
-- [ ] D-R3 NM common PHY: rewrite `NM_PHY_PROPOSAL.md` for nRF24
+- [ ] D-R3 NM common PHY: agree `NM_PHY_PROPOSAL.md` v0.2 with the teams; get every team's chip in writing (NM win gates the cost category)
 
-**Next up:**
+**Next up (from the 16-Oct review, in order):**
+- [ ] Today: order the **Pico 2 (×3–4, one batch)** together with the radios (QM modules are final); name owners for:
+      SP4 breakout, carrier PCB, Pico toolchain + USB host + hop sync, NM inter-team talks, sustainability report,
+      BoM + invoices, mechanics/drop test (secure the U.FL plug)
+- [ ] By 20-Oct: Marcos posts Q1, Q4–Q9, Q11–Q21; archive the written Q3 answer
+- [ ] By 23-Oct inter-team meeting: each team's chip, hopping or fixed, NM_COMMON registers (hex), interop date (week 7)
+- [ ] QM deliverables (PD, plan, action item list, provisional BoM) + Atenea petition before 17:00 the day before;
+      check the Project Definition lists QM, SRI, MRM, NM and cost (rules p.3)
+- [ ] Go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K (or option B on a Q11 yes)
 - [ ] Atenea Q11: 20 dBm on one fixed channel (option B)? Use B only on an explicit yes.
 - [ ] usb_msc on the Pico: compile/bench `proto/port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT, 120 MHz clock)
 - [ ] D-R6: agree with the other teams: everyone hops with LBT at ≤ 20 dBm, ≥ 10 m between boxes at each MRM end;
@@ -155,7 +164,7 @@ consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended
       Verify EU seller + lead time first. Not needed: DP5, SMA pads, whips, Adafruit RFM69, 868 Molex.
 - [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
 - [ ] T0: measure SP4 output at all four RF_PWR steps (U.FL-to-SMA pigtail, ≥ 30 dB pad) before any field test; T2
-- [ ] Andrian: campus 2.4 GHz survey (eduroam channels at the SRI/MRM/NM sites) — now decides D-R4
+- [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and the NM channel 80
 - [ ] Share brief v0.8 / hw v0.4.3 / pt v0.3.5 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM plan (we hop) with the teams
 - [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team sim scenario
 - [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is asking the radio teacher which CST version

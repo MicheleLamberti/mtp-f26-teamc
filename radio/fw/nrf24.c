@@ -54,8 +54,14 @@ uint8_t nrf24_read_reg(nrf24_t *dev, uint8_t addr)
     return v;
 }
 
+#define RF_SETUP_TEST_BITS 0x90u   /* CONT_WAVE (bit 7) + PLL_LOCK (bit 4): carrier test modes */
+
 static uint8_t clamp_power(const nrf24_t *dev, uint8_t rf_setup)
 {
+#ifndef NRF24_LAB_TESTS
+    /* A continuous carrier would bypass the LBT rules: only a lab build (T13 CW measurement) may set it. */
+    rf_setup = (uint8_t)(rf_setup & ~RF_SETUP_TEST_BITS);
+#endif
     uint8_t pwr = (uint8_t)((rf_setup & RF_PWR_MASK) >> RF_PWR_SHIFT);
     if (pwr <= dev->pwr_max)
         return rf_setup;
@@ -136,6 +142,8 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
     if (!(nrf24_read_reg(dev, REG_RF_SETUP) & RF_DR_LOW))
         return NRF24_ERR_NOT_PLUS;
 
+    /* 5-byte addresses: set the width before writing them (the SPI test above left it at 4 bytes). */
+    nrf24_write_reg(dev, REG_SETUP_AW, 0x03u);
     write_addr(dev, REG_TX_ADDR, profile->address);
     write_addr(dev, REG_RX_ADDR_P0, profile->address);
     command(dev, CMD_FLUSH_TX, NULL, NULL, 0);
@@ -150,9 +158,17 @@ nrf24_status_t nrf24_set_channel(nrf24_t *dev, uint8_t rf_ch)
 {
     if (rf_ch > NRF24_MAX_LEGAL_CH || (dev->profile->hop && !in_hopset(rf_ch)))
         return NRF24_ERR_CH;
+    const nrf24_hal_t *h = dev->hal;
+    int was_rx = dev->rx_on;
+    if (was_rx) {   /* change the synthesiser from standby, not while receiving */
+        h->ce(h->ctx, 0);
+        dev->rx_on = 0;
+    }
     nrf24_write_reg(dev, REG_RF_CH, rf_ch);
     dev->rf_ch = rf_ch;
     dev->cca_clear = 0;   /* a new hop needs its own CCA */
+    if (was_rx)
+        nrf24_start_rx(dev);   /* back to RX after the 130 us PLL settling */
     return NRF24_OK;
 }
 
@@ -171,7 +187,8 @@ nrf24_status_t nrf24_send(nrf24_t *dev, const uint8_t *body, uint8_t len)
     if (dev->profile->lbt) {
         uint32_t used = h->micros(h->ctx) - dev->cot_start_us;
         uint32_t need = NRF24_TX_SETTLE_US + nrf24_airtime_us(dev->profile, len);
-        if (!dev->cca_clear || dev->cot_ch != dev->rf_ch || used + need > dev->profile->cot_us) {
+        if (!dev->cca_clear || dev->cot_ch != dev->rf_ch || used > dev->profile->cot_us ||
+            need > dev->profile->cot_us - used) {   /* no overflow of used + need */
             dev->cca_clear = 0;
             return NRF24_ERR_LBT;
         }
@@ -213,6 +230,7 @@ nrf24_status_t nrf24_start_rx(nrf24_t *dev)
     h->ce(h->ctx, 1);
     h->delay_us(h->ctx, NRF24_TX_SETTLE_US);
     dev->rx_on = 1;
+    dev->cca_clear = 0;   /* listening ends the channel occupancy: the next frame needs a new CCA */
     return NRF24_OK;
 }
 
@@ -257,7 +275,13 @@ int nrf24_cca(nrf24_t *dev)
     dev->rx_on = 0;
     nrf24_start_rx(dev);
     h->delay_us(h->ctx, NRF24_FHSS_CCA_US);
-    if (nrf24_carrier(dev)) {
+    /* RPD is one snapshot through a ~40 us filter: three reads 20 us apart, any 1 means busy. */
+    int busy = nrf24_carrier(dev);
+    for (int k = 0; k < 2 && !busy; k++) {
+        h->delay_us(h->ctx, 20u);
+        busy = nrf24_carrier(dev);
+    }
+    if (busy) {
         dev->cca_clear = 0;
         return 0;
     }

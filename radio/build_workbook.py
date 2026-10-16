@@ -79,7 +79,7 @@ REG = {  # (round, radio, limit type, limit dBm, sensitivity source)
     lb.F868: ("ERP", 27.0),   # 500 mW e.r.p., 869.40-869.65 MHz, UN-39
     lb.F24: ("EIRP", 10.0),   # 10 mW e.i.r.p., UN-85 b)
     869.85: ("ERP", 7.0),     # 5 mW e.r.p., 869.70-870.00 MHz, UN-39 (bench, no DC limit)
-    lb.F24_FIXED20: ("EIRP", 20.0),  # option B: 20 dBm on one channel; PSD > 10 dBm/MHz, course OK needed
+    lb.F24_FIXED20: ("EIRP", 10.0),  # option B: the binding limit is the 10 dBm/MHz PSD (< 1 MHz signal) -> shows OVER
     lb.F24_FHSS: ("EIRP", 20.0),  # 100 mW e.i.r.p., UN-85 a) adaptive FHSS + LBT (D-R6, SRI/MRM baseline since 16-Oct)
 }
 
@@ -358,7 +358,7 @@ def build_throughput(wb):
     hdr = ["Configuration", "Air rate (kbps)", "Payload (B)", "Frame overhead (B)", "Frames per ACK",
            "ACK frame (B)", "Turnaround (ms)", "System efficiency", "Mod. index h",
            "Frame time (ms)", "Cycle time (ms)", "Goodput (kbps)", "Lines, no compression",
-           "Lines, planning compression", "Occupied BW est. (kHz)", "Fits 250 kHz sub-band?"]
+           "Lines, planning compression", "Occupied BW est. (kHz)", "Fits 250 kHz sub-band?", "Frame gap (ms)"]
     for i, h in enumerate(hdr):
         c = ws.cell(row=13, column=1 + i, value=h)
         c.font = F_BOLD
@@ -385,7 +385,10 @@ def build_throughput(wb):
             if k >= 1 and v is not None:
                 c.font = F_IN
         ws.cell(row=r, column=10, value=f"=(C{r}+D{r})*8/B{r}")
-        ws.cell(row=r, column=11, value=f"=E{r}*J{r}+F{r}*8/B{r}+2*G{r}")
+        gap = ws.cell(row=r, column=17, value=fr.gap_ms)
+        gap.font = F_IN
+        gap.border = BOX
+        ws.cell(row=r, column=11, value=f"=E{r}*(J{r}+Q{r})+F{r}*8/B{r}+2*G{r}")
         ws.cell(row=r, column=12, value=f"=E{r}*C{r}*8/K{r}*H{r}")
         ws.cell(row=r, column=13, value=f"=MIN($B$4,INT(L{r}*1000*$B$5/8/$B$9))")
         ws.cell(row=r, column=14, value=f"=MIN($B$4,INT(L{r}*1000*$B$5/8*$B$6/$B$9))")
@@ -441,7 +444,7 @@ def build_throughput(wb):
         ws.cell(row=r, column=2).number_format = "0.0" if r != 31 else "0"
         ws.cell(row=r, column=2).fill = FILL_RES
     ws.column_dimensions["A"].width = 40
-    for col in range(2, 17):
+    for col in range(2, 18):
         ws.column_dimensions[get_column_letter(col)].width = 12
     ws.row_dimensions[13].height = 45
 

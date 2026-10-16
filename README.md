@@ -41,7 +41,7 @@ Needs `gcc`, `make`, `zlib` (`sudo apt install build-essential zlib1g-dev`) and 
 
 ```sh
 make -C radio/fw test        # radio driver: 235 checks
-make -C proto test           # protocol simulator (14 scenarios) + usb_msc tests (96 checks), ~2 s
+make -C proto test           # protocol simulator (14 scenarios) + usb_msc tests (109 checks), ~2 s
 python3 radio/phy_config.py  # radio profiles: channel, band edge, e.i.r.p. checks
 python3 radio/linkbudget.py  # link budget table
 ./proto/build/sim sri --loss 0.1 --blackout 20:30   # try your own scenario

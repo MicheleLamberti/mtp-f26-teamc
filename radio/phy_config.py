@@ -60,8 +60,10 @@ FHSS_SELF_CH = 74             # our fixed MRM channel (TEAM_CH below), given up 
 # the other teams hop too: no fixed MRM channels left to avoid. MRM sharing = LBT + >= 10 m between boxes.
 FHSS_OTHERS: list[int] = []   # fixed channels of other teams to keep clear of (none now)
 FHSS_GUARD_MHZ = 5            # skip RF_CH within +-5 MHz of another team (nearest hop >= 6 MHz: C/I <= -50 dB)
-FHSS_STRIDE = 7               # hop order = sorted set taken with this index stride (consecutive hops >= 14 MHz)
-FHSS_SLOT_US = 25_000         # dwell per hop: one 16-frame SR-ARQ window (~22 ms) + guard
+FHSS_STRIDE = 7               # hop order = sorted set taken with this index stride (consecutive hops >= 14 MHz).
+                              # Team C's own: other teams should pick a different stride (11, 13, 17...) so two
+                              # unsynchronised teams never share a hop pattern (review 16-Oct)
+FHSS_SLOT_US = 30_000         # dwell per hop: 16 frames (~26 ms) + turnaround + ACK (~28.5 ms) + guard
 FHSS_COT_US = 50_000          # max TX time after one CCA (cl. 4.3.1.7.2 step 3: < 60 ms)
 FHSS_IDLE_US = 2_500          # idle before re-CCA on the same channel (>= 5 % of COT, >= 100 us)
 # Option B (D-R6b): one fixed channel at <= 20 dBm. EN 300 328 treats it as adaptive non-FHSS equipment using LBT,
@@ -73,8 +75,13 @@ FHSS_CCA_US = 170             # RX time before RPD is valid (PS v1.0) = CCA obse
 N_MIN_FHSS = 15               # cl. 4.3.1.4.3.2: N >= max(15, 15 MHz / min separation)
 
 
+# BLE advertising channels 37/38/39 = 2402/2426/2480 MHz: every phone around the boxes beacons there (review).
+FHSS_AVOID = [2, 26, 80]
+
+
 def _hopset() -> list[int]:
-    return [ch for ch in range(2, 81, 2) if all(abs(ch - x) > FHSS_GUARD_MHZ for x in FHSS_OTHERS)]
+    return [ch for ch in range(2, 81, 2)
+            if ch not in FHSS_AVOID and all(abs(ch - x) > FHSS_GUARD_MHZ for x in FHSS_OTHERS)]
 
 
 FHSS_HOPSET = _hopset()
@@ -102,7 +109,7 @@ REG = dict(CONFIG=0x00, EN_AA=0x01, EN_RXADDR=0x02, SETUP_AW=0x03, SETUP_RETR=0x
            RF_SETUP=0x06, STATUS=0x07, RX_PW_P0=0x11, DYNPD=0x1C, FEATURE=0x1D)
 
 TEAM_CH = FHSS_SELF_CH  # our MRM/SRI channel: proposal, final after the inter-team meeting (D-R4)
-NM_CH = 80            # NM common channel: proposal for the other teams (NM_PHY_PROPOSAL.md)
+NM_CH = 77            # NM common channel, 2477 MHz: off BLE adv. 39 (2480) and above WiFi 11; T14 confirms (NM spec)
 TEAM_ADDR = bytes([0xE7, 0xC3, 0x1A, 0x5D, 0x92])   # 5 B pipe address: no 0x00/0xFF/0x55/0xAA runs
 NM_ADDR = bytes([0xC2, 0x5A, 0x9D, 0x3E, 0x71])     # shared by all teams in NM
 
@@ -172,6 +179,7 @@ class Profile:
             ("RF_PWR is a chip setting", self.chip_dbm in RF_PWR, f"{self.chip_dbm} dBm"),
             (f"RF_PWR <= {self.chip_cap} dBm (driver hard limit{', LBT profile' if self.lbt else ''})",
              self.chip_dbm <= self.chip_cap, f"{self.chip_dbm} dBm"),
+            self.eirp_t0_check(),
             ("5 B address, no 0x00/0xFF/0x55/0xAA first byte", len(self.address) == 5
              and self.address[0] not in (0x00, 0xFF, 0x55, 0xAA), self.address.hex(" ").upper()),
             ("CRC-16 in hardware", self.crc_bytes == 2, f"{self.crc_bytes} B"),
@@ -185,6 +193,19 @@ class Profile:
         elif self.lbt:
             out += self.fbe_checks()
         return out
+
+    def eirp_t0_check(self) -> tuple[str, bool, str]:
+        """Review 16-Oct: Molex may quote gain with its cable (no -0.5 dB credit), the box can add ~1 dB of
+        peak gain, and per-module PA gain varies (+0.5 dB). If that worst case passes the limit: OK; if not,
+        T0 must measure this module first (flagged, not failed)."""
+        g, _, pad = ANTENNAS[self.antenna]
+        worst = self.conducted_dbm + pad + g + 1.5
+        if worst <= self.eirp_max:
+            return ("e.i.r.p. with +1.5 dB uncertainty, no cable credit", True, f"<= {worst:.1f} dBm")
+        allowed_gain = self.eirp_max - 1.5 - g - pad - self.chip_dbm
+        return ("e.i.r.p. with +1.5 dB uncertainty, no cable credit", True,
+                f"T0: {worst:.1f} dBm at the 25 dB PA estimate; legal if the measured PA gain <= {allowed_gain:.1f} dB "
+                f"(or add a pad)")
 
     def cca_check(self, clause: str) -> tuple[str, bool, str]:
         """RPD as the energy-detect CCA vs the EN 300 328 threshold, scaled to our power and in-box gain."""
@@ -221,6 +242,9 @@ class Profile:
         acc_ms = 400 * N_MIN_FHSS / u                  # TX time per freq in the 400 ms x N window, 100 % duty
         seq_step = min(min(abs(a - b) for a, b in zip(FHSS_HOPSEQ, FHSS_HOPSEQ[1:] + FHSS_HOPSEQ[:1])), 99)
         others = min((abs(c - x) for c in hs for x in FHSS_OTHERS), default=99)
+        seq2 = FHSS_HOPSEQ * 2   # longest gap between two visits of the same channel, over the cyclic order
+        max_gap = max(next(j for j in range(i + 1, len(seq2)) if seq2[j] == seq2[i]) - i
+                      for i in range(len(FHSS_HOPSEQ))) * FHSS_SLOT_US
         return [
             ("4.3.1.2 FHSS RF output power <= 20 dBm e.i.r.p.", self.eirp_dbm <= 20.0, f"{self.eirp_dbm:.1f} dBm"),
             ("4.3.1.4.3.2 hop set N >= max(15, 15 MHz/sep)", u >= n_min and set(FHSS_HOPSEQ) == set(hs),
@@ -229,8 +253,8 @@ class Profile:
              f"{span / 1e6:.1f} MHz of {band / 1e6:.1f} MHz ({span / band * 100:.0f} %)"),
             ("4.3.1.4.3.2 accumulated TX <= 400 ms per 400 ms x N", acc_ms <= 400,
              f"<= {acc_ms:.0f} ms at 100 % duty ({u} channels, {FHSS_SLOT_US / 1e3:.0f} ms slots)"),
-            ("4.3.1.4.3.2 occupation: each freq within 4 x dwell x U", u * FHSS_SLOT_US <= 4 * FHSS_SLOT_US * u,
-             f"cycle {u * FHSS_SLOT_US / 1e6:.3f} s"),
+            ("4.3.1.4.3.2 occupation: each freq within 4 x dwell x U", max_gap <= 4 * FHSS_SLOT_US * u,
+             f"longest revisit {max_gap / 1e6:.3f} s (cycle {u * FHSS_SLOT_US / 1e6:.3f} s; busy hops still occupy)"),
             ("4.3.1.5.3 hop separation >= 100 kHz (and >= OBW)", sep_mhz * 1e6 >= max(100e3, self.obw),
              f"{sep_mhz} MHz vs OBW {self.obw / 1e3:.0f} kHz"),
             ("4.3.1.7.2 COT < 60 ms, slot <= COT", FHSS_COT_US < 60_000 and FHSS_SLOT_US <= FHSS_COT_US,
@@ -357,7 +381,8 @@ def report() -> bool:
             print(f"  hop order: {FHSS_HOPSEQ}")
         for label, ok, detail in p.checks():
             ok_all &= ok
-            tag = "WAIV" if ok and detail.startswith("WAIVED") else "OK " if ok else "FAIL"
+            tag = ("WAIV" if ok and detail.startswith("WAIVED") else "T0 " if ok and detail.startswith("T0:")
+                   else "OK " if ok else "FAIL")
             print(f"  [{tag}] {label:52} {detail}")
     print("\nNo duty-cycle limit in 2400-2483.5 MHz (UN-85 b, or UN-85 a with LBT): no TX budget to track.")
     print("Non-adaptive FHSS would add MU = P/100 mW x DC <= 10 % (cl. 4.3.1.6): not used.")

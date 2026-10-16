@@ -4,7 +4,7 @@ Version 0.5, 16-Oct-26 (v0.5: 20 dBm hopping is the SRI/MRM baseline; v0.4 added
 threshold, T18 hopping;
 v0.3 SP4 + omni; v0.2 the DP5 + patches; v0.1 the RFM69 at 868 MHz) · Owner: RT · Expected
 values come from `linkbudget.py` (flat earth, worst-case ground bounce, antennas at 0.75 m,
-−1 dB container, chip sensitivity −94 dBm at 250 kbps).
+−1 dB container, SP4 sensitivity −96 dBm at 250 kbps from the module datasheet).
 
 No duty-cycle limit at 2.4 GHz: tests can be repeated freely. **Never exceed 10 dBm e.i.r.p. on a fixed
 channel**: the driver only accepts RF_PWR −18 dBm for `TEAM_250K`, `TEAM_1M` and `NM_COMMON`. `TEAM_FHSS` (D-R6,
@@ -37,7 +37,7 @@ pad, frames sent/received.
    matches the E01 datasheet. A Si24R1 clone usually shows a different current and a weaker T2.
 4. Two boxes 1 m apart, `TEAM_250K`, flex antennas fitted: 1 000 frames of 32 B. Pass: ≥ 999 received.
 
-## T2 — Sensitivity / PER at 250 kbps (bench, conducted) — **gate for D-R2b before Quick Mode**
+## T2 — Sensitivity / PER at 250 kbps (bench, conducted) — **gate for D-R2c before Quick Mode**
 
 TX E01 → coax → lab step attenuator (≥ 100 dB total incl. fixed pads) → RX E01, both modules in
 shielded boxes or far apart so nothing leaks around the attenuator.
@@ -45,8 +45,11 @@ shielded boxes or far apart so nothing leaks around the attenuator.
 2. Received level = output measured in T0 − attenuation − cable loss. The level where PER = 1 %
    is our sensitivity. Repeat at 1 Mbps (`TEAM_1M`).
 
-Pass: PER ≤ 1 % at ≤ **−92 dBm** at 250 kbps (model uses −94; the LNA should give ~−96). If it is
-worse than −90, suspect a clone or a bad module, and update `linkbudget.py` with the measured value.
+Frames of 32 B. A +7 dBm module needs ~103 dB of isolation to the receiver: put the receiving module in a
+shielded box (or a metal tin with the coax through it), or the PER curve measures leakage, not the attenuator.
+Pass: PER ≤ 1 % at ≤ **−93 dBm** at 250 kbps (the conservative planning case: datasheet −96 "typical" at BER 0.1 %
++ 3 dB). If it is worse than −90, suspect a clone or a bad module. Write the measured 1 %-PER level into
+`linkbudget.py` (`sens_dbm`) and drop `PLAN_SENS_DB` to 0.
 
 ## T4 — Range, open box (campus, line of sight)
 
@@ -60,15 +63,19 @@ Distances 10 / 70 / 150 / 260 m, 1 000 frames each, our channel.
 | 150 m | −83 dBm | +13 dB |
 | 260 m | −93 dBm | +3 dB |
 
-Pass: PER ≤ 1 % at 70 m and 150 m; at 260 m record the PER at 0.75 m and at 1.0 m antenna height
-(the model says +5 dB for the extra 25 cm). Then one 2-minute file transfer at 70 m: pass if all
-10 000 lines arrive (simulator: ~28 s at 5 % loss).
+PER ≤ 1 % alone does not say how much margin is left. **Measure attenuation to failure:** U.FL-jack-to-SMA
+adapters and 3/6/10 dB SMA pads in the antenna feed, add pads until PER > 1 %; the pad value is the margin. Do it
+at 8 azimuths of the box, and once with a person standing 1 m in front of the box.
+Pass: ≥ 6 dB to failure at 70 m (10 mW, SRI) and at 260 m with `TEAM_FHSS` (MRM); record 0.75 m and 1.0 m antenna
+height (the model says +5 dB for the extra 25 cm). Then one 2-minute file transfer at 70 m: pass if all 10 000
+lines arrive (simulator: ~28 s at 5 % loss).
 
 ## T5 — Closed box and antenna placement
 
 As T4 at 70 m and 260 m with the box closed. Compare: antenna at the top of the wall vs the middle,
 box rotated 0 / 90 / 180° (omni pattern in the box, effect of the battery and PCB), box open vs closed.
-Pass: closed-box PER ≤ 1 % at 260 m. If it fails, raise the antenna and re-check before anything else.
+Pass: closed-box margin to failure ≥ 6 dB at 260 m (pads as in T4), and the worst azimuth within 6 dB of the best.
+If it fails, raise the antenna and re-check before anything else.
 
 ## T13 — Spectrum and e.i.r.p. (lab, spectrum analyser)
 
@@ -82,19 +89,22 @@ Pass: closed-box PER ≤ 1 % at 260 m. If it fails, raise the antenna and re-che
    < 1 MHz signal sits in one 1 MHz bin), i.e. 5–10 dB over the 10 dBm/MHz limit: record it for the Atenea Q11
    answer, and check the CCA every ≤ 10 ms in zero-span.
 
-## T14 — Campus 2.4 GHz survey (Andrian) — **decides the D-R4 channel plan**
+## T14 — Campus 2.4 GHz survey (Andrian) — WiFi load per channel and the NM channel
 
-Firmware loop on one SP4 with its flex antenna at the SRI, MRM and NM sites, at the competition hour if
-possible: for RF_CH 0..83, RX for 200 µs, read RPD (`nrf24_carrier`), 1 000 sweeps. Output: % busy
-per channel. An SDR (HackRF) or the lab analyser gives the same picture with levels. Pass: each of
-the four MRM channels and RF_CH 80 (NM) is busy < 5 % of the time; otherwise move the plan.
+Use an SDR (HackRF) or the lab analyser at the SRI, MRM and NM sites, at the competition hour if possible: the
+RPD bit only sees signals above ~-76 dBm at the port, while WiFi at ~-94 dBm in-channel already hurts an MRM link
+received at ~-82 dBm. (An RPD sweep on one SP4 - RF_CH 0..83, 200 us each, 1 000 sweeps - is a quick first look.)
+Output: % busy and level per channel. Pass: the NM channel RF_CH 77 busy < 5 % of the time (else propose another,
+e.g. RF_CH 50); report the average busy share over the 37 hop channels (the simulator assumes 10 %) and, for the
+fallback, over RF_CH 24/49/74/82. Note BLE advertising (2402/2426/2480 MHz) and any WiFi on channel 13.
 
-## T15 — MRM near-far (two of our boxes as the "other team")
+## T15 — MRM near-far (our extra boxes as the "other teams")
 
-Link at 260 m on RF_CH 74; a third box 2 m and 10 m from the receiver sends continuously on
-RF_CH 82 (8 MHz away) and then RF_CH 49 (25 MHz away). Pass: PER of the 260 m link stays ≤ 1 % with
-the interferer at 10 m on RF_CH 82 and at 2 m on RF_CH 49 (model: −50 / −60 dB selectivity vs
-41 / 55 dB near-far).
+The weak end is the **sender** (it listens for ACKs next to the other teams' senders, which transmit all the
+time). Link at 260 m with `TEAM_FHSS`; two or three more boxes hopping at 20 dBm with continuous traffic (other
+strides) stand 10 m and then 30 m from our sender. Measure ACK loss, POLLs and the 2-minute file time. Pass: all
+10 000 lines in < 120 s at 10 m (simulator T14: ~90 s with 30 % loss both ways). For the fallback/option B: the
+interferer on RF_CH 82 / 49 at 10 m / 2 m, PER ≤ 1 % (−50 / −60 dB selectivity).
 
 ## T16 — NM interop (with the other teams, see `NM_PHY_PROPOSAL.md`)
 
@@ -107,6 +117,8 @@ corrected for the antenna gain).
    a 250 kbps GFSK signal, then a CW tone, then a ~20 MHz wideband source (WiFi from a phone or the SG's
    noise mode) if available. Step 1 dB; at each step run `nrf24_cca()` 1 000 times.
 2. Trip level = input where CCA reports busy ≥ 90 %. Expected ~−76 dBm (−64 dBm chip − ~12 dB LNA).
+   Test **every module that goes into a box** (the −64 dBm RPD threshold has no published tolerance, and the
+   LNA gain varies). The driver reads RPD three times over ≥ 200 µs and treats any 1 as busy.
 3. Pass: trip level (in dBm/MHz for the wideband source) ≤ the threshold `phy_config.py` prints for the
    chosen step (−64 dBm at −12, −68.5 dBm at 20 dBm e.i.r.p.). Write the LNA gain into `SP4_LNA_GAIN_DB`.
    If it fails at 20 dBm, keep the lower step (the threshold relaxes with power).
@@ -116,15 +128,23 @@ corrected for the antenna gain).
 `TEAM_FHSS` sender with a receiver following it, file transfer running.
 1. Max-hold, 2400–2483.5 MHz: 40 channels visible (even RF_CH 2–80), whole emission
    inside the band. Peak e.i.r.p. per T13.
-2. Zero-span on one hop channel: dwell ≤ 25 ms, bursts ≤ 50 ms after each CCA, ≥ 2.5 ms idle before a re-CCA
-   on the same channel; each channel revisited every ~1.0 s.
+2. Zero-span on one hop channel: dwell ≤ 30 ms, bursts ≤ 50 ms after each CCA, ≥ 2.5 ms idle before a re-CCA
+   on the same channel; each channel revisited every ~1.2 s.
 3. A CW interferer at −60 dBm on one hop channel: the sender skips that channel (no bursts on it) while the
    transfer goes on. Then a −35 dBm CW at 2395 MHz and at 2488.5 MHz (EN 300 328 table 2): CCA and link still
    work.
-4. Pass: all of the above; record plots for the ANNEX and for the Atenea answer if the teachers want proof.
+4. EN 300 328 items not covered elsewhere (review 16-Oct), at the highest legal power step:
+   - out-of-band mask at the hop-set edges (RF_CH 4 and 78) at full power;
+   - spurious/harmonics, radiated (the Molex omni is a 2.4/5 GHz dual-band antenna, so the 2nd harmonic at
+     ~4.9 GHz may radiate well): ≤ −30 dBm e.i.r.p. per MHz;
+   - receiver blocking (category 1): link PER ≤ 10 % with a CW at −53 dBm at 2380 / 2504 MHz and −47 dBm in
+     2300–2674 MHz outside the band (the SP4's LNA likely has no SAW filter);
+   - output power per module at 3.6 V supply (the PA gain rises with VCC).
+5. Pass: all of the above; record plots for the ANNEX and for the Atenea answer if the teachers want proof.
 
 ## Order
 
 T0 → T2 (before QM) → T14 (survey) → T13 + T17 + T18 (one lab booking) → T4 with `TEAM_FHSS` (260 m model
 +13.9 dB at RF_PWR −6, +8.4 dB at −12; `TEAM_250K` as the 10 mW reference) → T5 → T15 (with our hopping box
-hopping at 20 dBm too, 10 m from ours) → T16.
+hopping at 20 dBm too, 10 m from ours) → T16. **Go/no-go for hopping in MRM: Fri 20-Nov** (T17, T18 and a
+260 m transfer with `TEAM_FHSS` passed); otherwise MRM runs `TEAM_250K`. SRI runs `TEAM_250K` in any case.

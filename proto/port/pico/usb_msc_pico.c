@@ -16,6 +16,13 @@
  *    divider and the UART baud still come out right at that clock.
  *  - Run tuh_task() from core 0's main loop only (the proposal puts USB, flash and codec on core 0).
  *  - Flash writes stall both cores: the radio loop on core 1 must run from RAM (__not_in_flash_func).
+ *  - Flash ERASES (45-400 ms per 4 KB) also stall PIO-USB's 1 ms SOF interrupt, and a stick suspends after
+ *    3 ms without SOF: erase the whole file region BEFORE mounting the stick, then only program pages
+ *    (the usbm_load sink) while it is attached.
+ *  - PIO_USB_DEFAULT_CONFIG uses DMA channel 0 and PIO0/PIO1: call usbm_pico_init() before anything that
+ *    claims DMA channels (or set cfg.tx_ch to a free one), and keep the radio's SPI off PIO.
+ *  - Stack: pico-sdk's default is 2 KB per core; FatFs with exFAT + LFN, vsnprintf and the log need more:
+ *    set PICO_STACK_SIZE (and PICO_CORE1_STACK_SIZE) to 8 KB, keep usbm_t and big buffers static.
  */
 #include <stdbool.h>
 #include <stdint.h>
@@ -53,14 +60,32 @@ static bool xfer_done(uint8_t dev_addr, tuh_msc_complete_data_t const *cb)
     return true;
 }
 
+/* A timed-out READ10/WRITE10 is still in flight with FatFs's buffer: a late completion would write into a
+ * buffer FatFs has already reused, and the MSC driver stays busy. So power-cycle the port: drop the device,
+ * cut the 5 V, and let the stick enumerate again; the caller remounts (usbm_mount) and retries. */
+static void reset_port(void)
+{
+    msc_addr = 0;
+    xfer_busy = false;
+    gpio_put(PIN_USB_5V_EN, 0);
+    uint64_t t0 = time_us_64();
+    while (time_us_64() - t0 < 200000u)   /* let VBUS fall and TinyUSB see the disconnect */
+        tuh_task();
+    gpio_put(PIN_USB_5V_EN, 1);
+}
+
 /* Run TinyUSB until the transfer completes, the stick goes away or the timeout expires. */
 static int wait_xfer(void)
 {
     uint64_t t0 = time_us_64();
     while (xfer_busy) {
         tuh_task();
-        if (!msc_addr || time_us_64() - t0 > MSC_TIMEOUT_US)
+        if (!msc_addr)
             return -1;
+        if (time_us_64() - t0 > MSC_TIMEOUT_US) {
+            reset_port();
+            return -1;
+        }
     }
     return xfer_ok ? 0 : -1;
 }

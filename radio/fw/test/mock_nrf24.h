@@ -23,6 +23,7 @@ typedef struct mock_nrf24 {
     unsigned n_peers;
     /* knobs */
     int dead_spi, not_plus, tx_stuck, rpd, bad_width;
+    uint8_t aw_at_addr;     /* SETUP_AW when the TX address was last written */
     /* counters */
     unsigned frames_tx, noack_writes, ack_writes, rx_dropped, short_ce_pulses;
 } mock_nrf24_t;

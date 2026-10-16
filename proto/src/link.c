@@ -52,6 +52,15 @@ void link_cfg_for_bitrate(link_cfg_t *cfg, uint32_t bitrate_bps)
 
 void link_cfg_default(link_cfg_t *cfg) { link_cfg_for_bitrate(cfg, 250000u); }
 
+void link_cfg_for_fhss(link_cfg_t *cfg, uint32_t bitrate_bps, uint32_t slot_us)
+{
+    link_cfg_for_bitrate(cfg, bitrate_bps);
+    cfg->idle_ack_us += slot_us;
+    cfg->ack_timeout_us += slot_us;
+    if (cfg->hello_min_us < 2u * slot_us)
+        cfg->hello_min_us = 2u * slot_us;
+}
+
 /* ------------------------------------------------------------------ sender */
 
 int link_tx_init(link_tx_t *t, const proto_env_t *env, const link_cfg_t *cfg, const uint8_t *data,
@@ -64,11 +73,26 @@ int link_tx_init(link_tx_t *t, const proto_env_t *env, const link_cfg_t *cfg, co
     t->len = len;
     t->crc32 = crc32;
     t->codec = codec;
-    strncpy(t->name, name, HELLO_NAME_MAX);
-    t->n_frames = (len + DATA_PAYLOAD - 1u) / DATA_PAYLOAD;
+    size_t nl = strlen(name);
+    if (nl <= HELLO_NAME_MAX) {
+        memcpy(t->name, name, nl);
+    } else {   /* keep the extension: "very long name.txt" -> "very long na….txt" */
+        const char *dot = strrchr(name, '.');
+        size_t ext = dot ? strlen(dot) : 0;
+        if (ext > 8u)
+            ext = 0;
+        memcpy(t->name, name, HELLO_NAME_MAX - ext);
+        memcpy(t->name + HELLO_NAME_MAX - ext, name + nl - ext, ext);
+        nl = HELLO_NAME_MAX;
+    }
+    t->name[nl] = '\0';
+    if (t->len > 0xFFFFu * DATA_PAYLOAD)   /* 16-bit sequence numbers: send the prefix that fits */
+        t->len = 0xFFFFu * DATA_PAYLOAD;
+    t->n_frames = (t->len + DATA_PAYLOAD - 1u) / DATA_PAYLOAD;
     t->state = LTX_IDLE;
     t->done_at = PROTO_NO_TIMER;
-    return t->n_frames > 0xFFFFu ? -1 : 0;
+    t->clean = 1;
+    return 0;
 }
 
 static void send_hello(link_tx_t *t)
@@ -132,6 +156,18 @@ static void send_burst(link_tx_t *t)
     }
     t->st.bursts++;
     t->state = LTX_WAIT_ACK;
+    t->on_air = 1;
+    t->polled = 0;
+    t->arm_us = t->cfg.ack_timeout_us;
+}
+
+static void send_poll(link_tx_t *t)
+{
+    uint8_t f[POLL_LEN] = {FT_POLL, t->session};
+    t->env->send(t->env->ctx, f, POLL_LEN);
+    t->st.polls++;
+    t->polled = 1;
+    t->on_air = 1;
     t->arm_us = t->cfg.ack_timeout_us;
 }
 
@@ -165,7 +201,7 @@ void link_tx_on_frame(link_tx_t *t, const uint8_t *f, uint8_t len)
         if (t->next_new < t->base)
             t->next_new = t->base;
         advance(t);
-    } else if (type == FT_ACK && len >= ACK_LEN && t->state == LTX_WAIT_ACK) {
+    } else if (type == FT_ACK && len >= ACK_LEN && t->state == LTX_WAIT_ACK && !t->on_air) {
         uint32_t nb = get16(f + 2);
         if (nb < t->base)
             return; /* stale */
@@ -174,6 +210,9 @@ void link_tx_on_frame(link_tx_t *t, const uint8_t *f, uint8_t len)
         t->acked = (uint16_t)get16(f + 4);
         t->timeouts = 0;
         t->st.acks++;
+        uint32_t out = t->next_new > nb ? t->next_new - nb : 0;   /* sent but not yet below next_seq */
+        uint32_t want = out > 1u ? ((1u << (out - 1u)) - 1u) & 0xFFFFu : 0u;
+        t->clean = out == 0 || (t->acked & want) == want;
         advance(t);
     }
 }
@@ -191,6 +230,8 @@ void link_tx_on_timer(link_tx_t *t)
             t->timeouts = 0;
             t->hello_us = t->cfg.hello_min_us;
             send_hello(t);
+        } else if (!t->polled && t->clean) {
+            send_poll(t);   /* the data was getting through: most likely only the ACK was lost */
         } else {
             send_burst(t);
         }
@@ -210,6 +251,7 @@ void link_tx_on_timer(link_tx_t *t)
 
 void link_tx_on_tx_idle(link_tx_t *t)
 {
+    t->on_air = 0;
     if (t->arm_us) {
         t->env->set_timer(t->env->ctx, now(t->env) + t->arm_us);
         t->arm_us = 0;
@@ -248,7 +290,8 @@ static void on_hello(link_rx_t *r, const uint8_t *f, uint8_t len)
     link_rx_store_t *s = r->store;
     uint32_t flen = get32(f + 2), crc = get32(f + 6);
     if (!s->valid || s->crc32 != crc || s->len != flen) {
-        if (flen > s->cap)
+        /* A file larger than the store is still accepted: we keep the prefix that fits (it is what scores). */
+        if (s->prepare && s->prepare(s->ctx, flen < s->cap ? flen : s->cap))
             return;
         s->valid = 1;
         s->done = 0;
@@ -262,7 +305,8 @@ static void on_hello(link_rx_t *r, const uint8_t *f, uint8_t len)
     }
     r->session = f[1];
     r->have_session = 1;
-    r->next = s->committed / DATA_PAYLOAD;
+    /* A finished file is acknowledged as finished: committed/28 would re-request a short last frame. */
+    r->next = s->committed >= s->len ? (s->len + DATA_PAYLOAD - 1u) / DATA_PAYLOAD : s->committed / DATA_PAYLOAD;
     r->have = 0;
     r->st.hellos++;
 
@@ -291,16 +335,24 @@ static void on_data(link_rx_t *r, const uint8_t *f, uint8_t len)
             r->win_len[slot] = (uint8_t)plen;
             r->have |= (uint16_t)(1u << slot);
         }
-        /* Commit the in-order run to the store. */
+        /* Commit the in-order run to the store (never past the announced length or the capacity). */
+        uint32_t limit = s->len < s->cap ? s->len : s->cap;
         for (;;) {
             uint32_t sl = r->next % LINK_WINDOW;
-            if (!((r->have >> sl) & 1u) || s->committed + r->win_len[sl] > s->cap)
+            if (!((r->have >> sl) & 1u) || s->committed + r->win_len[sl] > limit)
                 break;
-            memcpy(s->buf + s->committed, r->win[sl], r->win_len[sl]);
+            if (s->commit) {
+                if (s->commit(s->ctx, s->committed, r->win[sl], r->win_len[sl]))
+                    break;
+            } else {
+                memcpy(s->buf + s->committed, r->win[sl], r->win_len[sl]);
+            }
             s->committed += r->win_len[sl];
             r->have &= (uint16_t)~(1u << sl);
             r->next++;
         }
+        if (s->committed == s->len)
+            s->done = 1;   /* complete even if every END frame is lost */
     }
     if (f[0] & FF_LAST)
         send_ack(r);
@@ -322,6 +374,8 @@ void link_rx_on_frame(link_rx_t *r, const uint8_t *f, uint8_t len, uint8_t rssi)
         return;
     if (type == FT_DATA && len > DATA_HDR)
         on_data(r, f, len);
+    else if (type == FT_POLL)
+        send_ack(r);
     else if (type == FT_END && r->store->committed == r->store->len)
         r->store->done = 1;
 }

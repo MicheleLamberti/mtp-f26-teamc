@@ -148,11 +148,20 @@ void sim_set_fhss(sim_t *s, double busy)
     s->fhss = 1;
     s->fhss_slot_us = NRF24_FHSS_SLOT_US;
     s->fhss_hop_us = NRF24_TX_SETTLE_US + NRF24_FHSS_CCA_US;   /* PLL settling + CCA listen */
-    s->fhss_acq_us = NRF24_FHSS_N * NRF24_FHSS_SLOT_US;        /* worst case: wait a whole cycle */
     s->fhss_busy = busy < 0.95 ? busy : 0.95;
     s->fhss_seed = rng_next(s);
-    for (int i = 0; i < s->n; i++)
-        s->nodes[i].synced_at = s->fhss_acq_us;
+    for (int i = 0; i < s->n; i++) {
+        sim_node_t *nd = &s->nodes[i];
+        nd->ppm = (sim_rand(s) * 2.0 - 1.0) * 30.0;       /* crystal error, +-30 ppm */
+        nd->clk_off_us = sim_rand(s) * 1e9;               /* unrelated power-up phase */
+        nd->master = nd->synced = 0;
+    }
+}
+
+void sim_set_fhss_master(sim_t *s, int node)
+{
+    s->nodes[node].master = 1;
+    s->nodes[node].synced = 1;
 }
 
 const proto_env_t *sim_env(sim_t *s, int node) { return &s->nodes[node].env; }
@@ -178,6 +187,31 @@ void sim_reboot(sim_t *s, int node, uint64_t down_us, sim_call_fn fn, void *arg)
 static int overlap(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1) { return a0 < b1 && b0 < a1; }
 
 /* Same answer every time for a given node and hop: the CCA result of that hop. */
+static double to_local(const sim_node_t *nd, uint64_t t) { return (double)t * (1.0 + nd->ppm * 1e-6) + nd->clk_off_us; }
+
+static uint64_t to_global(const sim_node_t *nd, double local)
+{
+    double t = (local - nd->clk_off_us) / (1.0 + nd->ppm * 1e-6);
+    return t <= 0.0 ? 0u : (uint64_t)t + 1u;   /* round up: never before the local instant */
+}
+
+/* A slave that heard nothing for two hop cycles has lost the master: back to parking. */
+static void fhss_check_sync(sim_t *s, sim_node_t *nd)
+{
+    uint64_t cycle = (uint64_t)NRF24_FHSS_N * s->fhss_slot_us;
+    if (!nd->master && nd->synced && s->now > nd->last_heard + 2u * cycle)
+        nd->synced = 0;
+}
+
+/* Channel the node is on at global time t: its own hop if it has timing, else the parking channel. */
+static uint8_t fhss_channel(const sim_t *s, const sim_node_t *nd, uint64_t t)
+{
+    if (!nd->master && !nd->synced)
+        return NRF24_FHSS_HOPSEQ[0];
+    uint64_t k = (uint64_t)(to_local(nd, t) / s->fhss_slot_us);
+    return NRF24_FHSS_HOPSEQ[k % NRF24_FHSS_N];
+}
+
 static int hop_busy(const sim_t *s, int node, uint64_t slot)
 {
     uint64_t x = s->fhss_seed ^ (slot * 0x9E3779B97F4A7C15ULL) ^ ((uint64_t)node << 56);
@@ -191,17 +225,22 @@ static int hop_busy(const sim_t *s, int node, uint64_t slot)
  * and not in a hop whose CCA is busy. */
 static uint64_t fhss_start(sim_t *s, sim_node_t *nd, uint64_t t, uint32_t air)
 {
+    fhss_check_sync(s, nd);
+    if (!nd->master && !nd->synced)
+        return t;   /* no hop timing: it can only talk on the parking channel */
+    double slot_us = s->fhss_slot_us, L = to_local(nd, t);
     for (;;) {
-        uint64_t slot = t / s->fhss_slot_us, start = slot * s->fhss_slot_us;
-        if (t < start + s->fhss_hop_us)
-            t = start + s->fhss_hop_us;
-        if (hop_busy(s, nd->id, slot)) {
+        double k = (double)(uint64_t)(L / slot_us), start = k * slot_us;
+        if (L < start + s->fhss_hop_us)
+            L = start + s->fhss_hop_us;
+        if (hop_busy(s, nd->id, (uint64_t)k)) {
             nd->st.fhss_skipped++;
-            t = start + s->fhss_slot_us;
-        } else if (t + air > start + s->fhss_slot_us) {
-            t = start + s->fhss_slot_us;
+            L = start + slot_us;
+        } else if (L + air > start + slot_us) {
+            L = start + slot_us;
         } else {
-            return t;
+            uint64_t g = to_global(nd, L);
+            return g > t ? g : t;
         }
     }
 }
@@ -262,9 +301,12 @@ static void tx_end(sim_t *s, sim_node_t *nd)
         sim_node_t *rx = &s->nodes[j];
         if (j == i || s->loss[i][j] >= 1.0 || rx->down)
             continue;
-        if (s->fhss && t0 < rx->synced_at) {
-            rx->st.rx_unsynced++;
-            continue;
+        if (s->fhss) {
+            fhss_check_sync(s, rx);
+            if (fhss_channel(s, nd, t0) != fhss_channel(s, rx, t0)) {
+                rx->st.rx_unsynced++;
+                continue;
+            }
         }
         int deaf = rx->begin_pending && rx->begin_at - rx->begin_switch < t1;
         int coll = 0;
@@ -301,6 +343,15 @@ static void tx_end(sim_t *s, sim_node_t *nd)
             continue;
         }
         rx->st.rx_ok++;
+        if (s->fhss) {
+            rx->last_heard = s->now;
+            if (!rx->master) {   /* copy the master's hop timing (the hop is known from the channel) */
+                if (!rx->synced)
+                    rx->st.fhss_syncs++;
+                rx->clk_off_us = to_local(nd, t0) - (double)t0 * (1.0 + rx->ppm * 1e-6);
+                rx->synced = 1;
+            }
+        }
         if (rx->hooks.on_frame)
             rx->hooks.on_frame(rx->hooks.proto, nd->cur, nd->cur_len, s->rssi[i][j]);
     }
@@ -327,8 +378,10 @@ void sim_run_until(sim_t *s, uint64_t t_us)
         case EV_UP:
             nd->down = 0;
             nd->busy = 0;
-            if (s->fhss)
-                nd->synced_at = s->now + s->fhss_acq_us;
+            if (s->fhss) {   /* rebooted: a master restarts on a new phase, a slave parks again */
+                nd->clk_off_us = sim_rand(s) * 1e9;
+                nd->synced = nd->master;
+            }
             if (ev.fn)
                 ev.fn(s, ev.arg);
             break;

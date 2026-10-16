@@ -30,9 +30,12 @@ typedef struct {
  * keeps the receiver from ACKing in the middle of a burst. */
 void link_cfg_for_bitrate(link_cfg_t *cfg, uint32_t bitrate_bps);
 void link_cfg_default(link_cfg_t *cfg); /* = link_cfg_for_bitrate(cfg, 250000) */
+/* Hopping radio (TEAM_FHSS): a frame can wait for the next hop or skip a busy one, so the idle-ACK and
+ * ACK timeouts stretch by one hop slot (a burst + its ACK fit one hop; the ACK may wait one more). */
+void link_cfg_for_fhss(link_cfg_t *cfg, uint32_t bitrate_bps, uint32_t slot_us);
 
 typedef struct {
-    uint32_t frames, retx, bursts, acks, timeouts, hellos;
+    uint32_t frames, retx, bursts, acks, timeouts, hellos, polls;
 } link_tx_stats_t;
 
 typedef enum { LTX_IDLE, LTX_WAIT_HELLO, LTX_WAIT_ACK, LTX_END, LTX_DONE } link_tx_state_t;
@@ -54,11 +57,15 @@ typedef struct {
     uint32_t hello_us;
     uint32_t arm_us;        /* timer to arm when the radio queue drains */
     uint8_t end_left;
+    uint8_t on_air;         /* a burst is still queued in the radio: ignore ACKs until it has gone out */
+    uint8_t polled;         /* last ACK timeout was answered with a POLL; the next one resends the burst */
+    uint8_t clean;          /* the last ACK showed no gaps: a timeout then most likely lost only the ACK */
     uint64_t done_at;
     link_tx_stats_t st;
 } link_tx_t;
 
-/* Returns 0, or -1 if the file needs more than 65 535 frames. */
+/* Files longer than 65 535 frames (1.83 MB) are cut to that prefix: only the prefix can score anyway.
+ * Names longer than HELLO_NAME_MAX keep their extension. Always returns 0. */
 int link_tx_init(link_tx_t *t, const proto_env_t *env, const link_cfg_t *cfg, const uint8_t *data,
                  uint32_t len, uint32_t crc32, uint8_t codec, const char *name);
 void link_tx_start(link_tx_t *t);
@@ -66,7 +73,11 @@ void link_tx_on_frame(link_tx_t *t, const uint8_t *f, uint8_t len);
 void link_tx_on_timer(link_tx_t *t);
 void link_tx_on_tx_idle(link_tx_t *t);
 
-/* Receiver state that must survive a reboot (kept in flash on the Pico). */
+/* Receiver state that must survive a reboot. On the Pico the bytes go to flash through commit(): XIP
+ * flash cannot be written with memcpy, and a 4 KB erase stalls both cores for 45-400 ms. So prepare()
+ * erases the whole region when a new file is announced (before the round's data flows), commit()
+ * programs pages, and the store persists `committed` only after those pages are written. Without
+ * commit (the PC simulator) the bytes are copied into buf. */
 typedef struct {
     uint8_t valid, done, codec;
     uint32_t len, crc32;
@@ -74,6 +85,9 @@ typedef struct {
     uint32_t committed;     /* bytes received in order; frames are DATA_PAYLOAD each */
     uint8_t *buf;
     uint32_t cap;
+    void *ctx;
+    int (*prepare)(void *ctx, uint32_t len);                                  /* optional; 0 = ok */
+    int (*commit)(void *ctx, uint32_t off, const uint8_t *p, uint32_t n);     /* optional; 0 = ok */
 } link_rx_store_t;
 
 typedef struct {
