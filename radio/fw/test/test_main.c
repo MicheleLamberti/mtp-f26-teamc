@@ -248,7 +248,7 @@ static void test_power_limit(void)
     CHECK(n.m.regs[0x06] == (uint8_t)(0x20u | (NRF24_RF_PWR_MAX_BITS << 1)));
 }
 
-/* D-R6 draft: adaptive FHSS + LBT profile (EN 300 328 cl. 4.3.1.7.2). */
+/* D-R6 (SRI/MRM baseline): adaptive FHSS + LBT profile (EN 300 328 cl. 4.3.1.7.2). */
 static void test_fhss_profile(void)
 {
     const nrf24_profile_t *p = &NRF24_PROFILE_TEAM_FHSS;

@@ -23,7 +23,7 @@ typedef struct {
  * higher setting would break the 10 mW e.i.r.p. limit (CNAF UN-85 b). */
 #define NRF24_RF_PWR_MAX_BITS 0u
 
-/* D-R6 draft (only if Atenea Q3 = yes): adaptive FHSS + LBT under UN-85 a), 100 mW e.i.r.p.
+/* D-R6 (SRI/MRM baseline, 16-Oct-26): adaptive FHSS + LBT under UN-85 a), 100 mW e.i.r.p.
  * (EN 300 328 V2.2.2 cl. 4.3.1.7.2). Only an lbt profile may use RF_PWR up to -12 dBm, the
  * highest step whose worst-case e.i.r.p. (PA 25 dB, omni 3 dBi peak) is <= 20 dBm. T0 may raise it. */
 #define NRF24_RF_PWR_MAX_BITS_FHSS 1u
@@ -31,14 +31,14 @@ typedef struct {
 #define NRF24_FHSS_COT_US 50000u   /* max TX time after one clear CCA (< 60 ms) */
 #define NRF24_FHSS_IDLE_US 2500u    /* idle before a new CCA on the same channel */
 #define NRF24_FHSS_CCA_US 170u     /* RX time before RPD is valid */
-#define NRF24_FHSS_N 29u
-/* Hop order: RF_CH 2..76 even, >= 5 MHz from the other teams (RF_CH [24, 49, 82]). */
+#define NRF24_FHSS_N 27u
+/* Hop order: RF_CH 2..76 even, >= 6 MHz from the other teams (RF_CH [24, 49, 82]). */
 static const uint8_t NRF24_FHSS_HOPSEQ[NRF24_FHSS_N] = {
-    2u, 16u, 40u, 62u, 76u, 14u, 38u, 60u, 74u, 12u, 36u, 58u, 72u, 10u, 34u,
-    56u, 70u, 8u, 32u, 54u, 68u, 6u, 30u, 44u, 66u, 4u, 18u, 42u, 64u,
+    2u, 16u, 40u, 66u, 4u, 18u, 42u, 68u, 6u, 30u, 56u, 70u, 8u, 32u, 58u,
+    72u, 10u, 34u, 60u, 74u, 12u, 36u, 62u, 76u, 14u, 38u, 64u,
 };
 
-/* TEAM_250K: SRI/QM/MRM team link: our channel (D-R4), 250 kbps
+/* TEAM_250K: Quick Mode, bench and fallback: our fixed channel at 10 mW (UN-85 b), 250 kbps
  * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_250K[] = {
     {0x01, 0x01},  /* EN_AA */
@@ -60,7 +60,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_250K = {
     0u, 0u,
 };
 
-/* TEAM_1M: SRI option at 1 Mbps (teams sequential, +18 dB at 70 m)
+/* TEAM_1M: fixed-channel option at 1 Mbps, 10 mW (fallback only)
  * RF_CH 74 = 2474 MHz, 1000 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_1M[] = {
     {0x01, 0x01},  /* EN_AA */
@@ -104,7 +104,7 @@ static const nrf24_profile_t NRF24_PROFILE_NM_COMMON = {
     0u, 0u,
 };
 
-/* TEAM_FHSS: SRI/MRM adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6 draft, only if Atenea Q3 = yes)
+/* TEAM_FHSS: SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)
  * RF_CH 2 = 2402 MHz, 250 kbps, RF_PWR -12 dBm (<= +13 dBm at the E01 IPEX), omni: 15.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_TEAM_FHSS[] = {
     {0x01, 0x01},  /* EN_AA */

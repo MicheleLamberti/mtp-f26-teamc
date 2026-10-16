@@ -2,7 +2,7 @@
  *
  *   sim sri  [--loss P] [--burst] [--blackout A:B] [--rx-reboot T] [--tx-reboot T]
  *            [--codec deflate|none] [--profile 250k|1m] [--fhss BUSY] [--file F] [--seed N] [--duration S]
- *            --fhss: D-R6 draft, adaptive FHSS + LBT (TEAM_FHSS), BUSY = share of hops skipped
+ *            --fhss: D-R6 SRI/MRM baseline, adaptive FHSS + LBT (TEAM_FHSS), BUSY = share of hops skipped
  *   sim nm   [--nodes N] [--p1 P] [--p2 P] [--file F] [--seed N] [--duration S]
  *   sim test   run the pass/fail suite (exit code 1 on failure)
  *
@@ -425,7 +425,7 @@ static int run_tests(void)
     print_sri("\nT9  SRI, UTF-16 file (2 MB), 5 % loss, deflate", &r);
     expect(r.lines == r.total_lines && r.exact, "all lines of a UTF-16 file");
 
-    /* D-R6 draft: same link over adaptive FHSS + LBT (only if Atenea Q3 = yes). */
+    /* D-R6: the SRI/MRM baseline, the same link over adaptive FHSS + LBT. */
     o = sri_defaults();
     o.loss = 0.05;
     o.fhss = 1;

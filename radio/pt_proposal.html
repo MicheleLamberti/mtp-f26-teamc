@@ -127,8 +127,8 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.2 · Fri 16 Oct 2026</span></div>
-  <p class="lede"><b>New in v0.3.2 (16 Oct, radio proposal D-R6):</b> if Atenea allows 20 dBm e.i.r.p., SRI and MRM will <b>hop</b> every 25 ms over 29 channels and <b>listen before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things land on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop.</p>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.3 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.3.3 (16 Oct): SRI and MRM hop.</b> A professor approved 20 dBm e.i.r.p., which our radio may use only while <b>hopping</b> every 25 ms over 27 channels and <b>listening before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things are now <b>required</b> on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop, and Quick Mode can stay on one fixed channel at 10 mW.</p>
   <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01SP4, one per box, one omni antenna; decided 13 Oct) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
   <p class="lede">The radio team has fixed the physical layer: 2.4 GHz, nRF24L01+, 250 kbps, with a tested driver. Everything above it belongs to protocols &amp; software. This is a starting <b>proposal</b> built from the competition rules and our link numbers, to speed you up. It is not a decision. Please change whatever you see better.</p>
 </header>
@@ -154,9 +154,9 @@ td.total{font-weight:600}
       <tr><td>5 min setup while wrapped in foil; the professor then picks the TX device at random; GO/STOP by button; 3 min to upload</td><td>Load the file into <b>both</b> devices at setup. A role switch (TX/RX) is read when the button is pressed. Save the received file to USB after STOP.</td></tr>
       <tr><td>"The system should be designed to self-recover from eventual interruptions on the link"; "attacks" during the round</td><td>Retry forever with backoff, resume by HELLO, watchdog. Received data persists across a reboot.</td></tr>
       <tr><td>NM: random order of teams on two rims, 5 lines / 0.5 KB, 5 min; win = deliver a copy from one of your nodes</td><td>A flooding/gossip protocol shared by all teams, where every node stores the file. <b>No switch may indicate the position in the network.</b></td></tr>
-      <tr><td>MRM: all teams transmit at once, 260 m, interference</td><td>Channel-access layer (listen before talk, backoff) and a plan agreed with the other teams. In the D-R6 hopping mode, the driver forces a clear-channel check before each hop's first frame and skips busy hops.</td></tr>
+      <tr><td>MRM: all teams transmit at once, 260 m, interference</td><td>Channel-access layer (listen before talk, backoff) and a plan agreed with the other teams. SRI and MRM hop (D-R6): the driver forces a clear-channel check before each hop's first frame and skips busy hops.</td></tr>
       <tr><td>Quick Mode: one line (&lt; 500 chars), zero errors, &lt; 2 min, first attempt only</td><td>A simple, robust first version is enough. Reliability beats speed there.</td></tr>
-      <tr><td>CNAF UN-85 b) (radio team): 2.4 GHz, 10 mW e.i.r.p., no duty-cycle limit; nRF24 frames ≤ 32 B</td><td>No transmit-time budget. Headers must stay small: every byte of header is 3 % of a frame.</td></tr>
+      <tr><td>CNAF UN-85 (radio team): SRI/MRM hop at ≤ 20 dBm e.i.r.p. (a), NM at 10 mW on one channel (b); no duty-cycle limit; nRF24 frames ≤ 32 B</td><td>No transmit-time budget. Headers must stay small: every byte of header is 3 % of a frame. Hops last 25 ms: one 16-frame burst plus its ACK fits one hop.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -277,12 +277,12 @@ sequenceDiagram
 
 <section aria-labelledby="s-mrm">
   <div class="col"><h2 id="s-mrm">MRM: one channel per team</h2>
-  <p>All teams transmit at the same time, 260 m apart. At 2.4 GHz each team gets its own channel, so each keeps its full rate. The radio team's draft for the four teams is RF_CH 24 / 49 / 74 / 82 (D-R4), to be agreed after the campus WiFi survey.</p>
+  <p>All teams transmit at the same time, 260 m apart. The other three teams keep fixed channels (RF_CH 24 / 49 / 82, D-R4); since 16 Oct we leave 74 and <b>hop</b> over 27 channels at least 6 MHz from theirs, at up to 20 dBm (D-R6).</p>
   <ul class="tight">
-    <li>The risk is a neighbouring team's box a few metres away, which can arrive 40–55 dB above our partner. Channel spacing and distance between boxes handle it (radio brief, MRM section).</li>
-    <li><b>Listen before talk</b> with the RPD bit before each burst stays an option if a channel turns out to be shared with WiFi.</li>
+    <li>The risk is a neighbouring team's box a few metres away. At 20 dBm we must keep ≥ 15 m from the other teams' 10 mW boxes; they reach us 25–37 dB above our partner, well inside the −50 dB selectivity (radio brief, MRM section).</li>
+    <li><b>Listen before talk</b> with the RPD bit is now mandatory in SRI/MRM: the driver refuses to transmit on a hop without a clear check, and a busy hop is skipped.</li>
   </ul>
-  <p>Software ask for now: keep the <b>channel number</b> and the channel-access policy <b>configurable at run time</b>, so the final plan doesn't need a rewrite.</p></div>
+  <p>Software ask: build the slot clock and hop acquisition early (bench by week 8), and keep the <b>fixed-channel mode</b> (Quick Mode, fallback) selectable at run time.</p></div>
 </section>
 
 <section aria-labelledby="s-fw">
@@ -290,7 +290,7 @@ sequenceDiagram
   <div class="tbl"><table>
     <thead><tr><th>Module</th><th>Runs on</th><th>Job</th><th>Owner</th></tr></thead>
     <tbody>
-      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>core 1</td><td>Radio driver, profiles, RPD carrier sense, clear-channel check and hop order for the D-R6 hopping mode. <b>Done, 194 host checks.</b></td><td>RT</td></tr>
+      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>core 1</td><td>Radio driver, profiles, RPD carrier sense, clear-channel check and hop order for SRI/MRM hopping. <b>Done, 194 host checks.</b></td><td>RT</td></tr>
       <tr><td class="mono">board_hal</td><td>—</td><td>SPI, pins, timers for the chosen board</td><td>RT + ET</td></tr>
       <tr><td class="mono">link</td><td>core 1</td><td>Frames, bursts, ACK bitmap, timeouts</td><td>PT</td></tr>
       <tr><td class="mono">session</td><td>core 1</td><td>HELLO / resume / END, role from the switch</td><td>PT</td></tr>
@@ -325,7 +325,7 @@ sequenceDiagram
       <tr class="hl"><td>No compression, 5 % loss</td><td class="num r">10 000</td><td class="num r">73 s (was 9 643 lines at 868 MHz)</td></tr>
       <tr><td>NM, 10 nodes, 10 % / 70 % loss at 1 / 2 hops</td><td class="num r">all nodes</td><td class="num r">12 s</td></tr>
       <tr><td>NM, 10 nodes, 30 % / 95 % loss</td><td class="num r">all nodes</td><td class="num r">43 s</td></tr>
-      <tr class="hl"><td>Hopping + listen-before-talk (D-R6 draft), 5 % loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">36 s</td></tr>
+      <tr class="hl"><td>Hopping + listen-before-talk (SRI/MRM baseline), 5 % loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">36 s</td></tr>
       <tr><td>Hopping, 25 % of hops busy, receiver reboot at 15 s (re-sync one hop cycle)</td><td class="num r">10 000</td><td class="num r">54 s</td></tr>
     </tbody>
   </table></div>
@@ -360,7 +360,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Related pages: Team C Radio Brief v0.6 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.1 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Related pages: Team C Radio Brief v0.7 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.2 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
 </footer>
 </div>

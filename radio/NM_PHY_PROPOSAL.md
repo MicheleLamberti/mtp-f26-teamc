@@ -17,7 +17,7 @@ without PA/LNA) can join with a few register writes, and no team has to share co
 | CRC | **hardware CRC-16** (`CONFIG` EN_CRC = 1, CRCO = 1) | Same on every nRF24L01+ |
 | Payload | **dynamic length 1..32 B** (`FEATURE` = 0x05 EN_DPL + EN_DYN_ACK, `DYNPD` = 0x01, `EN_AA` = 0x01) | DPL needs ENAA on the pipe |
 | ACKs | **none on air**: send every frame with `W_TX_PAYLOAD_NOACK` (0xB0), `SETUP_RETR` = 0 | Broadcast medium: Enhanced-ShockBurst ACKs from several receivers would collide |
-| TX power | **≤ 10 dBm e.i.r.p.** (CNAF UN-85 b) | Bare nRF24: 0 dBm is fine with any antenna ≤ 10 dBi. PA modules (E01-ML01SP4/DP5 etc.): lowest setting (−18 dBm, up to ~+7 dBm out) + antenna ≤ 3 dBi, or a pad. Stays so even if a team uses 20 dBm frequency hopping in SRI/MRM (UN-85 a), our D-R6 draft): NM does not hop |
+| TX power | **≤ 10 dBm e.i.r.p.** (CNAF UN-85 b) | Bare nRF24: 0 dBm is fine with any antenna ≤ 10 dBi. PA modules (E01-ML01SP4/DP5 etc.): lowest setting (−18 dBm, up to ~+7 dBm out) + antenna ≤ 3 dBi, or a pad. Stays so even though we (and any team that wants to) use 20 dBm frequency hopping in SRI/MRM (UN-85 a), our D-R6): NM does not hop |
 | Polarisation | **vertical** | Mismatched polarisation costs 10–20 dB between teams |
 | Channel access | listen-before-talk with the RPD bit (> −64 dBm at the chip), random back-off | The nRF24 has no CCA in hardware; RPD needs ≥ 170 µs in RX |
 

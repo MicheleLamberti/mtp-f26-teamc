@@ -44,7 +44,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - `radio/build_course_sheet.py` → `radio/AN5142_course_layout_869MHz.xlsx`: the course AN5142 sheet
   rebuilt row for row (Ground Multipath inlined), course example as a check + SRI/MRM/NM baseline sheets.
 - `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`, and `TEAM_FHSS`
-  for the D-R6 draft), UN-85 b checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm,
+  = the SRI/MRM baseline since 16-Oct, D-R6), UN-85 b checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm,
   MRM plan spacing) and EN 300 328 adaptive-FHSS checks for `TEAM_FHSS` (29-channel hop set, COT/idle/CCA, RPD
   threshold vs the LBT level); regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`, `…_FHSS`, the
   hop order). `E01_PA_GAIN_DB` and `SP4_LNA_GAIN_DB` are estimates until T0/T17.
@@ -53,25 +53,25 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   the hopping profile (`nrf24_cca`, hop-set-only channels, 50 ms COT, idle gap), mock nRF24 with a simulated
   channel, host tests: `make -C radio/fw test` (194 checks).
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
-- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c current; D-R6 draft = 20 dBm hopping; D-R2b/D-R5b and the
-  868 records superseded),
+- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c/D-R6 current; D-R6 = 20 dBm hopping for SRI/MRM;
+  D-R2b/D-R5b and the 868 records superseded),
   `HANDOFF_ET.md` (SP4 interface for electronics), `NM_PHY_PROPOSAL.md` (nRF24 NM PHY for other teams), `TEST_PLAN.md`
-  (T0 gate at all RF_PWR steps, T2, T4, T5, T13–T18; T17/T18 = CCA threshold and hopping for D-R6; PER-based, nRF24
-  has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 = 20 dBm hopping, rewritten 16-Oct).
+  (T0 gate at all RF_PWR steps, T2, T4, T5, T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
+  has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 = written confirmation of the 20 dBm the professor approved).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.6 published 16-Oct: + "20 dBm with frequency hopping" section, D-R6 draft).
+  republish to the same URL (v0.7 published 16-Oct: 20 dBm hopping is the SRI/MRM baseline, ≥ 15 m near-far table).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (v0.4.1 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
-  note that hopping needs no hardware change).
+  — source `radio/hw_proposal.html` (v0.4.2 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
+  hopping at 20 dBm needs no hardware change, TX bursts toward 120 mA).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip, codec) and the PC
-  simulator (`sim/`, `--fhss BUSY` = D-R6 hopping radio layer): `make -C proto test` (13 scenarios, ~1 s).
+  simulator (`sim/`, `--fhss BUSY` = the SRI/MRM hopping radio layer): `make -C proto test` (13 scenarios, ~1 s).
   See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3.2 16-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results,
-  hopping slot clock + acquisition for PT).
+  — source `radio/pt_proposal.html` (v0.3.3 16-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results;
+  SRI/MRM hop: slot clock + acquisition now required from PT).
 - PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, headless Chromium from
   `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the 16-Oct export
   script lived in the job scratch dir — recreate if needed). No poppler here: check PDFs with pypdf text.
@@ -100,45 +100,48 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 **9-Oct-26: BAND SWITCH to 2.4 GHz.** All four teams (us + 3 others) chose 2.4 GHz for every mode;
 868 MHz is dropped (kept in `radio/DECISIONS.md` as superseded history). Everything below is the 2.4 GHz baseline.
 
-**Radio — key results (9-Oct, `python3 radio/linkbudget.py`, workbook S16–S20):**
-- Limit 10 mW e.i.r.p. (UN-85 b). UN-85 a) gives a narrowband radio nothing (10 mW/MHz); only FHSS gets
-  100 mW (+10 dB) → Atenea Q3. No duty-cycle limit.
-- MRM is simultaneous (rules), 4 teams → one channel each at 2.4 GHz (at 868 they'd share 250 kHz).
-- Margins at h 0.75 m with SP4 + one omni (workbook S21–S23): **SRI 70 m +26.0 · MRM 260 m +3.4 (thin; +8.3 at
-  1.0 m) · NM 100 m hop −10 dB obstr. +9.9 dB**. If T0 measures only ~+2 dBm out, every margin drops ~5 dB.
-- NM round is **5 min** (SRI/MRM 2 min); NM file is 0.5 kB.
+**16-Oct-26: 20 dBm e.i.r.p. is the SRI/MRM BASELINE (D-R6).** A professor said yes to 20 dBm (Santiago).
+Under CNAF UN-85 a) a narrowband radio gets it only while hopping with the EN 300 328 sharing rules, so SRI/MRM run
+as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). Written confirmation requested (Atenea Q3).
 
-**Baseline (2.4 GHz; module + antenna DECIDED 13-Oct by Santiago with Marcos):**
-- D-R1b 2400–2483.5 MHz, **250 kbps GFSK in every mode** (goodput ~159 kbps ≫ 67 needed).
-- D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, 1.27 mm pads, IPEX), one per box,
-  RF_PWR −18 only (+2..+7 dBm est.) → ≤ 9.5 dBm e.i.r.p.; needs a breakout from the first bench test (QM module
-  = final). Not the DP5 (adapter loss), not the 2G4M27D (~12 dBm e.i.r.p.), never E01C-* (Si24R1 clone).
-- D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) plugged into the SP4, vertical, high
-  on a wall. Same antenna for SRI/MRM/NM and QM (antennas can't change between modes). Patches dropped.
-- D-R4 draft: MRM channels RF_CH 24/49/74/82; near-far up to 55 dB at 2 m → ≥10 m between teams' boxes.
+**Radio — key results (16-Oct, `python3 radio/linkbudget.py`, workbook S21–S26):**
+- SRI/MRM: hopping at ≤ 20 dBm e.i.r.p. (S24–S26): **SRI 70 m +36.5 · MRM 260 m +13.9 dB** (+6.9 at 0.5 m; +8.4 at
+  today's RF_PWR −12 until T0 shows the PA gain ≤ 23.5 dB and allows −6). **NM 100 m hop (−10 dB) +9.9 dB** at 10 mW.
+- 10 mW fixed-channel fallback (S21–S22, also Quick Mode): SRI +26.0, MRM +3.4. If T0 measures only ~+2 dBm at
+  −18, the 10 mW margins drop ~5 dB (hopping picks the highest legal step anyway).
+- Non-adaptive FHSS would be capped at MU 10 % (10 % duty at 20 dBm, ~16 kbps): too slow → adaptive with LBT.
+- Hopping goodput 141 kbps with 10 % of hops busy (≫ 67 needed); sim T12 35.9 s, T13 53.8 s (13/13 pass).
+- **Near-far at MRM:** our 20 dBm box lands 51.9 dB over a 10 mW neighbour's partner at 10 m (selectivity −50 dB at
+  our nearest hop, 6 MHz): **≥ 15 m between our boxes and theirs** (10 m OK at −12 or if they go to 20 dBm too).
+- NM round is **5 min** (SRI/MRM 2 min); NM file is 0.5 kB. No duty-cycle limit anywhere in 2.4 GHz.
 
-**D-R6 draft (16-Oct, needs Atenea Q3 = yes): 20 dBm e.i.r.p. via adaptive FHSS + LBT for SRI/MRM.**
-A teacher said we may qualify for 20 dBm. That is CNAF UN-85 a) (EN 300 328): 100 mW, but 100 mW/100 kHz only
-for hopping (10 mW/MHz otherwise, i.e. nothing for a narrowband fixed channel). Non-adaptive FHSS is capped at
-MU 10 % (10 % duty at 20 dBm, too slow), so adaptive with LBT. Same SP4 + omni; hop set 29 channels RF_CH 2–76
-(≥ 5 MHz from 24/49/82, we give up 74), 25 ms slots, RPD as the CCA, COT 50 ms. Workbook S24–S26: **SRI +36.5,
-MRM 260 m +13.9 (+8.4 at the worst RF_PWR step −12)**. NM stays fixed channel at 10 mW. phy_config picks RF_PWR −12
-until T0 shows the PA gain ≤ 23.5 dB (then −6). Firmware enforces LBT; sim T12/T13 pass.
+**Baseline (2.4 GHz):**
+- D-R1b 2400–2483.5 MHz, **250 kbps GFSK in every mode**.
+- D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, 1.27 mm pads, IPEX), one per box
+  (decided 13-Oct, Santiago with Marcos). RF_PWR −18 (+2..+7 dBm est.) for 10 mW; −12/−6 while hopping. Needs a
+  breakout from the first bench test (QM module = final). Not the DP5, not the 2G4M27D (can't do 10 mW), never E01C-*.
+- D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) in the SP4, vertical, high on a wall.
+  Same antenna for SRI/MRM/NM and QM.
+- **D-R6 SRI/MRM: `TEAM_FHSS`** — 27 hops RF_CH 2–76 (≥ 6 MHz from 24/49/82; we give up 74), 25 ms slots, RPD as
+  the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`** (RF_CH 80,
+  10 mW). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
+- D-R4 draft: other teams keep RF_CH 24/49/82; we hop.
 
 **Open decisions:**
 - [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
 - [ ] D-R3 NM common PHY: rewrite `NM_PHY_PROPOSAL.md` for nRF24
-- [ ] **Atenea Q3 (20 dBm hopping, D-R6) — worth +10.5 dB on MRM.** Marcos posts it, cc Prof. Anna Umbert
+- [ ] **Atenea Q3: written confirmation of the 20 dBm the professor approved** (Marcos posts, cc Prof. Anna Umbert)
 
 **Next up:**
-- [ ] D-R6: post Q3; tell the other teams (we may leave 74 and hop); T0 at all four RF_PWR steps; T17 (RPD trip
-      level) and T18 (hop pattern) in the T13 lab booking; PT: slot clock + hop acquisition on the Pico
+- [ ] D-R6: post Q3; tell the other teams we hop (leave 74, ≥ 6 MHz from theirs) and ask for ≥ 15 m between boxes;
+      T0 at all four RF_PWR steps; T17 (RPD trip level) + T18 (hop pattern) in the T13 lab booking — gates for
+      TEAM_FHSS outdoors; PT: slot clock + hop acquisition on the Pico (now required for SRI/MRM)
 - [ ] Order by 16-Oct (D-R2c): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4), 2 × U.FL-to-SMA pigtails.
       Verify EU seller + lead time first. Not needed: DP5, SMA pads, whips, Adafruit RFM69, 868 Molex.
 - [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
-- [ ] T0: measure SP4 output at RF_PWR −18 (U.FL-to-SMA pigtail into the SA) before any field test; T2 at 250 kbps
+- [ ] T0: measure SP4 output at all four RF_PWR steps (U.FL-to-SMA pigtail, ≥ 30 dB pad) before any field test; T2
 - [ ] Andrian: campus 2.4 GHz survey (eduroam channels at the SRI/MRM/NM sites) — now decides D-R4
-- [ ] Share brief v0.5 / hw v0.4 / pt v0.3.1 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM channel plan with the teams
+- [ ] Share brief v0.7 / hw v0.4.2 / pt v0.3.3 + `NM_PHY_PROPOSAL.md` v0.2 and the MRM plan (we hop) with the teams
 - [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team sim scenario
 - [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is asking the radio teacher which CST version
       the team may install on laptops. Then: review the code of `teslawei/mcp-cst-studio` (live on Windows, or
@@ -152,6 +155,16 @@ until T0 shows the PA gain ≤ 23.5 dB (then −6). Firmware enforces LBT; sim T
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-16 (later) — 20 dBm hopping made the SRI/MRM baseline
+- Santiago: a professor said yes to 20 dBm e.i.r.p. → make D-R6 the baseline (not a draft). Atenea Q3 now asks for
+  the yes in writing (rules: oral comments don't override the written rules); not blocking.
+- New finding at 20 dBm next to 10 mW teams: hops 5 MHz away (−38 dB) would drown them → hop guard widened to ±5 MHz
+  (27 channels, nearest 6 MHz, −50 dB); still needs **≥ 15 m between our boxes and theirs** at MRM (51.9 dB at 10 m).
+- Relabelled S21–S26 (baseline / fallback), near-far printout for 20 dBm, workbook rebuilt (0 dB diff); phy_config
+  profiles retitled (TEAM_FHSS = SRI/MRM, TEAM_250K = QM/bench/fallback); fw 194 checks; sim 13/13 (T12 35.9 s,
+  T13 53.8 s). DECISIONS, TEST_PLAN v0.5, Q3, handoff, NM note, READMEs. Pages: brief v0.7, hw v0.4.2, pt v0.3.3; PDFs.
+- **Start next session with:** written yes on Atenea? order placed? T0 at all four steps; other teams told (≥ 15 m)?
 
 ### 2026-10-16 — 20 dBm with frequency hopping (D-R6 draft)
 - Santiago: a teacher mentioned we could qualify for 20 dBm e.i.r.p.; asked how, which module, how to know, then

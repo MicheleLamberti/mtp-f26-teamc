@@ -1,14 +1,14 @@
 # Radio test plan — nRF24L01+ / Ebyte E01-ML01SP4 + flex omni, 2.4 GHz
 
-Version 0.4, 16-Oct-26 (v0.4 adds the D-R6 draft: T0 all power steps, T17 CCA threshold, T18 hopping;
+Version 0.5, 16-Oct-26 (v0.5: 20 dBm hopping is the SRI/MRM baseline; v0.4 added T0 all power steps, T17 CCA
+threshold, T18 hopping;
 v0.3 SP4 + omni; v0.2 the DP5 + patches; v0.1 the RFM69 at 868 MHz) · Owner: RT · Expected
 values come from `linkbudget.py` (flat earth, worst-case ground bounce, antennas at 0.75 m,
 −1 dB container, chip sensitivity −94 dBm at 250 kbps).
 
 No duty-cycle limit at 2.4 GHz: tests can be repeated freely. **Never exceed 10 dBm e.i.r.p. on a fixed
-channel**: the driver only accepts RF_PWR −18 dBm for `TEAM_250K`, `TEAM_1M` and `NM_COMMON`. The `TEAM_FHSS`
-profile (D-R6 draft, up to 20 dBm e.i.r.p. while hopping with LBT) is for the bench and the lab only until
-Atenea Q3 is answered yes; T17 and T18 must pass before it goes outdoors.
+channel**: the driver only accepts RF_PWR −18 dBm for `TEAM_250K`, `TEAM_1M` and `NM_COMMON`. `TEAM_FHSS` (D-R6,
+the SRI/MRM baseline, up to 20 dBm e.i.r.p. while hopping with LBT) goes outdoors once T0, T17 and T18 pass.
 
 **The nRF24 has no RSSI.** It only has RPD, one bit that says "above −64 dBm at the chip" (about
 −76 dBm at the E01 antenna port, through its ~12 dB LNA). So every range test measures **PER**
@@ -92,7 +92,7 @@ the interferer at 10 m on RF_CH 82 and at 2 m on RF_CH 49 (model: −50 / −60 
 
 ## T16 — NM interop (with the other teams, see `NM_PHY_PROPOSAL.md`)
 
-## T17 — CCA threshold: where does RPD trip? (lab, D-R6 draft) — **gate for TEAM_FHSS**
+## T17 — CCA threshold: where does RPD trip? (lab, D-R6) — **gate for TEAM_FHSS outdoors**
 
 The listen-before-talk check is the RPD bit, so its level at the SP4 antenna port decides whether we meet
 EN 300 328 cl. 4.3.1.7.2 step 5 (−70 dBm/MHz at 20 dBm e.i.r.p., relaxed by 10·log(100 mW/P) below that,
@@ -105,13 +105,13 @@ corrected for the antenna gain).
    chosen step (−64 dBm at −12, −68.5 dBm at 20 dBm e.i.r.p.). Write the LNA gain into `SP4_LNA_GAIN_DB`.
    If it fails at 20 dBm, keep the lower step (the threshold relaxes with power).
 
-## T18 — Hopping behaviour on the spectrum analyser (lab, D-R6 draft)
+## T18 — Hopping behaviour on the spectrum analyser (lab, D-R6) — **gate for TEAM_FHSS outdoors**
 
 `TEAM_FHSS` sender with a receiver following it, file transfer running.
-1. Max-hold, 2400–2483.5 MHz: 29 channels visible, none within ±4 MHz of RF_CH 24/49/82, whole emission
+1. Max-hold, 2400–2483.5 MHz: 27 channels visible, none within ±5 MHz of RF_CH 24/49/82, whole emission
    inside the band. Peak e.i.r.p. per T13.
 2. Zero-span on one hop channel: dwell ≤ 25 ms, bursts ≤ 50 ms after each CCA, ≥ 2.5 ms idle before a re-CCA
-   on the same channel; each channel revisited every ~0.73 s.
+   on the same channel; each channel revisited every ~0.68 s.
 3. A CW interferer at −60 dBm on one hop channel: the sender skips that channel (no bursts on it) while the
    transfer goes on. Then a −35 dBm CW at 2395 MHz and at 2488.5 MHz (EN 300 328 table 2): CCA and link still
    work.
@@ -119,6 +119,6 @@ corrected for the antenna gain).
 
 ## Order
 
-T0 → T2 (before QM) → T14 (survey) → T4 → T13 (book the lab) → T5 → T15 → T16. D-R6 (only if Atenea Q3 =
-yes): T17 and T18 in the same lab booking as T13, then T4 at 260 m with `TEAM_FHSS` (model +13.9 dB at
-RF_PWR −6, +8.4 dB at −12).
+T0 → T2 (before QM) → T14 (survey) → T13 + T17 + T18 (one lab booking) → T4 with `TEAM_FHSS` (260 m model
++13.9 dB at RF_PWR −6, +8.4 dB at −12; `TEAM_250K` as the 10 mW reference) → T5 → T15 (with our hopping box
+≥ 15 m from the "other team") → T16.

@@ -15,7 +15,7 @@
  * NRF24_RF_PWR_MAX_BITS would break the 10 mW e.i.r.p. limit. nrf24_init refuses
  * such a profile and nrf24_write_reg clamps any RF_SETUP write.
  *
- * D-R6 draft (only if Atenea Q3 = yes): a profile with lbt = 1 is adaptive FHSS
+ * D-R6 (SRI/MRM baseline since 16-Oct-26): a profile with lbt = 1 is adaptive FHSS
  * with listen-before-talk (CNAF UN-85 a), ETSI EN 300 328 cl. 4.3.1.7.2). Only such
  * a profile may go up to NRF24_RF_PWR_MAX_BITS_FHSS (<= 20 dBm e.i.r.p.), and the
  * driver enforces the rules that make that legal: channels only from the hop set,

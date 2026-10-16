@@ -158,13 +158,14 @@ NRF24_250k = dict(NRF24_1M, sens_dbm=-94, rate_kbps=250)
 # SMA) with RF_PWR = -18 dBm -> ~+7 dBm at the SMA [ESTIMATE from RFX2401C gain, measure T0].
 # Path = SMA pigtail -1 dB + 0.5 dB pad, FR4 patch 4.5 dBi [ASSUMPTION, measure T5] -> EIRP 10.0 dBm.
 # The pad sits in the shared TX/RX path, so RX pays it too. Sensitivity: chip figure (LNA ignored).
-F24_FHSS = 2441.0  # same band, UN-85 a) FHSS class: 100 mW e.i.r.p. - only if Atenea Q3 says yes (D-R6 draft)
+F24_FHSS = 2441.0  # same band, UN-85 a) FHSS class: 100 mW e.i.r.p. - D-R6 baseline for SRI/MRM since 16-Oct-26
 E01_250k = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-1.5, l_con_rx=-1.5,
                 g_tx_dbi=4.5, g_rx_dbi=4.5, sens_dbm=-94, rate_kbps=250,
                 notes="E01-ML01DP5 @RF_PWR -18 (~+7 dBm, est.), 1 dB pigtail + 0.5 dB pad, 4.5 dBi FR4 patch")
 E01_1M = dict(E01_250k, sens_dbm=-85, rate_kbps=1000)
 
-# DECIDED 13-Oct-26 (Santiago with Marcos): ONE omni per box on an Ebyte E01-ML01SP4 (SMD, IPEX on the
+# DECIDED 13-Oct-26 (Santiago with Marcos): ONE omni per box on an Ebyte E01-ML01SP4. At RF_PWR -18 this is the
+# 10 mW fixed-channel path: NM baseline, Quick Mode, bench and the SRI/MRM fallback (SMD, IPEX on the
 # module). RF_PWR -18 -> +2..+7 dBm at the IPEX [ESTIMATE: PA 20-25 dB; T0 measures; model uses +7].
 # Molex 146153-0100 flex dipole plugged straight in: ~0.5 dB cable, 2.4-3.0 dBi datasheet peak; the model
 # uses 2 dBi for the in-box antenna (container -1 dB is separate). Sensitivity: SP4 datasheet -96 dBm typ.
@@ -172,7 +173,7 @@ SP4_OMNI = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-0.5, l_con_rx=-
                 g_tx_dbi=2.0, g_rx_dbi=2.0, sens_dbm=-96, rate_kbps=250,
                 notes="E01-ML01SP4 @RF_PWR -18 (~+7 dBm, est.), Molex 146153 flex omni 2 dBi in box, 0.5 dB cable")
 
-# PROPOSED 16-Oct-26 (D-R6 draft, needs Atenea Q3 = yes): same SP4 + omni, but SRI/MRM run as ADAPTIVE FHSS
+# BASELINE 16-Oct-26 (D-R6; a professor approved 20 dBm e.i.r.p.): same SP4 + omni, SRI/MRM run as ADAPTIVE FHSS
 # with LBT (EN 300 328 cl. 4.3.1.7.2) under CNAF UN-85 a): 100 mW e.i.r.p. (100 mW/100 kHz for FHSS).
 # Same hardware; only RF_PWR goes up. Compliance (phy_config.py) uses the omni's 3 dBi PEAK: conducted
 # <= 20 - 3 + 0.5 = 17.5 dBm at the IPEX. RF_PWR steps are 6 dB apart and the PA gain is only known to
@@ -180,10 +181,10 @@ SP4_OMNI = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-0.5, l_con_rx=-
 # Worst case over that gain range is ~+12 dBm conducted (gain just above 23.5 dB forces -12).
 # NM stays on one fixed channel under UN-85 b) (10 mW): a shared hopping NM across 4 teams is not worth it.
 SP4_FHSS = dict(SP4_OMNI, f_mhz=F24_FHSS, p_pa_dbm=17.5,
-                notes="D-R6 draft: adaptive FHSS + LBT, UN-85 a) 20 dBm e.i.r.p.; SP4 at RF_PWR -6/-12 "
+                notes="D-R6 baseline: adaptive FHSS + LBT, UN-85 a) 20 dBm e.i.r.p.; SP4 at RF_PWR -6/-12 "
                       "(T0 picks), +17.5 dBm max at the IPEX, omni 3 dBi peak -> <= 20.0 dBm e.i.r.p.")
 SP4_FHSS_LOW = dict(SP4_FHSS, p_pa_dbm=12.0,
-                    notes="D-R6 draft, worst RF_PWR step: -6 would overshoot 20 dBm e.i.r.p., so -12 "
+                    notes="D-R6, worst RF_PWR step: -6 would overshoot 20 dBm e.i.r.p., so -12 "
                           "(~+12 dBm at the IPEX) -> ~14.5 dBm e.i.r.p.")
 
 SCENARIOS = [
@@ -218,15 +219,15 @@ SCENARIOS = [
     Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, 100 mW FHSS (DP5, superseded by S25)", d_m=260,
          **dict(E01_250k, f_mhz=F24_FHSS, p_pa_dbm=17,
                 notes="UN-85 a) FHSS: 100 mW e.i.r.p.; needs >=15 hop channels + EN 300 328 adaptivity")),
-    # 2.4 GHz baseline, DECIDED 13-Oct-26: E01-ML01SP4 + one Molex flex omni, 250 kbps, DECISIONS.md D-R2c/D-R5c
-    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni (2.4 baseline)", d_m=70, **SP4_OMNI),
-    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni (2.4 baseline)", d_m=260, **SP4_OMNI),
-    Link("NM hop 100 m | E01-ML01SP4 2.4G | 250 kbps, -10 dB obstr., omni (2.4 baseline)",
+    # E01-ML01SP4 + one Molex flex omni (D-R2c/D-R5c) at 10 mW on one channel: NM baseline; SRI/MRM fallback
+    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni, 10 mW fixed (QM/fallback)", d_m=70, **SP4_OMNI),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, 10 mW fixed (fallback)", d_m=260, **SP4_OMNI),
+    Link("NM hop 100 m | E01-ML01SP4 2.4G | 250 kbps, -10 dB obstr., omni, 10 mW (baseline)",
          d_m=100, l_obstruction=-10, **SP4_OMNI),
-    # PROPOSED 16-Oct-26, D-R6 draft (Atenea Q3): SRI/MRM as adaptive FHSS + LBT at 20 dBm e.i.r.p.
-    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (D-R6)", d_m=70, **SP4_FHSS),
-    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (D-R6)", d_m=260, **SP4_FHSS),
-    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS worst RF_PWR step (D-R6)", d_m=260,
+    # BASELINE 16-Oct-26, D-R6: SRI/MRM as adaptive FHSS + LBT at <= 20 dBm e.i.r.p. (S26 = today's RF_PWR -12)
+    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (baseline)", d_m=70, **SP4_FHSS),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (baseline)", d_m=260, **SP4_FHSS),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS at RF_PWR -12 (until T0)", d_m=260,
          **SP4_FHSS_LOW),
 ]
 
@@ -237,8 +238,8 @@ NRF24_CI_250K = {0: 12, 1: -12, 2: -33, 3: -38, 6: -50, 25: -60}
 # channels 1/6/11 at 25 MHz spacing, the fourth at the band edge, 8 MHz from its neighbour.
 MRM_CHANNELS = [24, 49, 74, 82]
 
-# D-R6 draft: if Team C hops in MRM, it gives up its fixed channel (RF_CH 74, TEAM_CH in phy_config.py)
-# and the other three teams keep 24/49/82. Our hop set avoids them by >= 5 MHz (C/I -38 dB or better).
+# D-R6: Team C hops in SRI/MRM and gives up its fixed channel (RF_CH 74, TEAM_CH in phy_config.py); the other
+# three teams keep 24/49/82. Our hop set avoids them by >= 6 MHz (C/I -50 dB or better).
 # The list and the EN 300 328 checks live in phy_config.py (FHSS_*); here only what the budget needs.
 FHSS_SLOT_MS = 25.0          # dwell per hop = one 16-frame SR-ARQ window (~22 ms) + guard
 FHSS_HOP_OVERHEAD_MS = 0.30  # PLL settle 130 us + RPD needs >= 170 us in RX (= the CCA) before TX
@@ -284,8 +285,7 @@ def report() -> None:
     print("\nHEIGHT SENSITIVITY: flat-earth margin (dB) vs common antenna height")
     hs = [0.5, 0.75, 1.0, 1.5]
     print(f"{'scenario':58} " + " ".join(f"{h:>6}m" for h in hs))
-    for s in SCENARIOS[:1] + SCENARIOS[4:5] + SCENARIOS[6:10] + [x for x in SCENARIOS
-                                                                 if "2.4 baseline" in x.name or "D-R6" in x.name]:
+    for s in SCENARIOS[:1] + SCENARIOS[4:5] + SCENARIOS[6:10] + SCENARIOS[20:]:
         row = [replace(s, h_tx_m=h, h_rx_m=h).margin_fe() for h in hs]
         print(f"{s.name:58} " + " ".join(f"{m:7.1f}" for m in row))
 
@@ -300,8 +300,9 @@ def report() -> None:
             print(f"  {label:52} @{r:6.1f} kbps -> goodput {g:6.1f} kbps | lines x1: "
                   f"{lines_delivered(g):5d}  x2: {lines_delivered(g, compression=2):5d}")
 
-    mrm = next(s for s in SCENARIOS if s.name.startswith("MRM") and "2.4 baseline" in s.name)
-    print("\nMRM NEAR-FAR (4 teams simultaneous): other team's box r m from our receiver vs our 260 m link")
+    mrm = next(s for s in SCENARIOS if s.name.startswith("MRM") and "10 mW fixed" in s.name)
+    hop = next(s for s in SCENARIOS if s.name.startswith("MRM") and "FHSS 20 dBm (baseline)" in s.name)
+    print("\nMRM NEAR-FAR (4 teams simultaneous), all at 10 mW: other team's box r m from our receiver vs our 260 m link")
     print(f"  nRF24 C/I at 250 kbps by offset (MHz): {NRF24_CI_250K}")
     for r in (2, 5, 10, 20):
         aligned, side = near_far(mrm, r), near_far(mrm, r, isolation_db=20)
@@ -313,10 +314,18 @@ def report() -> None:
         off = b - a
         print(f"    {2400 + a}/{2400 + b} MHz: {off} MHz apart -> selectivity {ci_needed(off)} dB "
               f"-> co-located boxes must keep I/W below {-ci_needed(off)} dB")
+    ci6 = -ci_needed(6)
+    print(f"  D-R6: we hop at 20 dBm, the others stay at 10 mW on {[c for c in chans if c != 74]}; "
+          f"nearest hop 6 MHz -> selectivity {ci_needed(6)} dB")
+    for r in (5, 10, 15, 20):
+        them = hop.p_rx_fs(r) - mrm.p_rx_fe()   # our box r m from their receiver vs their 10 mW 260 m link
+        us = mrm.p_rx_fs(r) - hop.p_rx_fe()     # their box r m from our receiver vs our 20 dBm 260 m link
+        print(f"    r = {r:3d} m: we land {them:5.1f} dB over their partner ({'OK' if them < ci6 else 'TOO CLOSE'}), "
+              f"they land {us:5.1f} dB over ours ({'OK' if us < ci6 else 'TOO CLOSE'})")
 
-    print("\nD-R6 DRAFT: 20 dBm e.i.r.p. via adaptive FHSS + LBT (UN-85 a), only if Atenea Q3 = yes")
-    base = {s.name.split("|")[0].strip(): s for s in SCENARIOS if "2.4 baseline" in s.name}
-    for s in (x for x in SCENARIOS if "D-R6" in x.name):
+    print("\nD-R6 BASELINE (16-Oct-26): SRI/MRM at <= 20 dBm e.i.r.p. via adaptive FHSS + LBT (UN-85 a)")
+    base = {s.name.split("|")[0].strip(): s for s in SCENARIOS if "10 mW" in s.name and "SP4" in s.name}
+    for s in (x for x in SCENARIOS if "FHSS 20 dBm (baseline)" in x.name or "until T0" in x.name):
         b = base[s.name.split("|")[0].strip()]
         print(f"  {s.name:72} margin {s.margin_fe():5.1f} dB ({s.margin_fe() - b.margin_fe():+.1f} vs 10 dBm)")
     nm = base["NM hop 100 m"]

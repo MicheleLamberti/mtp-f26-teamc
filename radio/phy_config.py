@@ -1,6 +1,6 @@
 """MTP-F26 Team C - nRF24L01+ (Ebyte E01-ML01SP4) physical-layer profiles and register generator.
 
-Turns the radio decisions (D-R1b band, D-R2c module, D-R4 channel plan, D-R5c antenna, D-R6 draft
+Turns the radio decisions (D-R1b band, D-R2c module, D-R4 channel plan, D-R5c antenna, D-R6
 FHSS; see radio/DECISIONS.md) into nRF24L01+ register values, checks them against CNAF UN-85 b)
 (2400-2483.5 MHz, 10 mW e.i.r.p.), UN-85 a) + ETSI EN 300 328 V2.2.2 for the adaptive-FHSS profile
 (100 mW e.i.r.p.) and the nRF24L01+ Product Specification v1.0, and writes radio/fw/nrf24_config.h.
@@ -20,11 +20,12 @@ for the e.i.r.p. limit). Test T0 replaces E01_PA_GAIN_DB with a measurement. Eve
 profile is held at RF_PWR -18 dBm and the driver refuses anything higher (NRF24_RF_PWR_MAX_BITS): at
 0 dBm the module would radiate ~+23 dBm e.i.r.p., 20x the limit.
 
-D-R6 draft (16-Oct-26, only if Atenea Q3 = yes): TEAM_FHSS hops over FHSS_HOPSET with listen-before-talk
+D-R6 (baseline since 16-Oct-26, a professor approved 20 dBm e.i.r.p.): TEAM_FHSS, the SRI/MRM profile, hops
+over FHSS_HOPSET with listen-before-talk
 (EN 300 328 cl. 4.3.1.7.2, adaptive FHSS using LBT), which UN-85 a) allows 100 mW e.i.r.p. The driver
 lets only an LBT profile go above -18 dBm (NRF24_RF_PWR_MAX_BITS_FHSS, the highest RF_PWR step whose
 worst-case e.i.r.p. is <= 20 dBm), and refuses to transmit without a clear CCA on the current hop.
-NM keeps the fixed-channel profile under UN-85 b).
+NM keeps the fixed-channel profile under UN-85 b); TEAM_250K stays for Quick Mode, the bench and as the fallback.
 
 Occupied bandwidth uses Carson's rule 2 (fdev + BR/2) with the datasheet deviation
 (160 kHz at 250 kbps/1 Mbps, 320 kHz at 2 Mbps); the bench spectrum test T13 replaces it.
@@ -43,7 +44,7 @@ from linkbudget import MRM_CHANNELS, NRF24_CI_250K
 
 BAND = (2400.0e6, 2483.5e6)   # CNAF UN-85 a) and b)
 EIRP_MAX_DBM = 10.0           # 10 mW e.i.r.p., UN-85 b) (fixed channel)
-EIRP_MAX_FHSS_DBM = 20.0      # 100 mW e.i.r.p., UN-85 a) FHSS (100 mW/100 kHz) - D-R6 draft, Atenea Q3
+EIRP_MAX_FHSS_DBM = 20.0      # 100 mW e.i.r.p., UN-85 a) FHSS (100 mW/100 kHz) - D-R6 baseline
 XTAL_PPM = 60.0               # nRF24L01+ crystal requirement: +-60 ppm per box
 E01_PA_GAIN_DB = 25.0         # module PA after the chip [ESTIMATE 20-25 dB, measure in T0]
 E01_PSAT_DBM = 20.0           # module saturates around +20 dBm
@@ -51,12 +52,12 @@ MAX_PAYLOAD = 32
 
 MAX_CHIP_DBM = -18            # hard limit for fixed-channel profiles: the driver refuses higher RF_PWR
 
-# --- D-R6 draft: adaptive FHSS + LBT (ETSI EN 300 328 V2.2.2, clause numbers in the checks) ----------
+# --- D-R6 baseline (SRI/MRM): adaptive FHSS + LBT (ETSI EN 300 328 V2.2.2, clause numbers in the checks) ----------
 SP4_LNA_GAIN_DB = 12.0        # module LNA ahead of the chip [ESTIMATE; T17 measures the RPD trip level]
 RPD_CHIP_DBM = -64.0          # nRF24L01+ received power detector threshold at the chip (PS v1.0)
 FHSS_SELF_CH = 74             # our fixed MRM channel (TEAM_CH below), given up when we hop
 FHSS_OTHERS = [c for c in MRM_CHANNELS if c != FHSS_SELF_CH]   # the other three teams keep theirs (D-R4)
-FHSS_GUARD_MHZ = 4            # skip RF_CH within +-4 MHz of another team (nearest hop >= 5 MHz: C/I <= -38 dB)
+FHSS_GUARD_MHZ = 5            # skip RF_CH within +-5 MHz of another team (nearest hop >= 6 MHz: C/I <= -50 dB)
 FHSS_STRIDE = 7               # hop order = sorted set taken with this index stride (consecutive hops >= 14 MHz)
 FHSS_SLOT_US = 25_000         # dwell per hop: one 16-frame SR-ARQ window (~22 ms) + guard
 FHSS_COT_US = 50_000          # max TX time after one CCA (cl. 4.3.1.7.2 step 3: < 60 ms)
@@ -110,7 +111,7 @@ class Profile:
     antenna: str = "omni"
     crc_bytes: int = 2
     plan: list[int] = field(default_factory=lambda: list(MRM_CHANNELS))
-    lbt: bool = False     # adaptive FHSS + LBT profile (UN-85 a), D-R6 draft)
+    lbt: bool = False     # adaptive FHSS + LBT profile (UN-85 a), D-R6)
 
     @property
     def eirp_max(self) -> float:
@@ -209,8 +210,8 @@ class Profile:
             ("4.3.1.7.2 CCA threshold (RPD) <= TL at the port", rpd_port <= tl_port,
              f"RPD {rpd_port:.0f} dBm (LNA {SP4_LNA_GAIN_DB:.0f} dB est.) vs TL {tl_port:.1f} dBm "
              f"({tl:.1f} dBm/MHz at 0 dBi): {tl_port - rpd_port:.1f} dB spare -> T17"),
-            ("D-R6: hops >= 5 MHz from the other teams' channels", others >= FHSS_GUARD_MHZ + 1,
-             f"others RF_CH {FHSS_OTHERS}, nearest hop {others} MHz (C/I {NRF24_CI_250K[3]} dB or better)"),
+            ("D-R6: hops >= 6 MHz from the other teams' channels", others >= FHSS_GUARD_MHZ + 1,
+             f"others RF_CH {FHSS_OTHERS}, nearest hop {others} MHz (C/I {NRF24_CI_250K[6]} dB or better)"),
             ("D-R6: consecutive hops >= 10 MHz apart", seq_step >= 10, f"min {seq_step} MHz"),
         ]
 
@@ -233,10 +234,11 @@ class Profile:
 
 
 PROFILES = [
-    Profile("TEAM_250K", "SRI/QM/MRM team link: our channel (D-R4), 250 kbps", rf_ch=TEAM_CH),
-    Profile("TEAM_1M", "SRI option at 1 Mbps (teams sequential, +18 dB at 70 m)", rf_ch=TEAM_CH, bitrate=1_000_000),
+    Profile("TEAM_250K", "Quick Mode, bench and fallback: our fixed channel at 10 mW (UN-85 b), 250 kbps",
+            rf_ch=TEAM_CH),
+    Profile("TEAM_1M", "fixed-channel option at 1 Mbps, 10 mW (fallback only)", rf_ch=TEAM_CH, bitrate=1_000_000),
     Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)", rf_ch=NM_CH, address=NM_ADDR),
-    Profile("TEAM_FHSS", "SRI/MRM adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6 draft, only if Atenea Q3 = yes)",
+    Profile("TEAM_FHSS", "SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)",
             rf_ch=FHSS_HOPSEQ[0], chip_dbm=MAX_CHIP_DBM_FHSS, lbt=True),
 ]
 
@@ -268,7 +270,7 @@ def header_text() -> str:
         " * higher setting would break the 10 mW e.i.r.p. limit (CNAF UN-85 b). */",
         f"#define NRF24_RF_PWR_MAX_BITS {RF_PWR[MAX_CHIP_DBM]}u",
         "",
-        "/* D-R6 draft (only if Atenea Q3 = yes): adaptive FHSS + LBT under UN-85 a), 100 mW e.i.r.p.",
+        "/* D-R6 (SRI/MRM baseline, 16-Oct-26): adaptive FHSS + LBT under UN-85 a), 100 mW e.i.r.p.",
         f" * (EN 300 328 V2.2.2 cl. 4.3.1.7.2). Only an lbt profile may use RF_PWR up to {MAX_CHIP_DBM_FHSS} dBm, the",
         " * highest step whose worst-case e.i.r.p. (PA 25 dB, omni 3 dBi peak) is <= 20 dBm. T0 may raise it. */",
         f"#define NRF24_RF_PWR_MAX_BITS_FHSS {RF_PWR[MAX_CHIP_DBM_FHSS]}u",

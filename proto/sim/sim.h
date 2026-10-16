@@ -8,7 +8,7 @@
  *   - two overlapping transmissions that a node can both hear collide;
  *   - per-link random loss, optional Gilbert-Elliott bursts, a blackout window
  *     ("attack"), node reboots. No duty-cycle limit at 2.4 GHz (UN-85 b).
- *   - optional adaptive FHSS + LBT (D-R6 draft, sim_set_fhss): time is cut into
+ *   - optional adaptive FHSS + LBT (D-R6, the SRI/MRM baseline; sim_set_fhss): time is cut into
  *     NRF24_FHSS_SLOT_US hops; each starts with PLL settling + CCA, a frame never
  *     crosses a hop, a node skips the hops its CCA finds busy, and after start-up or
  *     a reboot a node cannot receive until it has found the hop timing again (worst
@@ -100,7 +100,7 @@ void sim_init(sim_t *s, int n_nodes, const nrf24_profile_t *profile, uint64_t se
 void sim_free(sim_t *s);
 void sim_set_link(sim_t *s, int a, int b, double loss, uint8_t rssi);   /* both directions */
 void sim_set_hooks(sim_t *s, int node, const sim_hooks_t *h);
-/* D-R6 draft: hop over NRF24_FHSS_HOPSEQ with LBT; busy = share of hops a node's CCA finds busy (< 1). */
+/* D-R6: hop over NRF24_FHSS_HOPSEQ with LBT; busy = share of hops a node's CCA finds busy (< 1). */
 void sim_set_fhss(sim_t *s, double busy);
 const proto_env_t *sim_env(sim_t *s, int node);
 void sim_at(sim_t *s, uint64_t t_us, sim_call_fn fn, void *arg);
