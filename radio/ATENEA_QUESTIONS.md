@@ -46,3 +46,8 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    received file have on the USB stick (the original name, or a fixed one)?
 10. *(Not needed since 13-Oct-26: we use one antenna per box. Do not post.)* **Two antennas.** Please confirm
     that a device may use two antennas inside the box.
+11. **20 dBm without frequency hopping? (new 16-Oct-26)** Q3 confirmed 20 dBm e.i.r.p. for our hopping design. May
+    we also transmit at up to 20 dBm e.i.r.p. on **one fixed channel** (nRF24, 250 kbps, occupied bandwidth
+    ~0.6 MHz), with listen-before-talk before every ≤ 10 ms of transmission? We ask because EN 300 328 (and the EU
+    SRD decision behind CNAF UN-85 a) limits non-hopping equipment to 10 mW/MHz, which such a narrow signal
+    exceeds by 5–10 dB. If the answer is no, we stay with frequency hopping (already built and tested).

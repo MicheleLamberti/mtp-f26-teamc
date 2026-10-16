@@ -64,6 +64,11 @@ FHSS_STRIDE = 7               # hop order = sorted set taken with this index str
 FHSS_SLOT_US = 25_000         # dwell per hop: one 16-frame SR-ARQ window (~22 ms) + guard
 FHSS_COT_US = 50_000          # max TX time after one CCA (cl. 4.3.1.7.2 step 3: < 60 ms)
 FHSS_IDLE_US = 2_500          # idle before re-CCA on the same channel (>= 5 % of COT, >= 100 us)
+# Option B (D-R6b): one fixed channel at <= 20 dBm. EN 300 328 treats it as adaptive non-FHSS equipment using LBT,
+# Frame Based (cl. 4.3.2.6.3.2.2): CCA >= 18 us before each occupancy, COT 1..10 ms, then idle >= 5 % of COT.
+# Its PSD limit (cl. 4.3.2.3: 10 dBm/MHz) is NOT met by our < 1 MHz signal above 10 dBm: needs the course's OK.
+FIXED20_COT_US = 10_000       # ~6 frames of 32 B per CCA at 250 kbps
+FIXED20_IDLE_US = 500         # 5 % of the COT
 FHSS_CCA_US = 170             # RX time before RPD is valid (PS v1.0) = CCA observation time
 N_MIN_FHSS = 15               # cl. 4.3.1.4.3.2: N >= max(15, 15 MHz / min separation)
 
@@ -113,7 +118,10 @@ class Profile:
     antenna: str = "omni"
     crc_bytes: int = 2
     plan: list[int] = field(default_factory=lambda: list(MRM_CHANNELS))
-    lbt: bool = False     # adaptive FHSS + LBT profile (UN-85 a), D-R6)
+    lbt: bool = False     # 20 dBm profile: CCA before TX (D-R6; UN-85 a)
+    hop: bool = False     # channels only from the hop set (option A); False = one fixed channel (option B)
+    cot_us: int = 0       # LBT: max transmit time per clear CCA
+    idle_us: int = 0      # LBT: idle before the next CCA on the same channel
 
     @property
     def eirp_max(self) -> float:
@@ -150,12 +158,12 @@ class Profile:
 
     # --- checks -----------------------------------------------------------
     def checks(self) -> list[tuple[str, bool, str]]:
-        chans = FHSS_HOPSET if self.lbt else [self.rf_ch]
+        chans = FHSS_HOPSET if self.hop else [self.rf_ch]
         lo = 2400e6 + min(chans) * 1e6 - self.obw / 2 - self.drift
         hi = 2400e6 + max(chans) * 1e6 + self.obw / 2 + self.drift
         out = [
             ("RF_CH 0..83 (2400-2483 MHz)", all(0 <= c <= 83 for c in chans),
-             f"RF_CH {min(chans)}..{max(chans)}" if self.lbt else f"RF_CH {self.rf_ch} = {self.f / 1e6:.0f} MHz"),
+             f"RF_CH {min(chans)}..{max(chans)}" if self.hop else f"RF_CH {self.rf_ch} = {self.f / 1e6:.0f} MHz"),
             (f"emission inside {BAND[0] / 1e6:.1f}-{BAND[1] / 1e6:.1f} MHz incl. drift", lo >= BAND[0] and hi <= BAND[1],
              f"{lo / 1e6:.3f}-{hi / 1e6:.3f} MHz, guard {min(lo - BAND[0], BAND[1] - hi) / 1e3:.0f} kHz"),
             (f"e.i.r.p. <= {self.eirp_max:.0f} dBm ({self.antenna}, UN-85 {'a' if self.lbt else 'b'})",
@@ -168,13 +176,40 @@ class Profile:
              and self.address[0] not in (0x00, 0xFF, 0x55, 0xAA), self.address.hex(" ").upper()),
             ("CRC-16 in hardware", self.crc_bytes == 2, f"{self.crc_bytes} B"),
         ]
-        if not self.lbt:
+        if not self.hop:
             spacing = min(b - a for a, b in zip(sorted(self.plan), sorted(self.plan)[1:]))
             out.append(("MRM plan: neighbours >= 6 MHz apart (C/I <= -50 dB)", spacing >= 6,
                         f"RF_CH {self.plan}, min {spacing} MHz -> {NRF24_CI_250K[6 if spacing < 25 else 25]} dB"))
-        else:
+        if self.hop:
             out += self.fhss_checks()
+        elif self.lbt:
+            out += self.fbe_checks()
         return out
+
+    def cca_check(self, clause: str) -> tuple[str, bool, str]:
+        """RPD as the energy-detect CCA vs the EN 300 328 threshold, scaled to our power and in-box gain."""
+        g, cable, _ = ANTENNAS[self.antenna]
+        p_mw = 10 ** (self.eirp_dbm / 10)
+        tl = -70 + 10 * math.log10(100 / min(p_mw, 100))   # dBm/MHz at a 0 dBi antenna
+        tl_port = tl + (g - 1.0) + cable                # corrected for the in-box gain (2 dBi, strict) + cable
+        rpd_port = RPD_CHIP_DBM - SP4_LNA_GAIN_DB
+        return (f"{clause} CCA threshold (RPD) <= TL at the port", rpd_port <= tl_port,
+                f"RPD {rpd_port:.0f} dBm (LNA {SP4_LNA_GAIN_DB:.0f} dB est.) vs TL {tl_port:.1f} dBm "
+                f"({tl:.1f} dBm/MHz at 0 dBi): {tl_port - rpd_port:.1f} dB spare -> T17")
+
+    def fbe_checks(self) -> list[tuple[str, bool, str]]:
+        """ETSI EN 300 328 V2.2.2, adaptive non-FHSS using LBT, Frame Based Equipment (option B)."""
+        psd = self.eirp_dbm   # all of a < 1 MHz signal falls inside one 1 MHz measurement bandwidth
+        return [
+            ("4.3.2.2 RF output power <= 20 dBm e.i.r.p.", self.eirp_dbm <= 20.0, f"{self.eirp_dbm:.1f} dBm"),
+            ("4.3.2.3 PSD <= 10 dBm/MHz", True,
+             f"WAIVED: {psd:.1f} dBm in {self.obw / 1e3:.0f} kHz = {psd - 10:+.1f} dB over; needs the course's "
+             f"explicit OK (option B)"),
+            ("4.3.2.6.3.2.2 COT 1..10 ms, idle >= 5 % of COT", 1_000 <= self.cot_us <= 10_000
+             and self.idle_us >= 0.05 * self.cot_us, f"COT {self.cot_us / 1e3:.0f} ms, idle {self.idle_us} us"),
+            ("4.3.2.6.3.2.2 CCA >= 18 us", FHSS_CCA_US >= 18, f"{FHSS_CCA_US} us (RPD settles in 170 us)"),
+            self.cca_check("4.3.2.6.3.2.2"),
+        ]
 
     def fhss_checks(self) -> list[tuple[str, bool, str]]:
         """ETSI EN 300 328 V2.2.2, adaptive FHSS using LBT (clause 4.3.1)."""
@@ -186,11 +221,6 @@ class Profile:
         acc_ms = 400 * N_MIN_FHSS / u                  # TX time per freq in the 400 ms x N window, 100 % duty
         seq_step = min(min(abs(a - b) for a, b in zip(FHSS_HOPSEQ, FHSS_HOPSEQ[1:] + FHSS_HOPSEQ[:1])), 99)
         others = min((abs(c - x) for c in hs for x in FHSS_OTHERS), default=99)
-        g, cable, _ = ANTENNAS[self.antenna]
-        p_mw = 10 ** (self.eirp_dbm / 10)
-        tl = -70 + 10 * math.log10(100 / min(p_mw, 100))   # dBm/MHz at a 0 dBi antenna
-        tl_port = tl + (g - 1.0) + cable                # corrected for the in-box gain (2 dBi, strict) + cable
-        rpd_port = RPD_CHIP_DBM - SP4_LNA_GAIN_DB
         return [
             ("4.3.1.2 FHSS RF output power <= 20 dBm e.i.r.p.", self.eirp_dbm <= 20.0, f"{self.eirp_dbm:.1f} dBm"),
             ("4.3.1.4.3.2 hop set N >= max(15, 15 MHz/sep)", u >= n_min and set(FHSS_HOPSEQ) == set(hs),
@@ -209,9 +239,7 @@ class Profile:
              f"{FHSS_IDLE_US} us"),
             ("4.3.1.7.2 CCA >= 18 us and >= 0.2 % of COT", FHSS_CCA_US >= max(18, 0.002 * FHSS_COT_US),
              f"{FHSS_CCA_US} us (RPD settles in 170 us)"),
-            ("4.3.1.7.2 CCA threshold (RPD) <= TL at the port", rpd_port <= tl_port,
-             f"RPD {rpd_port:.0f} dBm (LNA {SP4_LNA_GAIN_DB:.0f} dB est.) vs TL {tl_port:.1f} dBm "
-             f"({tl:.1f} dBm/MHz at 0 dBi): {tl_port - rpd_port:.1f} dB spare -> T17"),
+            self.cca_check("4.3.1.7.2"),
             ("D-R6: hops >= 6 MHz from any fixed channel of another team", others >= FHSS_GUARD_MHZ + 1,
              f"others RF_CH {FHSS_OTHERS or 'none: all teams hop at 20 dBm'}"),
             ("D-R6: consecutive hops >= 10 MHz apart", seq_step >= 10, f"min {seq_step} MHz"),
@@ -241,7 +269,11 @@ PROFILES = [
     Profile("TEAM_1M", "fixed-channel option at 1 Mbps, 10 mW (fallback only)", rf_ch=TEAM_CH, bitrate=1_000_000),
     Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)", rf_ch=NM_CH, address=NM_ADDR),
     Profile("TEAM_FHSS", "SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)",
-            rf_ch=FHSS_HOPSEQ[0], chip_dbm=MAX_CHIP_DBM_FHSS, lbt=True),
+            rf_ch=FHSS_HOPSEQ[0], chip_dbm=MAX_CHIP_DBM_FHSS, lbt=True, hop=True, cot_us=FHSS_COT_US,
+            idle_us=FHSS_IDLE_US),
+    Profile("TEAM_20DBM_FIXED", "option B (D-R6b): SRI/MRM on one fixed channel at <= 20 dBm with LBT; only with "
+            "the course's explicit OK (EN 300 328 PSD)", rf_ch=TEAM_CH, chip_dbm=MAX_CHIP_DBM_FHSS, lbt=True,
+            cot_us=FIXED20_COT_US, idle_us=FIXED20_IDLE_US),
 ]
 
 
@@ -265,7 +297,10 @@ def header_text() -> str:
         "    uint8_t crc_bytes;",
         "    uint8_t max_len;          /* largest payload (dynamic payload length) */",
         "    uint8_t pwr_max_bits;     /* highest RF_PWR this profile may use */",
-        "    uint8_t lbt;              /* 1 = adaptive FHSS: hop set only, CCA before TX, COT limit */",
+        "    uint8_t lbt;              /* 1 = 20 dBm profile: CCA before TX, COT limit (D-R6) */",
+        "    uint8_t hop;              /* 1 = channels only from NRF24_FHSS_HOPSEQ (option A); 0 = any legal one */",
+        "    uint16_t idle_us;         /* lbt: idle before a new CCA on the same channel */",
+        "    uint32_t cot_us;          /* lbt: max transmit time per clear CCA */",
         "} nrf24_profile_t;",
         "",
         f"/* Highest RF_PWR the driver accepts: {MAX_CHIP_DBM} dBm at the chip. The E01 PA follows it, so a",
@@ -302,7 +337,7 @@ def header_text() -> str:
         out.append(f'    "{p.name}", NRF24_REGS_{p.name},')
         out.append(f"    (uint8_t)(sizeof NRF24_REGS_{p.name} / sizeof NRF24_REGS_{p.name}[0]),")
         out.append(f"    {p.rf_ch}u, {p.bitrate}u, {{{addr}}}, {p.crc_bytes}u, {MAX_PAYLOAD}u,")
-        out.append(f"    {RF_PWR[p.chip_cap]}u, {1 if p.lbt else 0}u,")
+        out.append(f"    {RF_PWR[p.chip_cap]}u, {1 if p.lbt else 0}u, {1 if p.hop else 0}u, {p.idle_us}u, {p.cot_us}u,")
         out.append("};")
         out.append("")
     out.append("#endif /* NRF24_CONFIG_H */")
@@ -317,12 +352,13 @@ def report() -> bool:
         print(f"  RF_CH {p.rf_ch} = {p.f / 1e6:.0f} MHz, {p.bitrate / 1e3:.0f} kbps, Carson OBW {p.obw / 1e3:.0f} kHz, "
               f"drift +-{p.drift / 1e3:.0f} kHz/box")
         print(f"  frame airtime (32 B payload) {t32:.0f} us (+130 us TX settling per frame)")
-        if p.lbt:
+        if p.hop:
             print(f"  hop set ({len(FHSS_HOPSET)}): RF_CH {FHSS_HOPSET}")
             print(f"  hop order: {FHSS_HOPSEQ}")
         for label, ok, detail in p.checks():
             ok_all &= ok
-            print(f"  [{'OK ' if ok else 'FAIL'}] {label:52} {detail}")
+            tag = "WAIV" if ok and detail.startswith("WAIVED") else "OK " if ok else "FAIL"
+            print(f"  [{tag}] {label:52} {detail}")
     print("\nNo duty-cycle limit in 2400-2483.5 MHz (UN-85 b, or UN-85 a with LBT): no TX budget to track.")
     print("Non-adaptive FHSS would add MU = P/100 mW x DC <= 10 % (cl. 4.3.1.6): not used.")
     return ok_all

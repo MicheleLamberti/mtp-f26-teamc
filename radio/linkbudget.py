@@ -183,6 +183,13 @@ SP4_OMNI = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-0.5, l_con_rx=-
 SP4_FHSS = dict(SP4_OMNI, f_mhz=F24_FHSS, p_pa_dbm=17.5,
                 notes="D-R6 baseline: adaptive FHSS + LBT, UN-85 a) 20 dBm e.i.r.p.; SP4 at RF_PWR -6/-12 "
                       "(T0 picks), +17.5 dBm max at the IPEX, omni 3 dBi peak -> <= 20.0 dBm e.i.r.p.")
+# Option B (D-R6b): the same 20 dBm on ONE fixed channel, no hopping (frame-based LBT, COT <= 10 ms). Same link
+# margins as option A. EN 300 328 caps non-hopping equipment at 10 dBm/MHz, which a < 1 MHz signal exceeds by
+# 5-10 dB: legal only if the course explicitly accepts it. MRM then uses the fixed plan below, all at 20 dBm.
+F24_FIXED20 = 2474.0  # RF_CH 74 (TEAM_CH)
+SP4_FIXED20 = dict(SP4_FHSS, f_mhz=F24_FIXED20,
+                   notes="Option B (D-R6b): one fixed channel at <= 20 dBm e.i.r.p. with frame-based LBT; PSD "
+                         "exceeds EN 300 328's 10 dBm/MHz, so only with the course's explicit OK")
 SP4_FHSS_LOW = dict(SP4_FHSS, p_pa_dbm=12.0,
                     notes="D-R6, worst RF_PWR step: -6 would overshoot 20 dBm e.i.r.p., so -12 "
                           "(~+12 dBm at the IPEX) -> ~14.5 dBm e.i.r.p.")
@@ -229,6 +236,9 @@ SCENARIOS = [
     Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (baseline)", d_m=260, **SP4_FHSS),
     Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS at RF_PWR -12 (until T0)", d_m=260,
          **SP4_FHSS_LOW),
+    # Option B (D-R6b): one fixed channel at 20 dBm, no hopping; only with the course's explicit OK
+    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni, 20 dBm fixed ch (option B)", d_m=70, **SP4_FIXED20),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, 20 dBm fixed ch (option B)", d_m=260, **SP4_FIXED20),
 ]
 
 # nRF24L01+ RX selectivity, C/I in dB at 250 kbps (Product Spec v1.0 table 8; negative = interferer
@@ -331,6 +341,11 @@ def report() -> None:
     for s in (x for x in SCENARIOS if "FHSS 20 dBm (baseline)" in x.name or "until T0" in x.name):
         b = base[s.name.split("|")[0].strip()]
         print(f"  {s.name:72} margin {s.margin_fe():5.1f} dB ({s.margin_fe() - b.margin_fe():+.1f} vs 10 dBm)")
+    for s in (x for x in SCENARIOS if "option B" in x.name):
+        b = base[s.name.split("|")[0].strip()]
+        print(f"  {s.name:72} margin {s.margin_fe():5.1f} dB ({s.margin_fe() - b.margin_fe():+.1f} vs 10 dBm)")
+    print("  option B = same margins, no hopping; EN 300 328 PSD (10 dBm/MHz) exceeded by 5-10 dB -> course OK needed;")
+    print("  MRM uses the fixed plan above at equal power (74/82: 41 dB at 10 m vs -50 dB selectivity: OK)")
     nm = base["NM hop 100 m"]
     print(f"  NM stays on one fixed channel under UN-85 b) (10 mW): margin {nm.margin_fe():.1f} dB")
     fr = FRAMING["nRF24L01+, 32 B payload"]

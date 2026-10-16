@@ -43,7 +43,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   live formulas (the hand-in artefact). Keep it in sync with `linkbudget.py`.
 - `radio/build_course_sheet.py` → `radio/AN5142_course_layout_869MHz.xlsx`: the course AN5142 sheet
   rebuilt row for row (Ground Multipath inlined), course example as a check + SRI/MRM/NM baseline sheets.
-- `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`, and `TEAM_FHSS`
+- `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`, `TEAM_20DBM_FIXED` = option B, and `TEAM_FHSS`
   = the SRI/MRM baseline since 16-Oct, D-R6), UN-85 b checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm,
   MRM plan spacing) and EN 300 328 adaptive-FHSS checks for `TEAM_FHSS` (40-channel hop set, COT/idle/CCA, RPD
   threshold vs the LBT level); regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`, `…_FHSS`, the
@@ -51,7 +51,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - `radio/fw/` — portable C99 nRF24L01+ driver behind a HAL (DPL + NOACK frames, RF_CH ≤ 83, RPD),
   CRC-16, power cap per profile (−18 dBm; only an `lbt` profile may use `NRF24_RF_PWR_MAX_BITS_FHSS`), LBT for
   the hopping profile (`nrf24_cca`, hop-set-only channels, 50 ms COT, idle gap), mock nRF24 with a simulated
-  channel, host tests: `make -C radio/fw test` (194 checks).
+  channel, host tests: `make -C radio/fw test` (235 checks). Profiles carry `hop`, `cot_us`, `idle_us`.
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
 - `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c/D-R6 current; D-R6 = 20 dBm hopping for SRI/MRM;
   D-R2b/D-R5b and the 868 records superseded),
@@ -60,17 +60,20 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 answered yes 16-Oct: 20 dBm confirmed).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.8 published 16-Oct: 20 dBm hopping is the SRI/MRM baseline, confirmed by Atenea Q3; all teams hop, ≥ 10 m between boxes; low-battery note).
+  republish to the same URL (v0.9 published 16-Oct: 20 dBm option A (hopping, default) vs B (fixed channel, Atenea Q11), NM diagram; all teams hop, ≥ 10 m between boxes; low-battery note).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
   — source `radio/hw_proposal.html` (v0.4.3 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
   hopping at 20 dBm needs no hardware change, TX bursts toward 120 mA; low-battery countermeasures).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
-- `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip, codec) and the PC
-  simulator (`sim/`, `--fhss BUSY` = the SRI/MRM hopping radio layer): `make -C proto test` (14 scenarios, ~1 s).
+- `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
+  I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
+  hopping radio layer): `make -C proto test` (14 scenarios + 96 usb_msc checks, ~2 s); `make usb-xcheck PYTHON=<venv
+  python with pyfatfs + setuptools<81>` cross-checks FAT16/32 images. `port/pico/usb_msc_pico.c` = TinyUSB + PIO-USB
+  skeleton, NOT compiled here (no pico-sdk / ARM gcc on this machine).
   See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3.5 16-Oct: all teams hop, T14; 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results;
+  — source `radio/pt_proposal.html` (v0.3.6 16-Oct: NM link diagrams, relay log, usb_msc started, option B; all teams hop, T14; 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results;
   SRI/MRM hop: slot clock + acquisition now required from PT; battery check in ui/store).
 - PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, headless Chromium from
   `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the 16-Oct export
@@ -132,11 +135,19 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
   10 mW). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
 - D-R4: superseded for MRM (all teams hop at 20 dBm); agree LBT + ≥ 10 m between boxes; fixed plan = 10 mW fallback.
 
+**20 dBm, two versions (rechecked 16-Oct, D-R6/D-R6b):** A = hopping (`TEAM_FHSS`, default, EN 300 328 compliant).
+B = one fixed channel at 20 dBm with frame-based LBT (`TEAM_20DBM_FIXED`, COT 10 ms): same margins, no hop sync, but
+EN 300 328 cl. 4.3.2.3 / the EU SRD decision cap non-hopping radios at 10 dBm/MHz → our 0.6 MHz signal is 5–10 dB
+over; use B only on an explicit yes (Atenea Q11). CNAF in force: Orden TDF/732/2026 (BOE-A-2026-15661); its
+consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended to 2022/180) is the reference.
+
 **Open decisions:**
 - [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
 - [ ] D-R3 NM common PHY: rewrite `NM_PHY_PROPOSAL.md` for nRF24
 
 **Next up:**
+- [ ] Atenea Q11: 20 dBm on one fixed channel (option B)? Use B only on an explicit yes.
+- [ ] usb_msc on the Pico: compile/bench `proto/port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT, 120 MHz clock)
 - [ ] D-R6: agree with the other teams: everyone hops with LBT at ≤ 20 dBm, ≥ 10 m between boxes at each MRM end;
       T0 at all four RF_PWR steps; T17 (RPD trip level) + T18 (hop pattern) in the T13 lab booking — gates for
       TEAM_FHSS outdoors; PT: slot clock + hop acquisition on the Pico (now required for SRI/MRM)
@@ -159,6 +170,19 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-16 (night) — relay log, usb_msc started, 20 dBm rechecked (A/B), NM diagrams
+- Relay log: `nm_gossip` keeps a trace (first/last heard, broadcasts, per-chunk times); `nm_log.c` formats
+  NM_LOG.TXT; the sim writes one per node (`build/nm_logs/`) and checks them (T10).
+- usb_msc: portable module over FatFs R0.15a (LFN, exFAT, cp850, fixed 11-Dec-2026 timestamp): largest root .txt
+  (skips hidden, "._", our log), 4 KB chunked load to a flash sink, save via `.part` + read-back CRC + rename
+  (found by the tests: a failing stick left a truncated final file). 96 host checks (FAT16/32/exFAT, full, fault,
+  unplugged) + pyfatfs cross-check. Pico glue skeleton + bench checklist in `proto/port/pico/`.
+- 20 dBm recheck (Santiago: "apparently we wouldn't need to hop"): EN 300 328 V2.2.2 non-FHSS = 20 dBm AND
+  10 dBm/MHz PSD (cl. 4.3.2.3) + frame-based LBT above 10 dBm; EU SRD decision same density. Kept both: A default,
+  B built (profile, driver per-profile COT/idle/hop, 41 new fw checks → 235; S27–S28; workbook 28 scenarios, 0 dB),
+  Atenea Q11 drafted. Pages: brief v0.9 (A/B table, NM diagram), pt v0.3.6 (NM sequence + node flowchart, relay
+  log, usb_msc), hw v0.4.3 footer. Mermaid: a ";" inside a sequence label breaks it (fixed).
 
 ### 2026-10-16 (close) — Atenea Q3 answered yes; every team at 20 dBm
 - Santiago: assume every team uses 20 dBm e.i.r.p. → they hop too (narrowband needs FHSS for 20 dBm). Hop set opened

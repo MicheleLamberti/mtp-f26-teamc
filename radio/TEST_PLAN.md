@@ -78,6 +78,9 @@ Pass: closed-box PER ≤ 1 % at 260 m. If it fails, raise the antenna and re-che
    emission below 2483.5 MHz including the offset.
 3. Conducted power (T0) + measured antenna gain (lab) → e.i.r.p. Pass: ≤ 10 dBm for the fixed-channel
    profiles, ≤ 20 dBm for `TEAM_FHSS` (D-R6). Put the plots in the ANNEX.
+4. Option B only (`TEAM_20DBM_FIXED`): PSD in 1 MHz (EN 300 328 cl. 5.4.3). Expected = the e.i.r.p. (the whole
+   < 1 MHz signal sits in one 1 MHz bin), i.e. 5–10 dB over the 10 dBm/MHz limit: record it for the Atenea Q11
+   answer, and check the CCA every ≤ 10 ms in zero-span.
 
 ## T14 — Campus 2.4 GHz survey (Andrian) — **decides the D-R4 channel plan**
 

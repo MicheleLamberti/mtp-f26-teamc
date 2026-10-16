@@ -17,7 +17,8 @@ static int failures, checks;
     } while (0)
 
 static const nrf24_profile_t *const PROFILES[] = {&NRF24_PROFILE_TEAM_250K, &NRF24_PROFILE_TEAM_1M,
-                                                  &NRF24_PROFILE_NM_COMMON, &NRF24_PROFILE_TEAM_FHSS};
+                                                  &NRF24_PROFILE_NM_COMMON, &NRF24_PROFILE_TEAM_FHSS,
+                                                  &NRF24_PROFILE_TEAM_20DBM_FIXED};
 #define N_PROFILES (sizeof PROFILES / sizeof PROFILES[0])
 
 typedef struct {
@@ -356,6 +357,39 @@ static void test_fhss_lbt(void)
     CHECK(nrf24_send(&c.dev, tx, 8) == NRF24_OK);
 }
 
+/* Option B (D-R6b): one fixed channel at 20 dBm with frame-based LBT (COT <= 10 ms). */
+static void test_fixed20(void)
+{
+    const nrf24_profile_t *p = &NRF24_PROFILE_TEAM_20DBM_FIXED;
+    CHECK(p->lbt == 1 && p->hop == 0 && p->pwr_max_bits == NRF24_RF_PWR_MAX_BITS_FHSS);
+    CHECK(p->cot_us >= 1000u && p->cot_us <= 10000u && p->idle_us * 20u >= p->cot_us);
+    node_t a, b;
+    uint8_t tx[32] = {1, 2, 3}, rx[32], len;
+    CHECK(node_up(&a, p) == NRF24_OK);
+    CHECK(node_up(&b, p) == NRF24_OK);
+    CHECK(((a.m.regs[0x06] >> 1) & 3u) == NRF24_RF_PWR_MAX_BITS_FHSS);
+    mock_link(&a.m, &b.m);
+    nrf24_start_rx(&b.dev);
+
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_ERR_LBT);   /* LBT still required */
+    CHECK(nrf24_cca(&a.dev) == 1);
+    for (int i = 0; i < 3; i++) {                          /* 3 frames fit one 10 ms occupancy */
+        CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_OK);
+        CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_OK && len == 32);
+    }
+    a.m.now_us = a.dev.cot_start_us + p->cot_us - 1000u;
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_ERR_LBT);   /* would end past the 10 ms COT */
+    uint32_t t = a.m.now_us;
+    a.dev.last_tx_end_us = t;
+    CHECK(nrf24_cca(&a.dev) == 1);                         /* idle gap (5 % of COT) first */
+    CHECK(a.m.now_us - t >= p->idle_us + NRF24_FHSS_CCA_US);
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_OK);
+
+    /* Not limited to the hop set: any legal fixed channel (MRM plan, odd ones too). */
+    CHECK(nrf24_set_channel(&a.dev, 25) == NRF24_OK);
+    CHECK(nrf24_set_channel(&a.dev, 84) == NRF24_ERR_CH);
+}
+
 static void test_carrier(void)
 {
     node_t a;
@@ -381,6 +415,7 @@ int main(void)
     test_carrier();
     test_fhss_profile();
     test_fhss_lbt();
+    test_fixed20();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }

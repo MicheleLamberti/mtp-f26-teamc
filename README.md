@@ -15,9 +15,9 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 
 | Document | For |
 |---|---|
-| [`briefs/TeamC Radio Brief v0.8.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6, all teams hop), link budget, test plan |
+| [`briefs/TeamC Radio Brief v0.9.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, MRM channel plan, 20 dBm hopping baseline (D-R6, all teams hop), link budget, test plan |
 | [`briefs/TeamC Hardware Proposal v0.4.3.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power |
-| [`briefs/TeamC Protocol Proposal v0.3.5.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
+| [`briefs/TeamC Protocol Proposal v0.3.6.pdf`](briefs/) | Suggested protocol for protocols & software, with simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status and session log (kept up to date each session) |
 
 ## Layout
@@ -31,7 +31,7 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 | `radio/fw/` | Portable C99 nRF24L01+ driver (power cap per profile, LBT/CCA for the FHSS profile), CRC-16, mock radio and host tests |
 | `radio/*.md` | Decisions, electronics handoff, shared NM radio settings, test plan, Atenea questions |
 | `radio/*.html` | Sources of the three published pages (PDF exports in `briefs/`) |
-| `proto/` | Protocol code (link with resume, NM gossip, compression) and the PC simulator. See [`proto/README.md`](proto/README.md) |
+| `proto/` | Protocol code (link with resume, NM gossip + relay log, compression, USB stick I/O over FatFs) and the PC simulator. See [`proto/README.md`](proto/README.md) |
 | `hw/` | Carrier PCB (KiCad), starting with [`hw/KICAD_SESSION_PROMPT.md`](hw/KICAD_SESSION_PROMPT.md) |
 | `docs/` | Course material, **not included**. See [`docs/README.md`](docs/README.md) |
 
@@ -40,8 +40,8 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 Needs `gcc`, `make`, `zlib` (`sudo apt install build-essential zlib1g-dev`) and Python 3.
 
 ```sh
-make -C radio/fw test        # radio driver: 194 checks
-make -C proto test           # protocol simulator: 14 scenarios in ~1 s
+make -C radio/fw test        # radio driver: 235 checks
+make -C proto test           # protocol simulator (14 scenarios) + usb_msc tests (96 checks), ~2 s
 python3 radio/phy_config.py  # radio profiles: channel, band edge, e.i.r.p. checks
 python3 radio/linkbudget.py  # link budget table
 ./proto/build/sim sri --loss 0.1 --blackout 20:30   # try your own scenario

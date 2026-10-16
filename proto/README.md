@@ -7,7 +7,8 @@ before any hardware exists. Proposal it implements:
 https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
 
 ```
-make test                     # build, generate sample files, run the pass/fail suite (~1 s)
+make test                     # build, generate sample files, run the simulator suite and the usb_msc tests (~2 s)
+make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip install pyfatfs "setuptools<81")
 ./build/sim sri --loss 0.1 --blackout 20:30 --rx-reboot 40
 ./build/sim sri --codec none --profile 1m --file my_file.txt
 ./build/sim sri --fhss 0.25 --loss 0.05       # SRI/MRM baseline (D-R6): adaptive FHSS + LBT, 25 % busy
@@ -22,7 +23,13 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `src/proto_env.h` | Platform interface: `send`, `now_us`, `set_timer`, `rand32`. The protocol never touches hardware directly. |
 | `src/frames.h` | Frame formats (DATA, ACK, HELLO, HELLO_ACK, END, NM_DATA), all ≤ 32 B (nRF24 payload). |
 | `src/link.c` | SRI/MRM link: selective-repeat ARQ, 16-frame bursts, bitmap ACK, HELLO resume, timeouts scaled to the bit rate. |
-| `src/nm_gossip.c` | Network Mode: Trickle gossip (RFC 6206), software CRC-16, no routing. |
+| `src/nm_gossip.c` | Network Mode: Trickle gossip (RFC 6206), software CRC-16, no routing; keeps a relay trace (times, broadcasts). |
+| `src/nm_log.c` | NM relay log: plain-text evidence written next to the NM-file copy on the USB stick (file id, CRC-32, when it arrived, what we rebroadcast). |
+| `src/usb_msc.c` | USB stick file I/O over FatFs (FAT12/16/32, exFAT): pick the input `.txt`, load it in 4 KB chunks to flash, save the received file + log (`.part`, read-back CRC, rename). |
+| `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (TinyUSB MSC on the Pico, a RAM disk in the tests). |
+| `third_party/fatfs/` | ChaN FatFs R0.15a (BSD-style licence in `ff.c`); `ffconf.h` is ours: LFN, exFAT, code page 850, no RTC. |
+| `port/pico/` | Pico 2 glue. `usb_msc_pico.c` (TinyUSB host + Pico-PIO-USB) is a **skeleton, not compiled here**. |
+| `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks (96 checks); `--image` mode for `tools/fat_xcheck.py`. |
 | `src/codec.c` | deflate/inflate via the zlib API (miniz offers the same API on the Pico). |
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
@@ -78,5 +85,7 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 - FHSS on the Pico (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
   sender, every frame carries the slot number) and the slot clock; `nrf24_cca()` and the hop order are in
   `radio/fw` already.
+- `usb_msc` on the Pico: compile and bench-test `port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT); the flash
+  store sink/source; output file name and encoding (Atenea Q9).
 - Board port: implement `proto_env_t` on the Pico (`nrf24_send`, `time_us_64`, an alarm),
   call `*_on_frame` from the RX poll loop and `*_on_tx_idle` after `nrf24_send` returns.

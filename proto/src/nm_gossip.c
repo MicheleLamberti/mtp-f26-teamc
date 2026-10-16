@@ -9,6 +9,13 @@ enum { PH_FIRE = 0, PH_END = 1 };
 
 static uint64_t now(const nm_t *n) { return n->env->now_us(n->env->ctx); }
 
+/* ms since GO, saturating below NM_NEVER */
+static uint32_t ms_since_go(const nm_t *n)
+{
+    uint64_t ms = (now(n) - n->start_at) / 1000u;
+    return ms >= NM_NEVER ? NM_NEVER - 1u : (uint32_t)ms;
+}
+
 void nm_cfg_default(nm_cfg_t *cfg)
 {
     cfg->imin_us = 1000000;
@@ -22,6 +29,11 @@ void nm_init(nm_t *n, const proto_env_t *env, const nm_cfg_t *cfg)
     n->env = env;
     n->cfg = *cfg;
     n->complete_at = PROTO_NO_TIMER;
+    n->start_at = now(n);
+    n->tr.first_rx_ms = n->tr.last_rx_ms = NM_NEVER;
+    n->tr.first_tx_ms = n->tr.last_tx_ms = NM_NEVER;
+    for (uint32_t i = 0; i < NM_MAX_CHUNKS; i++)
+        n->tr.chunk_ms[i] = NM_NEVER;
 }
 
 static void begin_interval(nm_t *n)
@@ -61,7 +73,9 @@ int nm_set_file(nm_t *n, const uint8_t *file, uint32_t len)
         memcpy(n->data[i], file + off, l);
         n->clen[i] = (uint8_t)l;
         n->have |= 1u << i;
+        n->tr.chunk_ms[i] = ms_since_go(n);
     }
+    n->tr.origin = 1;
     n->complete_at = now(n);
     reset_trickle(n);
     return 0;
@@ -81,6 +95,11 @@ uint32_t nm_get_file(const nm_t *n, uint8_t *out, uint32_t cap)
 
 static void broadcast(nm_t *n)
 {
+    uint32_t t = ms_since_go(n);
+    if (n->tr.first_tx_ms == NM_NEVER)
+        n->tr.first_tx_ms = t;
+    n->tr.last_tx_ms = t;
+    n->st.broadcasts++;
     for (uint32_t i = 0; i < n->total; i++) {
         if (!((n->have >> i) & 1u))
             continue;
@@ -130,6 +149,7 @@ void nm_on_frame(nm_t *n, const uint8_t *f, uint8_t len)
     uint8_t idx = f[3], total = f[4];
     if (total == 0 || total > NM_MAX_CHUNKS || idx >= total)
         return;
+    uint32_t t = ms_since_go(n);
     if (n->total == 0) {
         n->file_id = fid;
         n->total = total;
@@ -137,6 +157,9 @@ void nm_on_frame(nm_t *n, const uint8_t *f, uint8_t len)
         n->st.rx_other_file++;
         return;
     }
+    if (n->tr.first_rx_ms == NM_NEVER)
+        n->tr.first_rx_ms = t;
+    n->tr.last_rx_ms = t;
     if ((n->have >> idx) & 1u) {
         n->st.rx_dup++;
         n->dup_count++;
@@ -146,6 +169,7 @@ void nm_on_frame(nm_t *n, const uint8_t *f, uint8_t len)
     memcpy(n->data[idx], f + NM_HDR, dlen);
     n->clen[idx] = (uint8_t)dlen;
     n->have |= 1u << idx;
+    n->tr.chunk_ms[idx] = t;
     n->st.rx_new++;
     if (nm_complete(n) && n->complete_at == PROTO_NO_TIMER)
         n->complete_at = now(n);

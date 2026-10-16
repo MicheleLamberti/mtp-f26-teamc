@@ -15,14 +15,16 @@
  * NRF24_RF_PWR_MAX_BITS would break the 10 mW e.i.r.p. limit. nrf24_init refuses
  * such a profile and nrf24_write_reg clamps any RF_SETUP write.
  *
- * D-R6 (SRI/MRM baseline since 16-Oct-26): a profile with lbt = 1 is adaptive FHSS
- * with listen-before-talk (CNAF UN-85 a), ETSI EN 300 328 cl. 4.3.1.7.2). Only such
- * a profile may go up to NRF24_RF_PWR_MAX_BITS_FHSS (<= 20 dBm e.i.r.p.), and the
- * driver enforces the rules that make that legal: channels only from the hop set,
- * no frame without a clear CCA on the current hop (nrf24_cca), at most
- * NRF24_FHSS_COT_US of transmissions per CCA, and an idle gap before a new CCA on
- * the same channel. Which channel to use when (nrf24_fhss_channel) and skipping a
- * busy slot are the protocol's job.
+ * D-R6 (SRI/MRM since 16-Oct-26): a profile with lbt = 1 transmits at up to 20 dBm
+ * e.i.r.p. (NRF24_RF_PWR_MAX_BITS_FHSS) with listen-before-talk (CNAF UN-85 a)). Two
+ * versions: option A (hop = 1, TEAM_FHSS) is adaptive FHSS, EN 300 328 cl. 4.3.1.7.2;
+ * option B (hop = 0, TEAM_20DBM_FIXED) is one fixed channel, frame-based LBT
+ * (cl. 4.3.2.6.3.2.2), legal only with the course's explicit OK because a < 1 MHz
+ * signal exceeds the 10 dBm/MHz PSD limit. The driver enforces what applies: hop-set
+ * channels only (A), no frame without a clear CCA on the current channel (nrf24_cca),
+ * at most profile->cot_us of transmissions per CCA, and profile->idle_us before a
+ * new CCA on the same channel. Which channel to use when (nrf24_fhss_channel) and
+ * skipping a busy slot are the protocol's job.
  */
 #ifndef NRF24_H
 #define NRF24_H

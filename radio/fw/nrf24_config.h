@@ -16,7 +16,10 @@ typedef struct {
     uint8_t crc_bytes;
     uint8_t max_len;          /* largest payload (dynamic payload length) */
     uint8_t pwr_max_bits;     /* highest RF_PWR this profile may use */
-    uint8_t lbt;              /* 1 = adaptive FHSS: hop set only, CCA before TX, COT limit */
+    uint8_t lbt;              /* 1 = 20 dBm profile: CCA before TX, COT limit (D-R6) */
+    uint8_t hop;              /* 1 = channels only from NRF24_FHSS_HOPSEQ (option A); 0 = any legal one */
+    uint16_t idle_us;         /* lbt: idle before a new CCA on the same channel */
+    uint32_t cot_us;          /* lbt: max transmit time per clear CCA */
 } nrf24_profile_t;
 
 /* Highest RF_PWR the driver accepts: -18 dBm at the chip. The E01 PA follows it, so a
@@ -57,7 +60,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_250K = {
     "TEAM_250K", NRF24_REGS_TEAM_250K,
     (uint8_t)(sizeof NRF24_REGS_TEAM_250K / sizeof NRF24_REGS_TEAM_250K[0]),
     74u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
-    0u, 0u,
+    0u, 0u, 0u, 0u, 0u,
 };
 
 /* TEAM_1M: fixed-channel option at 1 Mbps, 10 mW (fallback only)
@@ -79,7 +82,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_1M = {
     "TEAM_1M", NRF24_REGS_TEAM_1M,
     (uint8_t)(sizeof NRF24_REGS_TEAM_1M / sizeof NRF24_REGS_TEAM_1M[0]),
     74u, 1000000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
-    0u, 0u,
+    0u, 0u, 0u, 0u, 0u,
 };
 
 /* NM_COMMON: PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)
@@ -101,7 +104,7 @@ static const nrf24_profile_t NRF24_PROFILE_NM_COMMON = {
     "NM_COMMON", NRF24_REGS_NM_COMMON,
     (uint8_t)(sizeof NRF24_REGS_NM_COMMON / sizeof NRF24_REGS_NM_COMMON[0]),
     80u, 250000u, {0xC2, 0x5A, 0x9D, 0x3E, 0x71}, 2u, 32u,
-    0u, 0u,
+    0u, 0u, 0u, 0u, 0u,
 };
 
 /* TEAM_FHSS: SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)
@@ -123,7 +126,29 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_FHSS = {
     "TEAM_FHSS", NRF24_REGS_TEAM_FHSS,
     (uint8_t)(sizeof NRF24_REGS_TEAM_FHSS / sizeof NRF24_REGS_TEAM_FHSS[0]),
     2u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
-    1u, 1u,
+    1u, 1u, 1u, 2500u, 50000u,
+};
+
+/* TEAM_20DBM_FIXED: option B (D-R6b): SRI/MRM on one fixed channel at <= 20 dBm with LBT; only with the course's explicit OK (EN 300 328 PSD)
+ * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -12 dBm (<= +13 dBm at the E01 IPEX), omni: 15.5 dBm e.i.r.p. */
+static const nrf24_reg_t NRF24_REGS_TEAM_20DBM_FIXED[] = {
+    {0x01, 0x01},  /* EN_AA */
+    {0x02, 0x01},  /* EN_RXADDR */
+    {0x03, 0x03},  /* SETUP_AW */
+    {0x04, 0x00},  /* SETUP_RETR */
+    {0x05, 0x4A},  /* RF_CH */
+    {0x06, 0x22},  /* RF_SETUP */
+    {0x11, 0x20},  /* RX_PW_P0 */
+    {0x1D, 0x05},  /* FEATURE */
+    {0x1C, 0x01},  /* DYNPD */
+    {0x07, 0x70},  /* STATUS */
+    {0x00, 0x0E},  /* CONFIG */
+};
+static const nrf24_profile_t NRF24_PROFILE_TEAM_20DBM_FIXED = {
+    "TEAM_20DBM_FIXED", NRF24_REGS_TEAM_20DBM_FIXED,
+    (uint8_t)(sizeof NRF24_REGS_TEAM_20DBM_FIXED / sizeof NRF24_REGS_TEAM_20DBM_FIXED[0]),
+    74u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
+    1u, 1u, 0u, 500u, 10000u,
 };
 
 #endif /* NRF24_CONFIG_H */

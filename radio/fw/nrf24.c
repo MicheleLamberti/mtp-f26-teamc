@@ -118,7 +118,7 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
         if (profile->regs[i].addr == REG_RF_SETUP &&
             ((profile->regs[i].value & RF_PWR_MASK) >> RF_PWR_SHIFT) > dev->pwr_max)
             return NRF24_ERR_POWER;
-    if (profile->lbt && !in_hopset(profile->rf_ch))
+    if (profile->hop && !in_hopset(profile->rf_ch))
         return NRF24_ERR_CH;
 
     hal->ce(hal->ctx, 0);
@@ -148,7 +148,7 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
 
 nrf24_status_t nrf24_set_channel(nrf24_t *dev, uint8_t rf_ch)
 {
-    if (rf_ch > NRF24_MAX_LEGAL_CH || (dev->profile->lbt && !in_hopset(rf_ch)))
+    if (rf_ch > NRF24_MAX_LEGAL_CH || (dev->profile->hop && !in_hopset(rf_ch)))
         return NRF24_ERR_CH;
     nrf24_write_reg(dev, REG_RF_CH, rf_ch);
     dev->rf_ch = rf_ch;
@@ -171,7 +171,7 @@ nrf24_status_t nrf24_send(nrf24_t *dev, const uint8_t *body, uint8_t len)
     if (dev->profile->lbt) {
         uint32_t used = h->micros(h->ctx) - dev->cot_start_us;
         uint32_t need = NRF24_TX_SETTLE_US + nrf24_airtime_us(dev->profile, len);
-        if (!dev->cca_clear || dev->cot_ch != dev->rf_ch || used + need > NRF24_FHSS_COT_US) {
+        if (!dev->cca_clear || dev->cot_ch != dev->rf_ch || used + need > dev->profile->cot_us) {
             dev->cca_clear = 0;
             return NRF24_ERR_LBT;
         }
@@ -249,8 +249,8 @@ int nrf24_cca(nrf24_t *dev)
     if (dev->cot_ch == dev->rf_ch) {
         /* Same channel as the last occupancy: no transmissions for the idle period first. */
         uint32_t idle = h->micros(h->ctx) - dev->last_tx_end_us;
-        if (idle < NRF24_FHSS_IDLE_US)
-            h->delay_us(h->ctx, NRF24_FHSS_IDLE_US - idle);
+        if (idle < dev->profile->idle_us)
+            h->delay_us(h->ctx, dev->profile->idle_us - idle);
     }
     /* Fresh RX so RPD is not a value latched from an earlier frame. */
     h->ce(h->ctx, 0);

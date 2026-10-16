@@ -26,7 +26,20 @@ void nm_cfg_default(nm_cfg_t *cfg);
 
 typedef struct {
     uint32_t tx_frames, rx_new, rx_dup, rx_bad_crc, rx_other_file, suppressed;
+    uint32_t broadcasts;    /* transmission points where we sent everything we hold */
 } nm_stats_t;
+
+#define NM_NEVER 0xFFFFFFFFu
+
+/* Relay evidence for the NM log (nm_log.h): times in ms since nm_init (= GO). The rules make a team an NM
+ * winner by "delivering a copy of the NM-file from at least one of their node devices"; this record shows
+ * how our copy arrived and that the node relayed it. */
+typedef struct {
+    uint8_t origin;                    /* 1 = this node loaded the file from USB (SW corner) */
+    uint32_t first_rx_ms, last_rx_ms;  /* first / last valid NM frame heard */
+    uint32_t first_tx_ms, last_tx_ms;  /* first / last own broadcast */
+    uint32_t chunk_ms[NM_MAX_CHUNKS];  /* when each chunk was first held */
+} nm_trace_t;
 
 typedef struct {
     const proto_env_t *env;
@@ -40,7 +53,9 @@ typedef struct {
     uint32_t interval_us, dup_count;
     uint64_t end_at;
     uint64_t complete_at;   /* PROTO_NO_TIMER until every chunk is held */
+    uint64_t start_at;      /* nm_init time: GO */
     nm_stats_t st;
+    nm_trace_t tr;
 } nm_t;
 
 void nm_init(nm_t *n, const proto_env_t *env, const nm_cfg_t *cfg);

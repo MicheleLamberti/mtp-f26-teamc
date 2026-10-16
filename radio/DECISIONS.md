@@ -80,6 +80,24 @@ yes, reported by Santiago) · **Owner:** RT (PHY, driver) + PT (hop sync)
 - **Quick Mode** keeps TEAM_250K (one fixed channel, 10 mW): one line in < 2 min doesn't need the margin, and
   the hop sync may not be on the Pico yet.
 
+- **Two versions (16-Oct, Santiago: "apparently we wouldn't need to frequency hop"; rechecked, keep both):**
+
+  | | **Option A: hopping (default)** | **Option B: one fixed channel** |
+  |---|---|---|
+  | Profile | `TEAM_FHSS`: 40 hops, 25 ms slots | `TEAM_20DBM_FIXED`: RF_CH 74 (MRM plan 24/49/74/82) |
+  | EN 300 328 class | adaptive FHSS, LBT (cl. 4.3.1.7.2) | adaptive non-FHSS, frame-based LBT (cl. 4.3.2.6.3.2.2) |
+  | Listen-before-talk | CCA per hop, COT ≤ 50 ms | CCA every ≤ 10 ms (COT 10 ms, idle 0.5 ms): ~6 frames per CCA |
+  | Power density | 100 mW/100 kHz allowed: **compliant** | **10 dBm/MHz limit (cl. 4.3.2.3; EU Dec. 2006/771/EC as amended)**: a < 1 MHz signal at 15.5–20 dBm is **5–10 dB over** |
+  | Margins (S24–S25 / S27–S28) | SRI +36.5, MRM +13.9 dB | identical |
+  | Firmware / protocol | hop clock + acquisition on the Pico | none: today's link code on one channel |
+  | MRM sharing | random hop collisions (12 % of pairs at 10 m), ≥ 10 m | fixed plan at equal power: 74/82 pair 41 dB at 10 m vs −50 dB: OK at ≥ 10 m |
+  | Use when | default | only if the course explicitly accepts 20 dBm on one fixed channel (Atenea Q11) |
+
+  The UN-85 note in CNAF 2013/2017 states the density limit in its own text; CNAF 2021 refers to the EU decision,
+  whose annex keeps "100 mW/100 kHz for FHSS, 10 mW/MHz for other modulations". The CNAF now in force is Orden
+  TDF/732/2026 (BOE-A-2026-15661); its consolidated text leaves the UN notes out, so the EU decision is the
+  reference. Switching A ↔ B is one profile change in the firmware; both are built and tested (`radio/fw`, 235 checks).
+
 **Reverse if:** T17 shows the RPD threshold cannot meet the CCA level at a useful power, or the hop sync is not
 working on the bench by the pretest (4-Dec): then SRI/MRM fall back to TEAM_250K at RF_PWR −18.
 
@@ -319,4 +337,5 @@ Fallback: Si4463 (same band, same link budget, more effort).
 | D-R3 | NM PHY shared by all teams: redo `NM_PHY_PROPOSAL.md` for nRF24 (250 kbps, common address, CRC-16, no auto-ACK) | draft 16-Oct, frozen by week 6 |
 | D-R4 | MRM channel plan (draft above: RF_CH 24/49/74/82); agree with the 3 other teams after the WiFi survey | inter-team meeting, then week 8–9 |
 | D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
+| D-R6b | Option B (20 dBm on one fixed channel, no hopping): ask Atenea Q11; use only on an explicit yes | Q11 now |
 | D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pico; ≥ 10 m between teams' boxes at MRM | bench by week 8 |

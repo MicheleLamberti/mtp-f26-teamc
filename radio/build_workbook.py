@@ -68,15 +68,18 @@ def style_range(ws, ref, font=None, fill=None, border=None, align=None, fmt=None
 RX_BW_KHZ = [125, 200, 200, 100, 1000, 2000, 125, 200, 500, 500, 125, 500, 200, 200, 200,
              500, 1000, 500, 500, 500,
              500, 500, 500,
-             500, 500, 500]  # S24-S26: D-R6 FHSS baseline, same 250 kbps channel filter
+             500, 500, 500,  # S24-S26: D-R6 FHSS baseline, same 250 kbps channel filter
+             500, 500]  # S27-S28: option B, fixed channel at 20 dBm
 NF_DB = [7, 7, 7, 7, 10, 10, 7, 7, 10, 10, 7, 10, 7, 7, 7,
          10, 10, 10, 10, 10,
          10, 10, 10,
-         10, 10, 10]  # E01: chip NF kept (LNA ignored, conservative)
+         10, 10, 10,
+         10, 10]  # E01: chip NF kept (LNA ignored, conservative)
 REG = {  # (round, radio, limit type, limit dBm, sensitivity source)
     lb.F868: ("ERP", 27.0),   # 500 mW e.r.p., 869.40-869.65 MHz, UN-39
     lb.F24: ("EIRP", 10.0),   # 10 mW e.i.r.p., UN-85 b)
     869.85: ("ERP", 7.0),     # 5 mW e.r.p., 869.70-870.00 MHz, UN-39 (bench, no DC limit)
+    lb.F24_FIXED20: ("EIRP", 20.0),  # option B: 20 dBm on one channel; PSD > 10 dBm/MHz, course OK needed
     lb.F24_FHSS: ("EIRP", 20.0),  # 100 mW e.i.r.p., UN-85 a) adaptive FHSS + LBT (D-R6, SRI/MRM baseline since 16-Oct)
 }
 
@@ -557,8 +560,10 @@ def build_regulatory(wb):
          "Room for every team on its own channel (MRM). Campus WiFi/BT share the band."],
         ["2400-2483.5 MHz", "UN-85 a)", "100 mW e.i.r.p.; 100 mW/100 kHz FHSS, 10 mW/MHz other", "mitigation techniques (EN 300 328) mandatory", "Yes, if mitigation implemented", "83.5 MHz",
          "SRI/MRM baseline since 16-Oct (D-R6, a professor approved 20 dBm): adaptive FHSS + LBT (EN 300 328 4.3.1.7.2: >= 15 hop channels over >= 70 % "
-         "of the band, CCA at -70 dBm/MHz, COT < 60 ms). A non-hopping narrowband radio gets nothing here (10 mW/MHz "
-         "= 10 dBm in our < 1 MHz). Non-adaptive FHSS: MU <= 10 % (10 % duty at 20 dBm). Confirmed: a professor approved it and Atenea Q3 answered yes (16-Oct)."],
+         "of the band, CCA at -70 dBm/MHz, COT < 60 ms) = option A. Option B (S27-S28): 20 dBm on one fixed channel "
+         "with frame-based LBT (COT <= 10 ms); EN 300 328 4.3.2.3 caps non-hopping equipment at 10 dBm/MHz, so our "
+         "< 1 MHz signal is 5-10 dB over: only with the course's explicit OK. Non-adaptive FHSS: MU <= 10 % (10 % duty "
+         "at 20 dBm). A professor approved 20 dBm and Atenea Q3 answered yes (16-Oct)."],
         ["5725-5875 MHz", "UN-130", "25 mW e.i.r.p.", "none (generic SRD, EN 300 440)", "Yes", "150 MHz",
          "Few cheap non-WiFi modules; higher path loss and container loss. Not shortlisted."],
     ]
@@ -590,8 +595,8 @@ def build_readme(wb):
         ("Owner: Radio Team (Santiago, Andrian, Marcos). Version 0.1, 2026-10-03.", F_CALC),
         ("", None),
         ("Sheets", F_BOLD),
-        ("Link Budget - AN5142 rows (course-corrected), one column per scenario S1-S26. This is the ANNEX 'Link Budget Analysis' artefact.", F_CALC),
-        ("Baseline (16-Oct): S24-S26 = SRI/MRM on the E01-ML01SP4 + one omni as adaptive FHSS + LBT at <= 20 dBm e.i.r.p. (UN-85 a, D-R6; S26 = RF_PWR -12 until T0). S23 = NM at 10 mW on one channel. S21-S22 = the 10 mW fixed-channel fallback (and Quick Mode).", F_CALC),
+        ("Link Budget - AN5142 rows (course-corrected), one column per scenario S1-S28. This is the ANNEX 'Link Budget Analysis' artefact.", F_CALC),
+        ("Baseline (16-Oct): S24-S26 = SRI/MRM on the E01-ML01SP4 + one omni as adaptive FHSS + LBT at <= 20 dBm e.i.r.p. (UN-85 a, D-R6; S26 = RF_PWR -12 until T0). S23 = NM at 10 mW on one channel. S21-S22 = the 10 mW fixed-channel fallback (and Quick Mode). S27-S28 = option B: the same 20 dBm on one fixed channel without hopping (EN 300 328 PSD exceeded: only with the course's explicit OK).", F_CALC),
         ("Height Sweep - same budgets recomputed for antenna heights 0.5-1.5 m.", F_CALC),
         ("Throughput - lines delivered in 120 s per radio/data rate; occupied bandwidth check for the 250 kHz 868 sub-band.", F_CALC),
         ("Candidates - radio module shortlist with datasheet figures, gotchas and compliance notes.", F_CALC),

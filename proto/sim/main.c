@@ -12,10 +12,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "codec.h"
 #include "link.h"
 #include "nm_gossip.h"
+#include "nm_log.h"
 #include "nrf24.h"
 #include "sim.h"
 
@@ -248,7 +250,7 @@ typedef struct {
 } nm_opts_t;
 
 typedef struct {
-    int nodes, complete, exact;
+    int nodes, complete, exact, logs_ok;
     double far_s, last_s, max_tx_s;
     uint32_t file_len, collisions, frames;
 } nm_result_t;
@@ -305,6 +307,25 @@ static int run_nm(const nm_opts_t *o, nm_result_t *r)
         r->frames += s->nodes[i].st.frames_tx;
     }
     r->far_s = nm_complete(&nm[o->nodes - 1]) ? (double)nm[o->nodes - 1].complete_at / S_US : -1;
+
+    /* Relay logs (what each box writes next to its copy on the USB stick), kept in build/nm_logs/. */
+    r->logs_ok = 1;
+    mkdir("build/nm_logs", 0755);
+    for (int i = 0; i < o->nodes; i++) {
+        char text[NM_LOG_MAX], box[16], path[64];
+        snprintf(box, sizeof box, "N%02d", i);
+        nm_log_info_t info = {"sim", box, "sim", nm_complete(&nm[i]) ? "NM_FILE.TXT" : ""};
+        size_t n = nm_log_format(&nm[i], &info, text, sizeof text);
+        if (n == 0 || !strstr(text, nm_complete(&nm[i]) ? "COMPLETE" : "INCOMPLETE") ||
+            (nm_complete(&nm[i]) && nm[i].st.tx_frames == 0))
+            r->logs_ok = 0;
+        snprintf(path, sizeof path, "build/nm_logs/node_%02d.txt", i);
+        FILE *lf = fopen(path, "wb");
+        if (lf) {
+            fwrite(text, 1, n, lf);
+            fclose(lf);
+        }
+    }
     sim_free(s);
     free(s);
     free(nm);
@@ -459,6 +480,7 @@ static int run_tests(void)
     print_nm("\nT10 NM, 10 nodes in a line, 10 % loss to neighbours, 70 % two hops away", &n);
     expect(n.complete == n.nodes && n.exact, "every node gets an exact copy");
     expect(n.far_s >= 0 && n.far_s < 60, "far end within 60 s");
+    expect(n.logs_ok, "every node's relay log shows a complete copy and its own broadcasts (build/nm_logs/)");
 
     no = nm_defaults();
     no.p1 = 0.3;

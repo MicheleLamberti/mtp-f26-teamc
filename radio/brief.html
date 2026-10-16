@@ -113,7 +113,8 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team</div>
   <h1>Radio brief: band, module and link budget</h1>
-  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.8 · Fri 16 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.9 · Fri 16 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <p class="lede"><b>New in v0.9 (16 Oct): 20 dBm rechecked; two versions kept.</b> Hopping (option A) stays the default because it meets EN 300 328 as written. <b>Option B</b> sends the same 20 dBm on one fixed channel without hopping: same margins, simpler firmware, but our narrow signal is 5–10 dB above the 10 mW/MHz density limit for non-hopping radios, so we use it only if the course explicitly says yes (Atenea Q11). Both are built and tested. See <a href="#s-fhss">20 dBm</a>. Also new: an NM link-protocol diagram.</p>
   <p class="lede"><b>New in v0.8 (16 Oct): every team uses 20 dBm, so every team hops.</b> Atenea Q3 confirmed 20 dBm in writing, and the other teams will use it too. For a narrowband radio that means hopping, so the fixed MRM channel plan is gone: our hop set now covers all 40 even channels (2402–2480 MHz), the teams share the band by listen-before-talk, and the boxes need <b>≥ 10 m</b> between teams. Random hop collisions cost about a third of our ACKs in the worst case; the simulator still delivers the whole file in 81 s.</p>
   <p class="lede"><b>New in v0.7 (16 Oct): 20 dBm e.i.r.p. is the baseline for SRI and MRM.</b> A professor said yes to 20 dBm, and Atenea Q3 confirmed it in writing. For our narrowband radio that is allowed only as a <b>frequency-hopping radio with listen-before-talk</b> (CNAF UN-85 a), EN 300 328 adaptive FHSS), so SRI and MRM now hop with the same SP4 and omni: <b>+10.5 dB on every link</b>, MRM 260 m <b>+13.9 dB</b>. NM stays at 10 mW on channel 80; Quick Mode uses the 10 mW channel too. See <a href="#s-fhss">20 dBm with frequency hopping</a>.</p>
   <p class="lede"><b>New in v0.5 (decided 13 Oct, Santiago with Marcos):</b> <b>one omni antenna per box on the Ebyte E01-ML01SP4</b>. Antennas cannot change between the competition modes, and the patches' risks in NM (aiming, the rim corner, tuning) outweighed their +1 dB on MRM. The SP4 has the antenna socket on the module, so the flex omni plugs straight in. Shopping list updated below.</p>
@@ -148,6 +149,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <tr><td class="mono">TEAM_1M</td><td>Fallback option at 1 Mbps</td><td class="num r">74 · 2474 MHz</td><td class="num r">1 Mbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 8.7 MHz to edge</span></td></tr>
       <tr><td class="mono">NM_COMMON</td><td>Shared with all teams (below)</td><td class="num r">80 · 2480 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 3.1 MHz to edge</span></td></tr>
       <tr class="hl"><td class="mono">TEAM_FHSS</td><td><b>SRI and MRM baseline:</b> hopping with listen-before-talk (D-R6)</td><td class="num r">40 hops · 2402–2480</td><td class="num r">250 kbps</td><td class="num r">≤ +13 dBm (−12)</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 15.5 dBm (20 after T0)</td><td><span class="pill p-ok">yes · 1.6 MHz to edge</span></td></tr>
+      <tr><td class="mono">TEAM_20DBM_FIXED</td><td>Option B: SRI/MRM on one fixed channel at 20 dBm (only on an explicit yes)</td><td class="num r">74 · 2474 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +13 dBm (−12)</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 15.5 dBm (20 after T0)</td><td><span class="pill p-warn">yes · PSD over</span></td></tr>
     </tbody>
   </table></div>
   <div class="grid2">
@@ -203,7 +205,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 <section aria-labelledby="s-fhss">
   <div class="col"><h2 id="s-fhss">20 dBm with frequency hopping <span class="pill p-ok" style="vertical-align:4px">baseline · 16 Oct</span></h2>
   <p>CNAF UN-85 has two regimes in 2400–2483.5 MHz <span class="tag t-ver">verified</span>. <b>b)</b> generic low-power devices: under 10 mW e.i.r.p.: NM, Quick Mode and the fallback. <b>a)</b> wideband data systems under EN 300 328: <b>100 mW e.i.r.p.</b>, but the density is capped at <b>100 mW per 100 kHz for frequency hopping</b> and <b>10 mW per MHz for anything else</b>. Our signal is under 1 MHz wide, so without hopping a) still means ~10 dBm. The 20 dBm needs a hopping radio that follows the EN 300 328 sharing rules.</p>
-  <p>EN 300 328 V2.2.2 has two kinds of hopping. <b>Non-adaptive</b> hopping caps power × duty: at 20 dBm the radio may transmit only 10 % of the time (~16 kbps), too slow for a 2-minute file. <b>Adaptive hopping with listen-before-talk</b> has no duty limit, so that is what SRI and MRM use (D-R6). A professor approved 20 dBm e.i.r.p. on 16 Oct.</p></div>
+  <p><b>Without hopping</b>, EN 300 328 also allows 20 dBm in total, but caps the density at <b>10 dBm per MHz</b> (cl. 4.3.2.3), as does the EU decision that UN-85 a) points to. Our signal is about 0.6 MHz wide, so on one fixed channel it is 5–10 dB over (option B below). EN 300 328 V2.2.2 has two kinds of hopping. <b>Non-adaptive</b> hopping caps power × duty: at 20 dBm the radio may transmit only 10 % of the time (~16 kbps), too slow for a 2-minute file. <b>Adaptive hopping with listen-before-talk</b> has no duty limit, so that is what SRI and MRM use (D-R6). A professor approved 20 dBm e.i.r.p. on 16 Oct.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>EN 300 328 rule (adaptive FHSS, LBT)</th><th>Requirement</th><th>Our design (<span class="mono">phy_config.py</span>, all checks OK)</th></tr></thead>
     <tbody>
@@ -215,6 +217,21 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <tr><td>Channel occupancy (4.3.1.7.2)</td><td>&lt; 60 ms per check, then idle ≥ 5 %</td><td>50 ms, then 2.5 ms idle; busy hops are skipped</td></tr>
     </tbody>
   </table></div>
+  <h3 class="col">Two versions of 20 dBm</h3>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th><b>Option A: hopping</b> (default)</th><th><b>Option B: one fixed channel</b></th></tr></thead>
+    <tbody>
+      <tr><td>Profile</td><td class="mono">TEAM_FHSS: 40 hops, 25 ms each</td><td class="mono">TEAM_20DBM_FIXED: RF_CH 74, MRM plan 24 / 49 / 74 / 82</td></tr>
+      <tr><td>EN 300 328 class</td><td>adaptive FHSS with LBT (4.3.1.7.2)</td><td>adaptive non-FHSS, frame-based LBT (4.3.2.6.3.2.2)</td></tr>
+      <tr><td>Listen-before-talk</td><td>a check per hop, ≤ 50 ms per check</td><td>a check every ≤ 10 ms (about 6 frames), 0.5 ms idle</td></tr>
+      <tr><td>Power density</td><td><span class="pill p-ok">compliant: 100 mW/100 kHz allowed</span></td><td><span class="pill p-bad">5–10 dB over 10 dBm/MHz</span></td></tr>
+      <tr><td>Margins (SRI 70 m · MRM 260 m)</td><td>+36.5 · +13.9 dB</td><td>same</td></tr>
+      <tr><td>Firmware</td><td>hop clock and acquisition on the Pico</td><td>none extra: today's link on one channel</td></tr>
+      <tr><td>MRM with the other teams</td><td>random hop collisions, ≥ 10 m between boxes</td><td>fixed plan at equal power: the 8 MHz pair is fine at ≥ 10 m</td></tr>
+      <tr><td>Use it</td><td><span class="pill p-ok">default</span></td><td><span class="pill p-warn">only on an explicit yes (Atenea Q11)</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="col sub">Sources: ETSI EN 300 328 V2.2.2 cl. 4.3.1 and 4.3.2; CNAF UN-85 (2013/2017 text) and Commission Decision 2006/771/EC as amended (2019/1345, 2022/180). The CNAF in force since July 2026 is Orden TDF/732/2026 (BOE-A-2026-15661); its consolidated text does not reproduce the UN notes, so the EU decision is the reference. Switching between A and B is one firmware profile.</p>
   <div class="grid2">
     <div class="card"><h3>What changes</h3><ul>
       <li><b>Nothing in the hardware.</b> The SP4 is a +20 dBm module that we hold at its lowest step; hopping only raises the step. TX bursts move toward the datasheet's 120 mA, which the radio LDO already covers.</li>
@@ -411,6 +428,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <tr><td><b>D-R3</b> NM radio shared by all teams</td><td>Radio + protocols</td><td>Other teams' modules</td><td>NM bonus (+2 to +2.5)</td><td><span class="pill p-mute">draft v0.2 ready</span><br><span class="sub">send to teams; freeze by week 6</span></td></tr>
       <tr><td><b>D-R4</b> MRM channel per team</td><td>Radio + other teams</td><td>Campus survey T14</td><td>MRM (+1)</td><td><span class="pill p-mute">superseded: every team hops</span><br><span class="sub">fixed plan = 10 mW fallback</span></td></tr>
       <tr><td><b>D-R6</b> SRI/MRM as adaptive hopping + listen-before-talk at ≤ 20 dBm e.i.r.p.</td><td>Radio + protocols</td><td>Atenea Q3 = yes; T0 (all steps), T17, T18</td><td>MRM (+10.5 dB), firmware, other teams</td><td><span class="pill p-ok">baseline 16 Oct</span><br><span class="sub">built and simulated; bench tests next</span></td></tr>
+      <tr><td><b>D-R6b</b> Option B: 20 dBm on one fixed channel, no hopping</td><td>Radio</td><td>Atenea Q11</td><td>Firmware (simpler), MRM plan</td><td><span class="pill p-mute">built, not in use</span><br><span class="sub">only on an explicit yes</span></td></tr>
       <tr><td><b>D-R5c</b> Antenna: one flex omni (Molex 146153-0100)</td><td>Radio</td><td>Box inside height, T5</td><td>Mechanics, carrier PCB</td><td><span class="pill p-ok">decided 13 Oct</span><br><span class="sub">T5 measures the in-box gain</span></td></tr>
     </tbody>
   </table></div>
@@ -450,6 +468,28 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     </tbody>
   </table></div>
   <p class="col sub">Interop test before week 6: every pair of boxes exchanges 1 000 frames at 10 m on RF_CH 80; pass is ≥ 99 % with a valid end-to-end CRC. Full proposal: <span class="mono">radio/NM_PHY_PROPOSAL.md</span>.</p>
+  <h3 class="col">NM link protocol (gossip, no routing)</h3>
+  <div style="margin-top:1rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto">
+<pre class="mermaid">
+sequenceDiagram
+  participant O as Origin box (SW corner)
+  participant S as Next box (South rim)
+  participant C as Boxes further on (corner, East rim)
+  participant R as Receiver (NE end)
+  Note over O: Setup: NM-file from the USB stick into flash, cut into ~20 chunks of 25 B
+  Note over O,R: GO. Every box on RF_CH 80, 250 kbps, 10 mW, no chip ACKs, no addresses
+  loop every Trickle interval I (1 s, doubling to 8 s)
+    O-)S: NM_DATA x 20 [0x4E, file_id, idx, total, 25 B, CRC-16]
+  end
+  Note over S: new chunk: check, store, reset I to 1 s
+  S-)O: rebroadcasts what it holds (O goes quiet after 3 copies per chunk)
+  S-)C: the same frames reach one box further
+  C-)R: relayed along the rim
+  Note over R: all chunks and the whole-file id check out: NM-file to flash
+  Note over O,R: STOP: every box writes the NM-file and NM_LOG.TXT to a USB stick
+</pre>
+  </div>
+  <p class="col sub">Every box ends up with an identical copy, which is how a team proves it took part (rules: "delivering a copy of the NM-file from at least one of their node devices"). The relay log is extra evidence. Details: the protocol proposal page.</p>
 </section>
 
 <section aria-labelledby="s-test">
@@ -462,7 +502,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <tr class="hl"><td class="num">T2</td><td>Sensitivity at 250 kbps and 1 Mbps through a lab step attenuator</td><td>1 % packet loss at ≤ <b>−92 dBm</b> (250 kbps). <b>Gate for the module.</b></td><td>before Quick Mode</td></tr>
       <tr><td class="num">T14</td><td>Campus 2.4 GHz survey with the RPD bit, channels 0–83, at each site</td><td>Our MRM channels and the NM channel busy &lt; 5 %</td><td>before the inter-team meeting</td></tr>
       <tr><td class="num">T4</td><td>Range, open box, 10 / 70 / 150 / 260 m; then one 2-min transfer at 70 m</td><td>≤ 1 % loss to 150 m; all 10,000 lines</td><td>after T2</td></tr>
-      <tr><td class="num">T13</td><td>Spectrum analyser: carrier offset, occupied bandwidth on channel 82, e.i.r.p.</td><td>Below 2483.5 MHz; ≤ 10 dBm (≤ 20 dBm hopping). Plot in the ANNEX.</td><td>book the lab</td></tr>
+      <tr><td class="num">T13</td><td>Spectrum analyser: carrier offset, occupied bandwidth on channel 82, e.i.r.p. (option B: PSD in 1 MHz)</td><td>Below 2483.5 MHz; ≤ 10 dBm (≤ 20 dBm hopping). Plot in the ANNEX.</td><td>book the lab</td></tr>
       <tr><td class="num">T17</td><td>D-R6: input level where the clear-channel check (RPD) trips, from a signal generator</td><td>≤ the threshold for our power (−64 dBm at −12, −68.5 dBm at 20 dBm)</td><td>with T13</td></tr>
       <tr><td class="num">T18</td><td>D-R6: hop pattern, dwell and occupancy on the analyser; skips a channel with a CW interferer on it</td><td>40 channels, ≤ 25 ms dwell, ≤ 50 ms per check, busy channel skipped</td><td>with T13</td></tr>
       <tr><td class="num">T5</td><td>Closed box; antenna high vs middle of the wall; box rotated 0 / 90 / 180°</td><td>≤ 1 % loss at 260 m</td><td>after T4</td></tr>
@@ -501,6 +541,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <div class="card"><h3>Atenea forum (posted by the project leader)</h3><ul>
       <li><b>Allowed chips.</b> Is the nRF24L01+ on the Ebyte E01-ML01SP4 allowed? Its packet format is Nordic-proprietary and it has no Bluetooth.</li>
       <li><b>20 dBm with hopping (Q3): answered yes, 16 Oct.</b> 20 dBm e.i.r.p. is confirmed for our SRI/MRM hopping design; nothing left to ask.</li>
+      <li><b>20 dBm without hopping (Q11, new).</b> May we use the confirmed 20 dBm on one fixed channel (about 0.6 MHz wide) with listen-before-talk every ≤ 10 ms? EN 300 328 limits non-hopping radios to 10 mW/MHz, which such a narrow signal exceeds by 5–10 dB. If not, we keep hopping.</li>
       <li><b>Support height and box.</b> Is the support fixed at 70 cm? May the box stand on its 15 × 7 cm edge?</li>
       <li><b>Cooperation.</b> May teams agree a common NM radio and an MRM channel split, sharing settings but not code?</li>
 </ul></div>
