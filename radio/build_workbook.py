@@ -67,15 +67,17 @@ def style_range(ws, ref, font=None, fill=None, border=None, align=None, fmt=None
 # Per-scenario extra inputs not held in linkbudget.Link
 RX_BW_KHZ = [125, 200, 200, 100, 1000, 2000, 125, 200, 500, 500, 125, 500, 200, 200, 200,
              500, 1000, 500, 500, 500,
-             500, 500, 500]
+             500, 500, 500,
+             500, 500, 500]  # S24-S26: D-R6 FHSS draft, same 250 kbps channel filter
 NF_DB = [7, 7, 7, 7, 10, 10, 7, 7, 10, 10, 7, 10, 7, 7, 7,
          10, 10, 10, 10, 10,
+         10, 10, 10,
          10, 10, 10]  # E01: chip NF kept (LNA ignored, conservative)
 REG = {  # (round, radio, limit type, limit dBm, sensitivity source)
     lb.F868: ("ERP", 27.0),   # 500 mW e.r.p., 869.40-869.65 MHz, UN-39
     lb.F24: ("EIRP", 10.0),   # 10 mW e.i.r.p., UN-85 b)
     869.85: ("ERP", 7.0),     # 5 mW e.r.p., 869.70-870.00 MHz, UN-39 (bench, no DC limit)
-    lb.F24_FHSS: ("EIRP", 20.0),  # 100 mW e.i.r.p., UN-85 a) FHSS - only if Atenea Q3 = yes
+    lb.F24_FHSS: ("EIRP", 20.0),  # 100 mW e.i.r.p., UN-85 a) adaptive FHSS + LBT (D-R6 draft) - only if Atenea Q3 = yes
 }
 
 
@@ -146,8 +148,8 @@ def build_link_budget(wb):
     inp("round", "Round", "", "", "Rules PDF: SRI 70 m, MRM ~260 m, NM hop (distance unknown)", lambda s, j: round_of(s.name), fmt="@")
     inp("radio", "Radio / configuration", "", "", "", lambda s, j: radio_of(s.name), fmt="@")
     inp("rate", "Air data rate", "R", "kbps", "Rate the sensitivity refers to", lambda s, j: s.rate_kbps, fmt="0.0")
-    inp("regtype", "Regulatory limit type", "", "", "868: e.r.p. (UN-39); 2.4 GHz: e.i.r.p. (UN-85 b)", lambda s, j: REG[s.f_mhz][0], fmt="@")
-    inp("reglim", "Regulatory power limit", "Plim", "dBm", "500 mW e.r.p. = 27 dBm; 10 mW e.i.r.p. = 10 dBm", lambda s, j: REG[s.f_mhz][1])
+    inp("regtype", "Regulatory limit type", "", "", "868: e.r.p. (UN-39); 2.4 GHz: e.i.r.p. (UN-85 b; FHSS UN-85 a)", lambda s, j: REG[s.f_mhz][0], fmt="@")
+    inp("reglim", "Regulatory power limit", "Plim", "dBm", "500 mW e.r.p. = 27 dBm; 10 mW e.i.r.p. = 10 dBm; FHSS 100 mW = 20 dBm", lambda s, j: REG[s.f_mhz][1])
     sec("System variables")
     inp("f0", "Frequency", "f0", "MHz", "869.525 = centre of 869.40-869.65 MHz", lambda s, j: s.f_mhz, fmt="0.000")
     inp("c", "Speed of light", "c", "m/s", "constant", lambda s, j: lb.C, fmt="0")
@@ -404,6 +406,37 @@ def build_throughput(wb):
     ws["A22"].font = F_NOTE
     ws["A22"].alignment = WRAP
     ws.merge_cells("A22:P24")
+
+    # D-R6 draft: the 250 kbps nRF24 row (row 18) when SRI/MRM hop with LBT (adaptive FHSS, UN-85 a)
+    ws["A26"] = "D-R6 draft: adaptive FHSS + LBT at 20 dBm e.i.r.p. (only if Atenea Q3 = yes) - nRF24 @250 kbps (row 18)"
+    ws["A26"].font = F_BOLD
+    fh = [
+        ("Hop slot (dwell)", lb.FHSS_SLOT_MS, "ms", "One 16-frame SR-ARQ window (~22 ms) + guard; COT must stay < 60 ms (EN 300 328 4.3.1.7.2)"),
+        ("Hop + CCA overhead per slot", lb.FHSS_HOP_OVERHEAD_MS, "ms", "PLL settle 130 us + RPD needs >= 170 us in RX (the CCA, >= 18 us required)"),
+        ("Slots skipped busy (LBT)", lb.FHSS_BUSY[1], "share", "ASSUMPTION: campus WiFi + other teams; measure in T14/T17"),
+    ]
+    for i, (lab, v, u, n) in enumerate(fh):
+        r = 27 + i
+        ws.cell(row=r, column=1, value=lab)
+        c = ws.cell(row=r, column=2, value=v)
+        c.font = F_IN
+        if "busy" in lab:
+            c.fill = FILL_KEY
+        ws.cell(row=r, column=3, value=u)
+        ws.cell(row=r, column=4, value=n).font = F_NOTE
+    ws["A30"] = "Goodput with hopping"
+    ws["B30"] = "=L18*(1-B28/B27)*(1-B29)"
+    ws["C30"] = "kbps"
+    ws["A31"] = "Lines, no compression"
+    ws["B31"] = "=MIN($B$4,INT(B30*1000*$B$5/8/$B$9))"
+    ws["A32"] = "Non-adaptive FHSS at 20 dBm instead (MU <= 10 % -> 10 % duty)"
+    ws["B32"] = "=L18*0.1"
+    ws["C32"] = "kbps"
+    ws["D32"] = "EN 300 328 4.3.1.6: MU = P/100 mW x DC <= 10 %. Too slow for a 2-min round: hence adaptive (LBT)."
+    ws["D32"].font = F_NOTE
+    for r in (30, 31, 32):
+        ws.cell(row=r, column=2).number_format = "0.0" if r != 31 else "0"
+        ws.cell(row=r, column=2).fill = FILL_RES
     ws.column_dimensions["A"].width = 40
     for col in range(2, 17):
         ws.column_dimensions[get_column_letter(col)].width = 12
@@ -523,7 +556,9 @@ def build_regulatory(wb):
         ["2400-2483.5 MHz", "UN-85 b)", "10 mW e.i.r.p.", "none (generic SRD, EN 300 440)", "YES", "83.5 MHz",
          "Room for every team on its own channel (MRM). Campus WiFi/BT share the band."],
         ["2400-2483.5 MHz", "UN-85 a)", "100 mW e.i.r.p.; 100 mW/100 kHz FHSS, 10 mW/MHz other", "mitigation techniques (EN 300 328) mandatory", "Yes, if mitigation implemented", "83.5 MHz",
-         "Wideband data/RLAN class. Whether a student FHSS/LBT design qualifies is a question for Atenea."],
+         "D-R6 draft (16-Oct): SRI/MRM as adaptive FHSS + LBT (EN 300 328 4.3.1.7.2: >= 15 hop channels over >= 70 % "
+         "of the band, CCA at -70 dBm/MHz, COT < 60 ms). A non-hopping narrowband radio gets nothing here (10 mW/MHz "
+         "= 10 dBm in our < 1 MHz). Non-adaptive FHSS: MU <= 10 % (10 % duty at 20 dBm). Needs Atenea Q3 = yes."],
         ["5725-5875 MHz", "UN-130", "25 mW e.i.r.p.", "none (generic SRD, EN 300 440)", "Yes", "150 MHz",
          "Few cheap non-WiFi modules; higher path loss and container loss. Not shortlisted."],
     ]
@@ -533,7 +568,7 @@ def build_regulatory(wb):
             c = ws.cell(row=r, column=1 + k, value=v)
             c.alignment = WRAP
             c.border = BOX
-            if "869.400" in row[0] or "UN-85 b" in row[1]:
+            if "869.400" in row[0] or "UN-85" in row[1]:
                 c.fill = FILL_RES
         ws.row_dimensions[r].height = 48
     r = 5 + len(rows) + 1
@@ -555,7 +590,8 @@ def build_readme(wb):
         ("Owner: Radio Team (Santiago, Andrian, Marcos). Version 0.1, 2026-10-03.", F_CALC),
         ("", None),
         ("Sheets", F_BOLD),
-        ("Link Budget - AN5142 rows (course-corrected), one column per scenario S1-S12. This is the ANNEX 'Link Budget Analysis' artefact.", F_CALC),
+        ("Link Budget - AN5142 rows (course-corrected), one column per scenario S1-S26. This is the ANNEX 'Link Budget Analysis' artefact.", F_CALC),
+        ("S21-S23 = 2.4 GHz baseline (E01-ML01SP4 + one omni, 10 mW e.i.r.p.). S24-S26 = D-R6 draft: same hardware as adaptive FHSS + LBT at 20 dBm e.i.r.p. (UN-85 a), only if Atenea Q3 = yes.", F_CALC),
         ("Height Sweep - same budgets recomputed for antenna heights 0.5-1.5 m.", F_CALC),
         ("Throughput - lines delivered in 120 s per radio/data rate; occupied bandwidth check for the 250 kHz 868 sub-band.", F_CALC),
         ("Candidates - radio module shortlist with datasheet figures, gotchas and compliance notes.", F_CALC),

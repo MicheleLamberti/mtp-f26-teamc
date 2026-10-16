@@ -1,11 +1,14 @@
 # Radio test plan — nRF24L01+ / Ebyte E01-ML01SP4 + flex omni, 2.4 GHz
 
-Version 0.3, 13-Oct-26 (v0.2 assumed the DP5 + patches; v0.1 the RFM69 at 868 MHz) · Owner: RT · Expected
+Version 0.4, 16-Oct-26 (v0.4 adds the D-R6 draft: T0 all power steps, T17 CCA threshold, T18 hopping;
+v0.3 SP4 + omni; v0.2 the DP5 + patches; v0.1 the RFM69 at 868 MHz) · Owner: RT · Expected
 values come from `linkbudget.py` (flat earth, worst-case ground bounce, antennas at 0.75 m,
 −1 dB container, chip sensitivity −94 dBm at 250 kbps).
 
-No duty-cycle limit at 2.4 GHz: tests can be repeated freely. **Never exceed 10 dBm e.i.r.p.**:
-the driver only accepts RF_PWR −18 dBm (`TEAM_250K`, `TEAM_1M`, `NM_COMMON` profiles).
+No duty-cycle limit at 2.4 GHz: tests can be repeated freely. **Never exceed 10 dBm e.i.r.p. on a fixed
+channel**: the driver only accepts RF_PWR −18 dBm for `TEAM_250K`, `TEAM_1M` and `NM_COMMON`. The `TEAM_FHSS`
+profile (D-R6 draft, up to 20 dBm e.i.r.p. while hopping with LBT) is for the bench and the lab only until
+Atenea Q3 is answered yes; T17 and T18 must pass before it goes outdoors.
 
 **The nRF24 has no RSSI.** It only has RPD, one bit that says "above −64 dBm at the chip" (about
 −76 dBm at the E01 antenna port, through its ~12 dB LNA). So every range test measures **PER**
@@ -19,12 +22,14 @@ pad, frames sent/received.
 1. Wire one SP4 (on its breakout) to the Pico (SPI + CSN + CE, 3.3 V with ≥ 100 µF near the module); run
    `nrf24_init`. Pass: `NRF24_OK`. `NRF24_ERR_SPI` = wiring/CSN; `NRF24_ERR_NOT_PLUS` = an old
    nRF24L01 (no 250 kbps), return it.
-2. **Conducted output power** at RF_PWR −18 dBm (a test build may unlock −12 for this step only), the
-   module's IPEX through a U.FL-to-SMA pigtail into the spectrum analyser or
-   power meter (lab, ≥ 20 dB attenuator in front if the instrument needs it). Expected ~+7 /
-   ~+13 dBm (estimate; could be ~5 dB lower if the PA gain is 20 dB). Add the pigtail loss back. Write the
-   value into `E01_PA_GAIN_DB` (`phy_config.py`) and `p_pa_dbm`
-   (`linkbudget.py`), then pick the pad so that output + cable + pad + antenna gain ≤ 10 dBm.
+2. **Conducted output power at all four RF_PWR steps** (−18 / −12 / −6 / 0 dBm; a lab-only test build
+   unlocks them, CW or continuous frames), the module's IPEX through a U.FL-to-SMA pigtail into the spectrum
+   analyser or power meter (lab, **≥ 30 dB attenuator in front**: up to +20 dBm). Expected ~+2..+7 /
+   +8..+13 / +14..+19 / ~+20 dBm (PA gain 20–25 dB, saturating near +20). Add the pigtail loss back. Write
+   the gain into `E01_PA_GAIN_DB` (`phy_config.py`) and `p_pa_dbm` (`linkbudget.py`). Fixed channel:
+   output + cable + antenna peak gain ≤ 10 dBm at −18. **D-R6:** `phy_config.py` then picks the highest
+   step with output − 0.5 + 3 ≤ 20 dBm (−6 if the gain is ≤ 23.5 dB, else −12). Also log the supply
+   current at each step (radio LDO budget) and repeat at 3.3 V supply (low battery).
 3. Clone check: the chip marking says nRF24L01P (Nordic), and the TX/RX current at the bench supply
    matches the E01 datasheet. A Si24R1 clone usually shows a different current and a weaker T2.
 4. Two boxes 1 m apart, `TEAM_250K`, flex antennas fitted: 1 000 frames of 32 B. Pass: ≥ 999 received.
@@ -68,7 +73,8 @@ Pass: closed-box PER ≤ 1 % at 260 m. If it fails, raise the antenna and re-che
    assumption (`XTAL_PPM`).
 2. 99 % occupied bandwidth at 250 kbps and 1 Mbps on RF_CH 82 (highest MRM channel). Pass: whole
    emission below 2483.5 MHz including the offset.
-3. Conducted power (T0) + measured antenna gain (lab) → e.i.r.p. Pass: ≤ 10 dBm. Put the plot in the ANNEX.
+3. Conducted power (T0) + measured antenna gain (lab) → e.i.r.p. Pass: ≤ 10 dBm for the fixed-channel
+   profiles, ≤ 20 dBm for `TEAM_FHSS` (D-R6). Put the plots in the ANNEX.
 
 ## T14 — Campus 2.4 GHz survey (Andrian) — **decides the D-R4 channel plan**
 
@@ -86,6 +92,33 @@ the interferer at 10 m on RF_CH 82 and at 2 m on RF_CH 49 (model: −50 / −60 
 
 ## T16 — NM interop (with the other teams, see `NM_PHY_PROPOSAL.md`)
 
+## T17 — CCA threshold: where does RPD trip? (lab, D-R6 draft) — **gate for TEAM_FHSS**
+
+The listen-before-talk check is the RPD bit, so its level at the SP4 antenna port decides whether we meet
+EN 300 328 cl. 4.3.1.7.2 step 5 (−70 dBm/MHz at 20 dBm e.i.r.p., relaxed by 10·log(100 mW/P) below that,
+corrected for the antenna gain).
+1. Signal generator (or a second SP4 through the step attenuator of T2) into the receiving SP4's IPEX:
+   a 250 kbps GFSK signal, then a CW tone, then a ~20 MHz wideband source (WiFi from a phone or the SG's
+   noise mode) if available. Step 1 dB; at each step run `nrf24_cca()` 1 000 times.
+2. Trip level = input where CCA reports busy ≥ 90 %. Expected ~−76 dBm (−64 dBm chip − ~12 dB LNA).
+3. Pass: trip level (in dBm/MHz for the wideband source) ≤ the threshold `phy_config.py` prints for the
+   chosen step (−64 dBm at −12, −68.5 dBm at 20 dBm e.i.r.p.). Write the LNA gain into `SP4_LNA_GAIN_DB`.
+   If it fails at 20 dBm, keep the lower step (the threshold relaxes with power).
+
+## T18 — Hopping behaviour on the spectrum analyser (lab, D-R6 draft)
+
+`TEAM_FHSS` sender with a receiver following it, file transfer running.
+1. Max-hold, 2400–2483.5 MHz: 29 channels visible, none within ±4 MHz of RF_CH 24/49/82, whole emission
+   inside the band. Peak e.i.r.p. per T13.
+2. Zero-span on one hop channel: dwell ≤ 25 ms, bursts ≤ 50 ms after each CCA, ≥ 2.5 ms idle before a re-CCA
+   on the same channel; each channel revisited every ~0.73 s.
+3. A CW interferer at −60 dBm on one hop channel: the sender skips that channel (no bursts on it) while the
+   transfer goes on. Then a −35 dBm CW at 2395 MHz and at 2488.5 MHz (EN 300 328 table 2): CCA and link still
+   work.
+4. Pass: all of the above; record plots for the ANNEX and for the Atenea answer if the teachers want proof.
+
 ## Order
 
-T0 → T2 (before QM) → T14 (survey) → T4 → T13 (book the lab) → T5 → T15 → T16.
+T0 → T2 (before QM) → T14 (survey) → T4 → T13 (book the lab) → T5 → T15 → T16. D-R6 (only if Atenea Q3 =
+yes): T17 and T18 in the same lab booking as T13, then T4 at 260 m with `TEAM_FHSS` (model +13.9 dB at
+RF_PWR −6, +8.4 dB at −12).

@@ -54,18 +54,38 @@ uint8_t nrf24_read_reg(nrf24_t *dev, uint8_t addr)
     return v;
 }
 
-static uint8_t clamp_power(uint8_t rf_setup)
+static uint8_t clamp_power(const nrf24_t *dev, uint8_t rf_setup)
 {
     uint8_t pwr = (uint8_t)((rf_setup & RF_PWR_MASK) >> RF_PWR_SHIFT);
-    if (pwr <= NRF24_RF_PWR_MAX_BITS)
+    if (pwr <= dev->pwr_max)
         return rf_setup;
-    return (uint8_t)((rf_setup & ~RF_PWR_MASK) | (NRF24_RF_PWR_MAX_BITS << RF_PWR_SHIFT));
+    return (uint8_t)((rf_setup & ~RF_PWR_MASK) | (uint8_t)(dev->pwr_max << RF_PWR_SHIFT));
+}
+
+/* The cap in force: a fixed-channel profile never gets more than the 10 mW step, whatever it says. */
+static uint8_t power_cap(const nrf24_profile_t *p)
+{
+    uint8_t legal = p->lbt ? NRF24_RF_PWR_MAX_BITS_FHSS : NRF24_RF_PWR_MAX_BITS;
+    return p->pwr_max_bits < legal ? p->pwr_max_bits : legal;
+}
+
+static int in_hopset(uint8_t rf_ch)
+{
+    for (unsigned i = 0; i < NRF24_FHSS_N; i++)
+        if (NRF24_FHSS_HOPSEQ[i] == rf_ch)
+            return 1;
+    return 0;
+}
+
+uint8_t nrf24_fhss_channel(uint32_t slot)
+{
+    return NRF24_FHSS_HOPSEQ[slot % NRF24_FHSS_N];
 }
 
 void nrf24_write_reg(nrf24_t *dev, uint8_t addr, uint8_t value)
 {
     if ((addr & 0x1Fu) == REG_RF_SETUP)
-        value = clamp_power(value);   /* never above the legal power, whoever asks */
+        value = clamp_power(dev, value);   /* never above the legal power, whoever asks */
     command(dev, (uint8_t)(CMD_W_REGISTER | (addr & 0x1Fu)), &value, NULL, 1);
 }
 
@@ -88,11 +108,18 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
     dev->rf_ch = profile->rf_ch;
     dev->rx_on = 0;
     dev->last_rpd = 0;
+    dev->pwr_max = power_cap(profile);
+    dev->cca_clear = 0;
+    dev->cot_ch = 0xFFu;
+    dev->cot_start_us = 0;
+    dev->last_tx_end_us = 0;
 
     for (unsigned i = 0; i < profile->n_regs; i++)
         if (profile->regs[i].addr == REG_RF_SETUP &&
-            ((profile->regs[i].value & RF_PWR_MASK) >> RF_PWR_SHIFT) > NRF24_RF_PWR_MAX_BITS)
+            ((profile->regs[i].value & RF_PWR_MASK) >> RF_PWR_SHIFT) > dev->pwr_max)
             return NRF24_ERR_POWER;
+    if (profile->lbt && !in_hopset(profile->rf_ch))
+        return NRF24_ERR_CH;
 
     hal->ce(hal->ctx, 0);
     hal->delay_us(hal->ctx, POWER_ON_RESET_US);
@@ -121,10 +148,11 @@ nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_prof
 
 nrf24_status_t nrf24_set_channel(nrf24_t *dev, uint8_t rf_ch)
 {
-    if (rf_ch > NRF24_MAX_LEGAL_CH)
+    if (rf_ch > NRF24_MAX_LEGAL_CH || (dev->profile->lbt && !in_hopset(rf_ch)))
         return NRF24_ERR_CH;
     nrf24_write_reg(dev, REG_RF_CH, rf_ch);
     dev->rf_ch = rf_ch;
+    dev->cca_clear = 0;   /* a new hop needs its own CCA */
     return NRF24_OK;
 }
 
@@ -140,6 +168,14 @@ nrf24_status_t nrf24_send(nrf24_t *dev, const uint8_t *body, uint8_t len)
     const nrf24_hal_t *h = dev->hal;
     if (len == 0 || len > dev->profile->max_len || len > NRF24_MAX_PAYLOAD)
         return NRF24_ERR_LEN;
+    if (dev->profile->lbt) {
+        uint32_t used = h->micros(h->ctx) - dev->cot_start_us;
+        uint32_t need = NRF24_TX_SETTLE_US + nrf24_airtime_us(dev->profile, len);
+        if (!dev->cca_clear || dev->cot_ch != dev->rf_ch || used + need > NRF24_FHSS_COT_US) {
+            dev->cca_clear = 0;
+            return NRF24_ERR_LBT;
+        }
+    }
 
     h->ce(h->ctx, 0);
     dev->rx_on = 0;
@@ -165,6 +201,7 @@ nrf24_status_t nrf24_send(nrf24_t *dev, const uint8_t *body, uint8_t len)
     nrf24_write_reg(dev, REG_STATUS, STATUS_TX_DS);
     if (st != NRF24_OK)
         command(dev, CMD_FLUSH_TX, NULL, NULL, 0);
+    dev->last_tx_end_us = h->micros(h->ctx);
     return st;
 }
 
@@ -204,4 +241,28 @@ nrf24_status_t nrf24_poll_rx(nrf24_t *dev, uint8_t *body, uint8_t *len)
 int nrf24_carrier(nrf24_t *dev)
 {
     return nrf24_read_reg(dev, REG_RPD) & 1u;
+}
+
+int nrf24_cca(nrf24_t *dev)
+{
+    const nrf24_hal_t *h = dev->hal;
+    if (dev->cot_ch == dev->rf_ch) {
+        /* Same channel as the last occupancy: no transmissions for the idle period first. */
+        uint32_t idle = h->micros(h->ctx) - dev->last_tx_end_us;
+        if (idle < NRF24_FHSS_IDLE_US)
+            h->delay_us(h->ctx, NRF24_FHSS_IDLE_US - idle);
+    }
+    /* Fresh RX so RPD is not a value latched from an earlier frame. */
+    h->ce(h->ctx, 0);
+    dev->rx_on = 0;
+    nrf24_start_rx(dev);
+    h->delay_us(h->ctx, NRF24_FHSS_CCA_US);
+    if (nrf24_carrier(dev)) {
+        dev->cca_clear = 0;
+        return 0;
+    }
+    dev->cca_clear = 1;
+    dev->cot_ch = dev->rf_ch;
+    dev->cot_start_us = h->micros(h->ctx);
+    return 1;
 }

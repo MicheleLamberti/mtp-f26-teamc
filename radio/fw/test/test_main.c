@@ -17,7 +17,7 @@ static int failures, checks;
     } while (0)
 
 static const nrf24_profile_t *const PROFILES[] = {&NRF24_PROFILE_TEAM_250K, &NRF24_PROFILE_TEAM_1M,
-                                                  &NRF24_PROFILE_NM_COMMON};
+                                                  &NRF24_PROFILE_NM_COMMON, &NRF24_PROFILE_TEAM_FHSS};
 #define N_PROFILES (sizeof PROFILES / sizeof PROFILES[0])
 
 typedef struct {
@@ -223,11 +223,12 @@ static void test_tx_timeout(void)
 
 static void test_power_limit(void)
 {
-    /* Every generated profile stays at or below the limit (RF_PWR -18 dBm). */
+    /* Every generated profile stays at or below its cap: RF_PWR -18 dBm unless it is the LBT profile. */
     for (unsigned k = 0; k < N_PROFILES; k++)
         for (unsigned i = 0; i < PROFILES[k]->n_regs; i++)
             if (PROFILES[k]->regs[i].addr == 0x06)
-                CHECK(((PROFILES[k]->regs[i].value >> 1) & 3u) <= NRF24_RF_PWR_MAX_BITS);
+                CHECK(((PROFILES[k]->regs[i].value >> 1) & 3u) <=
+                      (PROFILES[k]->lbt ? NRF24_RF_PWR_MAX_BITS_FHSS : NRF24_RF_PWR_MAX_BITS));
 
     /* A profile asking for 0 dBm at the chip is refused before anything is written. */
     nrf24_reg_t regs[sizeof NRF24_REGS_TEAM_250K / sizeof NRF24_REGS_TEAM_250K[0]];
@@ -245,6 +246,114 @@ static void test_power_limit(void)
     CHECK(node_up(&n, &NRF24_PROFILE_TEAM_250K) == NRF24_OK);
     nrf24_write_reg(&n.dev, 0x06, 0x26);
     CHECK(n.m.regs[0x06] == (uint8_t)(0x20u | (NRF24_RF_PWR_MAX_BITS << 1)));
+}
+
+/* D-R6 draft: adaptive FHSS + LBT profile (EN 300 328 cl. 4.3.1.7.2). */
+static void test_fhss_profile(void)
+{
+    const nrf24_profile_t *p = &NRF24_PROFILE_TEAM_FHSS;
+    CHECK(p->lbt == 1 && p->pwr_max_bits == NRF24_RF_PWR_MAX_BITS_FHSS);
+    CHECK(NRF24_RF_PWR_MAX_BITS_FHSS > NRF24_RF_PWR_MAX_BITS);
+    CHECK(NRF24_FHSS_N >= 15u);                                  /* cl. 4.3.1.4.3.2 */
+    CHECK(NRF24_FHSS_COT_US < 60000u && NRF24_FHSS_SLOT_US <= NRF24_FHSS_COT_US);
+    CHECK(NRF24_FHSS_IDLE_US * 20u >= NRF24_FHSS_COT_US);        /* idle >= 5 % of COT */
+    uint8_t lo = 255, hi = 0;
+    int legal = 1, unique = 1;
+    for (unsigned i = 0; i < NRF24_FHSS_N; i++) {
+        uint8_t c = NRF24_FHSS_HOPSEQ[i];
+        legal &= c <= NRF24_MAX_LEGAL_CH;
+        for (unsigned j = 0; j < i; j++)
+            unique &= NRF24_FHSS_HOPSEQ[j] != c;
+        lo = c < lo ? c : lo;
+        hi = c > hi ? c : hi;
+    }
+    CHECK(legal);
+    CHECK(unique);                                               /* each channel once per cycle */
+    CHECK(hi - lo >= 58);                                        /* >= 70 % of 83.5 MHz */
+    CHECK(p->rf_ch == NRF24_FHSS_HOPSEQ[0]);
+    CHECK(nrf24_fhss_channel(0) == NRF24_FHSS_HOPSEQ[0]);
+    CHECK(nrf24_fhss_channel(NRF24_FHSS_N + 3u) == NRF24_FHSS_HOPSEQ[3]);
+
+    /* The LBT profile gets its higher cap, and a register write still cannot exceed it. */
+    node_t n;
+    CHECK(node_up(&n, p) == NRF24_OK);
+    CHECK(((n.m.regs[0x06] >> 1) & 3u) == NRF24_RF_PWR_MAX_BITS_FHSS);
+    nrf24_write_reg(&n.dev, 0x06, 0x26);
+    CHECK(n.m.regs[0x06] == (uint8_t)(0x20u | (NRF24_RF_PWR_MAX_BITS_FHSS << 1)));
+
+    /* A fixed-channel profile cannot borrow the FHSS power: refused at init. */
+    nrf24_profile_t fixed = *p;
+    fixed.lbt = 0;
+    CHECK(node_up(&n, &fixed) == NRF24_ERR_POWER);
+    CHECK((n.m.regs[0x00] & 0x02u) == 0);
+
+    /* Only hop-set channels; another team's channel is refused. */
+    CHECK(node_up(&n, p) == NRF24_OK);
+    CHECK(nrf24_set_channel(&n.dev, 24) == NRF24_ERR_CH);
+    CHECK(nrf24_set_channel(&n.dev, nrf24_fhss_channel(1)) == NRF24_OK);
+    nrf24_profile_t off = *p;
+    off.rf_ch = 24;
+    CHECK(node_up(&n, &off) == NRF24_ERR_CH);
+}
+
+static void test_fhss_lbt(void)
+{
+    const nrf24_profile_t *p = &NRF24_PROFILE_TEAM_FHSS;
+    node_t a, b;
+    uint8_t tx[32], rx[32], len;
+    for (uint8_t i = 0; i < 32; i++)
+        tx[i] = (uint8_t)(0xA0u + i);
+    CHECK(node_up(&a, p) == NRF24_OK);
+    CHECK(node_up(&b, p) == NRF24_OK);
+    mock_link(&a.m, &b.m);
+    nrf24_start_rx(&b.dev);
+
+    /* No CCA, no frame. */
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_ERR_LBT);
+    CHECK(a.m.frames_tx == 0);
+
+    /* Busy channel: CCA says so and the frame stays home. */
+    a.m.rpd = 1;
+    uint32_t t0 = a.m.now_us;
+    CHECK(nrf24_cca(&a.dev) == 0);
+    CHECK(a.m.now_us - t0 >= NRF24_TX_SETTLE_US + NRF24_FHSS_CCA_US);   /* listened long enough */
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_ERR_LBT);
+    CHECK(a.m.frames_tx == 0);
+
+    /* Clear channel: the frame goes out and arrives. */
+    a.m.rpd = 0;
+    CHECK(nrf24_cca(&a.dev) == 1);
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_OK && len == 32 && memcmp(rx, tx, 32) == 0);
+
+    /* Occupancy time: once the next frame would end past NRF24_FHSS_COT_US, a new CCA is needed. */
+    a.m.now_us = a.dev.cot_start_us + NRF24_FHSS_COT_US - 1000u;
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_ERR_LBT);
+    uint32_t t1 = a.m.now_us;
+    a.dev.last_tx_end_us = t1;                     /* as if the last frame just ended */
+    CHECK(nrf24_cca(&a.dev) == 1);                 /* same channel: waits the idle gap first */
+    CHECK(a.m.now_us - t1 >= NRF24_FHSS_IDLE_US + NRF24_FHSS_CCA_US);
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_OK && len == 8);
+
+    /* Hopping clears the CCA: the next hop needs its own (and no idle gap on a new channel). */
+    CHECK(nrf24_set_channel(&a.dev, nrf24_fhss_channel(1)) == NRF24_OK);
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_ERR_LBT);
+    uint32_t t2 = a.m.now_us;
+    CHECK(nrf24_cca(&a.dev) == 1);
+    CHECK(a.m.now_us - t2 < NRF24_FHSS_IDLE_US);
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_ERR_NODATA);  /* b is still on hop 0 */
+    CHECK(nrf24_set_channel(&b.dev, nrf24_fhss_channel(1)) == NRF24_OK);
+    nrf24_start_rx(&b.dev);
+    CHECK(nrf24_cca(&a.dev) == 1);
+    CHECK(nrf24_send(&a.dev, tx, 8) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_OK && len == 8);  /* both on hop 1 */
+
+    /* Fixed-channel profiles never need a CCA. */
+    node_t c;
+    CHECK(node_up(&c, &NRF24_PROFILE_TEAM_250K) == NRF24_OK);
+    CHECK(nrf24_send(&c.dev, tx, 8) == NRF24_OK);
 }
 
 static void test_carrier(void)
@@ -270,6 +379,8 @@ int main(void)
     test_tx_timeout();
     test_power_limit();
     test_carrier();
+    test_fhss_profile();
+    test_fhss_lbt();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }

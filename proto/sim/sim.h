@@ -8,6 +8,11 @@
  *   - two overlapping transmissions that a node can both hear collide;
  *   - per-link random loss, optional Gilbert-Elliott bursts, a blackout window
  *     ("attack"), node reboots. No duty-cycle limit at 2.4 GHz (UN-85 b).
+ *   - optional adaptive FHSS + LBT (D-R6 draft, sim_set_fhss): time is cut into
+ *     NRF24_FHSS_SLOT_US hops; each starts with PLL settling + CCA, a frame never
+ *     crosses a hop, a node skips the hops its CCA finds busy, and after start-up or
+ *     a reboot a node cannot receive until it has found the hop timing again (worst
+ *     case one full hop cycle). The protocol above does not change.
  */
 #ifndef SIM_H
 #define SIM_H
@@ -36,6 +41,7 @@ typedef struct {
     uint64_t tx_us;
     uint32_t frames_tx, q_overflow;
     uint32_t rx_ok, rx_lost, rx_collision, rx_deaf, rx_blackout;
+    uint32_t fhss_skipped, rx_unsynced;   /* FHSS: hops skipped (CCA busy); frames missed before sync */
 } sim_node_stats_t;
 
 typedef struct {
@@ -52,6 +58,7 @@ typedef struct {
     uint8_t cur_len;
     uint64_t cur_start;
     uint32_t timer_gen;
+    uint64_t synced_at;     /* FHSS: hop timing known from here on */
     sim_node_stats_t st;
 } sim_node_t;
 
@@ -77,6 +84,10 @@ struct sim {
     uint64_t bo_from, bo_to;
     const nrf24_profile_t *profile;
     uint32_t t_turn_us, t_gap_us;
+    int fhss;
+    uint32_t fhss_slot_us, fhss_hop_us, fhss_acq_us;
+    double fhss_busy;       /* share of hops whose CCA finds the channel busy (per node, per hop) */
+    uint64_t fhss_seed;
     struct {
         uint64_t s, e, deaf_from, deaf_to;
         int src;
@@ -89,6 +100,8 @@ void sim_init(sim_t *s, int n_nodes, const nrf24_profile_t *profile, uint64_t se
 void sim_free(sim_t *s);
 void sim_set_link(sim_t *s, int a, int b, double loss, uint8_t rssi);   /* both directions */
 void sim_set_hooks(sim_t *s, int node, const sim_hooks_t *h);
+/* D-R6 draft: hop over NRF24_FHSS_HOPSEQ with LBT; busy = share of hops a node's CCA finds busy (< 1). */
+void sim_set_fhss(sim_t *s, double busy);
 const proto_env_t *sim_env(sim_t *s, int node);
 void sim_at(sim_t *s, uint64_t t_us, sim_call_fn fn, void *arg);
 /* Node goes down now (queue and timer lost); fn(arg) runs when it is back up. */

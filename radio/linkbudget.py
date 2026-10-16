@@ -158,7 +158,7 @@ NRF24_250k = dict(NRF24_1M, sens_dbm=-94, rate_kbps=250)
 # SMA) with RF_PWR = -18 dBm -> ~+7 dBm at the SMA [ESTIMATE from RFX2401C gain, measure T0].
 # Path = SMA pigtail -1 dB + 0.5 dB pad, FR4 patch 4.5 dBi [ASSUMPTION, measure T5] -> EIRP 10.0 dBm.
 # The pad sits in the shared TX/RX path, so RX pays it too. Sensitivity: chip figure (LNA ignored).
-F24_FHSS = 2441.0  # same band, UN-85 a) FHSS class: 100 mW e.i.r.p. - only if Atenea Q3 says yes
+F24_FHSS = 2441.0  # same band, UN-85 a) FHSS class: 100 mW e.i.r.p. - only if Atenea Q3 says yes (D-R6 draft)
 E01_250k = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-1.5, l_con_rx=-1.5,
                 g_tx_dbi=4.5, g_rx_dbi=4.5, sens_dbm=-94, rate_kbps=250,
                 notes="E01-ML01DP5 @RF_PWR -18 (~+7 dBm, est.), 1 dB pigtail + 0.5 dB pad, 4.5 dBi FR4 patch")
@@ -171,6 +171,20 @@ E01_1M = dict(E01_250k, sens_dbm=-85, rate_kbps=1000)
 SP4_OMNI = dict(f_mhz=F24, p_pa_dbm=7, l_match_tx=0.0, l_con_tx=-0.5, l_con_rx=-0.5,
                 g_tx_dbi=2.0, g_rx_dbi=2.0, sens_dbm=-96, rate_kbps=250,
                 notes="E01-ML01SP4 @RF_PWR -18 (~+7 dBm, est.), Molex 146153 flex omni 2 dBi in box, 0.5 dB cable")
+
+# PROPOSED 16-Oct-26 (D-R6 draft, needs Atenea Q3 = yes): same SP4 + omni, but SRI/MRM run as ADAPTIVE FHSS
+# with LBT (EN 300 328 cl. 4.3.1.7.2) under CNAF UN-85 a): 100 mW e.i.r.p. (100 mW/100 kHz for FHSS).
+# Same hardware; only RF_PWR goes up. Compliance (phy_config.py) uses the omni's 3 dBi PEAK: conducted
+# <= 20 - 3 + 0.5 = 17.5 dBm at the IPEX. RF_PWR steps are 6 dB apart and the PA gain is only known to
+# 20-25 dB, so T0 picks the step: -6 gives +14..+19 dBm (use it if <= 17.5), else -12 gives +8..+13.
+# Worst case over that gain range is ~+12 dBm conducted (gain just above 23.5 dB forces -12).
+# NM stays on one fixed channel under UN-85 b) (10 mW): a shared hopping NM across 4 teams is not worth it.
+SP4_FHSS = dict(SP4_OMNI, f_mhz=F24_FHSS, p_pa_dbm=17.5,
+                notes="D-R6 draft: adaptive FHSS + LBT, UN-85 a) 20 dBm e.i.r.p.; SP4 at RF_PWR -6/-12 "
+                      "(T0 picks), +17.5 dBm max at the IPEX, omni 3 dBi peak -> <= 20.0 dBm e.i.r.p.")
+SP4_FHSS_LOW = dict(SP4_FHSS, p_pa_dbm=12.0,
+                    notes="D-R6 draft, worst RF_PWR step: -6 would overshoot 20 dBm e.i.r.p., so -12 "
+                          "(~+12 dBm at the IPEX) -> ~14.5 dBm e.i.r.p.")
 
 SCENARIOS = [
     Link("SRI 70 m | RFM69HCW 868 | 38.4 kbps", d_m=70, **RFM69_38k),
@@ -201,7 +215,7 @@ SCENARIOS = [
     Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, patches (not chosen)", d_m=260, **E01_250k),
     Link("NM hop 100 m | E01-ML01DP5 2.4G | 250 kbps, -10 dB obstr. (patches, not chosen)",
          d_m=100, l_obstruction=-10, **E01_250k),
-    Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, 100 mW FHSS (if Atenea Q3 = yes)", d_m=260,
+    Link("MRM 260 m | E01-ML01DP5 2.4G | 250 kbps, 100 mW FHSS (DP5, superseded by S25)", d_m=260,
          **dict(E01_250k, f_mhz=F24_FHSS, p_pa_dbm=17,
                 notes="UN-85 a) FHSS: 100 mW e.i.r.p.; needs >=15 hop channels + EN 300 328 adaptivity")),
     # 2.4 GHz baseline, DECIDED 13-Oct-26: E01-ML01SP4 + one Molex flex omni, 250 kbps, DECISIONS.md D-R2c/D-R5c
@@ -209,6 +223,11 @@ SCENARIOS = [
     Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni (2.4 baseline)", d_m=260, **SP4_OMNI),
     Link("NM hop 100 m | E01-ML01SP4 2.4G | 250 kbps, -10 dB obstr., omni (2.4 baseline)",
          d_m=100, l_obstruction=-10, **SP4_OMNI),
+    # PROPOSED 16-Oct-26, D-R6 draft (Atenea Q3): SRI/MRM as adaptive FHSS + LBT at 20 dBm e.i.r.p.
+    Link("SRI 70 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (D-R6)", d_m=70, **SP4_FHSS),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS 20 dBm (D-R6)", d_m=260, **SP4_FHSS),
+    Link("MRM 260 m | E01-ML01SP4 2.4G | 250 kbps, omni, FHSS worst RF_PWR step (D-R6)", d_m=260,
+         **SP4_FHSS_LOW),
 ]
 
 # nRF24L01+ RX selectivity, C/I in dB at 250 kbps (Product Spec v1.0 table 8; negative = interferer
@@ -217,6 +236,18 @@ NRF24_CI_250K = {0: 12, 1: -12, 2: -33, 3: -38, 6: -50, 25: -60}
 # MRM channel plan proposal for 4 teams (RF_CH, f = 2400 + RF_CH MHz): three in the gaps between WiFi
 # channels 1/6/11 at 25 MHz spacing, the fourth at the band edge, 8 MHz from its neighbour.
 MRM_CHANNELS = [24, 49, 74, 82]
+
+# D-R6 draft: if Team C hops in MRM, it gives up its fixed channel (RF_CH 74, TEAM_CH in phy_config.py)
+# and the other three teams keep 24/49/82. Our hop set avoids them by >= 5 MHz (C/I -38 dB or better).
+# The list and the EN 300 328 checks live in phy_config.py (FHSS_*); here only what the budget needs.
+FHSS_SLOT_MS = 25.0          # dwell per hop = one 16-frame SR-ARQ window (~22 ms) + guard
+FHSS_HOP_OVERHEAD_MS = 0.30  # PLL settle 130 us + RPD needs >= 170 us in RX (= the CCA) before TX
+FHSS_BUSY = (0.0, 0.10, 0.25)  # share of slots skipped because the CCA found the channel busy
+
+
+def fhss_goodput_kbps(fr: "Framing", rate_kbps: float, busy: float) -> float:
+    """Goodput when the link hops every FHSS_SLOT_MS and skips busy slots (LBT says 'unavailable')."""
+    return fr.goodput_kbps(rate_kbps) * (1 - FHSS_HOP_OVERHEAD_MS / FHSS_SLOT_MS) * (1 - busy)
 
 
 def ci_needed(offset_mhz: float) -> float:
@@ -253,7 +284,8 @@ def report() -> None:
     print("\nHEIGHT SENSITIVITY: flat-earth margin (dB) vs common antenna height")
     hs = [0.5, 0.75, 1.0, 1.5]
     print(f"{'scenario':58} " + " ".join(f"{h:>6}m" for h in hs))
-    for s in SCENARIOS[:1] + SCENARIOS[4:5] + SCENARIOS[6:10] + [x for x in SCENARIOS if "2.4 baseline" in x.name]:
+    for s in SCENARIOS[:1] + SCENARIOS[4:5] + SCENARIOS[6:10] + [x for x in SCENARIOS
+                                                                 if "2.4 baseline" in x.name or "D-R6" in x.name]:
         row = [replace(s, h_tx_m=h, h_rx_m=h).margin_fe() for h in hs]
         print(f"{s.name:58} " + " ".join(f"{m:7.1f}" for m in row))
 
@@ -281,6 +313,24 @@ def report() -> None:
         off = b - a
         print(f"    {2400 + a}/{2400 + b} MHz: {off} MHz apart -> selectivity {ci_needed(off)} dB "
               f"-> co-located boxes must keep I/W below {-ci_needed(off)} dB")
+
+    print("\nD-R6 DRAFT: 20 dBm e.i.r.p. via adaptive FHSS + LBT (UN-85 a), only if Atenea Q3 = yes")
+    base = {s.name.split("|")[0].strip(): s for s in SCENARIOS if "2.4 baseline" in s.name}
+    for s in (x for x in SCENARIOS if "D-R6" in x.name):
+        b = base[s.name.split("|")[0].strip()]
+        print(f"  {s.name:72} margin {s.margin_fe():5.1f} dB ({s.margin_fe() - b.margin_fe():+.1f} vs 10 dBm)")
+    nm = base["NM hop 100 m"]
+    print(f"  NM stays on one fixed channel under UN-85 b) (10 mW): margin {nm.margin_fe():.1f} dB")
+    fr = FRAMING["nRF24L01+, 32 B payload"]
+    need = 1_000_000 * 8 / 120 / 1e3
+    print(f"  goodput with hopping ({FHSS_SLOT_MS:g} ms slots, {FHSS_HOP_OVERHEAD_MS * 1e3:.0f} us hop+CCA), "
+          f"need {need:.0f} kbps raw / {need / 3:.0f} kbps at 3x compression:")
+    for busy in FHSS_BUSY:
+        g = fhss_goodput_kbps(fr, 250, busy)
+        print(f"    {busy * 100:4.0f} % of slots busy -> {g:6.1f} kbps, lines x1 {lines_delivered(g):5d}")
+    g10 = fr.goodput_kbps(250) * 0.10
+    print(f"  (non-adaptive FHSS instead: MU = P/100 mW x DC <= 10 % -> 10 % duty at 20 dBm "
+          f"-> {g10:.0f} kbps, lines x1 {lines_delivered(g10)}: too slow, hence adaptive/LBT)")
 
 
 if __name__ == "__main__":

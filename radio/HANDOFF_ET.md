@@ -1,7 +1,8 @@
 # Radio → Electronics handoff — Ebyte E01-ML01SP4 (nRF24L01+ PA/LNA), 2.4 GHz, one omni
 
 From: Radio Team (Santiago, Andrian, Marcos) · To: Electronics Team (Carlos, Michele, Bikash,
-Guillem) · Version 0.3, 13-Oct-26 (v0.2 had two DP5 modules and patches; v0.1 the RFM69 at 868 MHz) ·
+Guillem) · Version 0.4, 16-Oct-26 (v0.4: D-R6 draft, higher TX power while hopping; v0.3 SP4 + omni;
+v0.2 had two DP5 modules and patches; v0.1 the RFM69 at 868 MHz) ·
 Status: **module and antenna decided 13-Oct (Santiago, with Marcos)**, see `DECISIONS.md` D-R2c / D-R5c.
 
 Per the team's division of decisions, the RT picks the transceiver and ET adapts to it and picks
@@ -36,6 +37,9 @@ Check the pad drawing (1.27 mm pitch, pad 0.8 × 1.5 mm per the manual) before m
 - A dedicated **3.3 V LDO for the radio** (e.g. AP2112K-3.3 or TLV75533, ≥ 300 mA) from the switched battery
   rail, with **100 µF + 10 µF + 100 nF** at the module. PA/LNA modules are sensitive to supply noise:
   short, wide VCC/GND, away from the 5 V boost.
+- **D-R6 draft (16-Oct):** if Atenea allows 20 dBm e.i.r.p. with frequency hopping, the same SP4 runs at
+  RF_PWR −12 or −6 in SRI/MRM, so TX bursts move toward the datasheet's **120 mA**. Same parts; size the LDO,
+  the bulk capacitor and the battery path for 120 mA peaks (they already are). No hardware change.
 
 ## What the micro needs (radio side only)
 
@@ -54,9 +58,11 @@ breadboard-friendly variant of the same part.
 ## Firmware
 
 `radio/fw/` is a portable C99 driver (no Arduino or vendor dependencies) with host tests
-(`make -C radio/fw test`, 124 checks against a mock nRF24). The board only has to implement
+(`make -C radio/fw test`, 194 checks against a mock nRF24). The board only has to implement
 `nrf24_hal_t`: select, transfer, ce, delay_us, micros. Register profiles come from
-`radio/phy_config.py`. The driver refuses any power setting above RF_PWR −18 dBm (10 mW e.i.r.p. limit).
+`radio/phy_config.py`. The driver refuses any power setting above RF_PWR −18 dBm (10 mW e.i.r.p. limit),
+except for the hopping profile `TEAM_FHSS` (D-R6 draft), which may use −12 but must pass a listen-before-talk
+check (`nrf24_cca`) before every burst. It needs the 100 ms power-on wait and nothing else from the board.
 
 ## Placement and antenna
 

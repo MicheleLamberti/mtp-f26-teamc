@@ -14,6 +14,15 @@
  * Power is capped: the E01 PA follows the chip, so RF_PWR above
  * NRF24_RF_PWR_MAX_BITS would break the 10 mW e.i.r.p. limit. nrf24_init refuses
  * such a profile and nrf24_write_reg clamps any RF_SETUP write.
+ *
+ * D-R6 draft (only if Atenea Q3 = yes): a profile with lbt = 1 is adaptive FHSS
+ * with listen-before-talk (CNAF UN-85 a), ETSI EN 300 328 cl. 4.3.1.7.2). Only such
+ * a profile may go up to NRF24_RF_PWR_MAX_BITS_FHSS (<= 20 dBm e.i.r.p.), and the
+ * driver enforces the rules that make that legal: channels only from the hop set,
+ * no frame without a clear CCA on the current hop (nrf24_cca), at most
+ * NRF24_FHSS_COT_US of transmissions per CCA, and an idle gap before a new CCA on
+ * the same channel. Which channel to use when (nrf24_fhss_channel) and skipping a
+ * busy slot are the protocol's job.
  */
 #ifndef NRF24_H
 #define NRF24_H
@@ -43,7 +52,8 @@ typedef enum {
     NRF24_ERR_LEN,
     NRF24_ERR_CH,
     NRF24_ERR_NODATA,
-    NRF24_ERR_POWER,     /* profile asks for more than NRF24_RF_PWR_MAX_BITS */
+    NRF24_ERR_POWER,     /* profile asks for more than its power cap */
+    NRF24_ERR_LBT,       /* lbt profile: no clear CCA on this hop, or its channel occupancy time is used up */
 } nrf24_status_t;
 
 typedef struct {
@@ -52,9 +62,15 @@ typedef struct {
     uint8_t rf_ch;
     uint8_t rx_on;
     uint8_t last_rpd;    /* RPD after the last frame: 1 = above -64 dBm at the chip */
+    uint8_t pwr_max;     /* RF_PWR cap in force: NRF24_RF_PWR_MAX_BITS, or ..._FHSS for an lbt profile */
+    uint8_t cca_clear;   /* lbt: 1 after a clear CCA on rf_ch, until a channel change or the COT ends */
+    uint8_t cot_ch;      /* lbt: channel of the last clear CCA */
+    uint32_t cot_start_us;
+    uint32_t last_tx_end_us;
 } nrf24_t;
 
 nrf24_status_t nrf24_init(nrf24_t *dev, const nrf24_hal_t *hal, const nrf24_profile_t *profile);
+/* lbt profiles accept only channels from NRF24_FHSS_HOPSEQ; a change needs a new CCA. */
 nrf24_status_t nrf24_set_channel(nrf24_t *dev, uint8_t rf_ch);
 
 /* Blocking send of one frame; leaves the radio in standby (RX off). */
@@ -69,6 +85,17 @@ nrf24_status_t nrf24_poll_rx(nrf24_t *dev, uint8_t *body, uint8_t *len);
  * -64 dBm at the chip (~-76 dBm at the E01 antenna port, LNA ~12 dB). Needs RX on
  * for >= 170 us. Used for the channel survey and listen-before-talk. */
 int nrf24_carrier(nrf24_t *dev);
+
+/* Clear channel assessment for lbt profiles (EN 300 328 cl. 4.3.1.7.2): waits out the
+ * idle gap if this channel's occupancy time was just used, re-enters RX, listens for
+ * NRF24_FHSS_CCA_US and reads RPD (~-76 dBm at the E01 port; must be <= the -70 dBm/MHz
+ * threshold scaled to our power, checked in phy_config.py and measured in T17).
+ * Returns 1 = clear: frames may go out on this hop for NRF24_FHSS_COT_US; 0 = busy:
+ * skip this hop. Leaves the radio in RX. */
+int nrf24_cca(nrf24_t *dev);
+
+/* Channel of hop slot number `slot` (both ends count slots of NRF24_FHSS_SLOT_US). */
+uint8_t nrf24_fhss_channel(uint32_t slot);
 
 /* On-air time of one frame with a len-byte payload, in microseconds (no settling). */
 uint32_t nrf24_airtime_us(const nrf24_profile_t *p, uint8_t len);

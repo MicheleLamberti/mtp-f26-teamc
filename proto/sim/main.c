@@ -1,7 +1,8 @@
 /* MTP-F26 Team C - protocol simulator: scenarios, scoring and test suite.
  *
  *   sim sri  [--loss P] [--burst] [--blackout A:B] [--rx-reboot T] [--tx-reboot T]
- *            [--codec deflate|none] [--profile 250k|1m] [--file F] [--seed N] [--duration S]
+ *            [--codec deflate|none] [--profile 250k|1m] [--fhss BUSY] [--file F] [--seed N] [--duration S]
+ *            --fhss: D-R6 draft, adaptive FHSS + LBT (TEAM_FHSS), BUSY = share of hops skipped
  *   sim nm   [--nodes N] [--p1 P] [--p2 P] [--file F] [--seed N] [--duration S]
  *   sim test   run the pass/fail suite (exit code 1 on failure)
  *
@@ -69,7 +70,8 @@ static uint32_t score_lines(const txtfile_t *f, const uint8_t *rx, uint32_t rx_l
 
 typedef struct {
     double loss, bo_from, bo_to, rx_reboot, tx_reboot, duration;
-    int burst, codec;
+    int burst, codec, fhss;
+    double fhss_busy;
     const nrf24_profile_t *profile;
     const char *file;
     uint64_t seed;
@@ -149,6 +151,8 @@ static int run_sri(const sri_opts_t *o, sri_result_t *r)
     sim_t *s = &c->sim;
     sim_init(s, 2, o->profile, o->seed);
     sim_set_link(s, 0, 1, o->loss, 140);
+    if (o->fhss)
+        sim_set_fhss(s, o->fhss_busy);
     if (o->burst) {
         s->ge_on = 1;
         s->ge_p_gb = 0.02; /* ~7 % of frames in a fade, 80 % lost there */
@@ -229,6 +233,9 @@ static void print_sri(const char *label, const sri_result_t *r)
     printf("  channel            rx lost %u, deaf %u, collisions %u, blackout %u\n",
            r->ns1.rx_lost + r->ns0.rx_lost, r->ns1.rx_deaf + r->ns0.rx_deaf,
            r->ns1.rx_collision + r->ns0.rx_collision, r->ns1.rx_blackout + r->ns0.rx_blackout);
+    if (r->ns0.fhss_skipped + r->ns1.fhss_skipped + r->ns0.rx_unsynced + r->ns1.rx_unsynced)
+        printf("  FHSS               hops skipped (CCA busy) sender %u, receiver %u; frames before sync %u\n",
+               r->ns0.fhss_skipped, r->ns1.fhss_skipped, r->ns0.rx_unsynced + r->ns1.rx_unsynced);
 }
 
 /* ------------------------------------------------------------------- NM */
@@ -418,6 +425,23 @@ static int run_tests(void)
     print_sri("\nT9  SRI, UTF-16 file (2 MB), 5 % loss, deflate", &r);
     expect(r.lines == r.total_lines && r.exact, "all lines of a UTF-16 file");
 
+    /* D-R6 draft: same link over adaptive FHSS + LBT (only if Atenea Q3 = yes). */
+    o = sri_defaults();
+    o.loss = 0.05;
+    o.fhss = 1;
+    o.fhss_busy = 0.10;
+    o.profile = &NRF24_PROFILE_TEAM_FHSS;
+    run_sri(&o, &r);
+    print_sri("\nT12 SRI/MRM over FHSS + LBT (D-R6), 5 % loss, 10 % of hops busy", &r);
+    expect(r.lines == r.total_lines && r.exact, "all lines while hopping");
+    expect(r.done_s >= 0 && r.done_s < 60, "whole file in under 60 s");
+
+    o.fhss_busy = 0.25;
+    o.rx_reboot = 15;
+    run_sri(&o, &r);
+    print_sri("\nT13 FHSS + LBT, 25 % of hops busy, receiver reboots at 15 s (re-sync)", &r);
+    expect(r.lines == r.total_lines && r.exact, "receiver re-syncs and resumes, all lines");
+
     nm_result_t n;
     nm_opts_t no = nm_defaults();
     if (run_nm(&no, &n))
@@ -469,6 +493,11 @@ int main(int argc, char **argv)
                 o.codec = !strcmp(argv[++i], "none") ? CODEC_NONE : CODEC_DEFLATE;
             else if (!strcmp(argv[i], "--profile") && i + 1 < argc)
                 o.profile = !strcmp(argv[++i], "1m") ? &NRF24_PROFILE_TEAM_1M : &NRF24_PROFILE_TEAM_250K;
+            else if (!strcmp(argv[i], "--fhss")) {
+                o.fhss = 1;
+                o.fhss_busy = arg_d(&i, argc, argv);
+                o.profile = &NRF24_PROFILE_TEAM_FHSS;
+            }
             else if (!strcmp(argv[i], "--file") && i + 1 < argc)
                 o.file = argv[++i];
             else if (!strcmp(argv[i], "--seed"))

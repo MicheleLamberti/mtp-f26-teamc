@@ -10,12 +10,21 @@ For Marcos to post as project leader. Draft 4-Oct-26 · Team C Radio Team.
    limited to 10 % of any hour (360 s). A 2-minute sending round uses ~115 s. How will the
    competition schedule SRI, MRM and NM rounds (and rehearsals) so that teams stay within that?
    Is the 10 % assessed per transmitter?
-3. **2.4 GHz power (now the most valuable question: +10 dB on the 260 m link).** All teams now use
-   2.4 GHz. If our nRF24-based radio hops over ≥ 15 channels (FHSS in the sense of EN 300 328) with
-   listen-before-talk, may it use the 100 mW e.i.r.p. of CNAF UN-85 a)? Or must every team stay at
-   the 10 mW e.i.r.p. of UN-85 b)? (A non-hopping narrowband radio is held to 10 mW/MHz under UN-85 a)
-   anyway.) Also: is the Ebyte E01-ML01SP4 (Nordic nRF24L01P, proprietary Enhanced ShockBurst) fine
-   under the standard-protocol ban (see Q1)?
+3. **2.4 GHz power: 20 dBm e.i.r.p. with frequency hopping (now the most valuable question: +10.5 dB
+   on the 260 m link).** *Updated 16-Oct-26: a teacher mentioned we might qualify for 20 dBm e.i.r.p.;
+   please cc Prof. Anna Umbert (spectrum regulations).* We read CNAF UN-85 a) as allowing 100 mW e.i.r.p.
+   for wideband data systems that follow EN 300 328, with 100 mW/100 kHz for frequency hopping and
+   10 mW/MHz for other modulations, so a non-hopping narrowband radio like ours stays at ~10 mW.
+   Our plan for SRI and MRM: the same Ebyte E01-ML01SP4 (nRF24L01P) as **adaptive FHSS with
+   listen-before-talk** (EN 300 328 V2.2.2 cl. 4.3.1.7.2): 29 hop channels over 2402–2476 MHz (89 % of the
+   band), 25 ms per hop, an energy-detect check (≥ 170 µs, threshold ≤ −70 dBm/MHz scaled to our power)
+   before transmitting on each hop, busy channels skipped, ≤ 50 ms per channel occupancy, ≤ 20 dBm
+   e.i.r.p. measured on the lab analyser. Network Mode stays on one channel at 10 mW (UN-85 b).
+   (a) May a student system designed and measured this way use UN-85 a) at up to 20 dBm e.i.r.p.?
+   (b) What evidence do you want: analyser plots (power, hop pattern, dwell, skip of a busy channel),
+   the design checks, or both? (c) Does this also apply to the other teams if they want it?
+   Also: is the E01-ML01SP4 (Nordic nRF24L01P, proprietary Enhanced ShockBurst) fine under the
+   standard-protocol ban (see Q1)?
 4. **Support height.** Is the support fixed at 70 cm, or "about 70 cm" with some tolerance?
    May the antenna sit anywhere inside the box (e.g. under the lid)? May the box stand on its
    15 × 7 cm edge on the support (so a vertical antenna board can be taller)?

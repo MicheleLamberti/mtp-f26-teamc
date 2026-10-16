@@ -15,11 +15,28 @@ typedef struct {
     uint8_t address[5];       /* TX_ADDR = RX_ADDR_P0, LSByte first on SPI */
     uint8_t crc_bytes;
     uint8_t max_len;          /* largest payload (dynamic payload length) */
+    uint8_t pwr_max_bits;     /* highest RF_PWR this profile may use */
+    uint8_t lbt;              /* 1 = adaptive FHSS: hop set only, CCA before TX, COT limit */
 } nrf24_profile_t;
 
 /* Highest RF_PWR the driver accepts: -18 dBm at the chip. The E01 PA follows it, so a
  * higher setting would break the 10 mW e.i.r.p. limit (CNAF UN-85 b). */
 #define NRF24_RF_PWR_MAX_BITS 0u
+
+/* D-R6 draft (only if Atenea Q3 = yes): adaptive FHSS + LBT under UN-85 a), 100 mW e.i.r.p.
+ * (EN 300 328 V2.2.2 cl. 4.3.1.7.2). Only an lbt profile may use RF_PWR up to -12 dBm, the
+ * highest step whose worst-case e.i.r.p. (PA 25 dB, omni 3 dBi peak) is <= 20 dBm. T0 may raise it. */
+#define NRF24_RF_PWR_MAX_BITS_FHSS 1u
+#define NRF24_FHSS_SLOT_US 25000u   /* dwell per hop */
+#define NRF24_FHSS_COT_US 50000u   /* max TX time after one clear CCA (< 60 ms) */
+#define NRF24_FHSS_IDLE_US 2500u    /* idle before a new CCA on the same channel */
+#define NRF24_FHSS_CCA_US 170u     /* RX time before RPD is valid */
+#define NRF24_FHSS_N 29u
+/* Hop order: RF_CH 2..76 even, >= 5 MHz from the other teams (RF_CH [24, 49, 82]). */
+static const uint8_t NRF24_FHSS_HOPSEQ[NRF24_FHSS_N] = {
+    2u, 16u, 40u, 62u, 76u, 14u, 38u, 60u, 74u, 12u, 36u, 58u, 72u, 10u, 34u,
+    56u, 70u, 8u, 32u, 54u, 68u, 6u, 30u, 44u, 66u, 4u, 18u, 42u, 64u,
+};
 
 /* TEAM_250K: SRI/QM/MRM team link: our channel (D-R4), 250 kbps
  * RF_CH 74 = 2474 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
@@ -40,6 +57,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_250K = {
     "TEAM_250K", NRF24_REGS_TEAM_250K,
     (uint8_t)(sizeof NRF24_REGS_TEAM_250K / sizeof NRF24_REGS_TEAM_250K[0]),
     74u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
+    0u, 0u,
 };
 
 /* TEAM_1M: SRI option at 1 Mbps (teams sequential, +18 dB at 70 m)
@@ -61,6 +79,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_1M = {
     "TEAM_1M", NRF24_REGS_TEAM_1M,
     (uint8_t)(sizeof NRF24_REGS_TEAM_1M / sizeof NRF24_REGS_TEAM_1M[0]),
     74u, 1000000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
+    0u, 0u,
 };
 
 /* NM_COMMON: PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)
@@ -82,6 +101,29 @@ static const nrf24_profile_t NRF24_PROFILE_NM_COMMON = {
     "NM_COMMON", NRF24_REGS_NM_COMMON,
     (uint8_t)(sizeof NRF24_REGS_NM_COMMON / sizeof NRF24_REGS_NM_COMMON[0]),
     80u, 250000u, {0xC2, 0x5A, 0x9D, 0x3E, 0x71}, 2u, 32u,
+    0u, 0u,
+};
+
+/* TEAM_FHSS: SRI/MRM adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6 draft, only if Atenea Q3 = yes)
+ * RF_CH 2 = 2402 MHz, 250 kbps, RF_PWR -12 dBm (<= +13 dBm at the E01 IPEX), omni: 15.5 dBm e.i.r.p. */
+static const nrf24_reg_t NRF24_REGS_TEAM_FHSS[] = {
+    {0x01, 0x01},  /* EN_AA */
+    {0x02, 0x01},  /* EN_RXADDR */
+    {0x03, 0x03},  /* SETUP_AW */
+    {0x04, 0x00},  /* SETUP_RETR */
+    {0x05, 0x02},  /* RF_CH */
+    {0x06, 0x22},  /* RF_SETUP */
+    {0x11, 0x20},  /* RX_PW_P0 */
+    {0x1D, 0x05},  /* FEATURE */
+    {0x1C, 0x01},  /* DYNPD */
+    {0x07, 0x70},  /* STATUS */
+    {0x00, 0x0E},  /* CONFIG */
+};
+static const nrf24_profile_t NRF24_PROFILE_TEAM_FHSS = {
+    "TEAM_FHSS", NRF24_REGS_TEAM_FHSS,
+    (uint8_t)(sizeof NRF24_REGS_TEAM_FHSS / sizeof NRF24_REGS_TEAM_FHSS[0]),
+    2u, 250000u, {0xE7, 0xC3, 0x1A, 0x5D, 0x92}, 2u, 32u,
+    1u, 1u,
 };
 
 #endif /* NRF24_CONFIG_H */

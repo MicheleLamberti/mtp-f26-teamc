@@ -17,6 +17,65 @@ session and no later than Fri 16-Oct.
 > E01-ML01SP4** (D-R2c, D-R5c). Antennas cannot change between competition modes, and the patches'
 > NM risks (aiming, the rim corner, tuning) outweighed their +1 dB on MRM. D-R2b and D-R5b are superseded.
 
+> **16-Oct-26: 20 dBm e.i.r.p. proposal (D-R6 draft).** A teacher said we might qualify for 20 dBm
+> e.i.r.p. That is CNAF UN-85 a), and for a narrowband radio it only applies to **frequency hopping**
+> with the EN 300 328 sharing rules. D-R6 keeps the same hardware (SP4 + one omni) and adds an adaptive
+> FHSS + LBT mode for SRI/MRM: **+10.5 dB** on every link (worst RF_PWR step +5.0 dB). Not in force until
+> Atenea Q3 is answered yes in writing; until then the 10 mW baseline below stands.
+
+## D-R6 (draft) — SRI/MRM as adaptive FHSS + LBT at ≤ 20 dBm e.i.r.p. (CNAF UN-85 a)
+
+**Status:** Proposed 16-Oct-26 (Santiago asked to build it into the project) · needs **Atenea Q3 = yes** ·
+**Owner:** RT (PHY, driver) + PT (hop sync)
+
+- **Rule.** CNAF UN-85 a) ("wideband data transmission systems", EN 300 328): **100 mW e.i.r.p.**, density
+  ≤ 100 mW/100 kHz for **FHSS** and ≤ 10 mW/MHz for any other modulation, with access/mitigation techniques
+  mandatory. Our non-hopping 250 kbps signal is < 1 MHz wide, so without hopping a) gives ~10 dBm: nothing.
+  UN-85 b) (generic SRD, EN 300 440) stays < 10 mW. The course rules require CNAF 2017 compliance and say
+  oral comments do not override the written rules, so we need the yes on Atenea (Q3), cc Prof. Anna Umbert
+  (spectrum-regulation consultant named in the rules).
+- **Which FHSS.** EN 300 328 V2.2.2 has two kinds:
+  - *Non-adaptive* (cl. 4.3.1.3/4.3.1.6): bursts ≤ 5 ms, gaps ≥ 5 ms and medium utilisation
+    MU = P/100 mW × duty ≤ 10 % → 10 % duty at 20 dBm = ~16 kbps goodput (2 380 lines raw). Too slow.
+  - **Adaptive with LBT (cl. 4.3.1.7.2): chosen.** No duty limit. ≥ 15 hop channels at all times over
+    ≥ 70 % of the band; ≤ 400 ms TX per channel in any 400 ms × N window; before transmitting on a hop, an
+    energy-detect CCA ≥ 18 µs (and ≥ 0.2 % of the occupancy time) at −70 dBm/MHz for 20 dBm (relaxed
+    10·log(100 mW/P) below that, corrected for antenna gain); channel occupancy < 60 ms, then idle ≥ 5 %;
+    busy channels are skipped; TX and RX follow the same hop pattern.
+- **Our design** (`phy_config.py` TEAM_FHSS, all checks OK):
+  - Hop set: even RF_CH 2…76 minus ±4 MHz around the other teams' D-R4 channels (24/49/82; we give up 74):
+    **29 channels, 74.6 MHz (89 % of the band)**, nearest hop 5 MHz from another team (C/I −38 dB).
+  - Hop order: sorted set with index stride 7 → consecutive hops ≥ 14 MHz apart; each channel once per
+    0.725 s cycle. Slot (dwell) **25 ms** = one 16-frame SR-ARQ window; accumulated TX ≤ 207 ms per channel.
+  - CCA = the nRF24's RPD bit after 170 µs in RX (−64 dBm at the chip; ~−76 dBm at the SP4 port with an
+    LNA of ~12 dB, ESTIMATE). Needed: ≤ −64 dBm at RF_PWR −12 (15.5 dBm e.i.r.p.), ≤ −68.5 dBm at 20 dBm.
+    **T17 measures the RPD trip level**; if the LNA gives < ~5 dB, 20 dBm needs a lower step.
+  - COT 50 ms, idle 2.5 ms, CCA 170 µs; hop + CCA overhead 0.3 ms per 25 ms slot (1.2 %).
+- **Power and module: keep the SP4 + omni.** The SP4 is a +20 dBm module that we hold at RF_PWR −18. For
+  20 dBm e.i.r.p. with the 3 dBi peak omni it needs ≤ +17.5 dBm at the IPEX. RF_PWR steps are 6 dB apart and
+  the PA gain is only known to 20–25 dB, so `phy_config.py` takes the highest step that is legal at the
+  worst-case gain: **−12 today (≤ 15.5 dBm e.i.r.p.)**; if T0 measures the gain ≤ 23.5 dB, −6 becomes legal
+  (14–17.5 dBm out → 16.5–20 dBm e.i.r.p.). The E01-2G4M27D would now be legal in this mode (−99 dBm claimed)
+  but cannot do the 10 mW fixed-channel mode (NM, or the fallback if Atenea says no): not reopened.
+- **NM stays on its fixed channel under UN-85 b)** (10 mW, +9.9 dB). A hopping NM shared by four teams'
+  boxes would need network-wide hop sync for a 0.5 kB file: not worth it.
+- **Firmware** (`radio/fw`, 194 checks): only an `lbt` profile may use RF_PWR above −18 dBm
+  (`NRF24_RF_PWR_MAX_BITS_FHSS`); a fixed-channel profile asking for it is refused at init. With an lbt
+  profile the driver refuses channels outside the hop set, refuses to send without a clear `nrf24_cca()` on
+  the current hop, ends the occupancy at 50 ms and waits the idle gap before a re-CCA on the same channel.
+  Hop timing (`nrf24_fhss_channel(slot)`) and skipping a busy slot are the protocol's job.
+- **Protocol** (`proto/sim --fhss BUSY`): the link code is unchanged; the radio layer hops. T12: all
+  10 000 lines in 36 s with 5 % loss and 10 % of hops busy; T13: 54 s with 25 % busy and a receiver reboot
+  (re-sync = one hop cycle). Still to design: hop acquisition on the Pico (RX parks on one channel until
+  the sender's slot clock is heard; each frame carries the slot number).
+- **Margins** (h 0.75 m, workbook S24–S26): **SRI 70 m +36.5 · MRM 260 m +13.9 (+6.9 even at 0.5 m) ·
+  MRM at the worst RF_PWR step +8.4 dB**, vs +26.0 / +3.4 at 10 mW. NM unchanged at +9.9.
+- **Other teams:** we leave our D-R4 channel and avoid theirs, but we are 10 dB louder next to their boxes.
+  Tell them before MRM; LBT also makes us back off whenever they transmit near us.
+
+**Reverse if:** Atenea says no (stay on TEAM_250K at RF_PWR −18), T17 shows the RPD threshold cannot meet
+the CCA level at a useful power, or the hop sync is not working on the bench by the pretest (4-Dec).
+
 ## D-R2c — Module: Ebyte E01-ML01SP4 (genuine nRF24L01P + PA/LNA, SMD, IPEX)
 
 **Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **Owner:** RT → handed to ET
@@ -30,7 +89,8 @@ session and no later than Fri 16-Oct.
 - **Power:** RF_PWR −18 dBm only. Output +2..+7 dBm at the IPEX (PA gain 20–25 dB, ESTIMATE) → ≤ 9.5 dBm
   e.i.r.p. with the 3 dBi datasheet peak gain. The driver refuses any profile above −18 dBm and clamps
   direct RF_SETUP writes (`NRF24_RF_PWR_MAX_BITS`). T0 measures the real output; if it is only ~+2 dBm,
-  every margin below drops by ~5 dB.
+  every margin below drops by ~5 dB. D-R6 (draft, Atenea Q3) would let the same module run at RF_PWR −12/−6
+  in an adaptive-FHSS mode (≤ 20 dBm e.i.r.p.).
 - **SMD consequence:** modules shown at Quick Mode are final, so the SP4 needs a breakout (lab-made or the
   carrier PCB) from the first bench test. No breadboard stage with a different module.
 - **Shopping (order by Fri 16-Oct; price and EU lead time to verify):** 6 × E01-ML01SP4 (2 boxes, 2 bench,
@@ -48,7 +108,8 @@ session and no later than Fri 16-Oct.
   ≥ 1–2 cm from the battery, PCB copper and metal, same orientation in every box.
 - Model: 2 dBi in the box (container −1 dB separate), 0.5 dB cable, sensitivity −96 dBm. Margins at
   h = 0.75 m: **SRI 70 m +26.0 dB · MRM 260 m +3.4 dB (+8.3 at 1.0 m) · NM 100 m hop (−10 dB) +9.9 dB**
-  (workbook S21–S23). MRM is the thin link: antenna height and Atenea Q3 (100 mW FHSS, +10 dB) are the levers.
+  (workbook S21–S23). MRM is the thin link: antenna height and Atenea Q3 (100 mW FHSS, +10.5 dB, D-R6 draft)
+  are the levers.
 - No sideways rejection: the MRM channel plan's ≥ 10 m between teams' boxes still holds (8 MHz pair:
   41 dB near-far at 10 m vs −50 dB selectivity), but there is no extra isolation from the antenna.
 - Quick Mode: the same flex antenna (simplest; the rules would allow a different one).
@@ -112,6 +173,8 @@ session and no later than Fri 16-Oct.
   teams' boxes** (or side-on placement). Ask the organisers for ≥ 10 m spacing at each end anyway.
 - Final channel numbers after the campus 2.4 GHz survey (Andrian): if eduroam is not on 1/6/11 there,
   shift the plan.
+- **If D-R6 goes ahead** (Atenea Q3 = yes): Team C leaves 74 and hops over 29 channels ≥ 5 MHz away from the
+  other three (24/49/82); the 74/82 near-far problem disappears. The other teams may choose to hop too.
 
 ## D-R5b — Antennas: two FR4 patches per box, vertical, front and back — *superseded 13-Oct-26 by D-R5c*
 
@@ -248,3 +311,4 @@ Fallback: Si4463 (same band, same link budget, more effort).
 | D-R3 | NM PHY shared by all teams: redo `NM_PHY_PROPOSAL.md` for nRF24 (250 kbps, common address, CRC-16, no auto-ACK) | draft 16-Oct, frozen by week 6 |
 | D-R4 | MRM channel plan (draft above: RF_CH 24/49/74/82); agree with the 3 other teams after the WiFi survey | inter-team meeting, then week 8–9 |
 | D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
+| D-R6 | 20 dBm adaptive FHSS + LBT for SRI/MRM: Atenea Q3 (cc Prof. Umbert), then T0 all steps, T17, T18, hop sync on the Pico | Q3 now; bench by week 8 |
