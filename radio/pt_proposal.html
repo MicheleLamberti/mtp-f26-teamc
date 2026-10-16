@@ -127,7 +127,8 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.1 · Tue 13 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.2 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.3.2 (16 Oct, radio proposal D-R6):</b> if Atenea allows 20 dBm e.i.r.p., SRI and MRM will <b>hop</b> every 25 ms over 29 channels and <b>listen before talking</b> on each hop (EN 300 328 adaptive FHSS). The protocol stays the same; the radio layer hops. Two things land on your side: a <b>slot clock</b> shared by both ends (each frame carries the slot number) and <b>hop acquisition</b> (the receiver parks on one channel until it hears the sender). The driver already provides <span class="mono">nrf24_cca()</span> and <span class="mono">nrf24_fhss_channel(slot)</span>, and the simulator runs it with <span class="mono">--fhss</span>. NM does not hop.</p>
   <p class="lede"><b>New in v0.3:</b> all four teams moved to 2.4 GHz. The radio is now the nRF24L01+ (Ebyte E01-ML01SP4, one per box, one omni antenna; decided 13 Oct) at 250 kbps, so <b>frames are at most 32 B</b>, each team has its own channel in MRM, and there is no duty-cycle limit any more. The protocol code and the simulator were ported; all 11 scenarios pass.</p>
   <p class="lede">The radio team has fixed the physical layer: 2.4 GHz, nRF24L01+, 250 kbps, with a tested driver. Everything above it belongs to protocols &amp; software. This is a starting <b>proposal</b> built from the competition rules and our link numbers, to speed you up. It is not a decision. Please change whatever you see better.</p>
 </header>
@@ -153,7 +154,7 @@ td.total{font-weight:600}
       <tr><td>5 min setup while wrapped in foil; the professor then picks the TX device at random; GO/STOP by button; 3 min to upload</td><td>Load the file into <b>both</b> devices at setup. A role switch (TX/RX) is read when the button is pressed. Save the received file to USB after STOP.</td></tr>
       <tr><td>"The system should be designed to self-recover from eventual interruptions on the link"; "attacks" during the round</td><td>Retry forever with backoff, resume by HELLO, watchdog. Received data persists across a reboot.</td></tr>
       <tr><td>NM: random order of teams on two rims, 5 lines / 0.5 KB, 5 min; win = deliver a copy from one of your nodes</td><td>A flooding/gossip protocol shared by all teams, where every node stores the file. <b>No switch may indicate the position in the network.</b></td></tr>
-      <tr><td>MRM: all teams transmit at once, 260 m, interference</td><td>Channel-access layer (listen before talk, backoff) and a plan agreed with the other teams.</td></tr>
+      <tr><td>MRM: all teams transmit at once, 260 m, interference</td><td>Channel-access layer (listen before talk, backoff) and a plan agreed with the other teams. In the D-R6 hopping mode, the driver forces a clear-channel check before each hop's first frame and skips busy hops.</td></tr>
       <tr><td>Quick Mode: one line (&lt; 500 chars), zero errors, &lt; 2 min, first attempt only</td><td>A simple, robust first version is enough. Reliability beats speed there.</td></tr>
       <tr><td>CNAF UN-85 b) (radio team): 2.4 GHz, 10 mW e.i.r.p., no duty-cycle limit; nRF24 frames ≤ 32 B</td><td>No transmit-time budget. Headers must stay small: every byte of header is 3 % of a frame.</td></tr>
     </tbody>
@@ -289,7 +290,7 @@ sequenceDiagram
   <div class="tbl"><table>
     <thead><tr><th>Module</th><th>Runs on</th><th>Job</th><th>Owner</th></tr></thead>
     <tbody>
-      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>core 1</td><td>Radio driver, profiles, RPD carrier sense. <b>Done, 138 host checks.</b></td><td>RT</td></tr>
+      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>core 1</td><td>Radio driver, profiles, RPD carrier sense, clear-channel check and hop order for the D-R6 hopping mode. <b>Done, 194 host checks.</b></td><td>RT</td></tr>
       <tr><td class="mono">board_hal</td><td>—</td><td>SPI, pins, timers for the chosen board</td><td>RT + ET</td></tr>
       <tr><td class="mono">link</td><td>core 1</td><td>Frames, bursts, ACK bitmap, timeouts</td><td>PT</td></tr>
       <tr><td class="mono">session</td><td>core 1</td><td>HELLO / resume / END, role from the switch</td><td>PT</td></tr>
@@ -311,7 +312,7 @@ sequenceDiagram
     <li>collisions, and random or bursty loss;</li>
     <li>a jamming blackout, and reboots.</li>
   </ul>
-  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 11 scenarios in about 1 second.</p></div>
+  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 13 scenarios in about 1 second.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>Scenario (1 MB sample, deflate 2.62×, 250 kbps, seed 1)</th><th class="r">Lines</th><th class="r">Whole file in</th></tr></thead>
     <tbody>
@@ -324,10 +325,12 @@ sequenceDiagram
       <tr class="hl"><td>No compression, 5 % loss</td><td class="num r">10 000</td><td class="num r">73 s (was 9 643 lines at 868 MHz)</td></tr>
       <tr><td>NM, 10 nodes, 10 % / 70 % loss at 1 / 2 hops</td><td class="num r">all nodes</td><td class="num r">12 s</td></tr>
       <tr><td>NM, 10 nodes, 30 % / 95 % loss</td><td class="num r">all nodes</td><td class="num r">43 s</td></tr>
+      <tr class="hl"><td>Hopping + listen-before-talk (D-R6 draft), 5 % loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">36 s</td></tr>
+      <tr><td>Hopping, 25 % of hops busy, receiver reboot at 15 s (re-sync one hop cycle)</td><td class="num r">10 000</td><td class="num r">54 s</td></tr>
     </tbody>
   </table></div>
   <div class="callout"><b>It already caught a bug</b> (on the old 868 MHz radio). With fixed timeouts, the 38.4 kbps fallback delivered only 883 lines. One frame (15.2 ms) outlasted the receiver's 15 ms idle-ACK timer, so the receiver ACKed in the middle of bursts and went deaf. All timeouts are now derived from the bit rate.</div>
-  <p class="col sub">Still open in the simulator: an MRM scenario with four teams on their own channels, listen-before-talk, and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the bench: 1 ms turnaround, 0.3 ms gap between frames.</p>
+  <p class="col sub">Still open in the simulator: an MRM scenario with four teams on their own channels, hop acquisition modelled in detail (today: a fixed one-cycle wait), and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the bench: 1 ms turnaround, 0.3 ms gap between frames.</p>
 </section>
 
 <section aria-labelledby="s-plan">
@@ -357,7 +360,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Related pages: Team C Radio Brief v0.5 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Related pages: Team C Radio Brief v0.6 (radio settings, MRM channel plan, test plan) · Team C Hardware Proposal v0.4.1 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
 </footer>
 </div>

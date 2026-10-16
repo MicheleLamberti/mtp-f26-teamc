@@ -121,7 +121,8 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4 · Tue 13 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.1 · Fri 16 Oct 2026</span></div>
+  <p class="lede"><b>New in v0.4.1 (16 Oct, radio proposal D-R6):</b> if Atenea allows it, SRI and MRM may run as a frequency-hopping radio at up to <b>20 dBm e.i.r.p.</b> (+10.5 dB on the links). <b>No hardware change</b>: same SP4, same omni. The radio's TX bursts move toward the datasheet's 120 mA, which the radio LDO, the 100 µF at the module and the battery path below already cover. Keep them sized for 120 mA.</p>
   <p class="lede"><b>New in v0.4 (decided 13 Oct):</b> <b>one Ebyte E01-ML01SP4</b> per box (nRF24L01+ with PA and LNA, surface-mount, antenna socket on the module) and <b>one flex omni antenna</b> plugged straight into it. No patch boards, no second radio. The SP4 is SMD, so it needs a small breakout from the first bench test.</p>
   <p class="lede">The radio baseline is 2.4 GHz with the nRF24L01+. Under our split, the electronics team picks the micro and designs the board. This page is the radio team's <b>suggestion</b>, built around every hardware rule in the competition PDF, to save you time. It is not a decision. Please challenge it.</p>
 </header>
@@ -150,7 +151,7 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
       <tr><td>At least one Tx/Rx switch or button; a pilot light that blinks in Tx/Rx</td><td>Panel pushbutton for Tx/Rx and an activity LED. The box is transparent, so the LED can stay inside.</td></tr>
       <tr><td>Extra switches allowed (e.g. network mode), but <b>no switch indicating the position in the network</b></td><td>One optional SRI/MRM ↔ NM mode switch. Nothing that encodes a node number.</td></tr>
       <tr><td>Drop test from table height to concrete (before MRM)</td><td>Everything soldered (no sockets or loose headers), board on standoffs, battery strapped, antenna glued down.</td></tr>
-      <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on USB and the buttons. RF power is small (≤ 10 mW e.i.r.p.).</td></tr>
+      <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on USB and the buttons. RF power is small (≤ 10 mW e.i.r.p.; ≤ 100 mW in the D-R6 hopping mode, if Atenea allows it).</td></tr>
       <tr><td>Modules shown at Quick Mode are final</td><td>The QM prototype uses the same Pico 2 and the same E01-ML01SP4 as the final board (on a breakout), and the same flex antenna.</td></tr>
       <tr><td>Unit cost ≤ €150; lab-made PCB counts €15; everything (screws, foam, wires) goes in the BoM</td><td>Cheap modules; consider an external fab for the PCB (see the cost table).</td></tr>
     </tbody>
@@ -284,7 +285,7 @@ flowchart LR
 </section>
 
 <footer>
-  <p>Radio details (interface pins, channel plan, test plan): Team C Radio Brief v0.5. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Radio details (interface pins, channel plan, test plan, the 20 dBm hopping draft): Team C Radio Brief v0.6. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>Sources checked 7 Oct 2026: <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> (USB host/device via PIO, RP2040 and RP2350) · <a href="https://www.cnx-software.com/2024/08/08/raspberry-pi-pico-2-raspberry-pi-rp2350-dual-core-risc-v-or-arm-cortex-m33-microcontroller/">Pico 2 specs</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>

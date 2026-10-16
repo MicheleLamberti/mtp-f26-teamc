@@ -43,29 +43,38 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   live formulas (the hand-in artefact). Keep it in sync with `linkbudget.py`.
 - `radio/build_course_sheet.py` → `radio/AN5142_course_layout_869MHz.xlsx`: the course AN5142 sheet
   rebuilt row for row (Ground Multipath inlined), course example as a check + SRI/MRM/NM baseline sheets.
-- `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`), UN-85 b
-  checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm, MRM plan spacing);
-  regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`). `E01_PA_GAIN_DB` is an estimate until T0.
+- `radio/phy_config.py` — nRF24L01+/E01-ML01SP4 profiles (`TEAM_250K`, `TEAM_1M`, `NM_COMMON`, and `TEAM_FHSS`
+  for the D-R6 draft), UN-85 b checks (channel, band edge, e.i.r.p. with the omni at 3 dBi peak, RF_PWR ≤ −18 dBm,
+  MRM plan spacing) and EN 300 328 adaptive-FHSS checks for `TEAM_FHSS` (29-channel hop set, COT/idle/CCA, RPD
+  threshold vs the LBT level); regenerates `radio/fw/nrf24_config.h` (incl. `NRF24_RF_PWR_MAX_BITS`, `…_FHSS`, the
+  hop order). `E01_PA_GAIN_DB` and `SP4_LNA_GAIN_DB` are estimates until T0/T17.
 - `radio/fw/` — portable C99 nRF24L01+ driver behind a HAL (DPL + NOACK frames, RF_CH ≤ 83, RPD),
-  CRC-16, power clamp (refuses/clamps RF_PWR above −18 dBm), mock nRF24 with a simulated channel, host tests:
-  `make -C radio/fw test` (124 checks).
+  CRC-16, power cap per profile (−18 dBm; only an `lbt` profile may use `NRF24_RF_PWR_MAX_BITS_FHSS`), LBT for
+  the hopping profile (`nrf24_cca`, hop-set-only channels, 50 ms COT, idle gap), mock nRF24 with a simulated
+  channel, host tests: `make -C radio/fw test` (194 checks).
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
-- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c current; D-R2b/D-R5b and the 868 records superseded),
+- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c current; D-R6 draft = 20 dBm hopping; D-R2b/D-R5b and the
+  868 records superseded),
   `HANDOFF_ET.md` (SP4 interface for electronics), `NM_PHY_PROPOSAL.md` (nRF24 NM PHY for other teams), `TEST_PLAN.md`
-  (T0 gate, T2, T4, T5, T13–T16; PER-based, nRF24 has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos).
+  (T0 gate at all RF_PWR steps, T2, T4, T5, T13–T18; T17/T18 = CCA threshold and hopping for D-R6; PER-based, nRF24
+  has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 = 20 dBm hopping, rewritten 16-Oct).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.5 published 13-Oct: SP4 + one omni decided, MRM channel plan, shopping list).
+  republish to the same URL (v0.6 published 16-Oct: + "20 dBm with frequency hopping" section, D-R6 draft).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (v0.4 13-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM).
+  — source `radio/hw_proposal.html` (v0.4.1 16-Oct: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM;
+  note that hopping needs no hardware change).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip, codec) and the PC
-  simulator (`sim/`): `make -C proto test` (11 scenarios, ~1 s). See `proto/README.md`.
+  simulator (`sim/`, `--fhss BUSY` = D-R6 hopping radio layer): `make -C proto test` (13 scenarios, ~1 s).
+  See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3.1 13-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results).
-- PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, Chrome headless with
-  mermaid from jsDelivr; the 9-Oct export script lived in the job scratch dir — recreate if needed).
+  — source `radio/pt_proposal.html` (v0.3.2 16-Oct: 32 B nRF24 frames, SR-ARQ + resume, NM gossip, sim results,
+  hopping slot clock + acquisition for PT).
+- PDF/HTML exports of the three pages: `briefs/` and the Windows folder (light theme, headless Chromium from
+  `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the 16-Oct export
+  script lived in the job scratch dir — recreate if needed). No poppler here: check PDFs with pypdf text.
 
 ## Working rules
 
@@ -108,12 +117,22 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   on a wall. Same antenna for SRI/MRM/NM and QM (antennas can't change between modes). Patches dropped.
 - D-R4 draft: MRM channels RF_CH 24/49/74/82; near-far up to 55 dB at 2 m → ≥10 m between teams' boxes.
 
+**D-R6 draft (16-Oct, needs Atenea Q3 = yes): 20 dBm e.i.r.p. via adaptive FHSS + LBT for SRI/MRM.**
+A teacher said we may qualify for 20 dBm. That is CNAF UN-85 a) (EN 300 328): 100 mW, but 100 mW/100 kHz only
+for hopping (10 mW/MHz otherwise, i.e. nothing for a narrowband fixed channel). Non-adaptive FHSS is capped at
+MU 10 % (10 % duty at 20 dBm, too slow), so adaptive with LBT. Same SP4 + omni; hop set 29 channels RF_CH 2–76
+(≥ 5 MHz from 24/49/82, we give up 74), 25 ms slots, RPD as the CCA, COT 50 ms. Workbook S24–S26: **SRI +36.5,
+MRM 260 m +13.9 (+8.4 at the worst RF_PWR step −12)**. NM stays fixed channel at 10 mW. phy_config picks RF_PWR −12
+until T0 shows the PA gain ≤ 23.5 dB (then −6). Firmware enforces LBT; sim T12/T13 pass.
+
 **Open decisions:**
 - [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
 - [ ] D-R3 NM common PHY: rewrite `NM_PHY_PROPOSAL.md` for nRF24
-- [ ] Atenea Q3 (FHSS 100 mW) — worth +10 dB on MRM
+- [ ] **Atenea Q3 (20 dBm hopping, D-R6) — worth +10.5 dB on MRM.** Marcos posts it, cc Prof. Anna Umbert
 
 **Next up:**
+- [ ] D-R6: post Q3; tell the other teams (we may leave 74 and hop); T0 at all four RF_PWR steps; T17 (RPD trip
+      level) and T18 (hop pattern) in the T13 lab booking; PT: slot clock + hop acquisition on the Pico
 - [ ] Order by 16-Oct (D-R2c): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4), 2 × U.FL-to-SMA pigtails.
       Verify EU seller + lead time first. Not needed: DP5, SMA pads, whips, Adafruit RFM69, 868 Molex.
 - [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
@@ -133,6 +152,20 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-16 — 20 dBm with frequency hopping (D-R6 draft)
+- Santiago: a teacher mentioned we could qualify for 20 dBm e.i.r.p.; asked how, which module, how to know, then
+  asked to add the scenarios and update the whole project. Also asked for a HW/SW stack walkthrough and the power
+  tree (answered in chat: Pico VSYS via diode, radio LDO, 5 V boost for the stick, MCP73831 USB-C charging).
+- Checked primary texts: CNAF UN-85 a)/b) (CNAF 2013 notes, same structure in 2017) and ETSI EN 300 328 V2.2.2
+  cl. 4.3.1. Only adaptive FHSS with LBT gives 20 dBm without a duty cap. Rules: oral comments don't override the
+  written rules → Atenea Q3 in writing, cc Prof. Umbert.
+- Built (proposal, not decided): `linkbudget.py` S24–S26 + FHSS goodput; workbook rebuilt (0 dB diff, FHSS block in
+  Throughput); `phy_config.py` TEAM_FHSS + EN 300 328 checks (all OK); driver power cap per profile + `nrf24_cca`,
+  hop order, COT/idle (194 checks); sim `--fhss` with T12/T13 (13/13 pass); DECISIONS D-R6, TEST_PLAN v0.4 (T17,
+  T18), Q3 rewritten, handoff v0.4, NM note, READMEs. Pages: brief v0.6, hw v0.4.1, pt v0.3.2 republished; PDFs.
+- Module answer: keep the SP4 (it is a +20 dBm module); the 2G4M27D would be legal while hopping but not at 10 mW.
+- **Start next session with:** Atenea Q3 answer? order placed? T0 at all four steps.
 
 ### 2026-10-13 — Antenna + module decided: one omni on the E01-ML01SP4
 - Santiago and Marcos reviewed the 2.4 GHz options. Antennas can't change between competition modes.
