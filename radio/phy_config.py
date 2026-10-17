@@ -291,7 +291,7 @@ PROFILES = [
     Profile("TEAM_250K", "Quick Mode, bench and fallback: our fixed channel at 10 mW (UN-85 b), 250 kbps",
             rf_ch=TEAM_CH),
     Profile("TEAM_1M", "fixed-channel option at 1 Mbps, 10 mW (fallback only)", rf_ch=TEAM_CH, bitrate=1_000_000),
-    Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)", rf_ch=NM_CH, address=NM_ADDR),
+    Profile("NM_COMMON", "PHY shared by all teams in NM (see NM_SPEC.md)", rf_ch=NM_CH, address=NM_ADDR),
     Profile("TEAM_FHSS", "SRI/MRM baseline: adaptive FHSS + LBT, <= 20 dBm e.i.r.p. (D-R6, UN-85 a)",
             rf_ch=FHSS_HOPSEQ[0], chip_dbm=MAX_CHIP_DBM_FHSS, lbt=True, hop=True, cot_us=FHSS_COT_US,
             idle_us=FHSS_IDLE_US),

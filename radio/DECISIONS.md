@@ -217,7 +217,7 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
 - Final channel numbers after the campus 2.4 GHz survey (Andrian): if eduroam is not on 1/6/11 there,
   shift the plan.
 - **Superseded for MRM on 16-Oct:** every team uses 20 dBm, so every team hops (D-R6): no fixed channel plan.
-  What the teams agree instead: LBT per EN 300 328, ≥ 10 m between boxes at each end, NM on RF_CH 80 at 10 mW.
+  What the teams agree instead: LBT per EN 300 328, ≥ 10 m between boxes at each end, NM on RF_CH 77 at 10 mW (`NM_SPEC.md`).
   The fixed plan stays as the 10 mW fallback (we would use 74).
 
 ## D-R5b — Antennas: two FR4 patches per box, vertical, front and back — *superseded 13-Oct-26 by D-R5c*
@@ -352,7 +352,7 @@ Fallback: Si4463 (same band, same link budget, more effort).
 
 | ID | Decision | Target |
 |---|---|---|
-| D-R3 | NM PHY shared by all teams: agree `NM_PHY_PROPOSAL.md` v0.2 (nRF24) and learn every team's chip | inter-team meeting by 23-Oct; first interop test by 6-Nov |
+| D-R3 | NM PHY + protocol shared by all teams: agree `NM_SPEC.md` v1.0 (nRF24, RF_CH 77, Trickle gossip, test vector) and learn every team's chip | inter-team meeting by 23-Oct; first interop test by 6-Nov |
 | D-R4 | Superseded for MRM (every team hops); fixed plan 24/49/74/82 kept for the 10 mW fallback and option B | — |
 | D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
 | D-R6b | Option B (20 dBm on one fixed channel, no hopping): ask Atenea Q11; use only on an explicit yes | Q11 now |

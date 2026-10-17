@@ -172,7 +172,18 @@ void nm_on_frame(nm_t *n, const uint8_t *f, uint8_t len)
     n->have |= 1ull << idx;
     n->tr.chunk_ms[idx] = t;
     n->st.rx_new++;
-    if (nm_complete(n) && n->complete_at == PROTO_NO_TIMER)
+    if (nm_complete(n) && n->complete_at == PROTO_NO_TIMER) {
+        /* Spec 4.5: complete only if the reassembled file's CRC-16 equals file_id (chunks of two different
+         * files that share an id would otherwise pass). On a mismatch, start the file over. */
+        static uint8_t file[NM_MAX_CHUNKS * NM_CHUNK];
+        uint32_t flen = nm_get_file(n, file, sizeof file);
+        if (crc16_ccitt(file, flen) != n->file_id) {
+            n->st.rx_bad_file++;
+            n->have = 0;
+            n->total = 0;
+            return;
+        }
         n->complete_at = now(n);
+    }
     reset_trickle(n);
 }

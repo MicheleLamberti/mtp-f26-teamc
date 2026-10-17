@@ -541,6 +541,38 @@ static int run_tests(void)
     expect(worst_hop < 120, "hopping: whole file inside 2 minutes in every seed");
     expect(total_q_overflow == 0, "no radio queue overflow in any SRI run");
 
+    /* radio/NM_SPEC.md section 6: the published test vector must decode to the published file and id. */
+    {
+        static const uint8_t v0[] = {0x4E, 0xA7, 0xE6, 0x00, 0x03, 0x4C, 0x69, 0x6E, 0x65, 0x20, 0x31, 0x20, 0x6F, 0x66,
+                                     0x20, 0x74, 0x68, 0x65, 0x20, 0x4E, 0x4D, 0x20, 0x66, 0x69, 0x6C, 0x65, 0x2E, 0x0D,
+                                     0x0A, 0x4C, 0x87, 0x6B};
+        static const uint8_t v1[] = {0x4E, 0xA7, 0xE6, 0x01, 0x03, 0x69, 0x6E, 0x65, 0x20, 0x32, 0x3A, 0x20, 0x68, 0x6F,
+                                     0x6C, 0x61, 0x20, 0x65, 0x71, 0x75, 0x69, 0x70, 0x6F, 0x73, 0x20, 0x4D, 0x54, 0x50,
+                                     0x2D, 0x46, 0x76, 0x6D};
+        static const uint8_t v2[] = {0x4E, 0xA7, 0xE6, 0x02, 0x03, 0x32, 0x36, 0x21, 0x21, 0x0D, 0x0A, 0x0A, 0xE5};
+        const char *want = "Line 1 of the NM file.\r\nLine 2: hola equipos MTP-F26!!\r\n";
+        sim_t *vs = calloc(1, sizeof *vs);
+        sim_init(vs, 2, &NRF24_PROFILE_NM_COMMON, 1);
+        static nm_t rx_nm, tx_nm;
+        nm_cfg_t cfg;
+        nm_cfg_default(&cfg);
+        nm_init(&rx_nm, sim_env(vs, 0), &cfg);
+        nm_on_frame(&rx_nm, v2, sizeof v2);   /* any order */
+        nm_on_frame(&rx_nm, v0, sizeof v0);
+        nm_on_frame(&rx_nm, v1, sizeof v1);
+        uint8_t got[64];
+        uint32_t gl = nm_get_file(&rx_nm, got, sizeof got);
+        nm_init(&tx_nm, sim_env(vs, 1), &cfg);
+        nm_set_file(&tx_nm, (const uint8_t *)want, (uint32_t)strlen(want));
+        printf("\nT18 NM spec test vector: %u bytes decoded, file_id 0x%04X (origin computes 0x%04X)\n", gl,
+               rx_nm.file_id, tx_nm.file_id);
+        expect(nm_complete(&rx_nm) && gl == strlen(want) && !memcmp(got, want, gl) && rx_nm.file_id == 0xA7E6 &&
+                   tx_nm.file_id == 0xA7E6,
+               "the NM_SPEC.md frames decode to the spec file, id 0xA7E6");
+        sim_free(vs);
+        free(vs);
+    }
+
     nm_result_t n;
     nm_opts_t no = nm_defaults();
     if (run_nm(&no, &n))

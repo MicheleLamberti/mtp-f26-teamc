@@ -21,9 +21,9 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | Path | What |
 |---|---|
 | `src/proto_env.h` | Platform interface: `send`, `now_us`, `set_timer`, `rand32`. The protocol never touches hardware directly. |
-| `src/frames.h` | Frame formats (DATA, ACK, HELLO, HELLO_ACK, END, NM_DATA), all ≤ 32 B (nRF24 payload). |
+| `src/frames.h` | Frame formats (DATA, ACK, HELLO, HELLO_ACK, END, POLL, NM_DATA), all ≤ 32 B (nRF24 payload). |
 | `src/link.c` | SRI/MRM link: selective-repeat ARQ, 16-frame bursts, bitmap ACK, HELLO resume, timeouts scaled to the bit rate. |
-| `src/nm_gossip.c` | Network Mode: Trickle gossip (RFC 6206), software CRC-16, no routing; keeps a relay trace (times, broadcasts). |
+| `src/nm_gossip.c` | Network Mode: Trickle gossip (RFC 6206), software CRC-16, no routing; keeps a relay trace (times, broadcasts). Implements the inter-team spec `../radio/NM_SPEC.md` (sim T18 checks its test vector). |
 | `src/nm_log.c` | NM relay log: plain-text evidence written next to the NM-file copy on the USB stick (file id, CRC-32, when it arrived, what we rebroadcast). |
 | `src/usb_msc.c` | USB stick file I/O over FatFs (FAT12/16/32, exFAT): pick the input `.txt`, load it in 4 KB chunks to flash, save the received file + log (`.part`, read-back CRC, rename). |
 | `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (TinyUSB MSC on the Pico, a RAM disk in the tests). |
@@ -82,7 +82,7 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 
 ## Not done yet
 
-- MRM scenario with 4 teams on their own channels (near-far: adjacent-channel leakage).
+- MRM scenario with the 4 teams' hopping boxes modelled explicitly (today their effect is a loss rate, T14).
 - FHSS on the Pico (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
   sender, every frame carries the slot number) and the slot clock; `nrf24_cca()` and the hop order are in
   `radio/fw` already.

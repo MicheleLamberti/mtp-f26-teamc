@@ -27,6 +27,7 @@ void nm_cfg_default(nm_cfg_t *cfg);
 typedef struct {
     uint32_t tx_frames, rx_new, rx_dup, rx_bad_crc, rx_other_file, suppressed;
     uint32_t broadcasts;    /* transmission points where we sent everything we hold */
+    uint32_t rx_bad_file;   /* all chunks held but the whole-file CRC-16 != file_id: started over */
 } nm_stats_t;
 
 #define NM_NEVER 0xFFFFFFFFu

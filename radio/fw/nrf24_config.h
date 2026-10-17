@@ -85,7 +85,7 @@ static const nrf24_profile_t NRF24_PROFILE_TEAM_1M = {
     0u, 0u, 0u, 0u, 0u,
 };
 
-/* NM_COMMON: PHY shared by all teams in NM (see NM_PHY_PROPOSAL.md)
+/* NM_COMMON: PHY shared by all teams in NM (see NM_SPEC.md)
  * RF_CH 77 = 2477 MHz, 250 kbps, RF_PWR -18 dBm (<= +7 dBm at the E01 IPEX), omni: 9.5 dBm e.i.r.p. */
 static const nrf24_reg_t NRF24_REGS_NM_COMMON[] = {
     {0x01, 0x01},  /* EN_AA */

@@ -113,7 +113,15 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team</div>
   <h1>Radio brief: band, module and link budget</h1>
-  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.9 · Fri 16 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.10 · Sat 17 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <div class="lede" style="margin:.7rem 0"><b>New in v0.10 (17 Oct): review fixes and the NM spec.</b>
+    <ul class="tight">
+      <li>The <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM interop spec</a> for all teams: radio registers, frame, gossip rules and a test vector.</li>
+      <li>The NM channel moves to <b>RF_CH 77</b> (2477 MHz). Channel 80 was BLE advertising channel 39, and the hop set now skips all three BLE advertising channels: <b>37 channels, 30 ms hops</b>.</li>
+      <li>A <b>conservative planning case</b>, worth reading before trusting the margins: MRM at 20 dBm keeps only +0.9 dB, and NM drops to −3.1 dB.</li>
+      <li>Goodput is now ~107 kbps (the old model counted the header as data).</li>
+      <li>The MRM near-far numbers include a +6 dB two-ray peak.</li>
+    </ul></div>
   <p class="lede"><b>New in v0.9 (16 Oct): 20 dBm rechecked; two versions kept.</b> Hopping (option A) stays the default because it meets EN 300 328 as written. <b>Option B</b> sends the same 20 dBm on one fixed channel without hopping: same margins, simpler firmware, but our narrow signal is 5–10 dB above the 10 mW/MHz density limit for non-hopping radios, so we use it only if the course explicitly says yes (Atenea Q11). Both are built and tested. See <a href="#s-fhss">20 dBm</a>. Also new: an NM link-protocol diagram.</p>
   <p class="lede"><b>New in v0.8 (16 Oct): every team uses 20 dBm, so every team hops.</b> Atenea Q3 confirmed 20 dBm in writing, and the other teams will use it too. For a narrowband radio that means hopping, so the fixed MRM channel plan is gone: our hop set now covers all 40 even channels (2402–2480 MHz), the teams share the band by listen-before-talk, and the boxes need <b>≥ 10 m</b> between teams. Random hop collisions cost about a third of our ACKs in the worst case; the simulator still delivers the whole file in 81 s.</p>
   <p class="lede"><b>New in v0.7 (16 Oct): 20 dBm e.i.r.p. is the baseline for SRI and MRM.</b> A professor said yes to 20 dBm, and Atenea Q3 confirmed it in writing. For our narrowband radio that is allowed only as a <b>frequency-hopping radio with listen-before-talk</b> (CNAF UN-85 a), EN 300 328 adaptive FHSS), so SRI and MRM now hop with the same SP4 and omni: <b>+10.5 dB on every link</b>, MRM 260 m <b>+13.9 dB</b>. NM stays at 10 mW on channel 80; Quick Mode uses the 10 mW channel too. See <a href="#s-fhss">20 dBm with frequency hopping</a>.</p>
@@ -132,9 +140,10 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <li><b>2.4 GHz is the right band for this competition.</b> In MRM all teams transmit at once <span class="tag t-rule">rule</span>. At 868 MHz four teams would share one 250 kHz channel (about a quarter of 67 kbps each). At 2.4 GHz the four teams share 83.5 MHz by hopping, there is no duty-cycle limit, and NM has one common radio for everybody.</li>
     <li><b>Margin, now with 20 dBm.</b> SRI and MRM hop at up to 20 dBm e.i.r.p. (CNAF UN-85 a), approved by a professor). With the SP4 and one omni at 0.75 m: <b>SRI 70 m +36.5 dB, MRM 260 m +13.9 dB</b> (+8.4 dB at today's RF_PWR −12 until T0 measures the module). NM stays at 10 mW on one channel (UN-85 b): <b>+9.9 dB</b>.</li>
     <li><b>MRM is no longer the thin link.</b> +13.9 dB at 0.75 m, +6.9 dB even at 0.5 m. All teams transmit at the same 20 dBm, so the near-far ratios are back to the equal-power ones: keep <b>≥ 10 m</b> between teams' boxes at each end (never 2 m).</li>
-    <li><b>Speed is no longer a problem.</b> 250 kbps gives ~159 kbps of goodput. The simulator delivers the whole file in 28 s at 5 % loss, and all 10,000 lines even without compression (73 s).</li>
+    <li><b>Speed is no longer a problem.</b> 250 kbps gives ~107 kbps of goodput (~96 kbps hopping). The simulator delivers the whole file in 27 s at 5 % loss, and all 10,000 lines even without compression (71 s).</li>
     <li><b>One omni, decided.</b> Plugged straight into the SP4 (no adapter) and with the SP4's −96 dBm sensitivity, it is only 1 dB behind the two-patch build on MRM, with none of the patches' NM risks. Remaining risk: if T0 measures only ~+2 dBm out of the module, every link loses ~5 dB.</li>
-    <li><b>MRM channel plan:</b> none any more. Every team hops at 20 dBm with listen-before-talk; ours uses all 40 even channels. Hops that land within 4 MHz of another team's collide: about 12 % of hop pairs at 5–10 m, which costs up to ~29 % of our ACKs at the sender end (pessimistic). The ARQ absorbs it: all lines in 81 s in the simulator.</li>
+    <li><b>MRM channel plan:</b> none any more. Every team hops at 20 dBm with listen-before-talk; ours uses 37 channels in its own order. Hops that land within 4 MHz of another team's collide: about 13 % of hop pairs at 10–20 m, which costs up to ~31 % of our ACKs at the sender end (pessimistic). The ARQ absorbs it, with a short POLL for lost ACKs: all lines in 58 s in the simulator (115 s with 30 % loss both ways).</li>
+    <li><b>Plan for less.</b> With the datasheet sensitivity 3 dB worse, the antenna's worst direction (0 dBi) at both ends and a 6 dB body or fade loss, MRM at 20 dBm keeps <b>+0.9 dB</b> and NM falls to <b>−3.1 dB</b>. Antenna height, people kept away from the boxes, and tests T4/T5 decide (<a href="#s-lb">link budget</a>).</li>
   </ol>
 </section>
 
@@ -147,8 +156,8 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <tbody>
       <tr><td class="mono">TEAM_250K</td><td>Quick Mode, bench, fallback (10 mW)</td><td class="num r">74 · 2474 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 9.1 MHz to edge</span></td></tr>
       <tr><td class="mono">TEAM_1M</td><td>Fallback option at 1 Mbps</td><td class="num r">74 · 2474 MHz</td><td class="num r">1 Mbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 8.7 MHz to edge</span></td></tr>
-      <tr><td class="mono">NM_COMMON</td><td>Shared with all teams (below)</td><td class="num r">80 · 2480 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 3.1 MHz to edge</span></td></tr>
-      <tr class="hl"><td class="mono">TEAM_FHSS</td><td><b>SRI and MRM baseline:</b> hopping with listen-before-talk (D-R6)</td><td class="num r">40 hops · 2402–2480</td><td class="num r">250 kbps</td><td class="num r">≤ +13 dBm (−12)</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 15.5 dBm (20 after T0)</td><td><span class="pill p-ok">yes · 1.6 MHz to edge</span></td></tr>
+      <tr><td class="mono">NM_COMMON</td><td>Shared with all teams (<a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM spec</a>)</td><td class="num r">77 · 2477 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +7 dBm</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 9.5 dBm</td><td><span class="pill p-ok">yes · 6.1 MHz to edge</span></td></tr>
+      <tr class="hl"><td class="mono">TEAM_FHSS</td><td><b>SRI and MRM baseline:</b> hopping with listen-before-talk (D-R6)</td><td class="num r">37 hops · 2404–2478</td><td class="num r">250 kbps</td><td class="num r">≤ +13 dBm (−12)</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 15.5 dBm (20 after T0)</td><td><span class="pill p-ok">yes · 3.6 MHz to edge</span></td></tr>
       <tr><td class="mono">TEAM_20DBM_FIXED</td><td>Option B: SRI/MRM on one fixed channel at 20 dBm (only on an explicit yes)</td><td class="num r">74 · 2474 MHz</td><td class="num r">250 kbps</td><td class="num r">≤ +13 dBm (−12)</td><td>omni 3 dBi peak, −0.5 dB</td><td class="num r">≤ 15.5 dBm (20 after T0)</td><td><span class="pill p-warn">yes · PSD over</span></td></tr>
     </tbody>
   </table></div>
@@ -157,8 +166,8 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <p>Neither UN-85 b) nor adaptive hopping under UN-85 a) has a duty-cycle condition, so the 3-rounds-per-hour limit of 868 MHz is gone. Test as often as we like. The firmware's duty-cycle guard was removed.</p>
       <p>The power limit is the only rule to watch. On the 10 mW profiles the driver <b>refuses any setting above RF_PWR −18 dBm</b>; only the hopping profile goes higher, and only after a clear-channel check on each hop.</p></div>
     <div class="card"><h3>Firmware ready before the hardware</h3>
-      <p>A portable C driver for the nRF24L01+ passes 194 host checks against a simulated radio, including two radios talking over a simulated channel, the power limit, and the listen-before-talk rules of the hopping profile. It needs five board functions (SPI select and transfer, CE pin, microsecond delay and clock).</p>
-      <p>Frames use dynamic length and the radio's CRC, and go out without the chip's own ACKs, so our ARQ stays in charge. The protocol simulator runs on it: 14 of 14 scenarios pass, three of them hopping.</p></div>
+      <p>A portable C driver for the nRF24L01+ passes 244 host checks against a simulated radio, including two radios talking over a simulated channel, the power limit, and the listen-before-talk rules of the hopping profile. It needs five board functions (SPI select and transfer, CE pin, microsecond delay and clock).</p>
+      <p>Frames use dynamic length and the radio's CRC, and go out without the chip's own ACKs, so our ARQ stays in charge. The protocol simulator runs on it: all 20 scenarios pass, five of them hopping.</p></div>
     <div class="card"><h3>Antenna</h3>
       <p><b>One Molex 146153-0100 flex dipole per box</b> (34.9 × 9 mm, 2.4–3.0 dBi peak, &gt; 66 % efficiency), plugged into the SP4's socket, stuck <b>vertically</b> as high as possible on a side wall. The same antenna serves SRI, MRM and NM, and Quick Mode too.</p>
       <p>The model uses 2 dBi in the box <span class="tag t-asm">assumption</span>; test T5 measures it.</p></div>
@@ -209,9 +218,9 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="tbl"><table>
     <thead><tr><th>EN 300 328 rule (adaptive FHSS, LBT)</th><th>Requirement</th><th>Our design (<span class="mono">phy_config.py</span>, all checks OK)</th></tr></thead>
     <tbody>
-      <tr><td>RF output power (4.3.1.2)</td><td>≤ 20 dBm e.i.r.p.</td><td>RF_PWR −12 today: ≤ 15.5 dBm at the worst-case PA gain. If T0 measures the gain at ≤ 23.5 dB, −6 is legal: 16.5–20 dBm.</td></tr>
-      <tr><td>Hop channels (4.3.1.4)</td><td>≥ 15 at all times, over ≥ 70 % of the band</td><td><b>40 channels</b>, RF_CH 2–80 (even), 78.6 MHz = 94 % of the band. Every team hops at 20 dBm, so there are no fixed channels to keep clear of</td></tr>
-      <tr><td>Time per channel (4.3.1.4)</td><td>≤ 400 ms in any 400 ms × N window</td><td>25 ms per hop, each channel once per 1.0 s cycle: ≤ 150 ms</td></tr>
+      <tr><td>RF output power (4.3.1.2)</td><td>≤ 20 dBm e.i.r.p.</td><td>RF_PWR −12 today: ≤ 15.5 dBm at the worst-case PA gain. If T0 measures the gain at ≤ 21.5 dB, −6 is legal: up to 20 dBm.</td></tr>
+      <tr><td>Hop channels (4.3.1.4)</td><td>≥ 15 at all times, over ≥ 70 % of the band</td><td><b>37 channels</b>, the even RF_CH 4–78 except 26 (BLE advertising channels 37/38/39 left out), about 75 MHz = 90 % of the band. Our own order (stride 7); other teams should pick another</td></tr>
+      <tr><td>Time per channel (4.3.1.4)</td><td>≤ 400 ms in any 400 ms × N window</td><td>30 ms per hop (one 16-frame burst plus its ACK), each channel once per 1.1 s cycle: ≤ 150 ms</td></tr>
       <tr><td>Hop separation (4.3.1.5)</td><td>≥ 100 kHz</td><td>2 MHz between neighbours; consecutive hops ≥ 14 MHz apart</td></tr>
       <tr><td>Clear channel check (4.3.1.7.2)</td><td>Energy detect ≥ 18 µs before each hop's first frame; ≤ −70 dBm/MHz at 20 dBm (relaxed at lower power)</td><td>The nRF24's RPD bit after 170 µs in RX: ~−76 dBm at the SP4 port <span class="tag t-est">estimate</span>, needed ≤ −64 dBm at −12 and ≤ −68.5 dBm at 20 dBm. <b>T17 measures it.</b></td></tr>
       <tr><td>Channel occupancy (4.3.1.7.2)</td><td>&lt; 60 ms per check, then idle ≥ 5 %</td><td>50 ms, then 2.5 ms idle; busy hops are skipped</td></tr>
@@ -221,7 +230,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="tbl"><table>
     <thead><tr><th></th><th><b>Option A: hopping</b> (default)</th><th><b>Option B: one fixed channel</b></th></tr></thead>
     <tbody>
-      <tr><td>Profile</td><td class="mono">TEAM_FHSS: 40 hops, 25 ms each</td><td class="mono">TEAM_20DBM_FIXED: RF_CH 74, MRM plan 24 / 49 / 74 / 82</td></tr>
+      <tr><td>Profile</td><td class="mono">TEAM_FHSS: 37 hops, 30 ms each</td><td class="mono">TEAM_20DBM_FIXED: RF_CH 74, MRM plan 24 / 49 / 74 / 82</td></tr>
       <tr><td>EN 300 328 class</td><td>adaptive FHSS with LBT (4.3.1.7.2)</td><td>adaptive non-FHSS, frame-based LBT (4.3.2.6.3.2.2)</td></tr>
       <tr><td>Listen-before-talk</td><td>a check per hop, ≤ 50 ms per check</td><td>a check every ≤ 10 ms (about 6 frames), 0.5 ms idle</td></tr>
       <tr><td>Power density</td><td><span class="pill p-ok">compliant: 100 mW/100 kHz allowed</span></td><td><span class="pill p-bad">5–10 dB over 10 dBm/MHz</span></td></tr>
@@ -235,9 +244,9 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="grid2">
     <div class="card"><h3>What changes</h3><ul>
       <li><b>Nothing in the hardware.</b> The SP4 is a +20 dBm module that we hold at its lowest step; hopping only raises the step. TX bursts move toward the datasheet's 120 mA, which the radio LDO already covers.</li>
-      <li><b>Driver:</b> only the hopping profile may go above −18 dBm. It refuses channels outside the hop set and any frame without a clear check on the current hop, ends each occupancy at 50 ms and waits the idle gap. 194 host checks pass.</li>
-      <li><b>Protocol:</b> unchanged; the radio layer hops every 25 ms (one 16-frame burst). Simulator: all 10,000 lines in 36 s with 10 % of hops busy, 54 s with 25 % busy plus a receiver reboot. Still to build on the Pico: the slot clock and finding the sender's hop timing.</li>
-      <li><b>NM stays on channel 80 at 10 mW.</b> Hopping in sync across four teams' boxes for a 0.5 kB file is not worth it, and NM has +9.9 dB.</li></ul></div>
+      <li><b>Driver:</b> only the hopping profile may go above −18 dBm. It refuses channels outside the hop set and any frame without a clear check on the current hop, ends each occupancy at 50 ms and waits the idle gap. 244 host checks pass.</li>
+      <li><b>Protocol:</b> unchanged; the radio layer hops every 30 ms (one 16-frame burst). The simulator gives each box its own drifting slot clock; the receiver parks on one channel and re-syncs. All 10,000 lines in 38 s with 10 % of hops busy, 69 s with 25 % busy plus a receiver reboot. Still to build on the Pico: the slot clock and hop acquisition (only simulated so far).</li>
+      <li><b>NM stays on one channel (77) at 10 mW.</b> Hopping in sync across four teams' boxes for a 0.5 kB file is not worth it, and NM has +9.9 dB.</li></ul></div>
     <div class="card"><h3>Why it is allowed, and what to keep</h3><ul>
       <li><b>Regulation:</b> the design meets the EN 300 328 adaptive-FHSS rules in the table, at ≤ 20 dBm e.i.r.p. measured with our antenna.</li>
       <li><b>Course:</b> a professor approved 20 dBm e.i.r.p. on 16 Oct, and the answer to <b>Atenea Q3</b> confirmed it in writing (the rules say oral comments do not override the written rules). Cite Q3 in the ANNEX.</li>
@@ -268,9 +277,9 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 
 <section aria-labelledby="s-reg">
   <div class="col"><h2 id="s-reg">Spectrum: 2400–2483.5 MHz and our channels</h2>
-  <p>nRF24 channel N sits at 2400 + N MHz, so only <b>RF_CH 0–83</b> are legal in Spain; the driver refuses anything higher. Campus WiFi (eduroam) normally uses channels 1, 6 and 11, which leave three gaps. The old fixed MRM plan (now only the 10 mW fallback) sits in those gaps. Since 16 Oct every team hops at 20 dBm across the band; ours uses the 40 even channels 2402–2480 MHz, and listen-before-talk skips whatever is busy. Test T14 (campus survey) confirms it before we propose it.</p></div>
+  <p>nRF24 channel N sits at 2400 + N MHz, so only <b>RF_CH 0–83</b> are legal in Spain; the driver refuses anything higher. Campus WiFi (eduroam) normally uses channels 1, 6 and 11, which leave three gaps. The old fixed MRM plan (now only the 10 mW fallback) sits in those gaps. Since 16 Oct every team hops at 20 dBm across the band; ours uses 37 even channels from 2404 to 2478 MHz (not the BLE advertising channels 2402/2426/2480), and listen-before-talk skips whatever is busy. Test T14 (campus survey) confirms it before we propose it.</p></div>
 
-  <div class="strip" role="img" aria-label="Spectrum map of 2400 to 2483.5 MHz with WiFi channels 1, 6 and 11 and the proposed nRF24 channels 24, 49, 74 and 82 for MRM and 80 for NM.">
+  <div class="strip" role="img" aria-label="Spectrum map of 2400 to 2483.5 MHz with WiFi channels 1, 6 and 11, the old fixed nRF24 channels 24, 49, 74 and 82, and channel 77 for NM.">
     <svg viewBox="0 0 1000 150" xmlns="http://www.w3.org/2000/svg">
       <!-- x = 20 + (f - 2400) / 83.5 * 960 -->
       <rect x="20" y="30" width="960" height="56" fill="var(--band-free)"/>
@@ -284,11 +293,11 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <rect x="577.6" y="30" width="11.5" height="56" fill="var(--band-ours)"/>
       <rect x="865.0" y="30" width="11.5" height="56" fill="var(--band-ours)"/>
       <rect x="957.0" y="30" width="11.5" height="56" fill="var(--band-ours)"/>
-      <rect x="934.0" y="30" width="11.5" height="56" fill="var(--s2)"/>
+      <rect x="905.3" y="30" width="11.5" height="56" fill="var(--s2)"/>
       <g fill="var(--ink)" font-size="11" text-anchor="middle">
         <text x="295.9" y="102">24</text><text x="583.4" y="102">49</text><text x="870.8" y="102">74</text><text x="962.8" y="102">82</text>
       </g>
-      <text x="939.8" y="22" text-anchor="end" font-size="11" fill="var(--ink-2)">NM ch 80 ▾</text>
+      <text x="911.1" y="22" text-anchor="end" font-size="11" fill="var(--ink-2)">NM ch 77 ▾</text>
       <g fill="var(--ink-3)" font-size="11" text-anchor="middle">
         <text x="20" y="124">2400</text><text x="158" y="124">2412</text><text x="445.3" y="124">2437</text><text x="732.8" y="124">2462</text><text x="980" y="140">2483.5</text>
       </g>
@@ -330,14 +339,14 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="tbl"><table>
     <thead><tr><th>Since 16 Oct: all teams hop at 20 dBm. Another team's box r m away</th><th class="r">2 m</th><th class="r">5 m</th><th class="r">10 m</th><th class="r">20 m</th></tr></thead>
     <tbody>
-      <tr><td>It lands above our 260 m partner (same power everywhere)</td><td class="num r">55.4 dB</td><td class="num r">47.4 dB</td><td class="num r">41.4 dB</td><td class="num r">35.4 dB</td></tr>
-      <tr><td>Hop offsets that hurt (selectivity too small)</td><td class="num r">≤ 24 MHz</td><td class="num r">≤ 4 MHz</td><td class="num r">≤ 4 MHz</td><td class="num r">≤ 2 MHz</td></tr>
-      <tr><td>Hop pairs that collide (40 channels each)</td><td class="r"><span class="pill p-bad">53 %</span></td><td class="r"><span class="pill p-warn">12 %</span></td><td class="r"><span class="pill p-warn">12 %</span></td><td class="r"><span class="pill p-ok">7 %</span></td></tr>
-      <tr><td>Lost ACKs at our sender (3 senders next to it, ~90 % busy; no CCA credit)</td><td class="r"><span class="pill p-bad">86 %</span></td><td class="r"><span class="pill p-warn">29 %</span></td><td class="r"><span class="pill p-warn">29 %</span></td><td class="r"><span class="pill p-warn">19 %</span></td></tr>
-      <tr><td>Lost DATA at our receiver (3 receivers next to it send ACKs ~5 % of the time)</td><td class="r"><span class="pill p-warn">8 %</span></td><td class="r"><span class="pill p-ok">2 %</span></td><td class="r"><span class="pill p-ok">2 %</span></td><td class="r"><span class="pill p-ok">1 %</span></td></tr>
+      <tr><td>It lands above our 260 m partner (same power everywhere), +6 dB two-ray peak</td><td class="num r">61.4 dB</td><td class="num r">53.4 dB</td><td class="num r">47.4 dB</td><td class="num r">41.4 dB</td></tr>
+      <tr><td>Hop offsets that hurt (selectivity too small)</td><td class="num r">all</td><td class="num r">≤ 24 MHz</td><td class="num r">≤ 4 MHz</td><td class="num r">≤ 4 MHz</td></tr>
+      <tr><td>Hop pairs that collide (37 channels each)</td><td class="r"><span class="pill p-bad">100 %</span></td><td class="r"><span class="pill p-bad">55 %</span></td><td class="r"><span class="pill p-warn">13 %</span></td><td class="r"><span class="pill p-warn">13 %</span></td></tr>
+      <tr><td>Lost ACKs at our sender (3 senders next to it, ~90 % busy; no CCA credit)</td><td class="r"><span class="pill p-bad">~100 %</span></td><td class="r"><span class="pill p-bad">87 %</span></td><td class="r"><span class="pill p-warn">31 %</span></td><td class="r"><span class="pill p-warn">31 %</span></td></tr>
+      <tr><td>Lost DATA at our receiver (3 receivers next to it send ACKs ~5 % of the time)</td><td class="r"><span class="pill p-warn">14 %</span></td><td class="r"><span class="pill p-warn">8 %</span></td><td class="r"><span class="pill p-ok">2 %</span></td><td class="r"><span class="pill p-ok">2 %</span></td></tr>
     </tbody>
   </table></div>
-  <p class="col sub">Pessimistic: it ignores the clear-channel check, which skips a hop when another team is on the same channel nearby. The simulator with 30 % loss in both directions and 10 % busy hops (T14) still delivers all 10,000 lines in 81 s. Agree <b>≥ 10 m between teams' boxes</b> at each end and listen-before-talk for everyone. Test T15 checks it with a third box hopping 10 m away.</p>
+  <p class="col sub">Pessimistic: it ignores the clear-channel check, which skips a hop when another team is on the same channel nearby. At 30 m the collisions fall to 8 % of hop pairs (20 % of ACKs). At any spacing, ~7 % of our ACKs meet another sender on the very same channel, which the clear-channel check cannot see while we listen. Hence the POLL: after a lost ACK the sender asks for it again with one 2-byte frame instead of resending 16. Simulator T14 (5 % data loss, 30 % ACK loss, 10 % busy hops): all 10,000 lines in 58 s; with 30 % loss both ways, 115 s. Agree <b>≥ 10 m between teams' boxes</b> at each end (<b>30 m between the senders</b> if the organisers allow it), a different hop order per team, and listen-before-talk for everyone. Test T15 checks it with a third box hopping 10 m away.</p>
 </section>
 
 <section aria-labelledby="s-lb">
@@ -367,6 +376,19 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <thead><tr><th>Scenario</th><th class="r">EIRP dBm</th><th class="r">Rx dBm</th><th class="r">Sens. dBm</th><th class="r">Margin dB</th><th class="r">With −20 dB multipath</th></tr></thead>
     <tbody id="lbtable"></tbody>
   </table></div>
+  <div class="callout"><b>Conservative planning case</b> (16-Oct review): the receiver 3 dB worse than the datasheet (for 1 % packet loss), the omni's worst direction (0 dBi) at both ends, and −6 dB for fading or a person near the box.
+    <ul class="tight">
+      <li>SRI at 20 dBm: +36.5 → <b>+23.5 dB</b>.</li>
+      <li>MRM at 20 dBm: +13.9 → <b>+0.9 dB</b>; at today's RF_PWR −12: <b>−4.6 dB</b>.</li>
+      <li>NM at 10 mW: +9.9 → <b>−3.1 dB</b>.</li>
+    </ul>
+    So MRM and NM are not safe on paper. The levers, in order:
+    <ul class="tight">
+      <li>mount the antenna as high as the box allows (+5 dB per 25 cm);</li>
+      <li>keep people away from the boxes;</li>
+      <li>use the highest legal power step after T0 (−6 if the PA gain is ≤ 21.5 dB);</li>
+      <li>measure in T4/T5: attenuate step by step until the link fails, so we know the real margin.</li>
+    </ul></div>
   <p class="sub">Full AN5142 rows are in <span class="mono">radio/MTP-F26_TeamC_Radio_LinkBudget.xlsx</span> (S24–S26 are the SRI/MRM baseline at 20 dBm hopping, S23 is NM at 10 mW, S21–S22 the 10 mW fallback; S16–S20 the patch option); every cell is a live formula and inputs are in blue. AN5142's default −20 dB multipath is for cluttered paths. Tests T4 and T5 on campus will tell us which number to use.</p>
 
   <div class="grid2">
@@ -374,7 +396,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <p>At 0.75 m the ground reflection takes over beyond ~18 m at 2.4 GHz. Past that point loss grows 40 dB per decade and hardly depends on frequency: P<sub>R</sub> ≈ EIRP·G<sub>R</sub>·(h₁h₂)²/d⁴.</p>
       <p>Raising both antennas from 0.75 to 1.0 m adds <b>+5 dB</b> on MRM. Mount the omni as high on the wall as the box allows. Whether "about 70 cm" allows a taller support is Atenea Q4.</p></div>
     <div class="card"><h3>The nRF24 has no RSSI</h3>
-      <p>It only has one bit (RPD) that says "above −64 dBm at the chip", about −74 dBm at the SP4's antenna socket. Range tests therefore measure packet loss, and levels come from the spectrum analyser or the model. RPD still works as listen-before-talk and for the campus channel survey.</p></div>
+      <p>It only has one bit (RPD) that says "above −64 dBm at the chip", about −76 dBm at the SP4's antenna socket (LNA gain to be measured). Range tests therefore measure packet loss, and levels come from the spectrum analyser or the model. RPD still works as listen-before-talk and for the campus channel survey.</p></div>
     <div class="card"><h3>Datasheet limits that matter</h3>
       <ul>
         <li><b>32 B maximum payload:</b> our frames shrank from 64 B to 32 B (28 B of data). <span class="tag t-ver">verified</span></li>
@@ -386,13 +408,13 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 
 <section aria-labelledby="s-tp">
   <div class="col"><h2 id="s-tp">Throughput: does the file fit in 2 minutes?</h2>
-  <p>About 1 MB in 120 s needs <b>66.7 kbps</b> of useful throughput. The model assumes selective-repeat ARQ with one ACK per 16 frames and 85 % efficiency for the micro and USB <span class="tag t-asm">assumption</span>. The simulator runs the real protocol code over a modelled channel with 5 % random loss, deflate compression, and the nRF24 airtime from the driver.</p></div>
+  <p>About 1 MB in 120 s needs <b>66.7 kbps</b> of useful throughput. The model assumes selective-repeat ARQ with one ACK per 16 frames, 28 B of file per 32 B frame, a 0.3 ms gap between frames, and 85 % efficiency for the micro and USB <span class="tag t-asm">assumption</span>. The simulator runs the real protocol code over a modelled channel with 5 % random loss, deflate compression, and the nRF24 airtime from the driver.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>Configuration</th><th class="r">Air rate</th><th class="r">Goodput (model)</th><th class="r">Whole file (sim, 5 % loss)</th><th class="r">Lines, no compression</th></tr></thead>
     <tbody>
-      <tr class="hl"><td><b>SP4 hopping, 32 B frames, 10 % of hops busy (SRI/MRM baseline)</b></td><td class="num r">250 kbps</td><td class="num r">141.1 kbps</td><td class="num r">36 s</td><td class="num r">10,000</td></tr>
-      <tr><td>SP4, 32 B frames, one fixed channel</td><td class="num r">250 kbps</td><td class="num r">158.7 kbps</td><td class="num r">28 s</td><td class="num r">10,000 (73 s)</td></tr>
-      <tr><td>SP4, 32 B frames, one fixed channel</td><td class="num r">1 Mbps</td><td class="num r">594.1 kbps</td><td class="num r">13 s</td><td class="num r">10,000</td></tr>
+      <tr class="hl"><td><b>SP4 hopping, 32 B frames, 10 % of hops busy (MRM baseline)</b></td><td class="num r">250 kbps</td><td class="num r">95.7 kbps</td><td class="num r">38 s</td><td class="num r">10,000</td></tr>
+      <tr><td>SP4, 32 B frames, one fixed channel (SRI, Quick Mode)</td><td class="num r">250 kbps</td><td class="num r">107.4 kbps</td><td class="num r">27 s</td><td class="num r">10,000 (71 s)</td></tr>
+      <tr><td>SP4, 32 B frames, one fixed channel</td><td class="num r">1 Mbps</td><td class="num r">249.8 kbps</td><td class="num r">12 s</td><td class="num r">10,000</td></tr>
       <tr><td>RFM69 868 MHz, 64 B frames (dropped)</td><td class="num r">100 kbps</td><td class="num r">67.3 kbps</td><td class="num r">38 s</td><td class="num r">9,643</td></tr>
       <tr><td>RFM69 868 MHz shared by 4 teams in MRM (dropped)</td><td class="num r">~25 kbps</td><td class="num r">~17 kbps</td><td class="num r">—</td><td class="num r">~2,500</td></tr>
     </tbody>
@@ -425,7 +447,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <tbody>
       <tr><td><b>D-R1b</b> Band: 2.4 GHz for every mode, 250 kbps</td><td>All teams + Radio</td><td>—</td><td>Everything radio</td><td><span class="pill p-ok">agreed by the teams, 9 Oct</span></td></tr>
       <tr><td><b>D-R2c</b> Radio module (frozen at Quick Mode)</td><td>Radio → handed to electronics</td><td>T0 output power, T2 sensitivity</td><td>PCB, BoM, power supply</td><td><span class="pill p-ok">decided 13 Oct: E01-ML01SP4</span><br><span class="sub">order by Fri 16 Oct</span></td></tr>
-      <tr><td><b>D-R3</b> NM radio shared by all teams</td><td>Radio + protocols</td><td>Other teams' modules</td><td>NM bonus (+2 to +2.5)</td><td><span class="pill p-mute">draft v0.2 ready</span><br><span class="sub">send to teams; freeze by week 6</span></td></tr>
+      <tr><td><b>D-R3</b> NM radio and protocol shared by all teams</td><td>Radio + protocols</td><td>Other teams' modules</td><td>NM bonus (+2 to +2.5)</td><td><span class="pill p-mute"><a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">spec v1.0 draft</a> ready</span><br><span class="sub">agree by 23 Oct; interop test by 6 Nov</span></td></tr>
       <tr><td><b>D-R4</b> MRM channel per team</td><td>Radio + other teams</td><td>Campus survey T14</td><td>MRM (+1)</td><td><span class="pill p-mute">superseded: every team hops</span><br><span class="sub">fixed plan = 10 mW fallback</span></td></tr>
       <tr><td><b>D-R6</b> SRI/MRM as adaptive hopping + listen-before-talk at ≤ 20 dBm e.i.r.p.</td><td>Radio + protocols</td><td>Atenea Q3 = yes; T0 (all steps), T17, T18</td><td>MRM (+10.5 dB), firmware, other teams</td><td><span class="pill p-ok">baseline 16 Oct</span><br><span class="sub">built and simulated; bench tests next</span></td></tr>
       <tr><td><b>D-R6b</b> Option B: 20 dBm on one fixed channel, no hopping</td><td>Radio</td><td>Atenea Q11</td><td>Firmware (simpler), MRM plan</td><td><span class="pill p-mute">built, not in use</span><br><span class="sub">only on an explicit yes</span></td></tr>
@@ -454,20 +476,20 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 
 <section aria-labelledby="s-nm">
   <div class="col"><h2 id="s-nm">Shared NM radio settings: draft for all teams</h2>
-  <p>Plain nRF24L01+ register settings, so any team's nRF24 board can join with a few register writes and no shared code.</p></div>
+  <p>Plain nRF24L01+ register settings, so any team's nRF24 board can join with a few register writes and no shared code. <b>The full spec to share with the other teams</b> (registers in hex, frame, gossip rules, CRC, test vector): <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM Interop Spec</a> v1.0, source <span class="mono">radio/NM_SPEC.md</span>.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead>
     <tbody>
-      <tr><td>Channel</td><td class="num">RF_CH 80 · 2480 MHz</td><td>Clear of WiFi 1/6/11; NM rounds run alone, so the MRM hopping doesn't meet it</td></tr>
+      <tr><td>Channel</td><td class="num">RF_CH 77 · 2477 MHz</td><td>Above WiFi 11 and 3 MHz from BLE advertising channel 39 (2480); NM rounds run alone, so the MRM hopping doesn't meet it</td></tr>
       <tr><td>Rate</td><td class="num">250 kbps</td><td>Best sensitivity and selectivity; NM moves only ~0.5 kB</td></tr>
-      <tr><td>Address</td><td class="num">5 B · C2 5A 9D 3E 71</td><td>Different from every team's own address</td></tr>
+      <tr><td>Address</td><td class="num">5 B · C2 5A 9D 3E 71</td><td>Bytes in SPI order (0x713E9D5AC2 as a 40-bit number); different from every team's own address</td></tr>
       <tr><td>Frames</td><td>dynamic length 1–32 B, hardware CRC-16</td><td>Same on every nRF24L01+</td></tr>
       <tr><td>ACKs</td><td>none on air: send with "no ACK", retries 0</td><td>Chip ACKs from several receivers would collide</td></tr>
-      <tr><td>Power · polarisation</td><td>≤ 10 dBm e.i.r.p. · vertical</td><td>Legal limit; mismatched polarisation costs 10–20 dB</td></tr>
+      <tr><td>Power · polarisation</td><td>8–10 dBm e.i.r.p. · vertical</td><td>Legal limit, and a floor so the weakest box still reaches the next; mismatched polarisation costs 10–20 dB</td></tr>
       <tr><td>Channel access</td><td>listen before talk with RPD, random back-off</td><td>The nRF24 has no carrier sense in hardware</td></tr>
     </tbody>
   </table></div>
-  <p class="col sub">Interop test before week 6: every pair of boxes exchanges 1 000 frames at 10 m on RF_CH 80; pass is ≥ 99 % with a valid end-to-end CRC. Full proposal: <span class="mono">radio/NM_PHY_PROPOSAL.md</span>.</p>
+  <p class="col sub">Interop test by Fri 6 Nov: every pair of boxes exchanges 1 000 frames at 10 m on RF_CH 77, with a pass at ≥ 99 % with a valid end-to-end CRC, then a gossip run with the spec's test-vector file; full rehearsal Fri 20 Nov.</p>
   <h3 class="col">NM link protocol (gossip, no routing)</h3>
   <div style="margin-top:1rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto">
 <pre class="mermaid">
@@ -477,7 +499,7 @@ sequenceDiagram
   participant C as Boxes further on (corner, East rim)
   participant R as Receiver (NE end)
   Note over O: Setup: NM-file from the USB stick into flash, cut into ~20 chunks of 25 B
-  Note over O,R: GO. Every box on RF_CH 80, 250 kbps, 10 mW, no chip ACKs, no addresses
+  Note over O,R: GO. Every box on RF_CH 77, 250 kbps, 10 mW, no chip ACKs, no addresses
   loop every Trickle interval I (1 s, doubling to 8 s)
     O-)S: NM_DATA x 20 [0x4E, file_id, idx, total, 25 B, CRC-16]
   end
@@ -500,11 +522,11 @@ sequenceDiagram
     <tbody>
       <tr class="hl"><td class="num">T0</td><td>Bring-up, then <b>conducted output power at all four settings</b> on the spectrum analyser (U.FL-to-SMA pigtail, ≥ 30 dB attenuator)</td><td>Driver starts; output ≤ +7.5 dBm at −18, so e.i.r.p. ≤ 10 dBm with the 3 dBi antenna. The other steps pick the hopping mode's power. <b>Gate for any field test.</b></td><td>modules arrive</td></tr>
       <tr class="hl"><td class="num">T2</td><td>Sensitivity at 250 kbps and 1 Mbps through a lab step attenuator</td><td>1 % packet loss at ≤ <b>−92 dBm</b> (250 kbps). <b>Gate for the module.</b></td><td>before Quick Mode</td></tr>
-      <tr><td class="num">T14</td><td>Campus 2.4 GHz survey with the RPD bit, channels 0–83, at each site</td><td>Our MRM channels and the NM channel busy &lt; 5 %</td><td>before the inter-team meeting</td></tr>
+      <tr><td class="num">T14</td><td>Campus 2.4 GHz survey with the RPD bit, channels 0–83, at each site</td><td>Our hop channels and the NM channel (77) busy &lt; 5 %; any team's hopping visible</td><td>before the inter-team meeting</td></tr>
       <tr><td class="num">T4</td><td>Range, open box, 10 / 70 / 150 / 260 m; then one 2-min transfer at 70 m</td><td>≤ 1 % loss to 150 m; all 10,000 lines</td><td>after T2</td></tr>
       <tr><td class="num">T13</td><td>Spectrum analyser: carrier offset, occupied bandwidth on channel 82, e.i.r.p. (option B: PSD in 1 MHz)</td><td>Below 2483.5 MHz; ≤ 10 dBm (≤ 20 dBm hopping). Plot in the ANNEX.</td><td>book the lab</td></tr>
       <tr><td class="num">T17</td><td>D-R6: input level where the clear-channel check (RPD) trips, from a signal generator</td><td>≤ the threshold for our power (−64 dBm at −12, −68.5 dBm at 20 dBm)</td><td>with T13</td></tr>
-      <tr><td class="num">T18</td><td>D-R6: hop pattern, dwell and occupancy on the analyser; skips a channel with a CW interferer on it</td><td>40 channels, ≤ 25 ms dwell, ≤ 50 ms per check, busy channel skipped</td><td>with T13</td></tr>
+      <tr><td class="num">T18</td><td>D-R6: hop pattern, dwell and occupancy on the analyser; skips a channel with a CW interferer on it</td><td>37 channels, ≤ 30 ms dwell, ≤ 50 ms per check, busy channel skipped</td><td>with T13</td></tr>
       <tr><td class="num">T5</td><td>Closed box; antenna high vs middle of the wall; box rotated 0 / 90 / 180°</td><td>≤ 1 % loss at 260 m</td><td>after T4</td></tr>
       <tr><td class="num">T15</td><td>MRM near-far with a third box hopping at 20 dBm, 10 m from our receiver and then from our sender</td><td>≤ 1 % loss on the 260 m link</td><td>after T5</td></tr>
     </tbody>
@@ -529,8 +551,8 @@ sequenceDiagram
       <tr><td class="num">R14</td><td class="num">09/10/26</td><td>RT</td><td>MRM channel plan + NM radio settings v0.2 to the other teams' leaders</td><td>Open</td><td class="num">16/10/26</td><td></td><td></td></tr>
       <tr><td class="num">R9</td><td class="num">13/10/26</td><td>RT → ET</td><td>Electronics handoff v0.3 reviewed; pin map, radio LDO, SP4 breakout and box height back</td><td>Open</td><td class="num">16/10/26</td><td></td><td></td></tr>
       <tr><td class="num">R15</td><td class="num">16/10/26</td><td>Marcos</td><td>Post Atenea Q3: written confirmation of the 20 dBm the professor approved</td><td>Done</td><td class="num">23/10/26</td><td class="num">16/10/26</td><td>Yes: 20 dBm e.i.r.p. confirmed for our hopping design</td></tr>
-      <tr><td class="num">R16</td><td class="num">16/10/26</td><td>RT → teams</td><td>Agree with the other teams: everyone hops with listen-before-talk at ≤ 20 dBm; ≥ 10 m between boxes at each MRM end; NM on RF_CH 80 at 10 mW</td><td>Open</td><td class="num">23/10/26</td><td></td><td></td></tr>
-      <tr><td class="num">R11</td><td class="num">04/10/26</td><td>RT</td><td>Tests T0 and T2 done; D-R2b confirmed or reversed</td><td>Open</td><td class="num">before QM</td><td></td><td></td></tr>
+      <tr><td class="num">R16</td><td class="num">16/10/26</td><td>RT → teams</td><td>Agree with the other teams: everyone hops with listen-before-talk at ≤ 20 dBm in its own order; ≥ 10 m between boxes at each MRM end; the NM interop spec (RF_CH 77, 10 mW)</td><td>Open</td><td class="num">23/10/26</td><td></td><td></td></tr>
+      <tr><td class="num">R11</td><td class="num">04/10/26</td><td>RT</td><td>Tests T0 and T2 done; D-R2c (E01-ML01SP4) confirmed or reversed</td><td>Open</td><td class="num">before QM</td><td></td><td></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -544,6 +566,20 @@ sequenceDiagram
       <li><b>20 dBm without hopping (Q11, new).</b> May we use the confirmed 20 dBm on one fixed channel (about 0.6 MHz wide) with listen-before-talk every ≤ 10 ms? EN 300 328 limits non-hopping radios to 10 mW/MHz, which such a narrow signal exceeds by 5–10 dB. If not, we keep hopping.</li>
       <li><b>Support height and box.</b> Is the support fixed at 70 cm? May the box stand on its 15 × 7 cm edge?</li>
       <li><b>Cooperation.</b> May teams agree a common NM radio and an MRM channel split, sharing settings but not code?</li>
+      <li><b>New (Q12–Q21):</b>
+        <ul class="tight">
+          <li>Q12: NM rim lengths and node spacing.</li>
+          <li>Q13: minimum distance between teams' boxes in MRM.</li>
+          <li>Q14: what the "attacks" are.</li>
+          <li>Q15: drop test details.</li>
+          <li>Q16: whether the scored range must start at line 1.</li>
+          <li>Q17: line terminator, and whose USB stick is used.</li>
+          <li>Q18: whether a PC may feed Quick Mode.</li>
+          <li>Q19: what counts in the cost category.</li>
+          <li>Q20: listen-before-talk for every team in MRM.</li>
+          <li>Q21: the NM output file name for relay boxes.</li>
+        </ul>
+        Full text in <span class="mono">radio/ATENEA_QUESTIONS.md</span>.</li>
 </ul></div>
     <div class="card"><h3>Consultants</h3><ul>
       <li><b>Anna Umbert</b> (spectrum regulation): which plots (power, hop pattern, clear-channel threshold) should go in the ANNEX for the 20 dBm hopping design?</li>
@@ -553,7 +589,7 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>Files: <span class="mono">radio/MTP-F26_TeamC_Radio_LinkBudget.xlsx</span> (hand-in link budget, live formulas) · <span class="mono">radio/linkbudget.py</span> (same model, plus the MRM near-far printout) · <span class="mono">radio/phy_config.py</span> (radio profiles and checks) · <span class="mono">radio/fw/</span> (nRF24 driver and tests) · <span class="mono">radio/DECISIONS.md</span>, <span class="mono">HANDOFF_ET.md</span>, <span class="mono">NM_PHY_PROPOSAL.md</span>, <span class="mono">TEST_PLAN.md</span>, <span class="mono">ATENEA_QUESTIONS.md</span>. Repo: <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc">github.com/SantiBarrios2002/mtp-f26-teamc</a>.</p>
+  <p>Files: <span class="mono">radio/MTP-F26_TeamC_Radio_LinkBudget.xlsx</span> (hand-in link budget, live formulas) · <span class="mono">radio/linkbudget.py</span> (same model, plus the MRM near-far printout) · <span class="mono">radio/phy_config.py</span> (radio profiles and checks) · <span class="mono">radio/fw/</span> (nRF24 driver and tests) · <span class="mono">radio/DECISIONS.md</span>, <span class="mono">HANDOFF_ET.md</span>, <span class="mono">NM_SPEC.md</span> (<a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM Interop Spec</a>), <span class="mono">TEST_PLAN.md</span>, <span class="mono">ATENEA_QUESTIONS.md</span>. Repo: <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc">github.com/SantiBarrios2002/mtp-f26-teamc</a>.</p>
   <p>Primary sources: competition rules PDF (MTP F26, Network Upgrade III + Sustainability); Session #1 slides; AN5142 with the course annotations; CNAF 2017/2021 (BOE); nRF24L01+ Product Specification v1.0; Ebyte E01-ML01SP4, E01-2G4M27D and E01C manuals; Molex 146153 and Taoglas FXP73 antenna listings.</p>
 </footer>
 </div>

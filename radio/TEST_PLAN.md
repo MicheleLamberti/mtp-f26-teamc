@@ -103,10 +103,19 @@ fallback, over RF_CH 24/49/74/82. Note BLE advertising (2402/2426/2480 MHz) and 
 The weak end is the **sender** (it listens for ACKs next to the other teams' senders, which transmit all the
 time). Link at 260 m with `TEAM_FHSS`; two or three more boxes hopping at 20 dBm with continuous traffic (other
 strides) stand 10 m and then 30 m from our sender. Measure ACK loss, POLLs and the 2-minute file time. Pass: all
-10 000 lines in < 120 s at 10 m (simulator T14: ~90 s with 30 % loss both ways). For the fallback/option B: the
+10 000 lines in < 120 s at 10 m (simulator T14: 58 s with 5 % data / 30 % ACK loss; 115 s with 30 % loss both ways). For the fallback/option B: the
 interferer on RF_CH 82 / 49 at 10 m / 2 m, PER ≤ 1 % (−50 / −60 dB selectivity).
 
-## T16 — NM interop (with the other teams, see `NM_PHY_PROPOSAL.md`)
+## T16 — NM interop (with the other teams, see `NM_SPEC.md` §8)
+
+Before the session: every team checks its code against the `NM_SPEC.md` §6 test vector (our sim does it, T18).
+1. **By Fri 6-Nov (week 7):** one box per team in one room, all on `NM_COMMON` (RF_CH 77, 10 mW). Every box
+   sends 1 000 NM frames to every other box at 10 m. Pass: ≥ 99 % received with a valid crc16 (count bad CRCs
+   and frames from other files separately: they point at register or byte-order mistakes).
+2. Same day: gossip run; one box starts with the test-vector file. Pass: every box writes an identical copy
+   within 60 s. Record each box's relay log.
+3. **Fri 20-Nov:** rehearsal along part of the South/East rims with all teams; note the box spacing that still
+   works (the planning case gives −3.1 dB at 100 m, so the measured spacing decides).
 
 ## T17 — CCA threshold: where does RPD trip? (lab, D-R6) — **gate for TEAM_FHSS outdoors**
 

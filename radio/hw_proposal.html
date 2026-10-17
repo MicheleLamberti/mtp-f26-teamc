@@ -121,7 +121,13 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.3 · Fri 16 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.4 · Sat 17 Oct 2026</span></div>
+  <div class="lede" style="margin:.7rem 0"><b>New in v0.4.4 (17 Oct):</b> small additions from the 16-Oct review, no new parts beyond one switch:
+    <ul class="tight">
+      <li>A <b>TX/RX role switch</b>. The professor picks the sending box after both are loaded, so the role must be set without reflashing; Atenea Q8 asks whether a switch is allowed.</li>
+      <li>The <b>U.FL plug is secured</b> for the drop test.</li>
+      <li>The USB firmware reads sticks formatted by Windows or macOS (FAT32 or exFAT, MBR or GPT). We bring our own sticks.</li>
+    </ul></div>
   <p class="lede"><b>New in v0.4.3 (16 Oct):</b> low-battery countermeasures. The radio's 3.3 V LDO runs straight from the 3.0–4.2 V cell and that is fine (see <a href="#s-power">Power budget</a>); we added an ideal diode for battery sensing, firmware thresholds, a T0 check at 3.0 V and a buck-boost fallback.</p>
   <p class="lede"><b>New in v0.4.2 (16 Oct):</b> a professor approved <b>20 dBm e.i.r.p.</b>, so SRI and MRM now run as a frequency-hopping radio at up to 20 dBm (+10.5 dB on the links). <b>No hardware change</b>: same SP4, same omni. The radio's TX bursts move toward the datasheet's <b>120 mA</b> in every SRI/MRM round, which the radio LDO, the 100 µF at the module and the battery path below already cover. Keep them sized for 120 mA.</p>
   <p class="lede"><b>New in v0.4 (decided 13 Oct):</b> <b>one Ebyte E01-ML01SP4</b> per box (nRF24L01+ with PA and LNA, surface-mount, antenna socket on the module) and <b>one flex omni antenna</b> plugged straight into it. No patch boards, no second radio. The SP4 is SMD, so it needs a small breakout from the first bench test.</p>
@@ -149,9 +155,9 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
       <tr><td>Read/write the file from/to a USB memory device: 5 min setup while still wrapped in foil, 3 min to upload afterwards</td><td>A USB-A host port on the box wall, plus <b>≥ 1 MB on-board storage</b>. The sender copies the file in at setup, and the receiver keeps what it got until upload. The stick can be removed during the round.</td></tr>
       <tr><td>Fits entirely in the 15 × 15 × 7 cm IKEA 365+; only connectors, switches and buttons may stick out</td><td>PCB about 100 × 80 mm or smaller. The antenna sits inside: a 35 × 9 mm flex omni, vertical, as high as possible on a wall.</td></tr>
       <tr><td>Operates autonomously</td><td>A battery and a power switch. Nothing plugged in during a round.</td></tr>
-      <tr><td>At least one Tx/Rx switch or button; a pilot light that blinks in Tx/Rx</td><td>Panel pushbutton for Tx/Rx and an activity LED. The box is transparent, so the LED can stay inside.</td></tr>
+      <tr><td>At least one Tx/Rx switch or button; a pilot light that blinks in Tx/Rx</td><td>Panel pushbutton for GO/STOP, a <b>TX/RX role switch</b> (the professor picks the sender after loading; Atenea Q8), and an activity LED. The box is transparent, so the LED can stay inside.</td></tr>
       <tr><td>Extra switches allowed (e.g. network mode), but <b>no switch indicating the position in the network</b></td><td>One optional SRI/MRM ↔ NM mode switch. Nothing that encodes a node number.</td></tr>
-      <tr><td>Drop test from table height to concrete (before MRM)</td><td>Everything soldered (no sockets or loose headers), board on standoffs, battery strapped, antenna glued down.</td></tr>
+      <tr><td>Drop test from table height to concrete (before MRM)</td><td>Everything soldered (no sockets or loose headers), board on standoffs, battery strapped, antenna glued down, <b>U.FL plug secured</b> (a drop of hot glue or a retention clip; a bare U.FL can pop off under shock).</td></tr>
       <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on USB and the buttons. RF power is small (≤ 10 mW e.i.r.p.; ≤ 100 mW e.i.r.p. while hopping in SRI/MRM).</td></tr>
       <tr><td>Modules shown at Quick Mode are final</td><td>The QM prototype uses the same Pico 2 and the same E01-ML01SP4 as the final board (on a breakout), and the same flex antenna.</td></tr>
       <tr><td>Unit cost ≤ €150; lab-made PCB counts €15; everything (screws, foam, wires) goes in the BoM</td><td>Cheap modules; consider an external fab for the PCB (see the cost table).</td></tr>
@@ -176,7 +182,8 @@ flowchart LR
   PICO -- "SPI0 + CSN/CE/IRQ" --> RA
   PICO -- "PIO-USB D+/D−&lt;br/&gt;(ESD: USBLC6)" --> USBA
   RA -- "IPEX" --> ANT["Flex omni&lt;br/&gt;Molex 146153, vertical on a wall"]
-  BTN["Tx/Rx button"] --> PICO
+  BTN["GO/STOP button"] --> PICO
+  ROLE["Role switch TX/RX&lt;br/&gt;(Atenea Q8)"] --> PICO
   MODE["Mode switch SRI/MRM ↔ NM"] --> PICO
   PICO --> LED["Activity LED (blinks)&lt;br/&gt;+ status LED"]
 </pre>
@@ -217,7 +224,7 @@ flowchart LR
       <tr><td>ESD</td><td>USBLC6-2SC6 on D+/D−; TVS on VBUS and the button lines</td><td>ESD compliance; the USB port is touched every round</td><td class="num r">0.6</td></tr>
       <tr><td>Battery</td><td>1 × protected 18650 Li-ion (~2500 mAh) with solder tabs, or holder + strap</td><td>Steel can is robust in the drop test; rechargeable (sustainability report)</td><td class="num r">6–8</td></tr>
       <tr><td>Charger</td><td>MCP73831 (or TP4056) + USB-C receptacle, charge only</td><td>Charge between rounds without opening the box. Nothing is plugged in during operation</td><td class="num r">1.2</td></tr>
-      <tr><td>Controls</td><td>Slide power switch, panel Tx/Rx pushbutton, optional mode switch, 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
+      <tr><td>Controls</td><td>Slide power switch, panel GO/STOP pushbutton, TX/RX role switch, optional mode switch, 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
       <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533, dropout ≤ 0.1 V at 150 mA) + 100 µF / 10 µF / 100 nF at the module; 100 µF on USB VBUS</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts and stick inrush</td><td class="num r">1</td></tr>
       <tr><td>PCB</td><td>2-layer carrier, ≤ 100 × 80 mm</td><td>ETSETB lab = €15 in the BoM (rule); an external fab is ~€1 per board but adds 1–2 weeks</td><td class="num r">1–15</td></tr>
       <tr><td>Mechanics</td><td>M3 nylon standoffs, base plate, cable ties, hot glue, IKEA 365+ box</td><td>Drop test; the BoM must list them too</td><td class="num r">5–7</td></tr>
@@ -271,7 +278,7 @@ flowchart LR
   <div class="tbl"><table>
     <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
     <tbody>
-      <tr><td>PIO-USB host fails with some USB sticks</td><td>Test 3–4 different sticks in stage 1. The RP2350's native USB can also be a host, so a second path exists on the same chip.</td></tr>
+      <tr><td>PIO-USB host fails with some USB sticks</td><td>Test 3–4 different sticks in stage 1 (FAT32 and exFAT, formatted on Windows and on a Mac; the firmware reads both and MBR or GPT layouts, host-tested). We bring our own sticks. The RP2350's native USB can also be a host, so a second path exists on the same chip.</td></tr>
       <tr><td>The foil-wrapped setup makes the USB port hard to reach</td><td>Put the port on a side wall. Ask on Atenea whether the foil may be opened at the port during the 5-min setup.</td></tr>
       <tr><td>Brown-out or noise during radio TX</td><td>Separate radio LDO and bulk capacitance at each module; battery sense on ADC3 with firmware thresholds; check the radio at 3.0 V in T0 and the box at low charge in stage 3.</td></tr>
       <tr><td>Clone radio chips (Si24R1)</td><td>Buy only the plain E01-ML01SP4 part number from Ebyte's store or a distributor; T0/T2 check the chip.</td></tr>
@@ -287,14 +294,14 @@ flowchart LR
   <ol>
     <li>Agree or counter-propose the micro by <b>Fri 16 Oct</b>, so we can order together with the radio modules.</li>
     <li>Confirm the E01-ML01SP4 and the radio LDO, say who makes its bench breakout, and pick the PCB route (lab at €15, or external fab).</li>
-    <li>Pin map for SPI and the radio's CSN, CE and IRQ (proposal: GP16/18/19, CSN GP17, CE GP20, IRQ GP21), PIO-USB D+/D−, button, LEDs and mode switch. We will write the radio's hardware layer against it.</li>
+    <li>Pin map for SPI and the radio's CSN, CE and IRQ (proposal: GP16/18/19, CSN GP17, CE GP20, IRQ GP21), PIO-USB D+/D−, button, role switch, LEDs and mode switch. We will write the radio's hardware layer against it.</li>
     <li>The IKEA box's inside height and where the antenna can sit highest.</li>
     <li>Book Prof. Chávez or Prof. Jiménez to review this block diagram and the lab's PCB capabilities.</li>
   </ol></div>
 </section>
 
 <footer>
-  <p>Radio details (interface pins, channel plan, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.9. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.10. Firmware and USB: Team C Protocol Proposal v0.3.7. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>Sources checked 7 Oct 2026: <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> (USB host/device via PIO, RP2040 and RP2350) · <a href="https://www.cnx-software.com/2024/08/08/raspberry-pi-pico-2-raspberry-pi-rp2350-dual-core-risc-v-or-arm-cortex-m33-microcontroller/">Pico 2 specs</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>
