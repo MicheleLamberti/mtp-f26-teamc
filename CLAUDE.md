@@ -26,7 +26,10 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 | Date | Milestone |
 |---|---|
-| Fri 16-Oct-26 | Proposed (not yet agreed) RT band + module decision; order radios + antennas (10–12 day delivery) |
+| Fri 16-Oct-26 | Band (9-Oct) and module + antenna (13-Oct) decided; order radios + antennas (10–12 day delivery) |
+| Fri 23-Oct-26 | Inter-team meeting: agree `NM_SPEC.md`, every team's chip, MRM etiquette (hop + LBT, ≥ 10 m) |
+| Fri 6-Nov-26 | Quick Mode attempt (week 7); NM interop test with the other teams |
+| Fri 20-Nov-26 | NM rehearsal on the rims; go/no-go for MRM hopping |
 | Fri 4-Dec-26 | Pretest |
 | Fri 11-Dec-26 | Competition / project deadline (week 12) |
 | Fri 18-Dec-26 | Presentations |
@@ -53,8 +56,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   the hopping profile (`nrf24_cca`, hop-set-only channels, 50 ms COT, idle gap), mock nRF24 with a simulated
   channel, host tests: `make -C radio/fw test` (244 checks). Profiles carry `hop`, `cot_us`, `idle_us`.
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
-- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R4 draft/D-R5c/D-R6 current; D-R6 = 20 dBm hopping for SRI/MRM;
-  D-R2b/D-R5b and the 868 records superseded),
+- `radio/DECISIONS.md` (D-R1b/D-R2c/D-R3/D-R5c/D-R6/D-R6b current; D-R6 = 20 dBm hopping for MRM, D-R6b = option B;
+  D-R4 fixed plan = 10 mW fallback only; D-R2b/D-R5b and the 868 records superseded),
   `HANDOFF_ET.md` (SP4 interface for electronics), **`NM_SPEC.md` (NM interop spec v1.0 for all teams: registers, frame,
   gossip, CRC, test vector; `NM_PHY_PROPOSAL.md` is now a pointer)**, `TEST_PLAN.md`
   (T0 gate at all RF_PWR steps, T2, T4, T5, T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
@@ -112,11 +115,12 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 Under CNAF UN-85 a) a narrowband radio gets it only while hopping with the EN 300 328 sharing rules, so SRI/MRM run
 as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed: Atenea Q3 answered yes.**
 
-**Radio — key results (16-Oct, `python3 radio/linkbudget.py`, workbook S21–S26):**
+**Radio — key results (17-Oct, `python3 radio/linkbudget.py`, workbook S21–S28, formulas = Python to 0 dB):**
 - SRI/MRM: hopping at ≤ 20 dBm e.i.r.p. (S24–S26): **SRI 70 m +36.5 · MRM 260 m +13.9 dB** (+6.9 at 0.5 m; +8.4 at
-  today's RF_PWR −12 until T0 shows the PA gain ≤ 21.5 dB and allows −6).
+  today's RF_PWR −12 until T0 shows the PA gain ≤ 21.5 dB and allows −6). **NM 100 m hop (−10 dB) +9.9 dB** at 10 mW.
 - **Conservative planning case (17-Oct review: sens +3 dB, 0 dBi worst azimuth, −6 dB fade/body): MRM 20 dBm +0.9 dB
-  (−4.6 at −12), NM −3.1 dB, SRI +23.5.** Antenna height, people away from the boxes and T4/T5 attenuation-to-failure decide. **NM 100 m hop (−10 dB) +9.9 dB** at 10 mW.
+  (−4.6 at −12), NM −3.1 dB, SRI +23.5.** Antenna height, people away from the boxes and T4/T5 attenuation-to-failure
+  decide. Repeat this caveat whenever margins come up.
 - 10 mW fixed-channel fallback (S21–S22, also Quick Mode): SRI +26.0, MRM +3.4. If T0 measures only ~+2 dBm at
   −18, the 10 mW margins drop ~5 dB (hopping picks the highest legal step anyway).
 - Non-adaptive FHSS would be capped at MU 10 % (10 % duty at 20 dBm, ~16 kbps): too slow → adaptive with LBT.
@@ -142,7 +146,9 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
 - **D-R6 MRM: `TEAM_FHSS`** — 37 hops, even RF_CH 4–78 without 26 (BLE advertising 2/26/80 left out), stride 7, 30 ms
   slots, RPD as the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`**
   (RF_CH 77 = 0x4D, 10 mW; `NM_SPEC.md`). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
-- D-R4: superseded for MRM (all teams hop at 20 dBm); agree LBT + ≥ 10 m between boxes; fixed plan = 10 mW fallback.
+- D-R4: superseded for MRM (all teams hop at 20 dBm); fixed plan RF_CH 24/49/74/82 = 10 mW fallback (and option B).
+- Software: Pico 2 (suggested to ET), C on the Pico SDK; protocol in `proto/` (SR-ARQ + resume + POLL, one deflate
+  stream, Trickle NM gossip, usb_msc over FatFs); where each interface is defined: pt page "Protocol specs".
 
 **20 dBm, two versions (rechecked 16-Oct, D-R6/D-R6b):** A = hopping (`TEAM_FHSS`, default, EN 300 328 compliant).
 B = one fixed channel at 20 dBm with frame-based LBT (`TEAM_20DBM_FIXED`, COT 10 ms): same margins, no hop sync, but
@@ -151,40 +157,36 @@ over; use B only on an explicit yes (Atenea Q11). CNAF in force: Orden TDF/732/2
 consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended to 2022/180) is the reference.
 
 **Open decisions:**
-- [ ] D-R4 channel plan with the 3 other teams (after Andrian's campus WiFi survey)
-- [ ] D-R3 NM common PHY + protocol: agree `NM_SPEC.md` v1.0 with the teams by 23-Oct; every team's chip in writing; interop
-      test by 6-Nov (NM win gates the cost category)
+- [ ] D-R3 NM common PHY + protocol: agree `NM_SPEC.md` v1.0 with the teams by 23-Oct; every team's chip in writing;
+      interop test by 6-Nov (NM win gates the cost category)
+- [ ] D-R6 go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K, or option B on a Q11 yes
+- [ ] ET: micro choice (Pico 2 suggested) and pin map
 
-**Next up (from the 16-Oct review, in order):**
-- [ ] Today: order the **Pico 2 (×3–4, one batch)** together with the radios (QM modules are final); name owners for:
-      SP4 breakout, carrier PCB, Pico toolchain + USB host + hop sync, NM inter-team talks, sustainability report,
-      BoM + invoices, mechanics/drop test (secure the U.FL plug)
-- [ ] By 20-Oct: Marcos posts Q1, Q4–Q9, Q11–Q21; archive the written Q3 answer
-- [ ] By 23-Oct inter-team meeting: each team's chip, hopping or fixed, NM_COMMON registers (hex), interop date (week 7)
+**Next up (17-Oct, roughly in order):**
+- [ ] **Order now** (one batch, QM modules are final): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4),
+      2 × U.FL-to-SMA pigtails, 3–4 × Pico 2. Verify EU seller + lead time. Not needed: DP5, SMA pads, whips, RFM69.
+- [ ] Name owners: SP4 breakout, carrier PCB, Pico toolchain + USB host + hop sync, NM inter-team talks (PT),
+      sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
+- [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
+      pt v0.3.7 with Team C (pt → Ibrahim, Guillem, Sofia)
+- [ ] By 20-Oct: Marcos posts `ATENEA_QUESTIONS.md` Q1, Q4–Q9, Q11–Q21 (Q2, Q10 not needed; Q3 answered yes —
+      archive the written answer)
+- [ ] By 23-Oct inter-team meeting: each team's chip; NM spec agreed; everyone hops with LBT at ≤ 20 dBm in its own
+      order, ≥ 10 m between boxes (30 m between senders); interop date 6-Nov
 - [ ] QM deliverables (PD, plan, action item list, provisional BoM) + Atenea petition before 17:00 the day before;
       check the Project Definition lists QM, SRI, MRM, NM and cost (rules p.3)
-- [ ] Go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K (or option B on a Q11 yes)
-- [ ] Atenea Q11: 20 dBm on one fixed channel (option B)? Use B only on an explicit yes.
-- [ ] usb_msc on the Pico: compile/bench `proto/port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT, 120 MHz clock)
-- [ ] D-R6: agree with the other teams: everyone hops with LBT at ≤ 20 dBm, ≥ 10 m between boxes at each MRM end;
-      T0 at all four RF_PWR steps; T17 (RPD trip level) + T18 (hop pattern) in the T13 lab booking — gates for
-      TEAM_FHSS outdoors; PT: slot clock + hop acquisition on the Pico (now required for SRI/MRM)
-- [ ] Order by 16-Oct (D-R2c): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4), 2 × U.FL-to-SMA pigtails.
-      Verify EU seller + lead time first. Not needed: DP5, SMA pads, whips, Adafruit RFM69, 868 Molex.
-- [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test
-- [ ] T0: measure SP4 output at all four RF_PWR steps (U.FL-to-SMA pigtail, ≥ 30 dB pad) before any field test; T2
-- [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and the NM channel 77
-- [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 / pt v0.3.7
-      with Team C
-- [ ] Pico: hop clock + acquisition (only in the simulator so far); T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1)
-- [ ] Write the Pico 2 HAL for `nrf24_hal_t` once ET confirms the pin map; MRM 4-team sim scenario
-- [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is asking the radio teacher which CST version
-      the team may install on laptops. Then: review the code of `teslawei/mcp-cst-studio` (live on Windows, or
-      offline VBA from WSL) or `woson-L` CST-MCP (CST 2026 Python API) before installing; `mcp-openems` as a
-      free cross-check. Nothing installed yet.
-- [ ] Measure the IKEA 365+ box inside dimensions (where the omni can sit highest; board outline)
-- [ ] Marcos posts `ATENEA_QUESTIONS.md` (Q2, Q3 (answered yes) and Q10 not needed; Q1, Q4 updated)
-- [ ] Share the protocol proposal with PT (Ibrahim, Guillem, Sofia); PT owner for NM gossip talks
+- [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
+- [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test; measure the IKEA 365+ inside dimensions
+- [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
+      T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
+- [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
+- [ ] Pico software: `nrf24_hal_t` once ET confirms the pin map; hop clock + acquisition (only in the simulator so
+      far); compile/bench `proto/port/pico/usb_msc_pico.c` (3–4 sticks, FAT32 + exFAT, 120 MHz clock)
+- [ ] Simulator: MRM scenario with the 4 teams' boxes modelled explicitly (today a loss rate, T14)
+- [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is
+      asking the radio teacher which CST version the team may install on laptops. Then: review the code of
+      `teslawei/mcp-cst-studio` (live on Windows, or offline VBA from WSL) or `woson-L` CST-MCP (CST 2026 Python API)
+      before installing; `mcp-openems` as a free cross-check. Nothing installed yet.
 
 ## Session log
 
@@ -204,7 +206,9 @@ what's pending.
   its page (NM Interop Spec artifact); sim T18 decodes the test vector. pt v0.3.7 has the "Protocol specs" table
   (NM spec, frames.h/link.h, phy_config → nrf24_config.h, nrf24.h, codec.h, usb_msc.h, nm_log.h). Brief v0.10, hw v0.4.4
   (role switch, U.FL secured). `NM_PHY_PROPOSAL.md` → pointer; TEST_PLAN T16 written out; PDFs re-exported (4 pages).
-- Checks: fw 244, proto 20 scenarios + 109 usb, phy_config all OK.
+- Checks: fw 244, proto 20 scenarios + 109 usb, phy_config all OK, workbook = Python (0 dB over 28 scenarios),
+  usb-xcheck (bare FAT16/32, MBR, GPT) OK. Santiago then asked to tidy CLAUDE.md/README and leave the repo clean:
+  Calendar, Status and Next up deduplicated; README status updated; only `main`, no worktrees.
 - **Start next session with:** NM spec shared with the teams? order placed? T0 at all four steps and at 3.0 V.
 
 ### 2026-10-16 (night) — relay log, usb_msc started, 20 dBm rechecked (A/B), NM diagrams
