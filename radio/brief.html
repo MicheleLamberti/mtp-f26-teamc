@@ -167,7 +167,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <p>Neither UN-85 b) nor adaptive hopping under UN-85 a) has a duty-cycle condition, so the 3-rounds-per-hour limit of 868 MHz is gone. Test as often as we like. The firmware's duty-cycle guard was removed.</p>
       <p>The power limit is the only rule to watch. On the 10 mW profiles the driver <b>refuses any setting above RF_PWR −18 dBm</b>; only the hopping profile goes higher, and only after a clear-channel check on each hop.</p></div>
     <div class="card"><h3>Firmware ready before the hardware</h3>
-      <p>A portable C driver for the nRF24L01+ passes 244 host checks against a simulated radio, including two radios talking over a simulated channel, the power limit, and the listen-before-talk rules of the hopping profile. It needs five board functions (SPI select and transfer, CE pin, microsecond delay and clock).</p>
+      <p>A portable C driver for the nRF24L01+ passes 318 host checks against a simulated radio, including two radios talking over a simulated channel, the power limit, and the listen-before-talk rules of the hopping profile. It needs five board functions (SPI select and transfer, CE pin, microsecond delay and clock).</p>
       <p>Frames use dynamic length and the radio's CRC, and go out without the chip's own ACKs, so our ARQ stays in charge. The protocol simulator runs on it: all 21 scenarios pass, six of them hopping (T19 adds a 30 s Linux reboot).</p></div>
     <div class="card"><h3>Antenna</h3>
       <p><b>One Molex 146153-0100 flex dipole per box</b> (34.9 × 9 mm, 2.4–3.0 dBi peak, &gt; 66 % efficiency), plugged into the SP4's socket, stuck <b>vertically</b> as high as possible on a side wall. The same antenna serves SRI, MRM and NM, and Quick Mode too.</p>
@@ -245,7 +245,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="grid2">
     <div class="card"><h3>What changes</h3><ul>
       <li><b>Nothing in the hardware.</b> The SP4 is a +20 dBm module that we hold at its lowest step; hopping only raises the step. TX bursts move toward the datasheet's 120 mA, which the radio LDO already covers.</li>
-      <li><b>Driver:</b> only the hopping profile may go above −18 dBm. It refuses channels outside the hop set and any frame without a clear check on the current hop, ends each occupancy at 50 ms and waits the idle gap. 244 host checks pass.</li>
+      <li><b>Driver:</b> only the hopping profile may go above −18 dBm. It refuses channels outside the hop set and any frame without a clear check on the current hop, ends each occupancy at 50 ms and waits the idle gap. 318 host checks pass.</li>
       <li><b>Protocol:</b> unchanged; the radio layer hops every 30 ms (one 16-frame burst). The simulator gives each box its own drifting slot clock; the receiver parks on one channel and re-syncs. All 10,000 lines in 38 s with 10 % of hops busy, 69 s with 25 % busy plus a receiver reboot. Still to build on the Pi 3: the slot clock and hop acquisition (only simulated so far); IRQ edges with kernel timestamps make the acquisition accurate under Linux.</li>
       <li><b>NM stays on one channel (77) at 10 mW.</b> Hopping in sync across four teams' boxes for a 0.5 kB file is not worth it, and NM has +9.9 dB.</li></ul></div>
     <div class="card"><h3>Why it is allowed, and what to keep</h3><ul>

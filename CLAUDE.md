@@ -54,7 +54,10 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - `radio/fw/` — portable C99 nRF24L01+ driver behind a HAL (DPL + NOACK frames, RF_CH ≤ 83, RPD),
   CRC-16, power cap per profile (−18 dBm; only an `lbt` profile may use `NRF24_RF_PWR_MAX_BITS_FHSS`), LBT for
   the hopping profile (`nrf24_cca`, hop-set-only channels, 50 ms COT, idle gap), mock nRF24 with a simulated
-  channel, host tests: `make -C radio/fw test` (244 checks). Profiles carry `hop`, `cot_us`, `idle_us`.
+  channel, host tests: `make -C radio/fw test` (318 checks; on Linux it also builds the Pi tool). **`radio/fw/linux/`
+  (18-Oct): Linux HAL for the Pi 3** (spidev `xfer` = one ioctl per command, GPIO chardev v2 for CE/IRQ with edge
+  timestamps, busy-wait delays, `nrf24_linux_realtime`) + bench tool `nrf24_probe` (init / survey / tx / rx / timing,
+  mapped to T0/T2/T14 in its README); `make -C radio/fw linux`. Not yet run on a Pi. Profiles carry `hop`, `cot_us`, `idle_us`.
   The RFM69 driver and duty-cycle guard were removed 9-Oct (in git history).
 - `radio/DECISIONS.md` (D-R1b/D-R2c/D-R3/D-R5c/D-R6/D-R6b current; D-R6 = 20 dBm hopping for MRM, D-R6b = option B;
   D-R4 fixed plan = 10 mW fallback only; D-R2b/D-R5b and the 868 records superseded),
@@ -196,7 +199,8 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
-- [ ] Pi 3 software: `nrf24_hal_t` on spidev + libgpiod (pins in the KiCad brief), `proto_env_t` on timerfd/epoll,
+- [ ] Pi 3 software: ~~`nrf24_hal_t` on spidev~~ (started 18-Oct, `radio/fw/linux/`: run `nrf24_probe init` on the Pi
+      first), `proto_env_t` on timerfd/epoll + the radio thread loop,
       SD-card store with fdatasync, `usbm_disk_t` on the raw stick, read-only root, boot ≤ 10 s; hop clock + acquisition
       (only in the simulator so far); measure frame gap/turnaround (T2)
 - [ ] Simulator: MRM scenario with the 4 teams' boxes modelled explicitly (today a loss rate, T14)
@@ -209,6 +213,17 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-18 (later) — Linux HAL port started
+- Santiago: start the Linux HAL port for the Pi 3. Driver: optional `nrf24_hal_t.xfer` (one whole SPI transaction,
+  select/transfer may be NULL; the mock stays byte-wise); `nrf24_send` re-reads TX_DS after its deadline, so a
+  preempted process does not report a sent frame as a timeout (test reproduces the race; fails without the fix).
+- `radio/fw/linux/`: `nrf24_hal_linux.c` (spidev, GPIO uAPI v2 without libgpiod, CLOCK_MONOTONIC, IRQ edge
+  timestamps, SCHED_FIFO/affinity/mlockall helper) and `nrf24_probe` (init, survey, tx, rx, timing). Pi setup and
+  wiring in its README. Builds with `-Werror -Wconversion` on x86 Linux; no Pi or ARM compiler here, so not run on
+  hardware. `timing` on this WSL box: worst 1 ms wake-up 2.06 ms late (the Pi needs its own run, with `--rt 3`).
+- Checks: fw 318, proto 21 scenarios + 109 usb, phy_config all OK. pt page v0.4 board_hal row updated.
+- **Start next session with:** `nrf24_probe init` + `timing --rt 3` on a real Pi 3; then `proto_env_t` on Linux.
 
 ### 2026-10-18 — Pi 3 instead of the Pico 2: impact analysis + team page
 - Santiago: the team wants a Raspberry Pi 3 in the build; asked for an analysis with subagents (code inventory + web

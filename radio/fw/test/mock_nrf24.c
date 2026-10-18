@@ -183,4 +183,5 @@ void mock_hal(mock_nrf24_t *m, nrf24_hal_t *hal)
     hal->ce = m_ce;
     hal->delay_us = m_delay_us;
     hal->micros = m_micros;
+    hal->xfer = NULL;   /* byte-wise; test_xfer_hal wraps it in a whole-transaction HAL */
 }

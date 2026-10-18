@@ -19,6 +19,8 @@ pad, frames sent/received.
 
 ## T0 — Bring-up and output power (bench, the day the modules arrive) — **gate for any field test**
 
+Tool on the Pi 3: `radio/fw/build/nrf24_probe` (`init`, `tx`/`rx`, `survey`, `timing`; see `radio/fw/linux/README.md`).
+
 1. Wire one SP4 (on its breakout) to the Raspberry Pi 3 (SPI0 + CSN = CE0 + CE GPIO 22 + IRQ GPIO 24; 3.3 V from the
    radio LDO, never the Pi's 3V3 pin, with ≥ 100 µF near the module); run
    `nrf24_init`. Pass: `NRF24_OK`. `NRF24_ERR_SPI` = wiring/CSN; `NRF24_ERR_NOT_PLUS` = an old

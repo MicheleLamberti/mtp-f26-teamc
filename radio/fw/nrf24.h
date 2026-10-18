@@ -44,6 +44,10 @@ typedef struct {
     void (*ce)(void *ctx, int high);
     void (*delay_us)(void *ctx, uint32_t us);
     uint32_t (*micros)(void *ctx);
+    /* Optional: one whole SPI transaction of n bytes (n <= 33) with CSN held low throughout.
+     * When set, the driver uses it instead of select/transfer, which may then be NULL. A Linux
+     * spidev HAL needs it: the kernel drives CSN, and one ioctl per byte would cost ~50 us each. */
+    void (*xfer)(void *ctx, const uint8_t *out, uint8_t *in, uint8_t n);
 } nrf24_hal_t;
 
 typedef enum {

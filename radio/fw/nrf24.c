@@ -36,6 +36,19 @@
 static uint8_t command(nrf24_t *dev, uint8_t cmd, const uint8_t *out, uint8_t *in, uint8_t n)
 {
     const nrf24_hal_t *h = dev->hal;
+    if (h->xfer) {   /* one transaction: command byte, then n data bytes */
+        uint8_t tx[1u + NRF24_MAX_PAYLOAD], rx[1u + NRF24_MAX_PAYLOAD];
+        if (n > NRF24_MAX_PAYLOAD)
+            n = NRF24_MAX_PAYLOAD;
+        tx[0] = cmd;
+        for (uint8_t i = 0; i < n; i++)
+            tx[1u + i] = out ? out[i] : 0xFFu;
+        h->xfer(h->ctx, tx, rx, (uint8_t)(n + 1u));
+        if (in)
+            for (uint8_t i = 0; i < n; i++)
+                in[i] = rx[1u + i];
+        return rx[0];
+    }
     h->select(h->ctx, 1);
     uint8_t status = h->transfer(h->ctx, cmd);
     for (uint8_t i = 0; i < n; i++) {
@@ -211,8 +224,13 @@ nrf24_status_t nrf24_send(nrf24_t *dev, const uint8_t *body, uint8_t len)
             st = NRF24_OK;
             break;
         }
-        if (h->micros(h->ctx) - t0 > limit)
+        if (h->micros(h->ctx) - t0 > limit) {
+            /* A preempted process (Linux) can pass the deadline between the read and the clock check:
+             * look once more, so a frame that did go out is not reported as lost. */
+            if (command(dev, 0xFFu, NULL, NULL, 0) & STATUS_TX_DS)
+                st = NRF24_OK;
             break;
+        }
         h->delay_us(h->ctx, 50);
     }
     nrf24_write_reg(dev, REG_STATUS, STATUS_TX_DS);

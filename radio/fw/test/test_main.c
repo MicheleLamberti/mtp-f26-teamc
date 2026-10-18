@@ -424,6 +424,101 @@ static void test_carrier(void)
     CHECK(nrf24_carrier(&a.dev) == 1);
 }
 
+/* Whole-transaction HAL over the mock, the way the Linux spidev HAL works (select/transfer NULL). */
+typedef struct {
+    nrf24_hal_t inner;   /* the mock's byte-wise HAL */
+    mock_nrf24_t *m;
+    unsigned transactions, max_len;
+    int preempt_after_tx;   /* 1: the first STATUS read after a TX payload misses TX_DS, then 20 ms pass */
+    int armed;
+} xfer_wrap_t;
+
+typedef struct {
+    mock_nrf24_t m;
+    xfer_wrap_t w;
+    nrf24_hal_t hal;
+    nrf24_t dev;
+} xfer_node_t;
+
+static void w_xfer(void *ctx, const uint8_t *out, uint8_t *in, uint8_t n)
+{
+    xfer_wrap_t *w = ctx;
+    w->inner.select(w->inner.ctx, 1);
+    for (uint8_t i = 0; i < n; i++)
+        in[i] = w->inner.transfer(w->inner.ctx, out[i]);
+    w->inner.select(w->inner.ctx, 0);
+    w->transactions++;
+    if (n > w->max_len)
+        w->max_len = n;
+    if (out[0] == 0xB0u && w->preempt_after_tx) {
+        w->armed = 1;
+    } else if (w->armed && n == 1 && out[0] == 0xFFu) {
+        in[0] = (uint8_t)(in[0] & ~0x20u);   /* read just before TX_DS rose... */
+        w->m->now_us += 20000u;              /* ...then the process was preempted for 20 ms */
+        w->armed = 0;
+        w->preempt_after_tx = 0;
+    }
+}
+static void w_ce(void *ctx, int high) { xfer_wrap_t *w = ctx; w->inner.ce(w->inner.ctx, high); }
+static void w_delay(void *ctx, uint32_t us) { xfer_wrap_t *w = ctx; w->inner.delay_us(w->inner.ctx, us); }
+static uint32_t w_micros(void *ctx) { xfer_wrap_t *w = ctx; return w->inner.micros(w->inner.ctx); }
+
+static nrf24_status_t xfer_node_up(xfer_node_t *n, const nrf24_profile_t *p)
+{
+    memset(n, 0, sizeof *n);
+    mock_init(&n->m);
+    mock_hal(&n->m, &n->w.inner);
+    n->w.m = &n->m;
+    n->hal.ctx = &n->w;
+    n->hal.select = NULL;
+    n->hal.transfer = NULL;
+    n->hal.ce = w_ce;
+    n->hal.delay_us = w_delay;
+    n->hal.micros = w_micros;
+    n->hal.xfer = w_xfer;
+    return nrf24_init(&n->dev, &n->hal, p);
+}
+
+static void test_xfer_hal(void)
+{
+    /* 18-Oct (Pi 3): the same driver over a whole-transaction HAL. Every profile initialises the same way. */
+    for (unsigned k = 0; k < N_PROFILES; k++) {
+        const nrf24_profile_t *p = PROFILES[k];
+        xfer_node_t n;
+        CHECK(xfer_node_up(&n, p) == NRF24_OK);
+        for (unsigned i = 0; i < p->n_regs; i++)
+            if (p->regs[i].addr != 0x07u)
+                CHECK(n.m.regs[p->regs[i].addr] == p->regs[i].value);
+        CHECK(memcmp(n.m.tx_addr, p->address, 5) == 0);
+    }
+
+    /* Frames between an xfer node and a byte-wise node, both ways. */
+    xfer_node_t a;
+    node_t b;
+    CHECK(xfer_node_up(&a, &NRF24_PROFILE_TEAM_250K) == NRF24_OK);
+    CHECK(node_up(&b, &NRF24_PROFILE_TEAM_250K) == NRF24_OK);
+    mock_link(&a.m, &b.m);
+    uint8_t tx[32], rx[32], len = 0;
+    for (unsigned i = 0; i < 32; i++)
+        tx[i] = (uint8_t)(i * 11u + 3u);
+    CHECK(nrf24_start_rx(&b.dev) == NRF24_OK);
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&b.dev, rx, &len) == NRF24_OK && len == 32 && memcmp(rx, tx, 32) == 0);
+    CHECK(nrf24_start_rx(&a.dev) == NRF24_OK);
+    CHECK(nrf24_send(&b.dev, tx, 5) == NRF24_OK);
+    CHECK(nrf24_poll_rx(&a.dev, rx, &len) == NRF24_OK && len == 5 && memcmp(rx, tx, 5) == 0);
+    CHECK(a.w.max_len == 33u);   /* command + 32 B payload, never more */
+    CHECK(a.w.transactions > 0);
+
+    /* Preempted between the STATUS read and the deadline check: the frame went out, so no timeout. */
+    unsigned sent = a.m.frames_tx;
+    a.w.preempt_after_tx = 1;
+    CHECK(nrf24_send(&a.dev, tx, 32) == NRF24_OK);
+    CHECK(a.w.preempt_after_tx == 0);   /* the race did happen */
+    CHECK(a.m.frames_tx == sent + 1u);
+    CHECK((a.m.regs[0x07] & 0x20u) == 0);   /* TX_DS cleared */
+}
+
 int main(void)
 {
     test_crc();
@@ -441,6 +536,7 @@ int main(void)
     test_fhss_lbt();
     test_fixed20();
     test_review_fixes();
+    test_xfer_hal();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }
