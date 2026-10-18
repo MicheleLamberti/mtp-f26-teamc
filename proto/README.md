@@ -12,6 +12,7 @@ make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip in
 ./build/sim sri --loss 0.1 --blackout 20:30 --rx-reboot 40
 ./build/sim sri --codec none --profile 1m --file my_file.txt
 ./build/sim sri --fhss 0.25 --loss 0.05       # SRI/MRM baseline (D-R6): adaptive FHSS + LBT, 25 % busy
+./build/sim sri --rx-reboot 15 --reboot-down 30   # a Pi 3 (Linux) box is down 10-30 s per reboot, the Pico 0.3 s
 ./build/sim nm --nodes 12 --p1 0.2 --p2 0.8 --seed 7
 ```
 Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator only).
@@ -59,6 +60,7 @@ docs/ the sample generator falls back to repo text (2.62× deflate instead of 3.
 | **FHSS + LBT** (D-R6, MRM baseline), 5 % loss, 10 % of hops busy | 10 000 | 37.9 s |
 | **FHSS + LBT**, 25 % of hops busy, receiver reboot at 15 s | 10 000 | 57.2 s |
 | **MRM, all four teams hopping at 20 dBm**: 30 % loss both ways, 10 % busy | 10 000 | 83.4 s |
+| MRM as T14 (5 % data / 30 % ACK loss), receiver (Pi 3) down 30 s after a reboot at 15 s (T19, 18-Oct) | 10 000 | 90.8 s |
 
 FHSS (16-Oct-26, `--fhss BUSY`, profile `TEAM_FHSS`): the protocol does not change; the simulated radio
 hops every 30 ms over the 40-channel hop order from `nrf24_config.h`, spends 300 µs per hop on PLL settling

@@ -1,0 +1,419 @@
+<title>Team C Pi 3 Switch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: same system as the other Team C pages - one reading column (~74ch), tables break out to 1040px; the power tree is the one diagram. */
+:root{
+  --bg:#f6f7f7; --panel:#ffffff; --ink:#14191b; --ink-2:#4b5559; --ink-3:#768186;
+  --rule:#dfe3e4; --rule-2:#eceff0; --accent:#0e5b6b; --accent-wash:#e3eff1;
+  --ok:#0b7a3b; --ok-wash:#e4f3ea; --warn:#9a5b00; --warn-wash:#fbf0dc; --bad:#b3261e; --bad-wash:#fbe6e4;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --band-free:#e9ecec; --band-ours:#0e5b6b; --band-ours-ink:#ffffff; --band-alarm:#d6dbdc;
+  --f-display:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121617; --panel:#1a1f21; --ink:#eef2f3; --ink-2:#b4bec2; --ink-3:#8a969b;
+  --rule:#2d3538; --rule-2:#232a2c; --accent:#6cc3d3; --accent-wash:#16343a;
+  --ok:#5fd18d; --ok-wash:#173327; --warn:#f0b452; --warn-wash:#3a2c13; --bad:#ff8a80; --bad-wash:#3d1c1a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --band-free:#262d30; --band-ours:#6cc3d3; --band-ours-ink:#0b1416; --band-alarm:#323b3e;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121617; --panel:#1a1f21; --ink:#eef2f3; --ink-2:#b4bec2; --ink-3:#8a969b;
+  --rule:#2d3538; --rule-2:#232a2c; --accent:#6cc3d3; --accent-wash:#16343a;
+  --ok:#5fd18d; --ok-wash:#173327; --warn:#f0b452; --warn-wash:#3a2c13; --bad:#ff8a80; --bad-wash:#3d1c1a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --band-free:#262d30; --band-ours:#6cc3d3; --band-ours-ink:#0b1416; --band-alarm:#323b3e;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+.col{max-width:74ch}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,4.4vw,2.9rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:700;margin-top:3.2rem;padding-top:1.1rem;border-top:1px solid var(--rule)}
+h3{font-size:1.05rem;font-weight:700;margin-top:1.8rem}
+p{margin:.7rem 0}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+.eyebrow{font:500 .75rem/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:.9rem;color:var(--ink-2);font-size:.9rem}
+.meta b{font-weight:600;color:var(--ink)}
+.lede{font-size:1.08rem;color:var(--ink-2);margin-top:1rem}
+.mono,.num{font-family:var(--f-mono);font-size:.92em}
+.num{font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font:500 .68rem/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:3px;vertical-align:1px;white-space:nowrap}
+.t-rule{background:var(--accent-wash);color:var(--accent)}
+.t-ver{background:var(--ok-wash);color:var(--ok)}
+.t-asm{background:var(--warn-wash);color:var(--warn)}
+.t-est{background:var(--rule-2);color:var(--ink-2)}
+
+.bottom{margin-top:1.8rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:20px 22px}
+.bottom h2{margin:0;padding:0;border:0;font-size:1.15rem}
+.bottom ol{margin:.8rem 0 0;padding-left:1.25rem;display:grid;gap:.55rem}
+.bottom li::marker{font-family:var(--f-mono);color:var(--ink-3)}
+
+/* spectrum strip */
+.strip{margin-top:1.2rem;overflow-x:auto}
+.strip svg{display:block;width:100%;min-width:640px;height:auto}
+.strip text{font-family:var(--f-mono)}
+.legend-row{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82rem;color:var(--ink-2);margin-top:.5rem}
+.key{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+
+/* tables */
+.tbl{overflow-x:auto;margin-top:1rem;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule-2)}
+th{font:600 .74rem/1.3 var(--f-body);letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+td.num{white-space:nowrap}
+.pill{display:inline-block;font:600 .74rem/1 var(--f-body);padding:4px 7px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-wash);color:var(--ok)}
+.p-warn{background:var(--warn-wash);color:var(--warn)}
+.p-bad{background:var(--bad-wash);color:var(--bad)}
+.p-mute{background:var(--rule-2);color:var(--ink-2)}
+tr.hl td{background:var(--accent-wash)}
+.sub{color:var(--ink-3);font-size:.82rem}
+
+/* chart */
+.chart-card{margin-top:1.2rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 16px 10px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82rem;color:var(--ink-2);margin-bottom:6px}
+.lk{display:inline-block;width:16px;height:2px;border-radius:1px;vertical-align:4px;margin-right:7px}
+.chart-wrap{position:relative}
+#chart{display:block;width:100%;height:auto;touch-action:pan-y}
+#chart text{font-family:var(--f-mono);font-size:11px;fill:var(--ink-3)}
+#chart .lbl{fill:var(--ink-2);font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:.8rem;box-shadow:0 4px 14px rgba(0,0,0,.12);min-width:200px}
+.tip .h{font:500 .75rem var(--f-mono);color:var(--ink-3);margin-bottom:4px}
+.tip .row{display:flex;align-items:center;gap:8px;line-height:1.5}
+.tip .row b{font:600 .85rem var(--f-mono);min-width:56px;text-align:right;color:var(--ink)}
+.tip .row span{color:var(--ink-2)}
+details{margin-top:.6rem}
+summary{cursor:pointer;color:var(--ink-2);font-size:.85rem}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:1rem}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 .3rem}
+.card p{margin:.4rem 0;font-size:.92rem}
+.card ul{margin:.4rem 0 0;padding-left:1.1rem;font-size:.92rem}
+ul.tight{padding-left:1.2rem}
+ul.tight li{margin:.25rem 0}
+.callout{border-left:3px solid var(--warn);background:var(--warn-wash);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:1rem;font-size:.93rem}
+.callout.info{border-left-color:var(--accent);background:var(--accent-wash)}
+footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid var(--rule);padding-top:1rem}
+@media (max-width:560px){.wrap{padding-inline:16px} h2{margin-top:2.4rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+.mermaid-wrap{margin-top:1.2rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto}
+.verdict{white-space:nowrap}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:.92rem;margin:.5rem 0 0}
+.kv dt{color:var(--ink-3);font-weight:600}
+.kv dd{margin:0;min-width:0}
+td.total{font-weight:600;border-top:2px solid var(--rule)}
+</style>
+
+<style>
+.wrap{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media (max-width:560px){.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}}
+.qbox{margin-top:1rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;font-size:.93rem}
+.qbox .eyebrow{margin-bottom:.4rem}
+.qbox p{margin:.4rem 0}
+.copy{font:500 .78rem/1 var(--f-body);color:var(--accent);background:var(--accent-wash);border:1px solid var(--rule);border-radius:4px;padding:6px 10px;cursor:pointer;margin-top:.4rem}
+.copy:hover{border-color:var(--accent)}
+</style>
+
+<div class="wrap">
+<header class="col">
+  <div class="eyebrow">MTP F26 · Team C · Radio Team → whole team</div>
+  <h1>Moving the controller to a Raspberry Pi 3</h1>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Team C: electronics, protocols, PM</span><span><b>Version</b> 0.1 · Sun 18 Oct 2026</span></div>
+  <p class="lede">The team wants a Raspberry Pi 3 in each box instead of the Pico 2. This page lists what that changes for each sub-team, with numbers from our link-budget model and the protocol simulator.</p>
+  <p class="lede"><b>Short version.</b> The radio side does not change: same E01-ML01SP4, same antenna, same margins, same NM spec. The work moves to <b>power</b> (an always-on 5 V rail and about 2 W instead of 0.3 W) and <b>software</b> (Linux timing, the SPI port, boot time, SD card). Cost per box roughly doubles but stays well under the 150 € cap. The USB stick gets simpler because the Pi has native USB host ports.</p>
+</header>
+
+<div class="col">
+<div class="callout info"><b>Working assumption.</b> The Pi 3's WiFi/Bluetooth chip is switched off in software or desoldered, and the professors accept the board. The rule (p.6) reads: <i>"The system can not include any chip implementing a standard wireless access protocol (e.g. WiFi, Bluetooth…)"</i>. Desoldering meets the wording; switching off in software depends on how the professors read it. Ask in writing on Atenea (draft below). Get the answer before the Quick Mode on 6 Nov, because the micro module shown there must be the final one (p.8): changing it later costs every bonus.</div>
+</div>
+
+<h2 id="s-glance" class="col">At a glance</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>Area</th><th>Pico 2 plan</th><th>With a Pi 3</th><th>Impact</th></tr></thead>
+<tbody>
+<tr><td>Radio, antenna, link budget</td><td>E01-ML01SP4 + Molex 146153 omni</td><td>Same parts, same margins (MRM 260 m +13.9 dB, NM +9.9 dB)</td><td><span class="pill p-ok">Unchanged</span></td></tr>
+<tr><td>NM spec, frames, hop set, 20 dBm hopping</td><td>NM_SPEC v1.0, TEAM_FHSS</td><td>Same. Nothing to tell the other teams</td><td><span class="pill p-ok">Unchanged</span></td></tr>
+<tr><td>USB stick</td><td>PIO-USB on two pins + 5 V boost + switch</td><td>Native USB host ports</td><td><span class="pill p-ok">Simpler</span></td></tr>
+<tr><td>Micro module</td><td>Pico 2, bare-metal C</td><td>Pi 3 (A+ suggested), Linux, same C code with a new HAL</td><td><span class="pill p-warn">Port</span></td></tr>
+<tr><td>Power</td><td>Cell → VSYS, about 0.3 W; 5 V only while the stick is in use</td><td>Cell → 5 V boost rated ≥ 2.5 A, always on, about 2 W</td><td><span class="pill p-bad">Most work</span></td></tr>
+<tr><td>Battery sense</td><td>Pico ADC3</td><td>The Pi has no ADC: add an I2C fuel gauge</td><td><span class="pill p-warn">New part</span></td></tr>
+<tr><td>Timing</td><td>Microsecond-exact</td><td>Up to ~1 ms jitter: busy-waits, real-time kernel, wider guards</td><td><span class="pill p-warn">Port</span></td></tr>
+<tr><td>Reboot after a crash or brown-out</td><td>0.3 s</td><td>10–30 s. One reboot per round still delivers the file</td><td><span class="pill p-warn">Risk</span></td></tr>
+<tr><td>Storage</td><td>4 MB on-chip flash</td><td>microSD card: corruption on power loss, loose in the drop test</td><td><span class="pill p-warn">Risk</span></td></tr>
+<tr><td>Carrier PCB</td><td>Pico soldered on our carrier</td><td>HAT-style board on the 40-pin header</td><td><span class="pill p-warn">Redesign</span></td></tr>
+<tr><td>Cost per box</td><td>about 40–55 €</td><td>about 70–90 € (estimate)</td><td><span class="pill p-warn">Worse for cost</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="col">
+<h2 id="s-variant">Which Pi 3</h2>
+<p>All Pi 3 boards share the same processor (BCM2837, 4 × Cortex-A53, 1 GB). They differ in wireless chip, current draw and size.</p>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Board</th><th>Wireless chip</th><th class="r">Typical / measured draw at 5 V</th><th>Size</th><th>USB</th><th>Built until</th></tr></thead>
+<tbody>
+<tr class="hl"><td><b>Pi 3 Model A+</b> (suggested)</td><td>CYW43455 under a shield</td><td class="r num">350 mA typ · ~240–340 mA idle</td><td class="num">65 × 56 mm</td><td>1 port, direct to the SoC</td><td class="num">≥ Jan 2030</td></tr>
+<tr><td>Pi 3 Model B</td><td>BCM43438, exposed, chip antenna</td><td class="r num">400 mA typ · 260 idle / 730 stress</td><td class="num">85 × 56 mm</td><td>4 ports via LAN9514 hub</td><td class="num">≥ Jan 2028</td></tr>
+<tr><td>Pi 3 Model B+</td><td>CYW43455 under a shield</td><td class="r num">500 mA typ · 350 idle / 980 stress</td><td class="num">85 × 56 mm</td><td>4 ports via LAN7515 hub</td><td class="num">≥ Jan 2030</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col">
+<p><b>Suggestion: the 3 A+.</b> It draws the least, is the smallest, and has no Ethernet or hub chip to power. If the team already owns 3 B boards, they work too: the BoM counts owned items at market price anyway (rules, "non-purchased items"), so owning them doesn't help the cost category. The 3 B+ draws the most; avoid it unless it's the only one we have.</p>
+
+<h3>The wireless chip</h3>
+<ul class="tight">
+  <li><b>Software off (minimum, always do it):</b> <span class="mono">dtoverlay=disable-wifi</span> and <span class="mono">dtoverlay=disable-bt</span> in <span class="mono">config.txt</span>, plus <span class="mono">rfkill block all</span> at boot. The chip stays on the board but stays silent. It would otherwise transmit in our own 2.4 GHz band.</li>
+  <li><b>Desoldering:</b> hot-air job, on one spare board first. On the A+/B+ the chip is under a metal shield. After removal, check that the Pi still boots and that the SPI and USB work. We found no published guide, so treat it as an experiment.</li>
+  <li><b>Fallback if Atenea says "remove it" and desoldering fails:</b> the Compute Module 3+ (same processor, no wireless at all, ~27–33 €, on a SODIMM carrier we would design). Stock in 2026 is patchy.</li>
+</ul>
+
+<div class="qbox">
+  <div class="eyebrow">Draft for Marcos · Atenea Q22</div>
+  <p id="q22">Team C will use a Raspberry Pi 3 (Model A+ or B) as its only microprocessor module. The board carries a WiFi/Bluetooth chip (Cypress CYW43455 / Broadcom BCM43438). We plan to disable it permanently in firmware (device-tree overlays disable-wifi and disable-bt, so the chip is never powered up or used). Does this satisfy the rule "The system can not include any chip implementing a standard wireless access protocol (e.g. WiFi, Bluetooth…)", or must the chip be physically removed from the board?</p>
+  <button class="copy" id="copy-q22" type="button">Copy question</button>
+</div>
+
+<h2 id="s-power">Power (electronics)</h2>
+<p>This is the biggest change. The Pico ran from the cell through VSYS and switched 5 V on only for the stick. The Pi needs a steady 5 V at all times, and Linux crashes or reboots when the rail sags. The Pi warns of undervoltage below 4.63 V (±5 %).</p>
+</div>
+
+<div class="mermaid-wrap">
+<pre class="mermaid">
+flowchart LR
+  CELL["18650 cell 3.0-4.2 V"] --> SW["Slide switch"]
+  SW --> BOOST["5.1 V boost, 2.5 A or more"]
+  BOOST --> PI["Pi 3, 5 V on header pins 2 and 4"]
+  SW --> LDO["3.3 V LDO, 300 mA or more"]
+  LDO --> SP4["E01-ML01SP4"]
+  SP4 --> ANT["Molex flex omni"]
+  PI ---|"SPI0 + CE + IRQ"| SP4
+  PI ---|"I2C"| FG["MAX17048 fuel gauge"]
+  FG --- CELL
+  PI ---|"native USB-A"| STICK["USB stick"]
+  USBC["USB-C, charge only"] --> CHG["MCP73831 charger"]
+  CHG --> CELL
+</pre>
+</div>
+
+<div class="col">
+<ul class="tight">
+  <li><b>5 V boost:</b> 5.1 V out, at least 2.5 A, from a 3.0–4.2 V input. Near the 3.0 V cutoff a 1 A load pulls about 2 A from the cell, so size the inductor and switch for that. A TPS61088-class part on our board, or a ready-made 5 V 3 A boost module for the bench. It replaces the TPS61023 + TPS2051 stick switch.</li>
+  <li><b>Feeding the Pi:</b> through the 5 V header pins 2 and 4. That bypasses the Pi's own input protection, so put a TVS and reverse-polarity protection on our board. No cable to the micro-USB connector.</li>
+  <li><b>Radio supply stays as it is:</b> its own 3.3 V LDO from the cell, 100 µF + 10 µF + 100 nF at the module. Never power the SP4 from the Pi's 3V3 pin (a few hundred mA shared with the board, and noisy).</li>
+  <li><b>Battery sense:</b> a MAX17048 fuel gauge on I2C1 (GPIO 2/3) reads the cell voltage and state of charge (~2 €). The firmware thresholds (3.5 / 3.4 / 3.2 V) need re-measuring at T0 under the Pi's load, because the cell sags more at 0.5–1 A.</li>
+  <li><b>Charger:</b> the MCP73831 at 500 mA can stay. It charges a 3000 mAh cell in about 6–7 h, which means overnight.</li>
+  <li><b>Gone:</b> ideal diode to VSYS, PIO-USB pins, TPS61023, TPS2051, the USBLC6 on the stick port (the Pi has its own), SWD header, castellated footprint.</li>
+</ul>
+
+<h3>Runtime on one 3000 mAh 18650</h3>
+<p>Usable energy is about 3.0 Ah × 3.6 V × 85 % boost efficiency ≈ 9.2 Wh. The Pi load assumes idle plus one core busy-waiting for the radio. The radio adds about 0.15 W on average.</p>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Board</th><th class="r">Pi at 5 V <span class="tag t-est">est.</span></th><th class="r">Total</th><th class="r">Hours</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Pi 3 A+</td><td class="r num">0.30–0.40 A</td><td class="r num">1.7–2.2 W</td><td class="r num">4.2–5.4 h</td></tr>
+<tr><td>Pi 3 B</td><td class="r num">0.35–0.45 A</td><td class="r num">2.0–2.4 W</td><td class="r num">3.8–4.6 h</td></tr>
+<tr><td>Pi 3 B+</td><td class="r num">0.45–0.60 A</td><td class="r num">2.4–3.2 W</td><td class="r num">2.9–3.8 h</td></tr>
+<tr><td><span class="sub">Pico 2 plan, for comparison</span></td><td class="r num sub">—</td><td class="r num sub">~0.3 W</td><td class="r num sub">&gt; 24 h</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col">
+<p>One cell covers a competition morning with the A+. With a B or B+, or if the boxes stay on longer than about 3 h, use two cells in parallel or a 3500 mAh cell. Measure the real draw at T0.</p>
+
+<h3>Proposed pin map (BCM numbering)</h3>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>GPIO</th><th class="r">Header pin</th><th>Signal</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="num">GPIO 11</td><td class="r num">23</td><td>SCK → radio</td><td>SPI0, 8 MHz or less</td></tr>
+<tr><td class="num">GPIO 10</td><td class="r num">19</td><td>MOSI → radio</td><td>SPI0</td></tr>
+<tr><td class="num">GPIO 9</td><td class="r num">21</td><td>MISO ← radio</td><td>SPI0</td></tr>
+<tr><td class="num">GPIO 8</td><td class="r num">24</td><td>CSN → radio</td><td>SPI0 CE0, driven by the kernel per transfer</td></tr>
+<tr><td class="num">GPIO 22</td><td class="r num">15</td><td>CE → radio</td><td>Same pin as the RF24 library examples, so bench tests can use it</td></tr>
+<tr><td class="num">GPIO 24</td><td class="r num">18</td><td>IRQ ← radio</td><td>Active low, pull-up; edge events with kernel timestamps (hop sync uses them)</td></tr>
+<tr><td class="num">GPIO 2 / 3</td><td class="r num">3 / 5</td><td>I2C1 SDA / SCL</td><td>MAX17048 fuel gauge (the Pi has 1.8 kΩ pull-ups)</td></tr>
+<tr><td class="num">GPIO 17</td><td class="r num">11</td><td>Tx/Rx button</td><td>To GND, pull-up, RC + ESD</td></tr>
+<tr><td class="num">GPIO 27</td><td class="r num">13</td><td>Role switch TX/RX</td><td>Atenea Q8 pending</td></tr>
+<tr><td class="num">GPIO 23</td><td class="r num">16</td><td>Mode switch SRI/MRM ↔ NM</td><td></td></tr>
+<tr><td class="num">GPIO 5</td><td class="r num">29</td><td>Activity LED</td><td>Blinks in Tx/Rx (rule)</td></tr>
+<tr><td class="num">GPIO 6</td><td class="r num">31</td><td>Status LED</td><td>Also "safe to pull the stick"</td></tr>
+<tr><td class="num">GPIO 26</td><td class="r num">37</td><td>MCP73831 STAT</td><td>Pull-up</td></tr>
+<tr><td class="num">GPIO 14 / 15</td><td class="r num">8 / 10</td><td>UART console</td><td>Debug header; we have no screen or network</td></tr>
+<tr><td class="num">5 V</td><td class="r num">2 / 4</td><td>From the boost</td><td>GND on 6, 9, 14, 20, 25, 30, 34, 39</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="col">
+<h2 id="s-sw">Software (protocols)</h2>
+<p>Our C code was written behind small interfaces (<span class="mono">nrf24_hal_t</span>, <span class="mono">proto_env_t</span>, <span class="mono">usbm_disk_t</span>), so most of it moves to Linux unchanged. It runs as one C program started by systemd at boot.</p>
+</div>
+<div class="grid2">
+  <div class="card">
+    <h3>Unchanged</h3>
+    <ul>
+      <li>nRF24 driver logic: power cap, hop set, LBT/CCA, COT and idle accounting. All delays are minimums, so a late wake-up only makes it more conservative</li>
+      <li>Link ARQ + resume + POLL, NM Trickle gossip and relay log, NM spec frames</li>
+      <li>Codec: the system zlib, which the simulator already links</li>
+      <li>usb_msc rules: largest root .txt, <span class="mono">.part</span> + read-back CRC + rename, write-protect</li>
+      <li><span class="mono">phy_config.py</span>, <span class="mono">nrf24_config.h</span>, all host tests</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Port</h3>
+    <ul>
+      <li><b>HAL:</b> add a buffer transfer so each nRF24 command is one spidev ioctl (byte by byte costs tens of µs per byte). CE and IRQ through libgpiod. <span class="mono">delay_us</span> busy-waits on <span class="mono">CLOCK_MONOTONIC</span></li>
+      <li><b>Timers:</b> <span class="mono">proto_env_t</span> on timerfd + epoll, random numbers from <span class="mono">getrandom</span></li>
+      <li><b>Resume store:</b> <span class="mono">pwrite</span> + <span class="mono">fdatasync</span> in a second thread (SD syncs take 10–100 ms)</li>
+      <li><b>USB:</b> keep FatFs, reading the raw block device <span class="mono">/dev/sda</span> with no automount, so the 109 usb checks stay valid</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Obsolete</h3>
+    <ul>
+      <li><span class="mono">proto/port/pico/usb_msc_pico.c</span> (TinyUSB + PIO-USB) and its bench checklist</li>
+      <li>miniz and its low-memory mode</li>
+      <li>Flash and XIP rules: erase stalls, core 0/1 split, 2 KB stacks, DMA channel use</li>
+      <li>The "≥ 1 MB on-board storage" argument (the SD card holds gigabytes)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="col">
+<h3>Timing on Linux</h3>
+<p>A stock kernel can pause our process for up to about 1.1 ms; with the real-time patch (PREEMPT_RT) the worst case is about 70 µs. These figures were measured on older Pi boards; we confirm on ours at T2.</p>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Requirement</th><th>Value</th><th>On a Pi 3</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>CE pulse, PLL settle</td><td class="num">≥ 10 µs, 130 µs</td><td><span class="pill p-ok">Fine</span></td><td>Busy-wait, never usleep (it overshoots by 60 µs or more)</td></tr>
+<tr><td>CCA: RPD read after RX on</td><td class="num">≥ 170 µs</td><td><span class="pill p-ok">Fine</span></td><td>Being late only delays the read. Read RPD right before TX</td></tr>
+<tr><td>SPI command</td><td class="num">few µs on the Pico</td><td><span class="pill p-warn">20–90 µs</span></td><td>One ioctl per command; pin <span class="mono">core_freq=250</span> so the SPI clock stays fixed</td></tr>
+<tr><td>Per-frame gap</td><td class="num">0.3 ms assumed</td><td><span class="pill p-warn">0.3–0.5 ms</span></td><td>Measure at T2; goodput table below</td></tr>
+<tr><td>Hop slot</td><td class="num">30 ms</td><td><span class="pill p-ok">Fine</span></td><td>Keep a 1–2 ms guard on a stock kernel. No frame may cross a hop boundary</td></tr>
+<tr><td>ACK timer, TX_DS timeout</td><td class="num">~4 ms, ~3.8 ms</td><td><span class="pill p-bad">Tight</span></td><td>PREEMPT_RT, radio thread SCHED_FIFO pinned to an isolated core (<span class="mono">isolcpus=3</span>), or widen both on Linux</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="col">
+<h3>Goodput if the Pi is slower between frames</h3>
+<p>From the framing model in <span class="mono">radio/linkbudget.py</span> (250 kbps, 28 B of file per frame, 16 frames per ACK, 85 % system efficiency). Without compression we need 67 kbps for the 10 000 lines in 2 min; with our ~3× deflate, about 22 kbps.</p>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Per-frame gap</th><th>TX↔RX turnaround</th><th class="r">Goodput</th><th>Case</th></tr></thead>
+<tbody>
+<tr><td class="num">0.3 ms</td><td class="num">1 ms</td><td class="r num">107 kbps</td><td>Pico assumption today</td></tr>
+<tr class="hl"><td class="num">0.5 ms</td><td class="num">1 ms</td><td class="r num">97 kbps</td><td>Likely on a Pi 3</td></tr>
+<tr><td class="num">0.5 ms</td><td class="num">2 ms</td><td class="r num">91 kbps</td><td>Stock kernel, wider timers</td></tr>
+<tr><td class="num">1.0 ms</td><td class="num">2 ms</td><td class="r num">73 kbps</td><td>Bad case, still above 67</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="col">
+<h3>Reboots: what a 10–30 s Linux boot costs</h3>
+<p>The rules ask the system to self-recover from interruptions (p.6). We added a reboot-time option to the simulator and a new test, T19. Times are for the whole 10 000-line file, sent compressed, with the receiver rebooting 15 s into the round.</p>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Scenario</th><th class="r">Down 0.3 s (Pico)</th><th class="r">Down 10 s</th><th class="r">Down 30 s</th></tr></thead>
+<tbody>
+<tr><td>SRI, 5 % loss</td><td class="r num">27.7 s</td><td class="r num">—</td><td class="r num">57.5 s</td></tr>
+<tr><td>MRM as T14 (hopping, 5 % data / 30 % ACK loss, 10 % of hops busy)</td><td class="r num">60.5 s</td><td class="r num">78.0 s</td><td class="r num">90.8 s</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col">
+<p>A reboot costs about its own downtime, and the resume logic picks up where it stopped. One reboot per round is survivable even at 30 s; two in MRM probably are not. <b>Target a boot of 10 s or less</b> (trimmed Pi OS Lite; Buildroot gets to 2–4 s if needed). Use the hardware watchdog through systemd (<span class="mono">RuntimeWatchdogSec</span>). Boot fits easily inside the 5-minute setup.</p>
+
+<h3>Linux setup checklist</h3>
+<ul class="tight">
+  <li>Pi OS Lite (64-bit) or Buildroot. Kernel with PREEMPT_RT if the timers stay tight.</li>
+  <li><b>Read-only root</b> with overlayfs (<span class="mono">raspi-config nonint enable_overlayfs</span>) and a small ext4 data partition for the resume state. A power cut or the drop test then cannot corrupt the card.</li>
+  <li>WiFi, Bluetooth and HDMI off (<span class="mono">tvservice -o</span>); no automount; our program owns the stick.</li>
+  <li>Before the status LED says "pull the stick": write, read back, sync.</li>
+</ul>
+
+<h2 id="s-radio">Radio (radio team)</h2>
+<ul class="tight">
+  <li>Link budget, margins, the conservative planning case (MRM +0.9 dB, NM −3.1 dB), the 20 dBm hopping profile and the NM spec are all unchanged. The micro was never part of the link.</li>
+  <li><b>New check at T0/T2: Pi noise in our band.</b> Clock harmonics (6 × 400 MHz = 2400 MHz) and the HDMI clock could raise the noise on some hop channels. Nobody has measured it. Log RPD hits and PER on every hop channel with the Pi idle, under load, with the wireless chip disabled, and (if done) desoldered. Drop any bad channel from the hop set.</li>
+  <li>Keep the antenna high on the wall and the SP4 at the board edge, away from the SoC and the boost.</li>
+  <li>Radio hardware order is unaffected: <b>6 × E01-ML01SP4, 4 × Molex 146153-0100, 2 × U.FL-to-SMA pigtails</b>. Drop the Pico 2s from the order.</li>
+</ul>
+
+<h2 id="s-mech">Mechanics and the drop test</h2>
+<ul class="tight">
+  <li>Fits the IKEA 365+ box (15 × 15 × 7 cm): the A+ is 65 × 56 mm, the B 85 × 56 mm; about 30 mm tall with our board on the header.</li>
+  <li>The Pi 3's microSD slot holds the card by friction only: tape or glue the card in place.</li>
+  <li>Board on M2.5 standoffs (58 × 49 mm hole pattern); our HAT on standoffs too, so it can't pull off the header.</li>
+  <li>U.FL plug glued and the cable tied (unchanged). Place the Pi so a USB-A port faces a wall cut-out for the stick during the foil-wrapped setup (Atenea Q6), or use a short internal extension to a panel socket.</li>
+</ul>
+
+<h2 id="s-cost">Cost and sustainability</h2>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Change per box <span class="tag t-est">est.</span></th><th class="r">€ excl. VAT</th></tr></thead>
+<tbody>
+<tr><td>Remove Pico 2</td><td class="r num">−5</td></tr>
+<tr><td>Remove PIO-USB parts: TPS61023, TPS2051, USB-A, USBLC6, ideal diode</td><td class="r num">−4</td></tr>
+<tr><td>Add Pi 3 A+ (B: ~37, B+: ~40)</td><td class="r num">+27</td></tr>
+<tr><td>Add microSD 16 GB</td><td class="r num">+5</td></tr>
+<tr><td>Add 5 V 2.5 A boost (bigger than the old one) and inductor</td><td class="r num">+4</td></tr>
+<tr><td>Add MAX17048 fuel gauge</td><td class="r num">+2</td></tr>
+<tr><td class="total">Net change</td><td class="r num total">+29 (A+) to +42 (B+)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col">
+<p>That takes a box from about 40–55 € to about 70–90 €. That is under the 150 € cap and within what ETSETB refunds, but it weakens us in the cost category, which is decided among the teams that win NM. For the sustainability report: about 7× the energy per box (2 W against 0.3 W). The point in our favour is reuse: a Pi is reflashable, repairable and reusable after the course, which the report's questions ask about.</p>
+
+<h2 id="s-plan">Who does what next</h2>
+<ol class="tight">
+  <li><b>Marcos:</b> post Atenea Q22 (above) with this week's batch.</li>
+  <li><b>Electronics:</b> pick the variant (A+ suggested), confirm how many boards we have, then the power tree: 5 V boost, fuel gauge, HAT-style carrier. Try desoldering on one spare board.</li>
+  <li><b>Protocols:</b> Linux HAL (spidev + libgpiod), timerfd environment, resume store, FatFs on the raw stick, systemd service, read-only root. The HAL first: Quick Mode only needs <span class="mono">TEAM_250K</span> on one channel, no hop sync.</li>
+  <li><b>Radio:</b> T0 adds the Pi-noise check and the current draw at 3.6 / 3.3 / 3.0 V; T2 measures the frame gap and turnaround on the Pi.</li>
+  <li><b>Everyone:</b> the Pi and the SP4 shown at the Quick Mode on 6 Nov are final, so this decision has to stick.</li>
+</ol>
+</div>
+
+<footer class="col">
+  <p>A proposal from the radio team, not a decision. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i> (p.6 hardware, p.8 Quick Mode, BoM section). Goodput from <span class="mono">radio/linkbudget.py</span>; reboot times from <span class="mono">proto/</span> simulator T19 (<span class="mono">--reboot-down</span>).</p>
+  <p>Sources checked 18 Oct 2026: <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/">Pi 3 A+</a> · <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b/">Pi 3 B</a> · <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/">Pi 3 B+</a> · <a href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html">Pi power and USB documentation</a> · <a href="https://pidramble.com/node/27">measured Pi 3 current</a> · <a href="https://raspi.tv/2018/how-much-power-does-raspberry-pi-3a-plus-use">Pi 3 A+ current</a> · <a href="https://blog.emlid.com/raspberry-pi-real-time-kernel">Pi real-time kernel latency</a> · <a href="https://github.com/nRF24/RF24/issues/971">RF24 on spidev</a> · <a href="https://learn.adafruit.com/read-only-raspberry-pi">read-only Pi</a> · <a href="https://pip-assets.raspberrypi.com/categories/627-raspberry-pi-compute-module-3/documents/RP-008163-DS-2-cm3-plus-datasheet.pdf">CM3+ datasheet</a>.</p>
+</footer>
+</div>
+
+<script>
+document.getElementById('copy-q22').addEventListener('click', function () {
+  var b = this, t = document.getElementById('q22');
+  var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy question'; }, 1600); };
+  var fallback = function () { var r = document.createRange(); r.selectNodeContents(t); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected: press Ctrl+C'; };
+  try { navigator.clipboard.writeText(t.textContent).then(done, fallback); } catch (e) { fallback(); }
+});
+</script>

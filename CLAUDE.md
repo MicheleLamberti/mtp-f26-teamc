@@ -73,7 +73,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
-  hopping radio layer): `make -C proto test` (20 scenarios incl. T18 = NM spec test vector, + 109 usb_msc checks, ~2 s); `make usb-xcheck PYTHON=<venv
+  hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 109 usb_msc checks, ~2 s; `--reboot-down S` sets the
+  downtime per reboot, 0.3 s Pico / 10–30 s Linux); `make usb-xcheck PYTHON=<venv
   python with pyfatfs + setuptools<81>` cross-checks FAT16/32 images. `port/pico/usb_msc_pico.c` = TinyUSB + PIO-USB
   skeleton, NOT compiled here (no pico-sdk / ARM gcc on this machine).
   See `proto/README.md`.
@@ -82,7 +83,10 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   streaming codec, 107 kbps, sim results; v0.3.6: NM diagrams, relay log, usb_msc, option B).
 - **NM Interop Spec** (artifact, private — Santiago shares it with the other teams): https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS
   — source `radio/nm_spec.html`, built from `radio/NM_SPEC.md` (keep both in sync; v1.0 draft 16/17-Oct).
-- PDF/HTML exports of the four pages: `briefs/` (PDF) and the Windows folder (HTML + PDF + workbooks), light theme, headless
+- **Pi 3 switch page** (artifact, private — for the whole team): https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw
+  — source `radio/pi3_impact.html` (v0.1 18-Oct: what a Raspberry Pi 3 instead of the Pico 2 changes; styles copied from
+  `hw_proposal.html`). Assumes the WiFi/BT chip is disabled or desoldered (Atenea Q22).
+- PDF/HTML exports of the pages: `briefs/` (PDF) and the Windows folder (HTML + PDF + workbooks), light theme, headless
   Chromium from `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the export
   script lived in the job scratch dir (wraps each page in a doctype with `data-theme="light"`) — recreate if needed. No poppler here: check PDFs with pypdf text.
 
@@ -156,20 +160,29 @@ EN 300 328 cl. 4.3.2.3 / the EU SRD decision cap non-hopping radios at 10 dBm/MH
 over; use B only on an explicit yes (Atenea Q11). CNAF in force: Orden TDF/732/2026 (BOE-A-2026-15661); its
 consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended to 2022/180) is the reference.
 
+**18-Oct-26: controller → Raspberry Pi 3 (team request; proposal page v0.1).** Working assumption (Santiago): the Pi 3 is
+allowed with its WiFi/BT chip disabled in software or desoldered; the rule (p.6) bans "any chip implementing" WiFi/BT,
+so Atenea Q22 asks. Radio unchanged (SP4, omni, margins, NM spec). Changes: always-on 5.1 V boost ≥ 2.5 A from the cell
+(Pi ~1.7–2.2 W with the A+, 4–5 h on 3000 mAh), MAX17048 fuel gauge (no ADC on the Pi), radio LDO from the cell as before,
+HAT-style carrier; Linux HAL (spidev buffer transfers, libgpiod, busy-wait delays, timerfd), PREEMPT_RT or wider ACK/TX_DS
+timers, read-only root + data partition, boot ≤ 10 s target; goodput 107 → ~97 kbps if the frame gap grows to 0.5 ms;
+sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Cost ~70–90 €/box (was 40–55).
+
 **Open decisions:**
 - [ ] D-R3 NM common PHY + protocol: agree `NM_SPEC.md` v1.0 with the teams by 23-Oct; every team's chip in writing;
       interop test by 6-Nov (NM win gates the cost category)
 - [ ] D-R6 go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K, or option B on a Q11 yes
-- [ ] ET: micro choice (Pico 2 suggested) and pin map
+- [ ] ET: micro choice — **18-Oct: the team wants a Raspberry Pi 3** (A+ suggested; WiFi/BT chip disabled or desoldered,
+      Atenea Q22 before QM 6-Nov) — and the pin map (Pi proposal on the Pi 3 page)
 
 **Next up (17-Oct, roughly in order):**
 - [ ] **Order now** (one batch, QM modules are final): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4),
-      2 × U.FL-to-SMA pigtails, 3–4 × Pico 2. Verify EU seller + lead time. Not needed: DP5, SMA pads, whips, RFM69.
+      2 × U.FL-to-SMA pigtails. ~~3–4 × Pico 2~~ (18-Oct: Pi 3 instead; count the boards we have). Verify EU seller + lead time. Not needed: DP5, SMA pads, whips, RFM69.
 - [ ] Name owners: SP4 breakout, carrier PCB, Pico toolchain + USB host + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
 - [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
       pt v0.3.7 with Team C (pt → Ibrahim, Guillem, Sofia)
-- [ ] By 20-Oct: Marcos posts `ATENEA_QUESTIONS.md` Q1, Q4–Q9, Q11–Q21 (Q2, Q10 not needed; Q3 answered yes —
+- [ ] By 20-Oct: Marcos posts `ATENEA_QUESTIONS.md` Q1, Q4–Q9, Q11–Q22 (Q22 = Pi 3 wireless chip; Q2, Q10 not needed; Q3 answered yes —
       archive the written answer)
 - [ ] By 23-Oct inter-team meeting: each team's chip; NM spec agreed; everyone hops with LBT at ≤ 20 dBm in its own
       order, ≥ 10 m between boxes (30 m between senders); interop date 6-Nov
@@ -192,6 +205,19 @@ consolidated text omits the UN notes, so the EU decision 2006/771/EC (as amended
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-18 — Pi 3 instead of the Pico 2: impact analysis + team page
+- Santiago: the team wants a Raspberry Pi 3 in the build; asked for an analysis with subagents (code inventory + web
+  research). Finding: every Pi 3 (B/B+/A+) has a WiFi/BT chip, which the rules (p.6) ban "even unused"; CM3+ has none.
+  Santiago then: assume we can disable or desolder the chip and use the Pi 3; make a page to share with the team.
+- Page "Team C Pi 3 Switch" v0.1 (`radio/pi3_impact.html`, artifact Q5EZxmB1HhcbiQhs2menMw; PDF in `briefs/` + Windows
+  folder): at-a-glance table, variant pick (A+), power tree (boost, fuel gauge, runtime), Pi pin map, software port,
+  Linux timing, goodput (107 → 97 / 91 / 73 kbps), reboot sim results, mechanics, BoM delta, owners. Atenea Q22 drafted.
+- Simulator: `--reboot-down S` and test T19 (MRM as T14, receiver down 30 s → 90.8 s; 10 s → 78 s; Pico 60.5 s).
+- Not yet updated for the Pi: hw_proposal, pt_proposal, brief, HANDOFF_ET, KiCad brief (still say Pico 2) — wait for ET's
+  variant pick and the Q22 answer.
+- Checks: fw 244, proto 21 scenarios + 109 usb, phy_config all OK.
+- **Start next session with:** Q22 answer? which Pi 3 variant and how many boards? then port the HAL to Linux.
 
 ### 2026-10-17 — Opus review fixes; NM interop spec; protocol specs section
 - Santiago asked for Opus reviewers on the whole project, then to fix their findings (commit a4bbad7 + this one):

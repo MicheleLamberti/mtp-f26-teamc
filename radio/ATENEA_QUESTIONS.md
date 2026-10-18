@@ -67,3 +67,12 @@ Added 16-Oct-26 after the project review:
     the total with or without non-purchased items?
 20. **MRM etiquette.** Must every team use listen-before-talk in MRM (relevant to Q3(c))?
 21. **NM output.** Must every relay box also write the NM-file to USB after STOP, and under which file name?
+
+Added 18-Oct-26 (the team wants a Raspberry Pi 3 as the micro module; see `radio/pi3_impact.html`):
+
+22. **Pi 3 wireless chip.** Team C will use a Raspberry Pi 3 (Model A+ or B) as its only microprocessor module. The
+    board carries a WiFi/Bluetooth chip (Cypress CYW43455 / Broadcom BCM43438). We plan to disable it permanently in
+    firmware (device-tree overlays disable-wifi and disable-bt, so the chip is never powered up or used). Does this
+    satisfy the rule "The system can not include any chip implementing a standard wireless access protocol (e.g.
+    WiFi, Bluetooth…)", or must the chip be physically removed from the board? Needed before the Quick Mode, since
+    the micro module shown there must be final.

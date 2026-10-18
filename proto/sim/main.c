@@ -1,6 +1,6 @@
 /* MTP-F26 Team C - protocol simulator: scenarios, scoring and test suite.
  *
- *   sim sri  [--loss P] [--burst] [--blackout A:B] [--rx-reboot T] [--tx-reboot T]
+ *   sim sri  [--loss P] [--burst] [--blackout A:B] [--rx-reboot T] [--tx-reboot T] [--reboot-down S]
  *            [--codec deflate|none] [--profile 250k|1m] [--fhss BUSY] [--file F] [--seed N] [--duration S]
  *            --fhss: D-R6 SRI/MRM baseline, adaptive FHSS + LBT (TEAM_FHSS), BUSY = share of hops skipped
  *   sim nm   [--nodes N] [--p1 P] [--p2 P] [--file F] [--seed N] [--duration S]
@@ -72,6 +72,7 @@ static uint32_t score_lines(const txtfile_t *f, const uint8_t *rx, uint32_t rx_l
 
 typedef struct {
     double loss, bo_from, bo_to, rx_reboot, tx_reboot, duration;
+    double reboot_down;     /* s offline per reboot: 0.3 for the Pico, 10-30 for a Linux box (Pi 3) */
     double ack_loss;        /* > 0: loss receiver -> sender instead of `loss` (ACKs lost next to other senders) */
     int burst, codec, fhss;
     double fhss_busy;
@@ -98,6 +99,7 @@ typedef struct {
     const uint8_t *xfer;
     uint32_t xfer_len, crc;
     uint8_t codec;
+    uint64_t down_us;
 } sri_ctx_t;
 
 static void h_tx_frame(void *p, const uint8_t *f, uint8_t len, uint8_t rssi)
@@ -121,8 +123,8 @@ static void sri_rx_boot(sim_t *s, void *arg)
     sri_ctx_t *c = arg;
     link_rx_init(&c->rx, sim_env(s, 1), &c->cfg, &c->store);
 }
-static void sri_rx_reboot(sim_t *s, void *arg) { sim_reboot(s, 1, 300000, sri_rx_boot, arg); }
-static void sri_tx_reboot(sim_t *s, void *arg) { sim_reboot(s, 0, 300000, sri_tx_boot, arg); }
+static void sri_rx_reboot(sim_t *s, void *arg) { sim_reboot(s, 1, ((sri_ctx_t *)arg)->down_us, sri_rx_boot, arg); }
+static void sri_tx_reboot(sim_t *s, void *arg) { sim_reboot(s, 0, ((sri_ctx_t *)arg)->down_us, sri_tx_boot, arg); }
 
 static int run_sri(const sri_opts_t *o, sri_result_t *r)
 {
@@ -143,6 +145,7 @@ static int run_sri(const sri_opts_t *o, sri_result_t *r)
         c->xfer_len = f.len;
     }
     c->codec = (uint8_t)o->codec;
+    c->down_us = (uint64_t)(o->reboot_down * S_US);
     c->crc = codec_crc32(c->xfer, c->xfer_len);
     r->xfer_len = c->xfer_len;
     r->ratio = (double)f.len / c->xfer_len;
@@ -376,6 +379,7 @@ static sri_opts_t sri_defaults(void)
 {
     sri_opts_t o = {0};
     o.duration = 120;
+    o.reboot_down = 0.3;
     o.codec = CODEC_DEFLATE;
     o.profile = &NRF24_PROFILE_TEAM_250K;
     o.file = DEFAULT_FILE;
@@ -445,6 +449,20 @@ static int run_tests(void)
     run_sri(&o, &r);
     print_sri("\nT7  SRI, sender reboots at 15 s", &r);
     expect(r.lines == r.total_lines && r.exact, "sender resumes, all lines");
+
+    /* 18-Oct: a Pi 3 (Linux) is down 10-30 s per reboot instead of the Pico's 0.3 s. Worst case in MRM. */
+    o = sri_defaults();
+    o.fhss = 1;
+    o.fhss_busy = 0.10;
+    o.profile = &NRF24_PROFILE_TEAM_FHSS;
+    o.loss = 0.05;
+    o.ack_loss = 0.30;
+    o.rx_reboot = 15;
+    o.reboot_down = 30;
+    run_sri(&o, &r);
+    print_sri("\nT19 MRM as T14, receiver (Pi 3) reboots at 15 s and is down 30 s", &r);
+    expect(r.lines == r.total_lines && r.exact, "receiver re-syncs after a Linux boot, all lines");
+    expect(r.done_s >= 0 && r.done_s < 100, "whole file within 100 s of the 120 s round");
 
     o = sri_defaults();
     o.loss = 0.05;
@@ -623,6 +641,8 @@ int main(int argc, char **argv)
                 o.rx_reboot = arg_d(&i, argc, argv);
             else if (!strcmp(argv[i], "--tx-reboot"))
                 o.tx_reboot = arg_d(&i, argc, argv);
+            else if (!strcmp(argv[i], "--reboot-down"))
+                o.reboot_down = arg_d(&i, argc, argv);
             else if (!strcmp(argv[i], "--codec") && i + 1 < argc)
                 o.codec = !strcmp(argv[++i], "none") ? CODEC_NONE : CODEC_DEFLATE;
             else if (!strcmp(argv[i], "--profile") && i + 1 < argc)
