@@ -19,7 +19,8 @@ pad, frames sent/received.
 
 ## T0 — Bring-up and output power (bench, the day the modules arrive) — **gate for any field test**
 
-1. Wire one SP4 (on its breakout) to the Pico (SPI + CSN + CE, 3.3 V with ≥ 100 µF near the module); run
+1. Wire one SP4 (on its breakout) to the Raspberry Pi 3 (SPI0 + CSN = CE0 + CE GPIO 22 + IRQ GPIO 24; 3.3 V from the
+   radio LDO, never the Pi's 3V3 pin, with ≥ 100 µF near the module); run
    `nrf24_init`. Pass: `NRF24_OK`. `NRF24_ERR_SPI` = wiring/CSN; `NRF24_ERR_NOT_PLUS` = an old
    nRF24L01 (no 250 kbps), return it.
 2. **Conducted output power at all four RF_PWR steps** (−18 / −12 / −6 / 0 dBm; a lab-only test build
@@ -36,6 +37,13 @@ pad, frames sent/received.
 3. Clone check: the chip marking says nRF24L01P (Nordic), and the TX/RX current at the bench supply
    matches the E01 datasheet. A Si24R1 clone usually shows a different current and a weaker T2.
 4. Two boxes 1 m apart, `TEAM_250K`, flex antennas fitted: 1 000 frames of 32 B. Pass: ≥ 999 received.
+5. **Pi 3 checks (18-Oct, D-H1):**
+   - Noise from the Pi in our band: with the SP4 in RX on the Pi, log RPD hits per hop channel (37 channels,
+     10 000 samples each) with the Pi idle, under load (all four cores busy, SD writes, USB stick copy), HDMI off,
+     WiFi/BT disabled and, if done, desoldered. Pass: no channel busier than the same test with the SP4 on a bench
+     supply far from the Pi + 2 %. Drop any channel that fails from the hop set (`phy_config.py`).
+   - The Pi's own current at 5 V and the cell current at 3.6 / 3.3 / 3.0 V through the 5.1 V boost (idle, radio TX
+     bursts, stick copy, boot). Pass: the 5 V rail stays ≥ 4.75 V and `vcgencmd get_throttled` reports no undervoltage.
 
 ## T2 — Sensitivity / PER at 250 kbps (bench, conducted) — **gate for D-R2c before Quick Mode**
 
@@ -50,6 +58,10 @@ shielded box (or a metal tin with the coax through it), or the PER curve measure
 Pass: PER ≤ 1 % at ≤ **−93 dBm** at 250 kbps (the conservative planning case: datasheet −96 "typical" at BER 0.1 %
 + 3 dB). If it is worse than −90, suspect a clone or a bad module. Write the measured 1 %-PER level into
 `linkbudget.py` (`sens_dbm`) and drop `PLAN_SENS_DB` to 0.
+
+On the Pi 3 (D-H1), also measure from the same runs: the gap between frames and the TX↔RX turnaround (logic
+analyser on CE and IRQ). The model assumes 0.3 ms and 1 ms; 0.5 ms / 1 ms gives ~97 kbps, 1 ms / 2 ms ~73 kbps.
+Write the values into `FRAMING` in `linkbudget.py` and the link timers in `proto/src/link.c`.
 
 ## T4 — Range, open box (campus, line of sight)
 

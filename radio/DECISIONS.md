@@ -23,6 +23,38 @@ session and no later than Fri 16-Oct.
 > omni): **+10.5 dB** on every link (+5.0 dB at today's RF_PWR −12 until T0). NM stays at 10 mW on one channel.
 > The 10 mW fixed-channel profile stays for Quick Mode, the bench and as the fallback.
 
+> **18-Oct-26: the micro is a Raspberry Pi 3** (team request, D-H1). Nothing in the radio changes (SP4, omni,
+> profiles, margins, NM spec). The controller, its power tree and the software port change; see D-H1 and
+> `radio/pi3_impact.html`.
+
+## D-H1 — Micro module: Raspberry Pi 3 (Model A+ suggested), WiFi/BT chip disabled or removed
+
+**Status:** **Team request 18-Oct-26** (reported by Santiago); ET owns the choice of model; working assumption until
+Atenea Q22 is answered · **Owner:** ET (board, model) + PT (Linux software) + RT (radio checks)
+
+- **Rule.** The rules allow "one but only one module including a microprocessor (e.g. Arduino, BeagleBone,
+  Raspberry…)" but ban "any chip implementing a standard wireless access protocol (e.g. WiFi, Bluetooth…)". Every
+  Pi 3 (B, B+, A+) carries one (BCM43438 / CYW43455). Working assumption (Santiago): allowed if disabled for good in
+  software (`dtoverlay=disable-wifi`, `disable-bt`, rfkill) or desoldered. **Atenea Q22** asks; the answer is needed
+  before Quick Mode (6-Nov), because the micro shown there is final. Fallback if removal is required and desoldering
+  fails: Compute Module 3+ (same SoC, no wireless, SODIMM carrier).
+- **Model.** A+ suggested: lowest draw (~0.30–0.40 A at 5 V with one core busy), 65 × 56 mm, one USB port direct to
+  the SoC. B works if owned (owned boards still count at market price in the BoM).
+- **Hardware consequences.** HAT-style carrier on the 40-pin header; always-on 5.1 V boost ≥ 2.5 A from the cell
+  (up to ~2 A input near 3.0 V); MAX17048 fuel gauge (no ADC); radio LDO from the cell as before, never the Pi's 3V3;
+  stick on the Pi's own USB port (PIO-USB, stick boost and switch dropped); microSD taped for the drop test.
+  ~1.7–2.2 W per box (A+), 4.2–5.4 h on one 3000 mAh cell; ~70–90 € per box (was 40–55 €).
+- **Software consequences.** Same C code; Linux HAL (spidev one ioctl per command, libgpiod CE/IRQ with kernel
+  timestamps, busy-wait µs delays), timerfd/epoll environment, files on the SD card with fdatasync, FatFs over the
+  raw stick block device, read-only root, systemd watchdog. Tight timers (idle-ACK ~4 ms, TX_DS ~3.8 ms) need
+  PREEMPT_RT + SCHED_FIFO on an isolated core, or wider values on Linux.
+- **Numbers.** Goodput 107 → ~97 kbps if the frame gap grows to 0.5 ms (73 kbps at 1 ms gap + 2 ms turnaround, still
+  > 67). A Linux reboot costs 10–30 s instead of 0.3 s: sim T19 (MRM as T14, receiver down 30 s) delivers the file in
+  90.8 s (78.0 s at 10 s down, 60.5 s on the Pico). Boot target ≤ 10 s.
+- **Radio checks added.** T0: Pi noise per hop channel (idle/busy, wireless off/removed) and the Pi's current at
+  3.6/3.3/3.0 V. T2: frame gap and turnaround on the Pi.
+- Superseded: the Pico 2 suggestion (hw_proposal v0.4.x, in git history).
+
 ## D-R6 — SRI/MRM as adaptive FHSS + LBT at ≤ 20 dBm e.i.r.p. (CNAF UN-85 a)
 
 **Status:** **Baseline since 16-Oct-26, confirmed** (a professor approved 20 dBm e.i.r.p.; Atenea Q3 answered
@@ -73,7 +105,7 @@ yes, reported by Santiago) · **Owner:** RT (PHY, driver) + PT (hop sync)
   Hop timing (`nrf24_fhss_channel(slot)`) and skipping a busy slot are the protocol's job.
 - **Protocol** (`proto/sim --fhss BUSY`): the link code is unchanged; the radio layer hops. T12: all
   10 000 lines in 37.9 s with 5 % loss and 10 % of hops busy; T13: 57.2 s with 25 % busy and a receiver reboot
-  (re-sync = one hop cycle). Still to design: hop acquisition on the Pico (RX parks on one channel until
+  (re-sync = one hop cycle). Still to design: hop acquisition on the Pi 3 (RX parks on one channel until
   the sender's slot clock is heard; each frame carries the slot number).
 - **Margins** (h 0.75 m, workbook S24–S26): **SRI 70 m +36.5 · MRM 260 m +13.9 (+6.9 even at 0.5 m) ·
   MRM at the worst RF_PWR step +8.4 dB**, vs +26.0 / +3.4 at 10 mW. NM unchanged at +9.9.
@@ -90,7 +122,7 @@ yes, reported by Santiago) · **Owner:** RT (PHY, driver) + PT (hop sync)
   timeout the sender asks for the ACK with one short frame instead of resending the burst. **Ask for ≥ 10 m between
   teams' boxes at each MRM end, ideally ≥ 30 m between the senders** (never 2 m). Every team must use LBT.
 - **Quick Mode** keeps TEAM_250K (one fixed channel, 10 mW): one line in < 2 min doesn't need the margin, and
-  the hop sync may not be on the Pico yet.
+  the hop sync may not be on the Pi 3 yet.
 - **SRI also runs on TEAM_250K** (16-Oct review): teams take turns in SRI, +26 dB at 70 m and 10 mW is ample,
   goodput is highest without hopping (159 vs 141 kbps), and SRI then does not depend on the hop sync. The 20 dBm
   modes (option A, or B if Q11 = yes) are for MRM.
@@ -106,7 +138,7 @@ yes, reported by Santiago) · **Owner:** RT (PHY, driver) + PT (hop sync)
   | Listen-before-talk | CCA per hop, COT ≤ 50 ms | CCA every ≤ 10 ms (COT 10 ms, idle 0.5 ms): ~6 frames per CCA |
   | Power density | 100 mW/100 kHz allowed: **compliant** | **10 dBm/MHz limit (cl. 4.3.2.3; EU Dec. 2006/771/EC as amended)**: a < 1 MHz signal at 15.5–20 dBm is **5–10 dB over** |
   | Margins (S24–S25 / S27–S28) | SRI +36.5, MRM +13.9 dB | identical |
-  | Firmware / protocol | hop clock + acquisition on the Pico | none: today's link code on one channel |
+  | Firmware / protocol | hop clock + acquisition on the Pi 3 | none: today's link code on one channel |
   | MRM sharing | random hop collisions (12 % of pairs at 10 m), ≥ 10 m | fixed plan at equal power: 74/82 pair 41 dB at 10 m vs −50 dB: OK at ≥ 10 m |
   | Use when | default | only if the course explicitly accepts 20 dBm on one fixed channel (Atenea Q11) |
 
@@ -352,8 +384,9 @@ Fallback: Si4463 (same band, same link budget, more effort).
 
 | ID | Decision | Target |
 |---|---|---|
+| D-H1 | Raspberry Pi 3 as the micro: Atenea Q22 (WiFi/BT chip disabled vs removed); ET picks the model (A+ suggested) | Q22 before QM 6-Nov |
 | D-R3 | NM PHY + protocol shared by all teams: agree `NM_SPEC.md` v1.0 (nRF24, RF_CH 77, Trickle gossip, test vector) and learn every team's chip | inter-team meeting by 23-Oct; first interop test by 6-Nov |
 | D-R4 | Superseded for MRM (every team hops); fixed plan 24/49/74/82 kept for the 10 mW fallback and option B | — |
 | D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
 | D-R6b | Option B (20 dBm on one fixed channel, no hopping): ask Atenea Q11; use only on an explicit yes | Q11 now |
-| D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pico; ≥ 10 m between teams' boxes at MRM | bench by week 8 |
+| D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pi 3; ≥ 10 m between teams' boxes at MRM | bench by week 8 |

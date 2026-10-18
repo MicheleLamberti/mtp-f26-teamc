@@ -15,7 +15,9 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 > - **Margins.** On datasheet numbers, MRM 260 m has +13.9 dB and NM +9.9 dB. In the conservative planning case
 >   (receiver 3 dB worse, worst antenna direction, −6 dB fade) they fall to +0.9 and −3.1 dB, so the field tests
 >   decide.
-> - **Still to prove on hardware.** Hop sync between boxes and the Pico USB host exist only in the simulator and
+> - **Controller (18-Oct).** The team wants a Raspberry Pi 3 (WiFi/BT chip disabled or desoldered, Atenea Q22). The
+>   radio does not change; power and the Linux software port do ([Pi 3 switch page](briefs/)).
+> - **Still to prove on hardware.** Hop sync between boxes and the Linux port exist only in the simulator and
 >   in host tests.
 > - **Ownership.** The hardware and protocol pages are **suggestions** to the electronics and protocols teams,
 >   who own those decisions.
@@ -25,9 +27,10 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 | Document | For |
 |---|---|
 | [`radio/NM_SPEC.md`](radio/NM_SPEC.md) · [`briefs/MTP NM Interop Spec v1.0.pdf`](briefs/) | **Network Mode interop spec for all teams** (draft v1.0): nRF24 registers, frame, gossip rules, CRC, test vector, interop test |
-| [`briefs/TeamC Radio Brief v0.10.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, 20 dBm hopping (D-R6, all teams hop), link budget incl. the conservative planning case, test plan |
-| [`briefs/TeamC Hardware Proposal v0.4.4.pdf`](briefs/) | Suggested board for electronics: Pico 2 + E01-ML01SP4 + flex omni, BoM, power, role switch |
-| [`briefs/TeamC Protocol Proposal v0.3.7.pdf`](briefs/) | Suggested protocol for protocols & software, **where each protocol spec lives**, simulator results |
+| [`briefs/TeamC Radio Brief v0.11.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, 20 dBm hopping (D-R6, all teams hop), link budget incl. the conservative planning case, test plan |
+| [`briefs/TeamC Pi 3 Switch v0.1.pdf`](briefs/) | What moving from the Pico 2 to a Raspberry Pi 3 changes: power, software, timing, reboot cost, BoM |
+| [`briefs/TeamC Hardware Proposal v0.5.pdf`](briefs/) | Suggested board for electronics: Raspberry Pi 3 + E01-ML01SP4 HAT + flex omni, BoM, power, role switch |
+| [`briefs/TeamC Protocol Proposal v0.4.pdf`](briefs/) | Suggested protocol for protocols & software, **where each protocol spec lives**, simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status, next steps and session log (kept up to date each session) |
 
 ## Specs: where each interface is defined

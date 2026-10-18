@@ -121,27 +121,28 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.4.4 · Sat 17 Oct 2026</span></div>
-  <div class="lede" style="margin:.7rem 0"><b>New in v0.4.4 (17 Oct):</b> small additions from the 16-Oct review, no new parts beyond one switch:
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.5 · Sun 18 Oct 2026</span></div>
+  <div class="lede" style="margin:.7rem 0"><b>New in v0.5 (18 Oct): the micro is now a Raspberry Pi 3</b> (the team's request; the 3 A+ is suggested). The radio side does not change. On the board:
     <ul class="tight">
-      <li>A <b>TX/RX role switch</b>. The professor picks the sending box after both are loaded, so the role must be set without reflashing; Atenea Q8 asks whether a switch is allowed.</li>
-      <li>The <b>U.FL plug is secured</b> for the drop test.</li>
-      <li>The USB firmware reads sticks formatted by Windows or macOS (FAT32 or exFAT, MBR or GPT). We bring our own sticks.</li>
+      <li>The carrier becomes a <b>HAT-style board</b> on the Pi's 40-pin header: SP4, radio LDO, 5 V boost, fuel gauge, charger, switches and LEDs.</li>
+      <li>A <b>5.1 V boost rated for at least 2.5 A</b> now feeds the Pi all the time. It replaces the small boost and switch that only powered the stick.</li>
+      <li>The stick uses the Pi's <b>own USB port</b>, so PIO-USB, the stick switch and the USBLC6 are gone.</li>
+      <li>The Pi has no ADC, so a <b>MAX17048 fuel gauge</b> reads the cell instead of ADC3 and the ideal diode.</li>
+      <li>The Pi's <b>WiFi/BT chip</b> is disabled in software or desoldered. That is our working assumption; Atenea Q22 asks.</li>
+      <li>Cost goes to about <b>70–90 € per box</b>. The full analysis is on the <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a> page.</li>
     </ul></div>
-  <p class="lede"><b>New in v0.4.3 (16 Oct):</b> low-battery countermeasures. The radio's 3.3 V LDO runs straight from the 3.0–4.2 V cell and that is fine (see <a href="#s-power">Power budget</a>); we added an ideal diode for battery sensing, firmware thresholds, a T0 check at 3.0 V and a buck-boost fallback.</p>
-  <p class="lede"><b>New in v0.4.2 (16 Oct):</b> a professor approved <b>20 dBm e.i.r.p.</b>, so SRI and MRM now run as a frequency-hopping radio at up to 20 dBm (+10.5 dB on the links). <b>No hardware change</b>: same SP4, same omni. The radio's TX bursts move toward the datasheet's <b>120 mA</b> in every SRI/MRM round, which the radio LDO, the 100 µF at the module and the battery path below already cover. Keep them sized for 120 mA.</p>
-  <p class="lede"><b>New in v0.4 (decided 13 Oct):</b> <b>one Ebyte E01-ML01SP4</b> per box (nRF24L01+ with PA and LNA, surface-mount, antenna socket on the module) and <b>one flex omni antenna</b> plugged straight into it. No patch boards, no second radio. The SP4 is SMD, so it needs a small breakout from the first bench test.</p>
+  <p class="lede"><b>Earlier:</b> v0.4.4 added the TX/RX role switch and the secured U.FL plug. v0.4.3 added low-battery countermeasures. v0.4.2 moved SRI/MRM to 20 dBm hopping on the same hardware. v0.4 chose one Ebyte E01-ML01SP4 and one flex omni per box.</p>
   <p class="lede">The radio baseline is 2.4 GHz with the nRF24L01+. Under our split, the electronics team picks the micro and designs the board. This page is the radio team's <b>suggestion</b>, built around every hardware rule in the competition PDF, to save you time. It is not a decision. Please challenge it.</p>
 </header>
 
 <section class="bottom col" aria-labelledby="bl">
   <h2 id="bl">In short</h2>
   <ol>
-    <li><b>Micro module: Raspberry Pi Pico 2</b> (RP2350, <b>not</b> the Pico 2 W). It costs about $5, has 4 MB flash to hold the 1 MB file, 520 KB RAM and 3.3 V logic, and it can act as a USB host on any two pins or on its native USB port. It has no radio chip on board, so it is safe under the protocol ban.</li>
-    <li><b>Radio: one Ebyte E01-ML01SP4 per box</b> (genuine nRF24L01+ with PA and LNA; SMD 14.85 × 18 mm, 10 pads at 1.27 mm; IPEX antenna socket). <b>VCC is 2.0–3.6 V only</b>, so it gets its own 3.3 V regulator. The same module goes from the bench to the final boxes, because modules shown at Quick Mode are final; that means a small breakout for the bench. The radio team's driver is written and tested. <i>(v0.3 had two DP5 modules with patches; v0.2 the Adafruit RFM69HCW at 868 MHz.)</i></li>
-    <li><b>Board: a custom 2-layer carrier PCB</b> that the Pico 2 and the radio solder onto. It also carries the radio regulator, the USB-A host port, the battery charger, the 5 V supply for the stick, ESD protection, and the switch, button and LEDs. The antenna is a Molex flex omni stuck on a box wall, its cable plugged into the radio module: no RF circuitry on our board. Before Quick Mode we use a perfboard prototype with the <b>same modules</b>.</li>
-    <li><b>Power: one protected 18650 Li-ion cell</b>, charged on board through a charge-only USB-C port. Our whole competition day uses roughly 10–20 % of it.</li>
-    <li><b>Estimated cost: about €40–55 per device</b> with a lab-made PCB, or about €30–40 with an external fab, against the €150 cap.</li>
+    <li><b>Micro module: Raspberry Pi 3, Model A+ suggested</b> (Model B works if we already own them). It runs Linux on a microSD card and has native USB host ports. Its WiFi/BT chip is <b>disabled in software or desoldered</b>, which is our working assumption until Atenea Q22 is answered.</li>
+    <li><b>Radio: one Ebyte E01-ML01SP4 per box</b>, unchanged (genuine nRF24L01+ with PA and LNA; SMD 14.85 × 18 mm, 10 pads at 1.27 mm; IPEX antenna socket). <b>VCC is 2.0–3.6 V only</b>, so it keeps its own 3.3 V regulator from the cell, never the Pi's 3V3 pin. The same module goes from the bench to the final boxes.</li>
+    <li><b>Board: a 2-layer HAT-style carrier</b> on the Pi's 40-pin header. It carries the SP4, the radio LDO, the 5.1 V boost that feeds the Pi, the fuel gauge, the charger, ESD protection, and the switch, button and LEDs. The antenna is a Molex flex omni stuck on a box wall, its cable plugged into the radio module: no RF circuitry on our board.</li>
+    <li><b>Power: one protected 18650 Li-ion cell</b> (3000 mAh or more), charged on board through a charge-only USB-C port. The Pi and radio draw about 2 W, so one cell lasts about 4–5 h with the A+. Use two cells in parallel if the boxes stay on longer.</li>
+    <li><b>Estimated cost: about 70–90 € per device</b>, against the 150 € cap (40–55 € with the Pico 2).</li>
   </ol>
 </section>
 
@@ -150,17 +151,18 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
   <div class="tbl"><table>
     <thead><tr><th>Rule (competition PDF)</th><th>What it forces on the board</th></tr></thead>
     <tbody>
-      <tr><td>One and only one module including a microprocessor; no single commercial module embedding the entire system</td><td>Pico 2 is the only micro. The radio, charger and boost contain no CPU. No USB-host chips that have their own controller (e.g. CH376), which could count as a second micro.</td></tr>
-      <tr><td>No chip implementing WiFi, Bluetooth, ZigBee, 2G–5G</td><td><b>Banned even if unused:</b> Pico W / Pico 2 W, ESP32 boards, Arduino Nano 33 BLE/IoT, Uno R4 WiFi, Nano ESP32, Raspberry Pi Zero W / 3 / 4 / 5.</td></tr>
-      <tr><td>Read/write the file from/to a USB memory device: 5 min setup while still wrapped in foil, 3 min to upload afterwards</td><td>A USB-A host port on the box wall, plus <b>≥ 1 MB on-board storage</b>. The sender copies the file in at setup, and the receiver keeps what it got until upload. The stick can be removed during the round.</td></tr>
-      <tr><td>Fits entirely in the 15 × 15 × 7 cm IKEA 365+; only connectors, switches and buttons may stick out</td><td>PCB about 100 × 80 mm or smaller. The antenna sits inside: a 35 × 9 mm flex omni, vertical, as high as possible on a wall.</td></tr>
+      <tr><td>One and only one module including a microprocessor (the rules name "Raspberry…" as an example); no single commercial module embedding the entire system</td><td>The Pi 3 is the only micro. The radio, charger, boost and fuel gauge contain no CPU.</td></tr>
+      <tr><td>No chip implementing WiFi, Bluetooth, ZigBee, 2G–5G</td><td>The Pi 3 carries one (CYW43455 on the A+/B+, BCM43438 on the B). <b>Working assumption:</b> disabled for good (<span class="mono">dtoverlay=disable-wifi</span>, <span class="mono">disable-bt</span>, <span class="mono">rfkill</span>) or desoldered; <b>Atenea Q22</b> asks which one the professors require. Still banned: Pico W / Pico 2 W, ESP32 boards, Arduino Nano 33 BLE/IoT, Uno R4 WiFi, Nano ESP32.</td></tr>
+      <tr><td>Read/write the file from/to a USB memory device: 5 min setup while still wrapped in foil, 3 min to upload afterwards</td><td>A Pi USB-A port at a box wall (or a short internal extension to a panel socket). The microSD card holds the file, so storage is no longer a constraint. The stick can be removed during the round.</td></tr>
+      <tr><td>Fits entirely in the 15 × 15 × 7 cm IKEA 365+; only connectors, switches and buttons may stick out</td><td>Pi 3 A+ 65 × 56 mm (B: 85 × 56 mm), about 30 mm tall with the HAT. The antenna sits inside: a 35 × 9 mm flex omni, vertical, as high as possible on a wall.</td></tr>
       <tr><td>Operates autonomously</td><td>A battery and a power switch. Nothing plugged in during a round.</td></tr>
       <tr><td>At least one Tx/Rx switch or button; a pilot light that blinks in Tx/Rx</td><td>Panel pushbutton for GO/STOP, a <b>TX/RX role switch</b> (the professor picks the sender after loading; Atenea Q8), and an activity LED. The box is transparent, so the LED can stay inside.</td></tr>
       <tr><td>Extra switches allowed (e.g. network mode), but <b>no switch indicating the position in the network</b></td><td>One optional SRI/MRM ↔ NM mode switch. Nothing that encodes a node number.</td></tr>
-      <tr><td>Drop test from table height to concrete (before MRM)</td><td>Everything soldered (no sockets or loose headers), board on standoffs, battery strapped, antenna glued down, <b>U.FL plug secured</b> (a drop of hot glue or a retention clip; a bare U.FL can pop off under shock).</td></tr>
-      <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on USB and the buttons. RF power is small (≤ 10 mW e.i.r.p.; ≤ 100 mW e.i.r.p. while hopping in SRI/MRM).</td></tr>
-      <tr><td>Modules shown at Quick Mode are final</td><td>The QM prototype uses the same Pico 2 and the same E01-ML01SP4 as the final board (on a breakout), and the same flex antenna.</td></tr>
-      <tr><td>Unit cost ≤ €150; lab-made PCB counts €15; everything (screws, foam, wires) goes in the BoM</td><td>Cheap modules; consider an external fab for the PCB (see the cost table).</td></tr>
+      <tr><td>Drop test from table height to concrete (before MRM)</td><td>Pi on M2.5 standoffs; HAT soldered to the header pins or held by four standoffs; <b>microSD taped or glued</b> (the Pi 3 slot holds it by friction only); battery strapped; antenna glued down; <b>U.FL plug secured</b>.</td></tr>
+      <tr><td>Designed to self-recover from interruptions</td><td>Linux boots in 10–30 s instead of the Pico's 0.3 s. Target ≤ 10 s, hardware watchdog through systemd, read-only root so a power cut cannot corrupt the card. Sim T19: one 30 s reboot in MRM still delivers the file in 90.8 s.</td></tr>
+      <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on the buttons and the 5 V input. RF power is small (≤ 10 mW e.i.r.p.; ≤ 100 mW e.i.r.p. while hopping in SRI/MRM).</td></tr>
+      <tr><td>Modules shown at Quick Mode are final</td><td>The QM prototype uses the same Pi 3 model and the same E01-ML01SP4 as the final board, and the same flex antenna. Q22 must be answered before 6 Nov.</td></tr>
+      <tr><td>Unit cost ≤ €150; lab-made PCB counts €15; everything (screws, foam, wires, owned boards) goes in the BoM</td><td>A Pi we already own still counts at market price.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -173,41 +175,40 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 flowchart LR
   BAT["18650 Li-ion, protected&lt;br/&gt;3.0–4.2 V"] --> SW["Power slide switch"]
   CHG["Charger MCP73831&lt;br/&gt;USB-C, charge only"] --> BAT
-  SW --> VSYS["Pico 2 VSYS"]
-  SW --> BST["5 V boost + current-limited switch&lt;br/&gt;ON only during USB load/save"]
-  BST --> USBA["USB-A host port&lt;br/&gt;(file stick)"]
-  VSYS --> PICO["Raspberry Pi Pico 2&lt;br/&gt;RP2350 · 4 MB flash"]
+  SW --> BST["5.1 V boost, 2.5 A or more&lt;br/&gt;always on"]
+  BST --> PI["Raspberry Pi 3 A+&lt;br/&gt;5 V on header pins 2 and 4&lt;br/&gt;WiFi/BT off or removed"]
+  PI --> USBA["Pi USB-A port&lt;br/&gt;(file stick)"]
   SW --> LDO["Radio LDO 3.3 V&lt;br/&gt;≥ 300 mA"]
   LDO --> RA["Radio: E01-ML01SP4&lt;br/&gt;nRF24L01+ PA/LNA"]
-  PICO -- "SPI0 + CSN/CE/IRQ" --> RA
-  PICO -- "PIO-USB D+/D−&lt;br/&gt;(ESD: USBLC6)" --> USBA
+  PI -- "SPI0 + CSN/CE/IRQ" --> RA
+  FG["Fuel gauge MAX17048"] -- "I2C1" --> PI
+  BAT --> FG
   RA -- "IPEX" --> ANT["Flex omni&lt;br/&gt;Molex 146153, vertical on a wall"]
-  BTN["GO/STOP button"] --> PICO
-  ROLE["Role switch TX/RX&lt;br/&gt;(Atenea Q8)"] --> PICO
-  MODE["Mode switch SRI/MRM ↔ NM"] --> PICO
-  PICO --> LED["Activity LED (blinks)&lt;br/&gt;+ status LED"]
+  BTN["GO/STOP button"] --> PI
+  ROLE["Role switch TX/RX&lt;br/&gt;(Atenea Q8)"] --> PI
+  MODE["Mode switch SRI/MRM ↔ NM"] --> PI
+  PI --> LED["Activity LED (blinks)&lt;br/&gt;+ status LED"]
 </pre>
   </div>
 </section>
 
 <section aria-labelledby="s-micro">
   <div class="col"><h2 id="s-micro">Micro module options</h2>
-  <p>Ranked against what the board must do: hold a 1 MB file, act as a USB host, use 3.3 V logic, carry no radio chip, stay cheap, and be ready before Quick Mode.</p></div>
+  <p>The team wants a Pi 3. The table ranks the Pi 3 variants and keeps the alternatives for comparison.</p></div>
   <div class="tbl"><table>
-    <thead><tr><th>Module</th><th>Storage for 1 MB file</th><th>USB host</th><th class="r">Price</th><th>Verdict</th><th>Notes</th></tr></thead>
+    <thead><tr><th>Module</th><th>Wireless chip</th><th>Draw at 5 V</th><th class="r">Price</th><th>Verdict</th><th>Notes</th></tr></thead>
     <tbody>
-      <tr class="hl"><td><b>Raspberry Pi Pico 2</b> (RP2350)</td><td>4 MB flash ✓</td><td>PIO-USB on 2 GPIOs, or native USB</td><td class="num r">~$5</td><td class="verdict"><span class="pill p-ok">recommended</span></td><td>Native USB stays free for programming and logs. Big community. Castellated edge, so it solders flat (good for the drop test).</td></tr>
-      <tr><td>Raspberry Pi Pico (RP2040)</td><td>2 MB flash, tight</td><td>Same as above</td><td class="num r">~$4</td><td class="verdict"><span class="pill p-warn">fallback</span></td><td>Works, but 1 MB of file plus firmware leaves little headroom.</td></tr>
-      <tr><td>Adafruit Feather RP2040 USB Host</td><td>8 MB flash ✓</td><td>USB-A on board</td><td class="num r">~$15</td><td class="verdict"><span class="pill p-warn">fastest prototype</span></td><td>Less to build, but costs more, and we would show less electronics design of our own (which is graded).</td></tr>
-      <tr><td>Teensy 4.1</td><td>8 MB flash ✓</td><td>Host port + library</td><td class="num r">~$35</td><td class="verdict"><span class="pill p-warn">expensive</span></td><td>Easiest USB host, but it hurts the cost category.</td></tr>
-      <tr><td>STM32F411 "Black Pill"</td><td>512 KB ✗</td><td>Native OTG</td><td class="num r">~$5</td><td class="verdict"><span class="pill p-warn">needs extra flash</span></td><td>Would need external flash, and USB mass-storage host firmware is heavier.</td></tr>
-      <tr><td>Arduino Uno / Nano (AVR)</td><td>✗</td><td>✗</td><td class="num r">—</td><td class="verdict"><span class="pill p-bad">no</span></td><td>5 V logic (the radio is 3.3 V only), 2 KB RAM, no USB host.</td></tr>
-      <tr><td>Raspberry Pi Zero (non-W)</td><td>SD card ✓</td><td>✓</td><td class="num r">~$5–10</td><td class="verdict"><span class="pill p-bad">no</span></td><td>Linux: slow boot, high current, and SD corruption on power loss or a drop.</td></tr>
-      <tr><td>Pico W / Pico 2 W, ESP32, Nano 33 BLE/IoT, Uno R4 WiFi, Pi Zero W, Pi 3/4/5</td><td>—</td><td>—</td><td class="num r">—</td><td class="verdict"><span class="pill p-bad">banned</span></td><td>On-board WiFi/BT chip.</td></tr>
-      <tr><td>Micro + radio combos (Feather RP2040 RFM69, Moteino)</td><td>—</td><td>—</td><td class="num r">—</td><td class="verdict"><span class="pill p-bad">avoid</span></td><td>Risks the "single commercial module embedding the entire system" rule. Would need an Atenea answer first.</td></tr>
+      <tr class="hl"><td><b>Raspberry Pi 3 Model A+</b></td><td>CYW43455, off or removed</td><td class="num">~0.30–0.40 A</td><td class="num r">~€27</td><td class="verdict"><span class="pill p-ok">suggested</span></td><td>Lowest draw and smallest Pi 3 (65 × 56 mm); one USB port wired straight to the SoC; no Ethernet or hub chip to power. Built until at least Jan 2030.</td></tr>
+      <tr><td>Raspberry Pi 3 Model B</td><td>BCM43438, off or removed</td><td class="num">~0.35–0.45 A</td><td class="num r">~€37</td><td class="verdict"><span class="pill p-ok">if owned</span></td><td>85 × 56 mm, 4 USB ports behind a LAN9514 hub. Fine if the team already has them.</td></tr>
+      <tr><td>Raspberry Pi 3 Model B+</td><td>CYW43455, off or removed</td><td class="num">~0.45–0.60 A</td><td class="num r">~€40</td><td class="verdict"><span class="pill p-warn">highest draw</span></td><td>Shortest battery life of the three.</td></tr>
+      <tr><td>Compute Module 3+ (Lite)</td><td>None</td><td class="num">~0.3 A</td><td class="num r">~€27–33</td><td class="verdict"><span class="pill p-warn">fallback</span></td><td>Same processor with no wireless chip at all, if Atenea says the chip must go and desoldering fails. Needs a SODIMM carrier we would design. Stock is patchy.</td></tr>
+      <tr><td>Raspberry Pi Zero (non-W)</td><td>None</td><td class="num">~0.1–0.2 A</td><td class="num r">~€5–10</td><td class="verdict"><span class="pill p-warn">alternative</span></td><td>Linux too, no wireless question, a third of the draw. Single core, so real-time timing is harder; the USB host needs an OTG adapter.</td></tr>
+      <tr><td>Raspberry Pi Pico 2 (RP2350)</td><td>None</td><td class="num">~0.03–0.05 A</td><td class="num r">~€5</td><td class="verdict"><span class="pill p-mute">previous plan</span></td><td>Cheapest, 0.3 s reboot, exact timing. Its port (PIO-USB, flash rules) stays in git history.</td></tr>
+      <tr><td>Pico W / Pico 2 W, ESP32, Nano 33 BLE/IoT, Uno R4 WiFi, Pi Zero W, Pi 4/5</td><td>—</td><td>—</td><td class="num r">—</td><td class="verdict"><span class="pill p-bad">banned</span></td><td>On-board WiFi/BT chip, and nothing to gain over the Pi 3.</td></tr>
+      <tr><td>Micro + radio combos (Feather RP2040 RFM69, Moteino)</td><td>—</td><td>—</td><td class="num r">—</td><td class="verdict"><span class="pill p-bad">avoid</span></td><td>Risks the "single commercial module embedding the entire system" rule.</td></tr>
     </tbody>
   </table></div>
-  <p class="col sub">Prices are list prices seen online on 7 Oct 2026 (Raspberry Pi, TME, Adafruit). Get real quotes before ordering.</p>
+  <p class="col sub">Prices are estimates seen online in October 2026. Get real quotes before ordering.</p>
 </section>
 
 <section aria-labelledby="s-bom">
@@ -216,19 +217,20 @@ flowchart LR
   <div class="tbl"><table>
     <thead><tr><th>Function</th><th>Suggested part</th><th>Why</th><th class="r">≈ € / device</th></tr></thead>
     <tbody>
-      <tr><td>Micro module</td><td>Raspberry Pi Pico 2 (SC1631), <b>non-W</b></td><td>See above</td><td class="num r">5.5</td></tr>
+      <tr><td>Micro module</td><td>Raspberry Pi 3 Model A+ (B if owned)</td><td>See above. Owned boards count at market price</td><td class="num r">27–37</td></tr>
+      <tr><td>Storage</td><td>microSD 16 GB, high-endurance or industrial</td><td>Holds Linux and the files. Read-only root, small data partition</td><td class="num r">5–8</td></tr>
       <tr><td>Radio module</td><td>1 × Ebyte E01-ML01SP4 (nRF24L01P + PA/LNA, SMD, IPEX). <b>Not</b> E01C-* (clone chip)</td><td>Chip-controlled PA/LNA, so only SPI + CSN + CE + IRQ. Same module from the bench (on a breakout) to the final box</td><td class="num r">≈ 4–6</td></tr>
       <tr><td>Antenna</td><td>Molex 146153-0100 flex omni (34.9 × 9 mm, 100 mm cable, U.FL)</td><td>Plugs straight into the module. Vertical polarisation, mounted high on a wall</td><td class="num r">≈ 3</td></tr>
-      <tr><td>USB host port</td><td>USB-A receptacle, through-hole, panel-facing</td><td>Through-hole survives plugging and the drop test</td><td class="num r">0.5</td></tr>
-      <tr><td>5 V for the stick</td><td>Boost (e.g. TPS61023) + current-limited switch (e.g. TPS2051 / AP2552), enabled by a GPIO</td><td>Sticks need 5 V. Powered only during load/save, which saves energy and protects against shorts</td><td class="num r">2</td></tr>
-      <tr><td>ESD</td><td>USBLC6-2SC6 on D+/D−; TVS on VBUS and the button lines</td><td>ESD compliance; the USB port is touched every round</td><td class="num r">0.6</td></tr>
-      <tr><td>Battery</td><td>1 × protected 18650 Li-ion (~2500 mAh) with solder tabs, or holder + strap</td><td>Steel can is robust in the drop test; rechargeable (sustainability report)</td><td class="num r">6–8</td></tr>
-      <tr><td>Charger</td><td>MCP73831 (or TP4056) + USB-C receptacle, charge only</td><td>Charge between rounds without opening the box. Nothing is plugged in during operation</td><td class="num r">1.2</td></tr>
+      <tr><td>5 V for the Pi</td><td>Boost 5.1 V, ≥ 2.5 A out from 3.0–4.2 V (TPS61088-class + inductor; a ready-made 5 V 3 A module for the bench)</td><td>The Pi needs a steady 5 V; it flags undervoltage below 4.63 V. Near the 3.0 V cutoff the boost pulls about 2 A from the cell</td><td class="num r">3–5</td></tr>
+      <tr><td>Battery sense</td><td>MAX17048 fuel gauge on I2C1</td><td>The Pi has no ADC. Reads cell voltage and state of charge</td><td class="num r">2</td></tr>
+      <tr><td>Protection</td><td>TVS + reverse-polarity protection on the 5 V feed; TVS on the button lines</td><td>Feeding the header pins bypasses the Pi's own input protection</td><td class="num r">0.6</td></tr>
+      <tr><td>Battery</td><td>1 × protected 18650 Li-ion (3000 mAh or more) with solder tabs, or holder + strap; a second cell in parallel if needed</td><td>Steel can is robust in the drop test; rechargeable (sustainability report)</td><td class="num r">6–8</td></tr>
+      <tr><td>Charger</td><td>MCP73831 at 500 mA + USB-C receptacle, charge only</td><td>Charges a 3000 mAh cell overnight (6–7 h). Nothing is plugged in during operation</td><td class="num r">1.2</td></tr>
       <tr><td>Controls</td><td>Slide power switch, panel GO/STOP pushbutton, TX/RX role switch, optional mode switch, 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
-      <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533, dropout ≤ 0.1 V at 150 mA) + 100 µF / 10 µF / 100 nF at the module; 100 µF on USB VBUS</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts and stick inrush</td><td class="num r">1</td></tr>
-      <tr><td>PCB</td><td>2-layer carrier, ≤ 100 × 80 mm</td><td>ETSETB lab = €15 in the BoM (rule); an external fab is ~€1 per board but adds 1–2 weeks</td><td class="num r">1–15</td></tr>
-      <tr><td>Mechanics</td><td>M3 nylon standoffs, base plate, cable ties, hot glue, IKEA 365+ box</td><td>Drop test; the BoM must list them too</td><td class="num r">5–7</td></tr>
-      <tr><td class="total" colspan="3">Total per device (verify with quotes)</td><td class="num r total">≈ 30–55</td></tr>
+      <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533, dropout ≤ 0.1 V at 150 mA) from the cell + 100 µF / 10 µF / 100 nF at the module</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts. Never the Pi's 3V3 pin</td><td class="num r">1</td></tr>
+      <tr><td>PCB</td><td>2-layer HAT-style carrier, 65 × 56 mm (A+ outline), 40-pin header</td><td>ETSETB lab = €15 in the BoM (rule); an external fab is ~€1 per board but adds 1–2 weeks</td><td class="num r">1–15</td></tr>
+      <tr><td>Mechanics</td><td>M2.5 standoffs (58 × 49 mm pattern), base plate, cable ties, hot glue, tape for the SD card, IKEA 365+ box</td><td>Drop test; the BoM must list them too</td><td class="num r">5–7</td></tr>
+      <tr><td class="total" colspan="3">Total per device (verify with quotes)</td><td class="num r total">≈ 70–90</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -238,25 +240,31 @@ flowchart LR
   <div class="grid2">
     <div class="card"><h3>Current draw</h3>
       <dl class="kv">
-        <dt>Pico 2 running</dt><dd class="num">≈ 30–50 mA <span class="tag t-est">estimate</span></dd>
+        <dt>Pi 3 A+ at 5 V</dt><dd class="num">≈ 0.30–0.40 A, one core busy-waiting for the radio <span class="tag t-est">estimate</span></dd>
         <dt>SP4 TX</dt><dd class="num">≈ 120 mA peak <span class="tag t-ver">datasheet</span></dd>
         <dt>SP4 RX</dt><dd class="num">≈ 26 mA <span class="tag t-ver">datasheet</span></dd>
-        <dt>USB stick (5 V)</dt><dd class="num">50–100 mA, only during load/save <span class="tag t-est">estimate</span></dd>
-        <dt>Peak on the radio LDO</dt><dd class="num">≈ 120 mA (the radio does not load the Pico's 3V3)</dd>
+        <dt>USB stick (Pi port)</dt><dd class="num">50–100 mA, only during load/save <span class="tag t-est">estimate</span></dd>
+        <dt>From the cell</dt><dd class="num">≈ 0.5–0.8 A; up to ≈ 2 A at boot near 3.0 V</dd>
       </dl></div>
     <div class="card"><h3>Battery sizing</h3>
-      <p>A sending round averages about 150 mA. Idle with the radio listening is about 70 mA. A full competition day of ~4 hours powered on needs about <b>300–600 mAh</b>.</p>
-      <p>One 2500 mAh 18650 covers that about four times over. A smaller LiPo would also do, but pouch cells are more fragile in the drop test.</p></div>
-    <div class="card"><h3>Low battery: the LDO is fine</h3>
-      <p>The LDO gives a clean 3.3 V down to a cell of about 3.4 V (dropout ≤ 0.1 V at 150 mA). Below that it passes the cell through: about 2.95 V at the 3.0 V cutoff, still inside the SP4's 2.0–3.6 V. The cell spends ~90 % of its charge above 3.4 V. An LDO after the 5 V boost (~60 % efficient, boost ripple at the radio) or a 5 V battery would be worse.</p>
+      <p>Usable energy of one 3000 mAh cell is about 3.0 Ah × 3.6 V × 85 % boost efficiency ≈ 9.2 Wh. With the radio's ~0.15 W that gives:</p>
       <ul>
-        <li><b>Battery sense:</b> an ideal diode (e.g. LM66100) instead of the Schottky into VSYS, so ADC3 reads the cell.</li>
-        <li><b>Firmware:</b> ≥ 3.5 V normal; 3.4–3.5 V warning LED; below 3.4 V at setup a loud warning (never block a round); below 3.2 V write received data to flash after every burst.</li>
-        <li><b>T0</b> measures the radio output at 3.6, 3.3 and 3.0 V.</li>
-        <li><b>Fallback:</b> a buck-boost (TPS63001/TPS63020) if T0 shows more than 2 dB less output at 3.0 V; it needs a filter at the module.</li>
+        <li>Pi 3 A+, 1.7–2.2 W: <b>4.2–5.4 h</b></li>
+        <li>Pi 3 B, 2.0–2.4 W: 3.8–4.6 h</li>
+        <li>Pi 3 B+, 2.4–3.2 W: 2.9–3.8 h</li>
+      </ul>
+      <p>A competition day of ~4 h powered on fits the A+ on one cell, barely. Use two cells in parallel, or switch the box off between rounds (boot ≤ 10 s). Measure the real draw at T0.</p></div>
+    <div class="card"><h3>Low battery</h3>
+      <p>The radio LDO from the cell is still fine: a clean 3.3 V down to a cell of about 3.4 V, about 2.95 V at the 3.0 V cutoff, inside the SP4's 2.0–3.6 V. The new weak point is the <b>5 V boost</b>: if it sags below 4.63 V the Pi throttles, and lower it crashes.</p>
+      <ul>
+        <li><b>Battery sense:</b> MAX17048 on I2C1 (no ideal diode needed any more). The firmware also reads the Pi's undervoltage flag (<span class="mono">vcgencmd get_throttled</span>) and logs it.</li>
+        <li><b>Firmware:</b> thresholds (3.5 / 3.4 / 3.2 V) re-measured at T0 under the Pi's load, since the cell sags more at 0.5–1 A. Below the lowest, fsync received data after every burst.</li>
+        <li><b>T0</b> measures the radio output and the Pi's current at 3.6, 3.3 and 3.0 V.</li>
+        <li><b>Boost:</b> size the inductor and switch for 2 A input at 3.0 V; 100 µF or more at the Pi's 5 V pins.</li>
+        <li><b>Radio fallback</b> (unchanged): a buck-boost (TPS63001/TPS63020) if T0 shows more than 2 dB less output at 3.0 V.</li>
       </ul></div>
     <div class="card"><h3>For the sustainability report</h3>
-      <p>We can measure watts per round directly on this design. The parts are rechargeable and RoHS. The modules unsolder and can be reused, and the board shape lets you repair rather than replace.</p></div>
+      <p>The Pi 3 box uses about 7× the energy of the Pico design (≈ 2 W against ≈ 0.3 W). In its favour: the Pi is reflashable, repairable and reusable after the course, and the HAT unplugs. We can measure watts per round directly with the fuel gauge.</p></div>
   </div>
 </section>
 
@@ -265,9 +273,9 @@ flowchart LR
   <div class="tbl"><table>
     <thead><tr><th>Stage</th><th>Board</th><th>Goal</th><th>Target</th></tr></thead>
     <tbody>
-      <tr><td>1 · Bench</td><td>Pico 2 + E01-ML01SP4 on a small breakout (1.27 → 2.54 mm) with its flex antenna, USB powered</td><td>Radio tests T0 (output power) and T2; USB-stick read/write via PIO-USB</td><td class="num">as soon as parts arrive</td></tr>
-      <tr><td>2 · Quick Mode</td><td>Perfboard, <b>same module part numbers</b>, external power allowed</td><td>One error-free line from a file in &lt; 2 min, first attempt</td><td class="num">week 6–7</td></tr>
-      <tr><td>3 · PCB rev A</td><td>Custom 2-layer carrier (KiCad), boxed, battery</td><td>Autonomous, drop-tested, range tests T4/T5</td><td class="num">week 8–9</td></tr>
+      <tr><td>1 · Bench</td><td>Pi 3 + E01-ML01SP4 on a small breakout (1.27 → 2.54 mm) wired to the header, radio LDO from a bench supply, Pi on its own 5 V supply</td><td>Radio tests T0 (output power, Pi noise in our band) and T2 (frame gap on Linux); USB-stick read/write on the Pi's port</td><td class="num">as soon as parts arrive</td></tr>
+      <tr><td>2 · Quick Mode</td><td>Perfboard HAT, <b>same Pi model and module part numbers</b>, external power allowed</td><td>One error-free line from a file in &lt; 2 min, first attempt</td><td class="num">week 6–7</td></tr>
+      <tr><td>3 · PCB rev A</td><td>HAT-style carrier (KiCad), boxed, battery</td><td>Autonomous, drop-tested, range tests T4/T5</td><td class="num">week 8–9</td></tr>
       <tr><td>4 · PCB rev B</td><td>Fixes from rev A</td><td>Pretest (4 Dec) fully packaged</td><td class="num">week 10–11</td></tr>
     </tbody>
   </table></div>
@@ -278,13 +286,15 @@ flowchart LR
   <div class="tbl"><table>
     <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
     <tbody>
-      <tr><td>PIO-USB host fails with some USB sticks</td><td>Test 3–4 different sticks in stage 1 (FAT32 and exFAT, formatted on Windows and on a Mac; the firmware reads both and MBR or GPT layouts, host-tested). We bring our own sticks. The RP2350's native USB can also be a host, so a second path exists on the same chip.</td></tr>
-      <tr><td>The foil-wrapped setup makes the USB port hard to reach</td><td>Put the port on a side wall. Ask on Atenea whether the foil may be opened at the port during the 5-min setup.</td></tr>
-      <tr><td>Brown-out or noise during radio TX</td><td>Separate radio LDO and bulk capacitance at each module; battery sense on ADC3 with firmware thresholds; check the radio at 3.0 V in T0 and the box at low charge in stage 3.</td></tr>
+      <tr><td>The professors require the WiFi/BT chip to be removed</td><td>Atenea Q22 before Quick Mode. Try desoldering on one spare board now. Last resort: Compute Module 3+ (no chip).</td></tr>
+      <tr><td>SD card corrupted by a power cut or the drop test</td><td>Read-only root (overlayfs) with a small data partition, high-endurance card, card taped or glued in its slot.</td></tr>
+      <tr><td>Linux reboot after an "attack" or a brown-out takes 10–30 s</td><td>Boot ≤ 10 s target, hardware watchdog via systemd, resume from the last acknowledged line (sim T19: 90.8 s in MRM with a 30 s reboot).</td></tr>
+      <tr><td>The 5 V boost sags at low charge and the Pi crashes</td><td>Boost sized for 2 A input at 3.0 V, bulk capacitance, fuel gauge warning, a second cell in parallel if T0 shows trouble.</td></tr>
+      <tr><td>Pi clocks (6 × 400 MHz = 2400 MHz, HDMI) add noise in our band</td><td>HDMI off, SP4 at the board edge away from the SoC, antenna high on the wall; T0 logs RPD hits per hop channel with the Pi idle and busy, and drops a bad channel.</td></tr>
+      <tr><td>The foil-wrapped setup makes the USB port hard to reach</td><td>A Pi USB port facing a side wall, or a short internal extension to a panel socket. Atenea Q6 asks whether the foil may be opened at the port.</td></tr>
       <tr><td>Clone radio chips (Si24R1)</td><td>Buy only the plain E01-ML01SP4 part number from Ebyte's store or a distributor; T0/T2 check the chip.</td></tr>
-      <tr><td>SMD module needs a breakout before any PCB exists</td><td>A one-evening lab board (or careful wiring) in stage 1; the carrier PCB takes over in stage 3.</td></tr>
-      <tr><td>Drop test breaks a joint or ejects the battery</td><td>No sockets; standoffs; strapped cell; drop rev A on purpose in week 9.</td></tr>
-      <tr><td>The "attacks" interrupt the link mid-round</td><td>Watchdog and brown-out reset; firmware resumes from the last acknowledged line (protocols team).</td></tr>
+      <tr><td>SMD module needs a breakout before any PCB exists</td><td>A one-evening lab board (or careful wiring) in stage 1; the HAT takes over in stage 3.</td></tr>
+      <tr><td>Drop test pulls the HAT off the header or ejects the SD card or battery</td><td>HAT soldered or on four standoffs; SD taped; strapped cell; drop rev A on purpose in week 9.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -292,16 +302,16 @@ flowchart LR
 <section aria-labelledby="s-ask">
   <div class="col"><h2 id="s-ask">What we need from electronics</h2>
   <ol>
-    <li>Agree or counter-propose the micro by <b>Fri 16 Oct</b>, so we can order together with the radio modules.</li>
-    <li>Confirm the E01-ML01SP4 and the radio LDO, say who makes its bench breakout, and pick the PCB route (lab at €15, or external fab).</li>
-    <li>Pin map for SPI and the radio's CSN, CE and IRQ (proposal: GP16/18/19, CSN GP17, CE GP20, IRQ GP21), PIO-USB D+/D−, button, role switch, LEDs and mode switch. We will write the radio's hardware layer against it.</li>
+    <li>Confirm the Pi 3 model (A+ suggested) and how many boards we already have, by <b>Fri 23 Oct</b>. The radio order (SP4s, antennas, pigtails) goes out now regardless; the Pico 2s are dropped from it.</li>
+    <li>Try desoldering the WiFi/BT chip on one spare board, then check that the Pi still boots and that SPI and USB work.</li>
+    <li>Confirm the pin map (proposal: SPI0 on GPIO 9/10/11, CSN = CE0 on GPIO 8, CE GPIO 22, IRQ GPIO 24, I2C1 GPIO 2/3 for the fuel gauge, button GPIO 17, role switch GPIO 27, mode switch GPIO 23, LEDs GPIO 5/6). The full table is on the Pi 3 Switch page.</li>
+    <li>The power tree: 5.1 V boost part, fuel gauge, protection on the 5 V feed. The KiCad brief (<span class="mono">hw/KICAD_SESSION_PROMPT.md</span>) is updated for the HAT.</li>
     <li>The IKEA box's inside height and where the antenna can sit highest.</li>
-    <li>Book Prof. Chávez or Prof. Jiménez to review this block diagram and the lab's PCB capabilities.</li>
   </ol></div>
 </section>
 
 <footer>
-  <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.10. Firmware and USB: Team C Protocol Proposal v0.3.7. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
-  <p>Sources checked 7 Oct 2026: <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> (USB host/device via PIO, RP2040 and RP2350) · <a href="https://www.cnx-software.com/2024/08/08/raspberry-pi-pico-2-raspberry-pi-rp2350-dual-core-risc-v-or-arm-cortex-m33-microcontroller/">Pico 2 specs</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
+  <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.11. Firmware and USB: Team C Protocol Proposal v0.4. Pi 3 analysis: <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a>. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Sources checked 18 Oct 2026: <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/">Pi 3 A+</a> · <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b/">Pi 3 B</a> · <a href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html">Pi power and USB documentation</a> · <a href="https://pidramble.com/node/27">measured Pi 3 current</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>

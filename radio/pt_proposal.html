@@ -127,7 +127,16 @@ td.total{font-weight:600}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Protocols &amp; Software Team</div>
   <h1>Protocol and firmware proposal</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.3.7 · Sat 17 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Ibrahim, Guillem, Sofia</span><span><b>Version</b> 0.4 · Sun 18 Oct 2026</span></div>
+  <div class="lede" style="margin:.7rem 0"><b>New in v0.4 (18 Oct): the boxes run on a Raspberry Pi 3 with Linux</b> instead of the Pico 2 (the team's request; analysis on the <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a> page). The protocol, frames, NM spec and all C modules stay. What changes on your side:
+    <ul class="tight">
+      <li>A Linux <b>HAL</b>: spidev with one ioctl per radio command, CE and IRQ through libgpiod, busy-wait microsecond delays.</li>
+      <li>A Linux <b>environment</b>: timerfd + epoll, and a radio thread with real-time priority on an isolated core.</li>
+      <li>Files on the <b>SD card</b> instead of raw flash, with fsync; read-only root so a power cut cannot corrupt the card.</li>
+      <li>The stick on the Pi's own USB port: our FatFs code reads the raw block device, so the 109 checks stay valid. TinyUSB and PIO-USB are gone.</li>
+      <li>A Linux boot takes 10–30 s, so a reboot costs more. New simulator test <b>T19</b>: MRM with a 30 s reboot still delivers the file in 90.8 s. Target a boot of 10 s or less.</li>
+      <li>Goodput may drop from 107 to about <b>97 kbps</b> if the gap between frames grows to 0.5 ms on Linux. That is still well above what we need.</li>
+    </ul></div>
   <div class="lede" style="margin:.7rem 0"><b>New in v0.3.7 (17 Oct):</b> a <a href="#s-specs">Protocol specs</a> section that says where every interface is defined. Among them is the <b><a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM interop spec</a></b> to share with the other teams: radio registers, frame, gossip rules and a test vector. The NM channel moves to <b>RF_CH 77</b>, off the BLE advertising channel at 2480 MHz. Fixes from the 16-Oct code review:
     <ul class="tight">
       <li>a <b>POLL</b> frame recovers a lost ACK without resending the whole burst;</li>
@@ -153,7 +162,7 @@ td.total{font-weight:600}
     <li><b>Resume after any interruption.</b> A HELLO handshake identifies the file, and the receiver keeps its progress, so an "attack" or a reboot costs seconds, not the round.</li>
     <li><b>Network Mode: gossip, not routing.</b> Every node rebroadcasts the small file (~20 frames) on a randomised timer (Trickle-style). No addresses or positions are needed, and every node ends up with a copy (that is how teams win NM). It needs agreement with all teams.</li>
     <li><b>Specs:</b> every interface has one file that defines it (<a href="#s-specs">Protocol specs</a>). The <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM interop spec</a> is the one to share with the other teams.</li>
-    <li><b>Firmware: C on the Pico SDK</b>, with the radio loop on one core and USB/flash/compression on the other. Build a <b>PC simulator first</b> so the protocol is tested before boards exist.</li>
+    <li><b>Software: our C code as one Linux program on the Raspberry Pi 3</b>, started by systemd at boot. The radio loop runs in a real-time thread on its own core; USB, files and compression run in the main thread. The <b>PC simulator</b> runs the same protocol code, so it is tested before boards exist.</li>
   </ol>
 </section>
 
@@ -168,12 +177,12 @@ td.total{font-weight:600}
       <tr><td>SRI/MRM link frames</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/frames.h"><span class="mono">proto/src/frames.h</span></a> · <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/link.h"><span class="mono">link.h</span></a></td><td>DATA, ACK, HELLO, HELLO_ACK, END, POLL; timers; ARQ and resume (<a href="#s-frames">frames</a>, <a href="#s-link">procedure</a>)</td><td>Team C (both boxes)</td><td><span class="pill p-ok">in the simulator</span></td></tr>
       <tr><td>Radio profiles</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/radio/phy_config.py"><span class="mono">radio/phy_config.py</span></a> → <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/radio/fw/nrf24_config.h"><span class="mono">radio/fw/nrf24_config.h</span></a></td><td>Register values per mode (TEAM_250K, TEAM_FHSS, NM_COMMON, option B), hop order, COT and idle times, power caps</td><td>Team C; NM_COMMON is copied into the NM spec</td><td><span class="pill p-ok">checked, 244 driver tests</span></td></tr>
       <tr><td>Radio driver API</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/radio/fw/nrf24.h"><span class="mono">radio/fw/nrf24.h</span></a></td><td><span class="mono">nrf24_send</span>, <span class="mono">nrf24_poll_rx</span>, <span class="mono">nrf24_cca</span>, <span class="mono">nrf24_fhss_channel</span>, the HAL to port</td><td>PT + RT</td><td><span class="pill p-ok">host-tested</span></td></tr>
-      <tr><td>Codec</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/codec.h"><span class="mono">proto/src/codec.h</span></a></td><td>One deflate stream through 4 KB buffers, flash to flash</td><td>Team C</td><td><span class="pill p-ok">in the simulator</span></td></tr>
-      <tr><td>USB stick I/O</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/usb_msc.h"><span class="mono">proto/src/usb_msc.h</span></a> · <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/port/pico/README.md"><span class="mono">port/pico/README.md</span></a></td><td>Input-file choice, load, safe save (.part → verify → rename), FAT/exFAT, MBR/GPT sticks</td><td>Team C</td><td><span class="pill p-warn">host-tested; Pico glue not compiled</span></td></tr>
+      <tr><td>Codec</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/codec.h"><span class="mono">proto/src/codec.h</span></a></td><td>One deflate stream through 4 KB buffers, file to file (system zlib)</td><td>Team C</td><td><span class="pill p-ok">in the simulator</span></td></tr>
+      <tr><td>USB stick I/O</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/usb_msc.h"><span class="mono">proto/src/usb_msc.h</span></a></td><td>Input-file choice, load, safe save (.part → verify → rename), FAT/exFAT, MBR/GPT sticks</td><td>Team C</td><td><span class="pill p-warn">host-tested; Linux block-device glue to write</span></td></tr>
       <tr><td>Relay log format</td><td><a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/blob/main/proto/src/nm_log.h"><span class="mono">proto/src/nm_log.h</span></a></td><td>NM_LOG.TXT written next to the NM-file</td><td>Team C (others may copy it)</td><td><span class="pill p-ok">in the simulator</span></td></tr>
     </tbody>
   </table></div>
-  <p class="col sub">Pico 2 environment contract: <span class="mono">proto/src/proto_env.h</span>. Call <span class="mono">on_tx_idle</span> after every transmission, and <span class="mono">send</span> must queue a frame, never drop it. Test commands: <span class="mono">make -C proto test</span> and <span class="mono">make -C radio/fw test</span>.</p>
+  <p class="col sub">Environment contract: <span class="mono">proto/src/proto_env.h</span> (on the Pi: timerfd + epoll for timers, <span class="mono">getrandom</span> for random numbers). Call <span class="mono">on_tx_idle</span> after every transmission, and <span class="mono">send</span> must queue a frame, never drop it. Test commands: <span class="mono">make -C proto test</span> and <span class="mono">make -C radio/fw test</span>.</p>
 </section>
 
 <section class="col" aria-labelledby="s-rules">
@@ -199,7 +208,7 @@ td.total{font-weight:600}
   <div class="mermaid-wrap">
 <pre class="mermaid">
 flowchart TB
-  APP["File / application&lt;br/&gt;USB stick ⇄ flash, byte-exact"] --> CMP["Compression&lt;br/&gt;one deflate stream, 4 KB buffers, flash to flash"]
+  APP["File / application&lt;br/&gt;USB stick ⇄ SD card, byte-exact"] --> CMP["Compression&lt;br/&gt;one deflate stream, 4 KB buffers, file to file"]
   CMP --> TRN["Transport / session&lt;br/&gt;HELLO, resume, end of file"]
   TRN --> LNK["Link&lt;br/&gt;selective-repeat ARQ, 16-frame bursts, bitmap ACK, POLL"]
   LNK --> MAC["Channel access&lt;br/&gt;SRI: one channel, 10 mW · MRM: hopping + listen-before-talk, 20 dBm · NM: Trickle gossip"]
@@ -238,7 +247,7 @@ sequenceDiagram
     end
   end
   TX->>RX: END
-  Note over RX: STOP: decompress what arrived in order, save to flash, then to USB
+  Note over RX: STOP: decompress what arrived in order, save to the SD card, then to USB
 </pre>
   </div>
   <div class="grid2">
@@ -254,8 +263,8 @@ sequenceDiagram
       <p>If the last ACK showed a clean window, an ACK timeout most likely lost only the ACK: send a 2-byte <b>POLL</b> first, and resend the burst only if that times out too.</p>
       <p>After 8 silent timeouts, send HELLO again with backoff. 250 kbps is already the nRF24's slowest rate, so there is no slower fallback. Never give up before STOP.</p></div>
     <div class="card"><h3>Recovering from attacks</h3>
-      <p>Jamming or shadowing only looks like lost ACKs, and the retry loop covers it. A reboot of either box is handled by HELLO. The receiver keeps <span class="mono">next_seq</span> and the data in flash, and the sender re-reads the file from flash.</p>
-      <p>Hardware watchdog on both cores, plus brown-out reset.</p></div>
+      <p>Jamming or shadowing only looks like lost ACKs, and the retry loop covers it. A reboot of either box is handled by HELLO. The receiver keeps <span class="mono">next_seq</span> and the data on the SD card (fsync before it counts as committed), and the sender re-reads the file from the card.</p>
+      <p>Hardware watchdog through systemd (<span class="mono">RuntimeWatchdogSec</span>). A Linux reboot takes 10–30 s, not 0.3 s: simulator T19 (MRM, 30 s down) still delivers the file in 90.8 s. Target a boot of 10 s or less.</p></div>
   </div>
 </section>
 
@@ -266,14 +275,14 @@ sequenceDiagram
     <thead><tr><th>Method</th><th class="r">UTF-8</th><th class="r">UTF-16LE</th><th>Notes</th></tr></thead>
     <tbody>
       <tr class="hl"><td><b>deflate, one stream</b> (zlib level 6–9)</td><td class="num r">2.97×</td><td class="num r">4.7–4.8×</td><td>Recommended. The receiver inflates progressively as frames arrive in order.</td></tr>
-      <tr><td>deflate, independent 32 KB blocks</td><td class="num r">2.74×</td><td class="num r">4.31×</td><td>Not needed: after a reboot the receiver keeps its received prefix in flash and resumes the same stream.</td></tr>
+      <tr><td>deflate, independent 32 KB blocks</td><td class="num r">2.74×</td><td class="num r">4.31×</td><td>Not needed: after a reboot the receiver keeps its received prefix on the SD card and resumes the same stream.</td></tr>
       <tr><td>deflate, independent 4 KB blocks</td><td class="num r">2.23×</td><td class="num r">3.32×</td><td>Only needed if delivery were out of order. It isn't.</td></tr>
       <tr><td>deflate, independent 1 KB blocks</td><td class="num r">1.89×</td><td class="num r">2.56×</td><td></td></tr>
-      <tr><td>lzma / bz2, whole file</td><td class="num r">3.3×</td><td class="num r">6.3–6.4×</td><td>Better ratio, but too much RAM and CPU for the micro. Reference only.</td></tr>
+      <tr><td>lzma / bz2, whole file</td><td class="num r">3.3×</td><td class="num r">6.3–6.4×</td><td>Better ratio. Too heavy for the Pico, but feasible on the Pi 3 (1 GB RAM): about 10 % fewer bytes in UTF-8 and about 25 % fewer in UTF-16 than deflate. Worth trying once the deflate path works; the receiver can still decode the prefix it got.</td></tr>
     </tbody>
   </table></div>
-  <div class="callout">On the Pico 2, compress during the 5-minute setup, <b>streaming</b>: <span class="mono">codec_deflate_stream</span> reads the original from flash and writes the compressed stream to flash through 4 KB buffers, so the 1 MB file never sits in RAM. With miniz built with <span class="mono">TDEFL_LESS_MEMORY=1</span>, deflate needs about 170 KB and inflate about 45 KB <span class="tag t-est">estimate</span>, well inside 520 KB. The receiver inflates its received prefix from flash straight to the USB stick at STOP. Measure the speed on the bench and drop the level if setup gets tight.
-    <br><b>Raw fallback</b> (<span class="mono">codec = NONE</span>): only if deflate fails on the Pico. The 16-bit sequence number covers 1.83 MB, so a raw 2 MB UTF-16 file would deliver only its first 1.83 MB (simulator T16: 8 448 of 10 000 lines).</div>
+  <div class="callout">On the Pi 3, compress during the 5-minute setup with the system zlib. <span class="mono">codec_deflate_stream</span> still streams file to file through 4 KB buffers; with 1 GB of RAM that is no longer necessary, but it does no harm. Deflating 1 MB at level 9 takes under a second on the Pi's Cortex-A53. The receiver inflates its received prefix from the SD card straight to the USB stick at STOP.
+    <br><b>Raw fallback</b> (<span class="mono">codec = NONE</span>): only if deflate fails. The 16-bit sequence number covers 1.83 MB, so a raw 2 MB UTF-16 file would deliver only its first 1.83 MB (simulator T16: 8 448 of 10 000 lines).</div>
   <div class="tbl"><table>
     <thead><tr><th>Effect per 2-min round (1 MB file, 250 kbps, 107 kbps goodput)</th><th class="r">Time to send all of it (model, no loss)</th><th class="r">Simulator, 5 % loss</th></tr></thead>
     <tbody>
@@ -297,7 +306,7 @@ sequenceDiagram
   participant S as Next box (South rim)
   participant C as Boxes further on (corner, East rim)
   participant R as Receiver (NE end)
-  Note over O: Setup: NM-file from the USB stick into flash (usb_msc), cut into ~20 chunks of 25 B (≤ 64)
+  Note over O: Setup: NM-file from the USB stick to the SD card (usb_msc), cut into ~20 chunks of 25 B (≤ 64)
   Note over O,R: GO. Every box on RF_CH 77, 250 kbps, 10 mW, no chip ACKs, no addresses
   loop every Trickle interval I (random point in I/2..I, I = 1 s doubling to 8 s)
     O-)S: NM_DATA x 20 [0x4E, file_id, idx, total, 25 B, CRC-16]
@@ -306,7 +315,7 @@ sequenceDiagram
   S-)O: rebroadcasts what it holds (O hears duplicates and stays quiet after 3 copies per chunk)
   S-)C: the same frames reach one box further
   C-)R: relayed along the rim, with no routing
-  Note over R: all chunks held and file_id = CRC-16 of the whole file: write the NM-file to flash
+  Note over R: all chunks held and file_id = CRC-16 of the whole file: write the NM-file to the SD card
   Note over O,R: until STOP every box keeps gossiping, ever more slowly (I up to 8 s), so late boxes still catch up
   Note over O,R: STOP: every box writes the NM-file and NM_LOG.TXT to a USB stick (3 min)
 </pre>
@@ -320,7 +329,7 @@ flowchart LR
   N -- yes --> S["store it, log the time&lt;br/&gt;reset I = 1 s"]
   N -- no --> D["count a duplicate"]
   S --> F{"all chunks held and&lt;br/&gt;CRC-16(file) = file_id?"}
-  F -- yes --> W["write the NM-file to flash"]
+  F -- yes --> W["write the NM-file to the SD card"]
   T["Trickle timer fires&lt;br/&gt;(random in I/2..I)"] --> K{"3 copies per chunk&lt;br/&gt;heard this interval?"}
   K -- no --> B["broadcast every chunk held"]
   K -- yes --> Q["skip this turn"]
@@ -334,7 +343,7 @@ flowchart LR
         <li>The sender (SW corner) starts with the whole file.</li>
         <li>Every node keeps every valid chunk with the same <span class="mono">file_id</span>. When it hears its first new chunk, it starts rebroadcasting everything it holds.</li>
         <li>Rebroadcast interval: random in [I/2, I], starting at I = 1 s and doubling up to 8 s. Skip a turn if 3 or more identical copies were heard in that interval.</li>
-        <li>Once all <span class="mono">total</span> chunks are held and the CRC-16 of the whole file equals <span class="mono">file_id</span>, the node writes the file to flash; otherwise it starts over. It saves the file to USB after STOP.</li>
+        <li>Once all <span class="mono">total</span> chunks are held and the CRC-16 of the whole file equals <span class="mono">file_id</span>, the node writes the file to the SD card; otherwise it starts over. It saves the file to USB after STOP.</li>
       </ul></div>
     <div class="card"><h3>Why it fits</h3>
       <ul>
@@ -364,7 +373,7 @@ chunk first held (s from GO):
  0:11.865 1:5.732 2:36.099 3:10.427 4:7.702 5:9.123 6:5.735 7:27.294
  8:7.705 9:13.479 10:10.435 11:28.072 12:2.874 13:28.075 14:5.539 15:13.486
  16:10.441 17:13.489 18:11.888 19:5.742</pre>
-  <p class="col sub">Still open: the output file name and encoding (Atenea Q9). Write the NM-file to flash the moment it completes, not only at STOP, so a brown-out cannot lose it.</p>
+  <p class="col sub">Still open: the output file name and encoding (Atenea Q9). Write the NM-file to the SD card (with fsync) the moment it completes, not only at STOP, so a brown-out cannot lose it.</p>
 </section>
 
 <section aria-labelledby="s-mrm">
@@ -379,33 +388,33 @@ chunk first held (s from GO):
 </section>
 
 <section aria-labelledby="s-fw">
-  <div class="col"><h2 id="s-fw">Firmware architecture (Pico 2 suggested to electronics)</h2></div>
+  <div class="col"><h2 id="s-fw">Software architecture (Raspberry Pi 3, Linux)</h2></div>
   <div class="tbl"><table>
     <thead><tr><th>Module</th><th>Runs on</th><th>Job</th><th>Owner</th></tr></thead>
     <tbody>
-      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>core 1</td><td>Radio driver, profiles, RPD carrier sense, clear-channel check and hop order for SRI/MRM hopping. <b>Done, 244 host checks.</b></td><td>RT</td></tr>
-      <tr><td class="mono">board_hal</td><td>—</td><td>SPI, pins, timers for the chosen board</td><td>RT + ET</td></tr>
-      <tr><td class="mono">link</td><td>core 1</td><td>Frames, bursts, ACK bitmap, POLL, timeouts (<span class="mono">proto/src/link.c</span>, in the simulator)</td><td>PT</td></tr>
-      <tr><td class="mono">session</td><td>core 1</td><td>HELLO / resume / END, role from the switch</td><td>PT</td></tr>
-      <tr><td class="mono">codec</td><td>core 0</td><td>miniz deflate at setup, streamed flash to flash in 4 KB pieces; inflate on the receiver at STOP (<span class="mono">codec.c</span>)</td><td>PT</td></tr>
-      <tr><td class="mono">store</td><td>core 0</td><td>Raw flash region (~3 MB) for the file sent and the file received, with a progress record; below 3.2 V flush after every burst</td><td>PT</td></tr>
-      <tr><td class="mono">usb_msc</td><td>core 0</td><td><b>Started 16 Oct:</b> portable part done (<span class="mono">proto/src/usb_msc.c</span>, FatFs R0.15a, FAT and exFAT, MBR and GPT sticks as macOS and Windows format them, UTF-8 file names; 109 host checks, cross-checked with pyfatfs). We bring our own FAT32/exFAT sticks. Pico glue (<span class="mono">proto/port/pico</span>) is a skeleton. TinyUSB host + PIO-USB + FatFs: copy the stick's .txt to flash, write the result back</td><td>PT</td></tr>
-      <tr><td class="mono">nm_gossip</td><td>core 1</td><td>Trickle timers, chunk store, relay trace for NM_LOG.TXT (<span class="mono">nm_log.c</span>)</td><td>PT</td></tr>
-      <tr><td class="mono">ui</td><td>core 0</td><td>Button, role and mode switches, LED patterns (the rules require a blinking pilot light); battery check on ADC3 (≥ 3.5 V ok, 3.4–3.5 V warning pattern, &lt; 3.4 V at setup loud warning, never block a round)</td><td>PT</td></tr>
+      <tr><td class="mono">radio/fw/nrf24 + crc16</td><td>radio thread</td><td>Radio driver, profiles, RPD carrier sense, clear-channel check and hop order for SRI/MRM hopping. <b>Done, 244 host checks.</b></td><td>RT</td></tr>
+      <tr><td class="mono">board_hal</td><td>radio thread</td><td><span class="mono">nrf24_hal_t</span> on Linux: spidev with a buffer transfer (one ioctl per command; CSN = CE0 driven by the kernel), CE and IRQ through libgpiod with kernel timestamps (hop acquisition needs them), <span class="mono">delay_us</span> as a busy-wait on <span class="mono">CLOCK_MONOTONIC</span> (usleep overshoots)</td><td>RT + PT</td></tr>
+      <tr><td class="mono">link</td><td>radio thread</td><td>Frames, bursts, ACK bitmap, POLL, timeouts (<span class="mono">proto/src/link.c</span>, in the simulator)</td><td>PT</td></tr>
+      <tr><td class="mono">session</td><td>radio thread</td><td>HELLO / resume / END, role from the switch</td><td>PT</td></tr>
+      <tr><td class="mono">codec</td><td>main thread</td><td>zlib deflate at setup, streamed file to file; inflate on the receiver at STOP (<span class="mono">codec.c</span>)</td><td>PT</td></tr>
+      <tr><td class="mono">store</td><td>I/O thread</td><td>Files on a small ext4 data partition for the file sent and the file received, with a progress record: <span class="mono">pwrite</span> + <span class="mono">fdatasync</span> off the radio thread (an SD sync takes 10–100 ms), <span class="mono">committed</span> advanced only after the sync; below 3.2 V sync after every burst</td><td>PT</td></tr>
+      <tr><td class="mono">usb_msc</td><td>main thread</td><td><b>Started 16 Oct:</b> portable part done (<span class="mono">proto/src/usb_msc.c</span>, FatFs R0.15a, FAT and exFAT, MBR and GPT sticks as macOS and Windows format them, UTF-8 file names; 109 host checks, cross-checked with pyfatfs). We bring our own FAT32/exFAT sticks. On the Pi, keep FatFs and give it the stick as a raw block device (<span class="mono">/dev/sda</span>, no automount, O_DIRECT reads, disk group): a small <span class="mono">usbm_disk_t</span>, and the tested code stays as it is. The Pico glue (TinyUSB + PIO-USB) is obsolete</td><td>PT</td></tr>
+      <tr><td class="mono">nm_gossip</td><td>radio thread</td><td>Trickle timers, chunk store, relay trace for NM_LOG.TXT (<span class="mono">nm_log.c</span>)</td><td>PT</td></tr>
+      <tr><td class="mono">ui</td><td>main thread</td><td>Button, role and mode switches, LED patterns through libgpiod (the rules require a blinking pilot light); battery check from the MAX17048 fuel gauge on I2C (the Pi has no ADC), thresholds re-measured at T0 (≥ 3.5 V ok, 3.4–3.5 V warning pattern, &lt; 3.4 V at setup loud warning, never block a round)</td><td>PT</td></tr>
     </tbody>
   </table></div>
-  <div class="callout">Pico pitfall: erasing or writing flash stalls code that runs from flash on <b>both</b> cores. Keep the radio loop in RAM (<span class="mono">__not_in_flash_func</span>), buffer received data in RAM, and write flash in 4 KB sectors between bursts. Test this early, because it is the classic way to lose a round.</div>
+  <div class="callout">Linux pitfall: the scheduler. A stock kernel can pause our process for up to about 1.1 ms; the receiver's idle-ACK timer (~4 ms) and the TX_DS timeout (~3.8 ms) are tight against that. Use a PREEMPT_RT kernel, run the radio thread SCHED_FIFO on an isolated core (<span class="mono">isolcpus=3</span>, <span class="mono">mlockall</span>), set <span class="mono">core_freq=250</span> so the SPI clock stays fixed, or widen both timers on Linux. Keep the root file system read-only (overlayfs) so a power cut or the drop test cannot corrupt the SD card. Test this early, because it is the classic way to lose a round.</div>
 </section>
 
 <section aria-labelledby="s-sim">
   <div class="col"><h2 id="s-sim">Simulator: results on the nRF24 radio <span class="pill p-ok" style="vertical-align:4px">updated 17 Oct</span></h2>
-  <p>The radio team built the simulator in <span class="mono">proto/</span>. It runs the <b>same C protocol code</b> planned for the Pico (link with resume, NM gossip, deflate) against a modelled channel:</p>
+  <p>The radio team built the simulator in <span class="mono">proto/</span>. It runs the <b>same C protocol code</b> that will run on the Pi 3 (link with resume, NM gossip, deflate) against a modelled channel:</p>
   <ul class="tight">
     <li>half-duplex radios, with airtime from the real driver; in hopping mode, each box has its own slot clock with crystal drift, and the receiver parks and re-syncs;</li>
     <li>collisions, and random or bursty loss;</li>
     <li>a jamming blackout, and reboots.</li>
   </ul>
-  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 20 scenarios plus 109 USB checks in about 2 seconds.</p></div>
+  <p>Scoring copies the judges: decompress, then count the first unbroken run of identical lines. <span class="mono">make -C proto test</span> runs 21 scenarios plus 109 USB checks in about 2 seconds.</p></div>
   <div class="tbl"><table>
     <thead><tr><th>Scenario (1 MB sample, deflate 2.62×, 250 kbps, seed 1)</th><th class="r">Lines</th><th class="r">Whole file in</th></tr></thead>
     <tbody>
@@ -413,7 +422,8 @@ chunk first held (s from GO):
       <tr><td>5 % random loss</td><td class="num r">10 000</td><td class="num r">27 s</td></tr>
       <tr><td>Bursty fades (~6 % loss)</td><td class="num r">10 000</td><td class="num r">29 s</td></tr>
       <tr><td>10 s jamming attack + 5 % loss</td><td class="num r">10 000</td><td class="num r">37 s · back 0.2 s after the attack</td></tr>
-      <tr><td>Receiver or sender reboot at 15 s, 5 % loss</td><td class="num r">10 000</td><td class="num r">28 s</td></tr>
+      <tr><td>Receiver or sender reboot at 15 s, 5 % loss (0.3 s down)</td><td class="num r">10 000</td><td class="num r">28 s</td></tr>
+      <tr><td>Same, but 30 s down (a Linux boot)</td><td class="num r">10 000</td><td class="num r">58 s</td></tr>
       <tr><td>1 Mbps (SRI option), 5 % loss</td><td class="num r">10 000</td><td class="num r">12 s</td></tr>
       <tr class="hl"><td>No compression, 5 % loss</td><td class="num r">10 000</td><td class="num r">71 s</td></tr>
       <tr><td>NM, 10 nodes, 10 % / 70 % loss at 1 / 2 hops</td><td class="num r">all nodes</td><td class="num r">12 s</td></tr>
@@ -421,13 +431,14 @@ chunk first held (s from GO):
       <tr class="hl"><td>Hopping + listen-before-talk (MRM baseline), 5 % loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">38 s</td></tr>
       <tr><td>Hopping, 25 % of hops busy, receiver reboot at 15 s (re-sync)</td><td class="num r">10 000</td><td class="num r">69 s</td></tr>
       <tr class="hl"><td>MRM, all four teams hopping at 20 dBm: 5 % data loss, 30 % ACK loss, 10 % of hops busy</td><td class="num r">10 000</td><td class="num r">58 s</td></tr>
+      <tr class="hl"><td>T19: MRM as above, receiver (Pi 3) reboots at 15 s and is down 30 s</td><td class="num r">10 000</td><td class="num r">91 s</td></tr>
       <tr><td>Stress: hopping with 30 % loss both ways</td><td class="num r">10 000</td><td class="num r">115 s (just inside 2 min)</td></tr>
       <tr><td>10 seeds each: 5 % loss / hopping with 10 % busy</td><td class="num r">10 000</td><td class="num r">worst 27.5 s / 58.8 s</td></tr>
       <tr><td>NM spec test vector (the frames in the NM spec) decoded by our gossip code</td><td class="num r">—</td><td class="num r">pass</td></tr>
     </tbody>
   </table></div>
   <div class="callout"><b>It already caught a bug</b> (on the old 868 MHz radio). With fixed timeouts, the 38.4 kbps fallback delivered only 883 lines. One frame (15.2 ms) outlasted the receiver's 15 ms idle-ACK timer, so the receiver ACKed in the middle of bursts and went deaf. All timeouts are now derived from the bit rate.</div>
-  <p class="col sub">Still open in the simulator: an MRM scenario with four teams' boxes modelled explicitly (today their effect is a loss rate), and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the bench: 1 ms turnaround, 0.3 ms gap between frames. The hop clock and acquisition exist <b>only in the simulator</b> so far; they still have to be built on the Pico.</p>
+  <p class="col sub">Still open in the simulator: an MRM scenario with four teams' boxes modelled explicitly (today their effect is a loss rate), and loss taken from measured packet-error rates instead of fixed percentages. Assumptions to measure on the Pi: 1 ms turnaround, 0.3 ms gap between frames (0.5 ms would give ~97 kbps; 1 ms gap and 2 ms turnaround ~73 kbps, still above the 67 kbps an uncompressed file needs). Reboot downtime is set with <span class="mono">--reboot-down</span>. The hop clock and acquisition exist <b>only in the simulator</b> so far; they still have to be built on the Pi.</p>
 </section>
 
 <section aria-labelledby="s-plan">
@@ -437,7 +448,7 @@ chunk first held (s from GO):
     <tbody>
       <tr><td class="num">Fri 16 Oct</td><td>Agree or amend this proposal; set up a shared git repo; simulator skeleton</td><td>RT</td></tr>
       <tr><td class="num">Fri 23 Oct</td><td>Link + session in the simulator; agree the NM interop spec with the other teams</td><td>RT (NM radio settings)</td></tr>
-      <tr><td class="num">Fri 30 Oct</td><td>On bench boards: USB stick → flash; one line over the air</td><td>ET, RT</td></tr>
+      <tr><td class="num">Fri 30 Oct</td><td>On the bench Pi: Linux HAL, USB stick → SD card; one line over the air</td><td>ET, RT</td></tr>
       <tr><td class="num">Fri 6 Nov</td><td><b>Quick Mode attempt</b> (one error-free line, first try); NM interop test with the other teams</td><td>all</td></tr>
       <tr><td class="num">Fri 20 Nov</td><td>Compression, full SRI throughput, resume after reboot, NM rehearsal; go/no-go for MRM hopping</td><td>RT, other teams</td></tr>
       <tr><td class="num">Fri 27 Nov</td><td>MRM channel access; field tests at 70 m and 260 m</td><td>RT</td></tr>
@@ -451,13 +462,13 @@ chunk first held (s from GO):
   <ol>
     <li>Agree or counter-propose the stack, frames and compression by <b>Fri 16 Oct</b>.</li>
     <li>An owner for the NM talks with the other teams. Send them the <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM interop spec</a> once the page is shared.</li>
-    <li>A decision between Pico SDK (C, our suggestion) and Arduino-Pico, together with electronics.</li>
+    <li>The Linux base, together with electronics: Pi OS Lite (64-bit) with a PREEMPT_RT kernel (our suggestion), or Buildroot if the boot must get under 5 s.</li>
     <li>Two questions for Marcos to add to the Atenea list: is a TX/RX <b>role switch</b> allowed (it does not encode network position)? What file name should the received file have on the USB stick?</li>
   </ol></div>
 </section>
 
 <footer>
-  <p>Related pages: <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM Interop Spec</a> v1.0 (for all teams) · Team C Radio Brief v0.10 (radio settings, hopping, test plan) · Team C Hardware Proposal v0.4.4 (Pico 2 + E01-ML01SP4 board). Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
-  <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://github.com/richgel999/miniz">miniz</a> · <a href="https://github.com/sekigon-gonnoc/Pico-PIO-USB">Pico-PIO-USB</a> · <a href="https://github.com/hathach/tinyusb">TinyUSB</a>.</p>
+  <p>Related pages: <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM Interop Spec</a> v1.0 (for all teams) · Team C Radio Brief v0.11 (radio settings, hopping, test plan) · Team C Hardware Proposal v0.5 (Pi 3 + E01-ML01SP4 HAT) · <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a>. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>References: <a href="https://datatracker.ietf.org/doc/html/rfc6206">RFC 6206, The Trickle Algorithm</a> · <a href="https://zlib.net/">zlib</a> · <a href="https://www.kernel.org/doc/html/latest/spi/spidev.html">Linux spidev</a> · <a href="https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/">libgpiod</a> · <a href="https://blog.emlid.com/raspberry-pi-real-time-kernel">Pi real-time kernel latency</a> · <a href="http://elm-chan.org/fsw/ff/">FatFs</a>.</p>
 </footer>
 </div>

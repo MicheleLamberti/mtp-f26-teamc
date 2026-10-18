@@ -113,7 +113,8 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team</div>
   <h1>Radio brief: band, module and link budget</h1>
-  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.10 · Sat 17 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <div class="meta"><span><b>Team</b> Santiago, Andrian, Marcos</span><span><b>Version</b> 0.11 · Sun 18 Oct 2026</span><span><b>Next session</b> Fri 23 Oct (week 5)</span></div>
+  <p class="lede"><b>New in v0.11 (18 Oct): the micro is now a Raspberry Pi 3</b> (the team's request; its WiFi/BT chip disabled or desoldered, Atenea Q22). <b>Nothing changes in the radio</b>: same SP4, same omni, same margins, same NM spec. New for us: T0 also checks the Pi's own noise in our band and its current draw, and T2 measures the gap between frames on Linux (0.5 ms would give ~97 kbps instead of 107). Details on the <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a> page.</p>
   <div class="lede" style="margin:.7rem 0"><b>New in v0.10 (17 Oct): review fixes and the NM spec.</b>
     <ul class="tight">
       <li>The <a href="https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS">NM interop spec</a> for all teams: radio registers, frame, gossip rules and a test vector.</li>
@@ -167,7 +168,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <p>The power limit is the only rule to watch. On the 10 mW profiles the driver <b>refuses any setting above RF_PWR −18 dBm</b>; only the hopping profile goes higher, and only after a clear-channel check on each hop.</p></div>
     <div class="card"><h3>Firmware ready before the hardware</h3>
       <p>A portable C driver for the nRF24L01+ passes 244 host checks against a simulated radio, including two radios talking over a simulated channel, the power limit, and the listen-before-talk rules of the hopping profile. It needs five board functions (SPI select and transfer, CE pin, microsecond delay and clock).</p>
-      <p>Frames use dynamic length and the radio's CRC, and go out without the chip's own ACKs, so our ARQ stays in charge. The protocol simulator runs on it: all 20 scenarios pass, five of them hopping.</p></div>
+      <p>Frames use dynamic length and the radio's CRC, and go out without the chip's own ACKs, so our ARQ stays in charge. The protocol simulator runs on it: all 21 scenarios pass, six of them hopping (T19 adds a 30 s Linux reboot).</p></div>
     <div class="card"><h3>Antenna</h3>
       <p><b>One Molex 146153-0100 flex dipole per box</b> (34.9 × 9 mm, 2.4–3.0 dBi peak, &gt; 66 % efficiency), plugged into the SP4's socket, stuck <b>vertically</b> as high as possible on a side wall. The same antenna serves SRI, MRM and NM, and Quick Mode too.</p>
       <p>The model uses 2 dBi in the box <span class="tag t-asm">assumption</span>; test T5 measures it.</p></div>
@@ -235,7 +236,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
       <tr><td>Listen-before-talk</td><td>a check per hop, ≤ 50 ms per check</td><td>a check every ≤ 10 ms (about 6 frames), 0.5 ms idle</td></tr>
       <tr><td>Power density</td><td><span class="pill p-ok">compliant: 100 mW/100 kHz allowed</span></td><td><span class="pill p-bad">5–10 dB over 10 dBm/MHz</span></td></tr>
       <tr><td>Margins (SRI 70 m · MRM 260 m)</td><td>+36.5 · +13.9 dB</td><td>same</td></tr>
-      <tr><td>Firmware</td><td>hop clock and acquisition on the Pico</td><td>none extra: today's link on one channel</td></tr>
+      <tr><td>Firmware</td><td>hop clock and acquisition on the Pi 3</td><td>none extra: today's link on one channel</td></tr>
       <tr><td>MRM with the other teams</td><td>random hop collisions, ≥ 10 m between boxes</td><td>fixed plan at equal power: the 8 MHz pair is fine at ≥ 10 m</td></tr>
       <tr><td>Use it</td><td><span class="pill p-ok">default</span></td><td><span class="pill p-warn">only on an explicit yes (Atenea Q11)</span></td></tr>
     </tbody>
@@ -245,7 +246,7 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
     <div class="card"><h3>What changes</h3><ul>
       <li><b>Nothing in the hardware.</b> The SP4 is a +20 dBm module that we hold at its lowest step; hopping only raises the step. TX bursts move toward the datasheet's 120 mA, which the radio LDO already covers.</li>
       <li><b>Driver:</b> only the hopping profile may go above −18 dBm. It refuses channels outside the hop set and any frame without a clear check on the current hop, ends each occupancy at 50 ms and waits the idle gap. 244 host checks pass.</li>
-      <li><b>Protocol:</b> unchanged; the radio layer hops every 30 ms (one 16-frame burst). The simulator gives each box its own drifting slot clock; the receiver parks on one channel and re-syncs. All 10,000 lines in 38 s with 10 % of hops busy, 69 s with 25 % busy plus a receiver reboot. Still to build on the Pico: the slot clock and hop acquisition (only simulated so far).</li>
+      <li><b>Protocol:</b> unchanged; the radio layer hops every 30 ms (one 16-frame burst). The simulator gives each box its own drifting slot clock; the receiver parks on one channel and re-syncs. All 10,000 lines in 38 s with 10 % of hops busy, 69 s with 25 % busy plus a receiver reboot. Still to build on the Pi 3: the slot clock and hop acquisition (only simulated so far); IRQ edges with kernel timestamps make the acquisition accurate under Linux.</li>
       <li><b>NM stays on one channel (77) at 10 mW.</b> Hopping in sync across four teams' boxes for a 0.5 kB file is not worth it, and NM has +9.9 dB.</li></ul></div>
     <div class="card"><h3>Why it is allowed, and what to keep</h3><ul>
       <li><b>Regulation:</b> the design meets the EN 300 328 adaptive-FHSS rules in the table, at ≤ 20 dBm e.i.r.p. measured with our antenna.</li>
@@ -463,15 +464,15 @@ footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid 
   <div class="tbl"><table>
     <thead><tr><th>Pin</th><th>At the micro</th><th>What matters</th></tr></thead>
     <tbody>
-      <tr><td class="mono">VCC, GND</td><td>supply</td><td><b>2.0–3.6 V only</b>, never the battery rail (a Li-ion cell reaches 4.2 V). Use a dedicated 3.3 V LDO for the radio (≥ 300 mA, dropout ≤ 0.1 V at 150 mA) straight from the cell: it regulates down to ~3.4 V and then passes the cell through (≥ 2.95 V at cutoff, fine for the SP4). Battery sense on ADC3 with an ideal diode into VSYS; firmware warns below 3.5 V, and 100 µF + 10 µF + 100 nF at the module. 120 mA in TX, 26 mA in RX.</td></tr>
-      <tr><td class="mono">SCK MOSI MISO</td><td>SPI master</td><td>Mode 0, MSB first, ≤ 10 MHz.</td></tr>
-      <tr><td class="mono">CSN</td><td>GPIO out</td><td>Chip select, active low.</td></tr>
+      <tr><td class="mono">VCC, GND</td><td>supply</td><td><b>2.0–3.6 V only</b>, never the battery rail (a Li-ion cell reaches 4.2 V). Use a dedicated 3.3 V LDO for the radio (≥ 300 mA, dropout ≤ 0.1 V at 150 mA) straight from the cell: it regulates down to ~3.4 V and then passes the cell through (≥ 2.95 V at cutoff, fine for the SP4). Never the Pi's 3V3 pin. Battery sense with a MAX17048 fuel gauge on I2C (the Pi has no ADC); firmware warns below 3.5 V, and 100 µF + 10 µF + 100 nF at the module. 120 mA in TX, 26 mA in RX.</td></tr>
+      <tr><td class="mono">SCK MOSI MISO</td><td>SPI master</td><td>Mode 0, MSB first, ≤ 10 MHz (on the Pi: 7.8 MHz with <span class="mono">core_freq=250</span>).</td></tr>
+      <tr><td class="mono">CSN</td><td>GPIO out</td><td>Chip select, active low. On the Pi it is SPI0 CE0, driven by the kernel for each transfer.</td></tr>
       <tr><td class="mono">CE</td><td>GPIO out</td><td>High = receive; a ≥ 10 µs pulse sends one frame.</td></tr>
-      <tr><td class="mono">IRQ</td><td>GPIO in, optional</td><td>Active low: frame sent / frame received. The driver polls today.</td></tr>
-      <tr><td class="mono">IPEX</td><td>—</td><td>The flex omni plugs in here. Keep the module near the antenna wall and away from the battery, USB and the 5 V boost.</td></tr>
+      <tr><td class="mono">IRQ</td><td>GPIO in, optional</td><td>Active low: frame sent / frame received. The driver polls today; on the Pi, wire it, because edge timestamps help the hop sync.</td></tr>
+      <tr><td class="mono">IPEX</td><td>—</td><td>The flex omni plugs in here. Keep the module near the antenna wall and away from the battery, USB, the 5 V boost and the Pi's processor.</td></tr>
     </tbody>
   </table></div>
-  <p class="col sub">Proposed Pico 2 pins: SPI0 GP16/18/19, CSN GP17, CE GP20, IRQ GP21. The SP4 needs a small breakout (or the carrier PCB) from the first bench test, because the Quick Mode module is final. Needed back from electronics: OK on the module and the radio LDO, who makes the breakout, the pin map, a power check, and the box's inside height.</p>
+  <p class="col sub">Proposed Pi 3 pins (BCM numbers): SPI0 SCK GPIO 11, MOSI GPIO 10, MISO GPIO 9, CSN = CE0 GPIO 8, CE GPIO 22, IRQ GPIO 24; full table on the Pi 3 Switch page. The SP4 needs a small breakout (or the carrier PCB) from the first bench test, because the Quick Mode module is final. Needed back from electronics: OK on the module and the radio LDO, who makes the breakout, the pin map, a power check, and the box's inside height.</p>
 </section>
 
 <section aria-labelledby="s-nm">
@@ -498,7 +499,7 @@ sequenceDiagram
   participant S as Next box (South rim)
   participant C as Boxes further on (corner, East rim)
   participant R as Receiver (NE end)
-  Note over O: Setup: NM-file from the USB stick into flash, cut into ~20 chunks of 25 B
+  Note over O: Setup: NM-file from the USB stick to the SD card, cut into ~20 chunks of 25 B
   Note over O,R: GO. Every box on RF_CH 77, 250 kbps, 10 mW, no chip ACKs, no addresses
   loop every Trickle interval I (1 s, doubling to 8 s)
     O-)S: NM_DATA x 20 [0x4E, file_id, idx, total, 25 B, CRC-16]
@@ -507,7 +508,7 @@ sequenceDiagram
   S-)O: rebroadcasts what it holds (O goes quiet after 3 copies per chunk)
   S-)C: the same frames reach one box further
   C-)R: relayed along the rim
-  Note over R: all chunks and the whole-file id check out: NM-file to flash
+  Note over R: all chunks and the whole-file id check out: NM-file to the SD card
   Note over O,R: STOP: every box writes the NM-file and NM_LOG.TXT to a USB stick
 </pre>
   </div>
@@ -520,8 +521,8 @@ sequenceDiagram
   <div class="tbl"><table>
     <thead><tr><th>Test</th><th>What</th><th>Pass</th><th>When</th></tr></thead>
     <tbody>
-      <tr class="hl"><td class="num">T0</td><td>Bring-up, then <b>conducted output power at all four settings</b> on the spectrum analyser (U.FL-to-SMA pigtail, ≥ 30 dB attenuator)</td><td>Driver starts; output ≤ +7.5 dBm at −18, so e.i.r.p. ≤ 10 dBm with the 3 dBi antenna. The other steps pick the hopping mode's power. <b>Gate for any field test.</b></td><td>modules arrive</td></tr>
-      <tr class="hl"><td class="num">T2</td><td>Sensitivity at 250 kbps and 1 Mbps through a lab step attenuator</td><td>1 % packet loss at ≤ <b>−92 dBm</b> (250 kbps). <b>Gate for the module.</b></td><td>before Quick Mode</td></tr>
+      <tr class="hl"><td class="num">T0</td><td>Bring-up, then <b>conducted output power at all four settings</b> on the spectrum analyser (U.FL-to-SMA pigtail, ≥ 30 dB attenuator)</td><td>Driver starts; output ≤ +7.5 dBm at −18, so e.i.r.p. ≤ 10 dBm with the 3 dBi antenna. The other steps pick the hopping mode's power. <b>Gate for any field test.</b> With the Pi 3: also log RPD hits and packet loss on every hop channel with the Pi idle and busy (clock harmonics, 6 × 400 MHz = 2400 MHz), and the Pi's current at 3.6 / 3.3 / 3.0 V.</td><td>modules arrive</td></tr>
+      <tr class="hl"><td class="num">T2</td><td>Sensitivity at 250 kbps and 1 Mbps through a lab step attenuator</td><td>1 % packet loss at ≤ <b>−92 dBm</b> (250 kbps). <b>Gate for the module.</b> On the Pi, also measure the gap between frames and the TX↔RX turnaround (model: 0.3 ms, 1 ms).</td><td>before Quick Mode</td></tr>
       <tr><td class="num">T14</td><td>Campus 2.4 GHz survey with the RPD bit, channels 0–83, at each site</td><td>Our hop channels and the NM channel (77) busy &lt; 5 %; any team's hopping visible</td><td>before the inter-team meeting</td></tr>
       <tr><td class="num">T4</td><td>Range, open box, 10 / 70 / 150 / 260 m; then one 2-min transfer at 70 m</td><td>≤ 1 % loss to 150 m; all 10,000 lines</td><td>after T2</td></tr>
       <tr><td class="num">T13</td><td>Spectrum analyser: carrier offset, occupied bandwidth on channel 82, e.i.r.p. (option B: PSD in 1 MHz)</td><td>Below 2483.5 MHz; ≤ 10 dBm (≤ 20 dBm hopping). Plot in the ANNEX.</td><td>book the lab</td></tr>
@@ -553,6 +554,7 @@ sequenceDiagram
       <tr><td class="num">R15</td><td class="num">16/10/26</td><td>Marcos</td><td>Post Atenea Q3: written confirmation of the 20 dBm the professor approved</td><td>Done</td><td class="num">23/10/26</td><td class="num">16/10/26</td><td>Yes: 20 dBm e.i.r.p. confirmed for our hopping design</td></tr>
       <tr><td class="num">R16</td><td class="num">16/10/26</td><td>RT → teams</td><td>Agree with the other teams: everyone hops with listen-before-talk at ≤ 20 dBm in its own order; ≥ 10 m between boxes at each MRM end; the NM interop spec (RF_CH 77, 10 mW)</td><td>Open</td><td class="num">23/10/26</td><td></td><td></td></tr>
       <tr><td class="num">R11</td><td class="num">04/10/26</td><td>RT</td><td>Tests T0 and T2 done; D-R2c (E01-ML01SP4) confirmed or reversed</td><td>Open</td><td class="num">before QM</td><td></td><td></td></tr>
+      <tr><td class="num">R17</td><td class="num">18/10/26</td><td>Marcos + ET</td><td>Raspberry Pi 3 as the micro: post Atenea Q22 (WiFi/BT chip disabled or desoldered); ET picks the model (A+ suggested) and counts the boards we have; Pico 2s dropped from the order</td><td>Open</td><td class="num">23/10/26</td><td></td><td></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -566,7 +568,7 @@ sequenceDiagram
       <li><b>20 dBm without hopping (Q11, new).</b> May we use the confirmed 20 dBm on one fixed channel (about 0.6 MHz wide) with listen-before-talk every ≤ 10 ms? EN 300 328 limits non-hopping radios to 10 mW/MHz, which such a narrow signal exceeds by 5–10 dB. If not, we keep hopping.</li>
       <li><b>Support height and box.</b> Is the support fixed at 70 cm? May the box stand on its 15 × 7 cm edge?</li>
       <li><b>Cooperation.</b> May teams agree a common NM radio and an MRM channel split, sharing settings but not code?</li>
-      <li><b>New (Q12–Q21):</b>
+      <li><b>New (Q12–Q22):</b>
         <ul class="tight">
           <li>Q12: NM rim lengths and node spacing.</li>
           <li>Q13: minimum distance between teams' boxes in MRM.</li>
@@ -578,6 +580,7 @@ sequenceDiagram
           <li>Q19: what counts in the cost category.</li>
           <li>Q20: listen-before-talk for every team in MRM.</li>
           <li>Q21: the NM output file name for relay boxes.</li>
+          <li>Q22 (18 Oct): whether the Pi 3's WiFi/BT chip may stay on the board disabled in firmware, or must be removed.</li>
         </ul>
         Full text in <span class="mono">radio/ATENEA_QUESTIONS.md</span>.</li>
 </ul></div>

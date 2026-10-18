@@ -64,22 +64,25 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 answered yes 16-Oct: 20 dBm confirmed).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
-  republish to the same URL (v0.10 published 17-Oct: review fixes, conservative planning case, 37 hops / 30 ms, NM ch 77 + link to
+  republish to the same URL (v0.11 18-Oct: Pi 3 note, T0 Pi-noise check, T2 frame gap, Pi pins, Q22; v0.10 17-Oct: review fixes, conservative planning case, 37 hops / 30 ms, NM ch 77 + link to
   the NM spec, Q12–Q21; v0.9: options A/B, NM diagram).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
+  — source `radio/hw_proposal.html` (**v0.5 18-Oct: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
+  BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
-- `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session
+- `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session (rewritten 18-Oct
+  for a Pi 3 HAT: pin map, power, mechanics)
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 109 usb_msc checks, ~2 s; `--reboot-down S` sets the
   downtime per reboot, 0.3 s Pico / 10–30 s Linux); `make usb-xcheck PYTHON=<venv
   python with pyfatfs + setuptools<81>` cross-checks FAT16/32 images. `port/pico/usb_msc_pico.c` = TinyUSB + PIO-USB
-  skeleton, NOT compiled here (no pico-sdk / ARM gcc on this machine).
+  skeleton, obsolete since the Pi 3 switch (18-Oct); the Linux port is still to write.
   See `proto/README.md`.
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
-  — source `radio/pt_proposal.html` (v0.3.7 17-Oct: **Protocol specs section** = where each interface is defined, POLL,
+  — source `radio/pt_proposal.html` (**v0.4 18-Oct: Linux on the Pi 3: HAL on spidev/libgpiod, threads, SD-card store,
+  FatFs on the raw stick, PREEMPT_RT pitfall, T19**; v0.3.7 17-Oct: **Protocol specs section** = where each interface is defined, POLL,
   streaming codec, 107 kbps, sim results; v0.3.6: NM diagrams, relay log, usb_msc, option B).
 - **NM Interop Spec** (artifact, private — Santiago shares it with the other teams): https://claude.ai/artifact/CeoNGSUz67ifecwzzkmgLS
   — source `radio/nm_spec.html`, built from `radio/NM_SPEC.md` (keep both in sync; v1.0 draft 16/17-Oct).
@@ -151,7 +154,7 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
   slots, RPD as the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`**
   (RF_CH 77 = 0x4D, 10 mW; `NM_SPEC.md`). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
 - D-R4: superseded for MRM (all teams hop at 20 dBm); fixed plan RF_CH 24/49/74/82 = 10 mW fallback (and option B).
-- Software: Pico 2 (suggested to ET), C on the Pico SDK; protocol in `proto/` (SR-ARQ + resume + POLL, one deflate
+- Software: **Raspberry Pi 3 with Linux (D-H1, 18-Oct)**, our C code as one program (radio thread SCHED_FIFO); protocol in `proto/` (SR-ARQ + resume + POLL, one deflate
   stream, Trickle NM gossip, usb_msc over FatFs); where each interface is defined: pt page "Protocol specs".
 
 **20 dBm, two versions (rechecked 16-Oct, D-R6/D-R6b):** A = hopping (`TEAM_FHSS`, default, EN 300 328 compliant).
@@ -178,7 +181,7 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 **Next up (17-Oct, roughly in order):**
 - [ ] **Order now** (one batch, QM modules are final): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4),
       2 × U.FL-to-SMA pigtails. ~~3–4 × Pico 2~~ (18-Oct: Pi 3 instead; count the boards we have). Verify EU seller + lead time. Not needed: DP5, SMA pads, whips, RFM69.
-- [ ] Name owners: SP4 breakout, carrier PCB, Pico toolchain + USB host + hop sync, NM inter-team talks (PT),
+- [ ] Name owners: SP4 breakout, Pi 3 HAT, Linux port (HAL, timers, store, USB) + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
 - [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
       pt v0.3.7 with Team C (pt → Ibrahim, Guillem, Sofia)
@@ -193,8 +196,9 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
-- [ ] Pico software: `nrf24_hal_t` once ET confirms the pin map; hop clock + acquisition (only in the simulator so
-      far); compile/bench `proto/port/pico/usb_msc_pico.c` (3–4 sticks, FAT32 + exFAT, 120 MHz clock)
+- [ ] Pi 3 software: `nrf24_hal_t` on spidev + libgpiod (pins in the KiCad brief), `proto_env_t` on timerfd/epoll,
+      SD-card store with fdatasync, `usbm_disk_t` on the raw stick, read-only root, boot ≤ 10 s; hop clock + acquisition
+      (only in the simulator so far); measure frame gap/turnaround (T2)
 - [ ] Simulator: MRM scenario with the 4 teams' boxes modelled explicitly (today a loss rate, T14)
 - [ ] **ON HOLD (9-Oct):** CST MCP (patches dropped 13-Oct; still useful to model the omni in the box). Santiago is
       asking the radio teacher which CST version the team may install on laptops. Then: review the code of
@@ -214,8 +218,10 @@ what's pending.
   folder): at-a-glance table, variant pick (A+), power tree (boost, fuel gauge, runtime), Pi pin map, software port,
   Linux timing, goodput (107 → 97 / 91 / 73 kbps), reboot sim results, mechanics, BoM delta, owners. Atenea Q22 drafted.
 - Simulator: `--reboot-down S` and test T19 (MRM as T14, receiver down 30 s → 90.8 s; 10 s → 78 s; Pico 60.5 s).
-- Not yet updated for the Pi: hw_proposal, pt_proposal, brief, HANDOFF_ET, KiCad brief (still say Pico 2) — wait for ET's
-  variant pick and the Q22 answer.
+- Santiago then: update the other pages for the Pi 3 too. Republished brief v0.11, hw v0.5 (Pi 3 + SP4 HAT, boost,
+  fuel gauge, BoM 70–90 €), pt v0.4 (Linux architecture, SD store, FatFs on the raw stick, lzma now possible);
+  rewrote the KiCad brief for a HAT; HANDOFF_ET v0.5; DECISIONS D-H1; TEST_PLAN T0 step 5 + T2 frame gap; READMEs.
+  PDFs re-exported. NM spec unchanged (no Pico in it).
 - Checks: fw 244, proto 21 scenarios + 109 usb, phy_config all OK.
 - **Start next session with:** Q22 answer? which Pi 3 variant and how many boards? then port the HAL to Linux.
 

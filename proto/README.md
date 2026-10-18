@@ -1,6 +1,6 @@
 # Team C protocol code + PC simulator
 
-The protocol code that will run on the Pico, plus a laptop simulator that runs that
+The protocol code that will run on the Raspberry Pi 3 (Linux; the Pico 2 until 18-Oct), plus a laptop simulator that runs that
 same code against a modelled radio channel in simulated time. A 2-minute round takes
 milliseconds, so protocols & software can develop, measure and break the protocol
 before any hardware exists. Proposal it implements:
@@ -27,11 +27,11 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `src/nm_gossip.c` | Network Mode: Trickle gossip (RFC 6206), software CRC-16, no routing; keeps a relay trace (times, broadcasts). Implements the inter-team spec `../radio/NM_SPEC.md` (sim T18 checks its test vector). |
 | `src/nm_log.c` | NM relay log: plain-text evidence written next to the NM-file copy on the USB stick (file id, CRC-32, when it arrived, what we rebroadcast). |
 | `src/usb_msc.c` | USB stick file I/O over FatFs (FAT12/16/32, exFAT): pick the input `.txt`, load it in 4 KB chunks to flash, save the received file + log (`.part`, read-back CRC, rename). |
-| `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (TinyUSB MSC on the Pico, a RAM disk in the tests). |
+| `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (the stick's raw block device on the Pi 3, a RAM disk in the tests). |
 | `third_party/fatfs/` | ChaN FatFs R0.15a (BSD-style licence in `ff.c`); `ffconf.h` is ours: LFN, exFAT, code page 850, no RTC. |
-| `port/pico/` | Pico 2 glue. `usb_msc_pico.c` (TinyUSB host + Pico-PIO-USB) is a **skeleton, not compiled here**. |
+| `port/pico/` | Pico 2 glue, **obsolete since the Pi 3 switch (18-Oct)**: `usb_msc_pico.c` (TinyUSB host + Pico-PIO-USB), never compiled. On the Pi, `usbm_disk_t` reads the stick as a raw block device. |
 | `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks, a Windows-style MBR stick and UTF-8 names (109 checks); `--image` mode for `tools/fat_xcheck.py`. |
-| `src/codec.c` | deflate/inflate via the zlib API (miniz offers the same API on the Pico). |
+| `src/codec.c` | deflate/inflate via the zlib API (the system zlib on the Pi 3 and in the simulator). |
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
 | `tools/make_sample.py` | 10 000 × 100 B test file from the course PDFs (UTF-8 or UTF-16). |
@@ -80,20 +80,22 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 - Loss is a fixed probability per link (plus optional Gilbert-Elliott fades). It is not yet
   derived from the link budget or from measured PER (test T2/T4).
 - Collisions destroy both frames (no capture effect). Range for hearing = range for interfering.
-- Not modelled: CPU time for compression, flash erase stalls on the Pico, USB copy time.
+- Not modelled: CPU time for compression, Linux scheduling jitter (up to ~1.1 ms on a stock kernel), SD-card sync
+  time, USB copy time. Reboot downtime is set with `--reboot-down` (T19: 30 s).
 
 ## Not done yet
 
 - MRM scenario with the 4 teams' hopping boxes modelled explicitly (today their effect is a loss rate, T14).
-- FHSS on the Pico (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
+- FHSS on the Pi 3 (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
   sender, every frame carries the slot number) and the slot clock; `nrf24_cca()` and the hop order are in
   `radio/fw` already.
-- Compression on the Pico: measure miniz deflate RAM and time for 1 MB at level 9 during setup (drop the level if
-  slow); send raw (codec = none) when a file compresses less than ~1.05×. No 32 KB restart points: the receiver
+- Compression on the Pi 3: system zlib (under 1 s for 1 MB at level 9); xz/lzma becomes possible too (~10 % fewer
+  bytes in UTF-8); send raw (codec = none) when a file compresses less than ~1.05×. No 32 KB restart points: the receiver
   keeps its in-order prefix in flash, which already covers resume.
 - USB sticks: FAT12/16/32 and exFAT, MBR or GPT (macOS) tables, UTF-8 names all work; NTFS/APFS/HFS+ sticks do not.
   The team brings its own FAT32/exFAT sticks.
-- `usb_msc` on the Pico: compile and bench-test `port/pico/usb_msc_pico.c` (3-4 sticks, FAT32 + exFAT); the flash
-  store sink/source; output file name and encoding (Atenea Q9).
-- Board port: implement `proto_env_t` on the Pico (`nrf24_send`, `time_us_64`, an alarm),
+- `usb_msc` on the Pi 3: a `usbm_disk_t` over the raw block device (`/dev/sda`, no automount, O_DIRECT), bench with
+  3-4 sticks (FAT32 + exFAT); the SD-card store sink/source; output file name and encoding (Atenea Q9).
+- Board port: implement `proto_env_t` on Linux (`nrf24_send`, `clock_gettime`, timerfd + epoll), the HAL on spidev +
+  libgpiod, a radio thread with SCHED_FIFO on an isolated core,
   call `*_on_frame` from the RX poll loop and `*_on_tx_idle` after `nrf24_send` returns.
