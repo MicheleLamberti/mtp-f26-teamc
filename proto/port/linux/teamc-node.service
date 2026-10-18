@@ -1,0 +1,21 @@
+# MTP-F26 Team C - the transceiver program, started at boot and restarted at once if it dies.
+# Install: sh proto/port/linux/install.sh (copies the binary to /opt/teamc and this file to /etc/systemd/system).
+# Edit --box (C1 / C2, the label on the box) before installing.
+[Unit]
+Description=MTP-F26 Team C transceiver (teamc-node)
+After=local-fs.target
+RequiresMountsFor=/data
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/opt/teamc/teamc-node --data /data/teamc --box C1 --rt 3
+Restart=always
+RestartSec=0
+# The program pings at least once a second; a hang restarts it, and a restarted round resumes by itself.
+WatchdogSec=5
+LimitRTPRIO=99
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

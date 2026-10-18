@@ -3,7 +3,8 @@
  * The rules: each device must be "capable of reading/writing a file from/to memory device (USB)". At
  * setup the sender copies the .txt from the stick into flash; after STOP every box writes what it
  * received (and the NM relay log) back to a stick, within 3 minutes. The stick plugs into the box's
- * USB-A port; on the Pico 2 that port is a USB host (TinyUSB + Pico-PIO-USB, port/pico/usb_msc_pico.c).
+ * USB-A port: on the Raspberry Pi 3 a native host port, the stick read as a raw block device
+ * (port/linux/stick.c, no automount). (The Pico 2 plan used TinyUSB + Pico-PIO-USB: in git history.)
  *
  * Sticks from any computer: FAT12/16/32 and exFAT, MBR (Windows, most factory sticks) or GPT (macOS Disk
  * Utility) partition tables, UTF-8 file names. NTFS, APFS and HFS+ are not readable: bring FAT32/exFAT sticks.
@@ -33,6 +34,7 @@ typedef struct {
     int (*write)(void *ctx, const uint8_t *buf, uint32_t lba, uint32_t count);
     int (*sync)(void *ctx);
     uint32_t (*sector_count)(void *ctx);
+    int (*write_protected)(void *ctx);   /* optional (may be NULL): 1 = the stick's lock switch is on */
 } usbm_disk_t;
 
 /* Register the device (once, before usbm_mount). */

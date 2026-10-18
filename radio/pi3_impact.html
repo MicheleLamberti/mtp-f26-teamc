@@ -255,7 +255,8 @@ flowchart LR
 <tr><td class="num">GPIO 2 / 3</td><td class="r num">3 / 5</td><td>I2C1 SDA / SCL</td><td>MAX17048 fuel gauge (the Pi has 1.8 kΩ pull-ups)</td></tr>
 <tr><td class="num">GPIO 17</td><td class="r num">11</td><td>Tx/Rx button</td><td>To GND, pull-up, RC + ESD</td></tr>
 <tr><td class="num">GPIO 27</td><td class="r num">13</td><td>Role switch TX/RX</td><td>Atenea Q8 pending</td></tr>
-<tr><td class="num">GPIO 23</td><td class="r num">16</td><td>Mode switch SRI/MRM ↔ NM</td><td></td></tr>
+<tr><td class="num">GPIO 23</td><td class="r num">16</td><td>Mode switch, NM position</td><td>3-position switch: 23 low = NM</td></tr>
+<tr><td class="num">GPIO 16</td><td class="r num">36</td><td>Mode switch, MRM position</td><td>16 low = MRM; neither = SRI</td></tr>
 <tr><td class="num">GPIO 5</td><td class="r num">29</td><td>Activity LED</td><td>Blinks in Tx/Rx (rule)</td></tr>
 <tr><td class="num">GPIO 6</td><td class="r num">31</td><td>Status LED</td><td>Also "safe to pull the stick"</td></tr>
 <tr><td class="num">GPIO 26</td><td class="r num">37</td><td>MCP73831 STAT</td><td>Pull-up</td></tr>
@@ -292,7 +293,7 @@ flowchart LR
   <div class="card">
     <h3>Obsolete</h3>
     <ul>
-      <li><span class="mono">proto/port/pico/usb_msc_pico.c</span> (TinyUSB + PIO-USB) and its bench checklist</li>
+      <li><span class="mono">proto/port/pico/</span> (TinyUSB + PIO-USB glue): removed 18 Oct, in git history</li>
       <li>miniz and its low-memory mode</li>
       <li>Flash and XIP rules: erase stalls, core 0/1 split, 2 KB stacks, DMA channel use</li>
       <li>The "≥ 1 MB on-board storage" argument (the SD card holds gigabytes)</li>

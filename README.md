@@ -30,7 +30,7 @@ firmware, plus the starting protocol code and simulator handed to protocols & so
 | [`briefs/TeamC Radio Brief v0.11.pdf`](briefs/) | 2.4 GHz band, module (E01-ML01SP4), one omni, 20 dBm hopping (D-R6, all teams hop), link budget incl. the conservative planning case, test plan |
 | [`briefs/TeamC Pi 3 Switch v0.1.pdf`](briefs/) | What moving from the Pico 2 to a Raspberry Pi 3 changes: power, software, timing, reboot cost, BoM |
 | [`briefs/TeamC Hardware Proposal v0.5.pdf`](briefs/) | Suggested board for electronics: Raspberry Pi 3 + E01-ML01SP4 HAT + flex omni, BoM, power, role switch |
-| [`briefs/TeamC Protocol Proposal v0.4.pdf`](briefs/) | Suggested protocol for protocols & software, **where each protocol spec lives**, simulator results |
+| [`briefs/TeamC Protocol Proposal v0.4.1.pdf`](briefs/) | Suggested protocol for protocols & software, **where each protocol spec lives**, simulator results |
 | [`CLAUDE.md`](CLAUDE.md) | Team, calendar, status, next steps and session log (kept up to date each session) |
 
 ## Specs: where each interface is defined
@@ -66,7 +66,8 @@ Needs `gcc`, `make`, `zlib` (`sudo apt install build-essential zlib1g-dev`) and 
 
 ```sh
 make -C radio/fw test        # radio driver: 244 checks
-make -C proto test           # protocol simulator (20 scenarios) + usb_msc tests (109 checks), ~2 s
+make -C proto test           # protocol simulator (21 scenarios) + usb_msc tests (116 checks), ~2 s
+make -C proto e2e            # the Pi 3 program teamc-node, node against node over an emulated radio (~3 min)
 python3 radio/phy_config.py  # radio profiles: channel, band edge, e.i.r.p. and EN 300 328 checks
 python3 radio/linkbudget.py  # link budget, throughput, near-far, planning case
 cd proto                                               # the simulator reads build/sample.txt from here

@@ -1,6 +1,6 @@
 # Team C protocol code + PC simulator
 
-The protocol code that will run on the Raspberry Pi 3 (Linux; the Pico 2 until 18-Oct), plus a laptop simulator that runs that
+The protocol code that runs on the Raspberry Pi 3 (`port/linux/teamc-node`, Linux; the Pico 2 until 18-Oct), plus a laptop simulator that runs that
 same code against a modelled radio channel in simulated time. A 2-minute round takes
 milliseconds, so protocols & software can develop, measure and break the protocol
 before any hardware exists. Proposal it implements:
@@ -8,6 +8,8 @@ https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
 
 ```
 make test                     # build, generate sample files, run the simulator suite and the usb_msc tests (~2 s)
+make linux                    # the Pi 3 program build/teamc-node + build/mkstick (port/linux/README.md)
+make e2e                      # whole nodes against each other over the emulated UDP radio (~3 min)
 make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip install pyfatfs "setuptools<81")
 ./build/sim sri --loss 0.1 --blackout 20:30 --rx-reboot 40
 ./build/sim sri --codec none --profile 1m --file my_file.txt
@@ -29,8 +31,8 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `src/usb_msc.c` | USB stick file I/O over FatFs (FAT12/16/32, exFAT): pick the input `.txt`, load it in 4 KB chunks to flash, save the received file + log (`.part`, read-back CRC, rename). |
 | `src/usb_diskio.c` | FatFs disk layer → `usbm_disk_t` (the stick's raw block device on the Pi 3, a RAM disk in the tests). |
 | `third_party/fatfs/` | ChaN FatFs R0.15a (BSD-style licence in `ff.c`); `ffconf.h` is ours: LFN, exFAT, code page 850, no RTC. |
-| `port/pico/` | Pico 2 glue, **obsolete since the Pi 3 switch (18-Oct)**: `usb_msc_pico.c` (TinyUSB host + Pico-PIO-USB), never compiled. On the Pi, `usbm_disk_t` reads the stick as a raw block device. |
-| `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks, a Windows-style MBR stick and UTF-8 names (109 checks); `--image` mode for `tools/fat_xcheck.py`. |
+| `port/linux/` | **The Raspberry Pi 3 program `teamc-node`** (18-Oct): radio layer with the hop sync, nRF24 and UDP-emulated radios, SD-card store, stick as a raw block device, GPIO UI, systemd unit; `make linux`, `make e2e`. See `port/linux/README.md`. (The Pico 2 glue `port/pico/` was removed, in git history.) |
+| `tests/test_usb.c` | `usb_msc` host tests on FAT16/FAT32/exFAT RAM disks, a Windows-style MBR stick, UTF-8 names and a write-protected stick (116 checks); `--image` mode for `tools/fat_xcheck.py`. |
 | `src/codec.c` | deflate/inflate via the zlib API (the system zlib on the Pi 3 and in the simulator). |
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
@@ -86,16 +88,11 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
 ## Not done yet
 
 - MRM scenario with the 4 teams' hopping boxes modelled explicitly (today their effect is a loss rate, T14).
-- FHSS on the Pi 3 (D-R6, needed for SRI/MRM): hop acquisition (the receiver parks on one channel until it hears the
-  sender, every frame carries the slot number) and the slot clock; `nrf24_cca()` and the hop order are in
-  `radio/fw` already.
-- Compression on the Pi 3: system zlib (under 1 s for 1 MB at level 9); xz/lzma becomes possible too (~10 % fewer
-  bytes in UTF-8); send raw (codec = none) when a file compresses less than ~1.05×. No 32 KB restart points: the receiver
-  keeps its in-order prefix in flash, which already covers resume.
+- The Linux program (`port/linux/`, 18-Oct) is complete and tested node-to-node over the emulated radio
+  (`make e2e`), but not yet run on a Pi with real radios: bench T0/T2 with `radio/fw/linux/nrf24_probe`, then two
+  boxes; tune the hop guard (`RADIO_GUARD_US`) and the link timers from measured turnaround and jitter.
+- The simulator still copies the master's hop clock exactly; the real acquisition (beacon + timing estimate,
+  `port/linux/radio.h`) is only exercised by the e2e tests.
+- Output file name and encoding on the stick: Atenea Q9 (today `RX_<name>`, `NM_FILE.TXT`, `NM_LOG.TXT`).
 - USB sticks: FAT12/16/32 and exFAT, MBR or GPT (macOS) tables, UTF-8 names all work; NTFS/APFS/HFS+ sticks do not.
   The team brings its own FAT32/exFAT sticks.
-- `usb_msc` on the Pi 3: a `usbm_disk_t` over the raw block device (`/dev/sda`, no automount, O_DIRECT), bench with
-  3-4 sticks (FAT32 + exFAT); the SD-card store sink/source; output file name and encoding (Atenea Q9).
-- Board port: implement `proto_env_t` on Linux (`nrf24_send`, `clock_gettime`, timerfd + epoll), the HAL on spidev +
-  libgpiod, a radio thread with SCHED_FIFO on an isolated core,
-  call `*_on_frame` from the RX poll loop and `*_on_tx_idle` after `nrf24_send` returns.

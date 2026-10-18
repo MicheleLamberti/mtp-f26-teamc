@@ -13,6 +13,8 @@ DSTATUS disk_status(BYTE pdrv)
 {
     if (pdrv != 0 || !disk || !disk->ready(disk->ctx))
         return STA_NOINIT | STA_NODISK;
+    if (disk->write_protected && disk->write_protected(disk->ctx))
+        return STA_PROTECT;   /* FatFs then answers FR_WRITE_PROTECTED, usb_msc USBM_READ_ONLY */
     return 0;
 }
 
@@ -23,7 +25,7 @@ static int lba_ok(LBA_t sector, UINT count) { return (uint64_t)sector + count <=
 
 DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 {
-    if (disk_status(pdrv))
+    if (disk_status(pdrv) & STA_NOINIT)
         return RES_NOTRDY;
     if (!lba_ok(sector, count))
         return RES_PARERR;
@@ -32,8 +34,11 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
 {
-    if (disk_status(pdrv))
+    DSTATUS st = disk_status(pdrv);
+    if (st & STA_NOINIT)
         return RES_NOTRDY;
+    if (st & STA_PROTECT)
+        return RES_WRPRT;
     if (!lba_ok(sector, count))
         return RES_PARERR;
     return disk->write(disk->ctx, buff, (uint32_t)sector, (uint32_t)count) ? RES_ERROR : RES_OK;
@@ -41,7 +46,7 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
 
 DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
 {
-    if (disk_status(pdrv))
+    if (disk_status(pdrv) & STA_NOINIT)
         return RES_NOTRDY;
     switch (cmd) {
     case CTRL_SYNC:

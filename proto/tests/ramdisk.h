@@ -10,6 +10,7 @@ typedef struct {
     uint8_t *img;
     uint32_t sectors;
     int present;            /* 0 = "stick unplugged" */
+    int wp;                 /* 1 = write-protect switch on */
     int32_t fail_after;     /* < 0: never; else writes fail once this many more sectors were written */
     uint32_t writes, reads;
     uint32_t offset;        /* expose only sectors from here on (to format one partition of a bigger image) */

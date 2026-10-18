@@ -22,6 +22,7 @@ void ramdisk_free(ramdisk_t *r)
 }
 
 static int rd_ready(void *ctx) { return ((ramdisk_t *)ctx)->present; }
+static int rd_wp(void *ctx) { return ((ramdisk_t *)ctx)->wp; }
 
 static int rd_read(void *ctx, uint8_t *buf, uint32_t lba, uint32_t count)
 {
@@ -66,6 +67,7 @@ void ramdisk_bind(ramdisk_t *r, usbm_disk_t *d)
     d->write = rd_write;
     d->sync = rd_sync;
     d->sector_count = rd_count;
+    d->write_protected = rd_wp;
 }
 
 int ramdisk_load(ramdisk_t *r, const char *path)

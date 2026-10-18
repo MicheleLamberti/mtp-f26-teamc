@@ -157,7 +157,7 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
       <tr><td>Fits entirely in the 15 × 15 × 7 cm IKEA 365+; only connectors, switches and buttons may stick out</td><td>Pi 3 A+ 65 × 56 mm (B: 85 × 56 mm), about 30 mm tall with the HAT. The antenna sits inside: a 35 × 9 mm flex omni, vertical, as high as possible on a wall.</td></tr>
       <tr><td>Operates autonomously</td><td>A battery and a power switch. Nothing plugged in during a round.</td></tr>
       <tr><td>At least one Tx/Rx switch or button; a pilot light that blinks in Tx/Rx</td><td>Panel pushbutton for GO/STOP, a <b>TX/RX role switch</b> (the professor picks the sender after loading; Atenea Q8), and an activity LED. The box is transparent, so the LED can stay inside.</td></tr>
-      <tr><td>Extra switches allowed (e.g. network mode), but <b>no switch indicating the position in the network</b></td><td>One optional SRI/MRM ↔ NM mode switch. Nothing that encodes a node number.</td></tr>
+      <tr><td>Extra switches allowed (e.g. network mode), but <b>no switch indicating the position in the network</b></td><td>A 3-position mode switch SRI / MRM / NM (two GPIOs). Nothing that encodes a node number.</td></tr>
       <tr><td>Drop test from table height to concrete (before MRM)</td><td>Pi on M2.5 standoffs; HAT soldered to the header pins or held by four standoffs; <b>microSD taped or glued</b> (the Pi 3 slot holds it by friction only); battery strapped; antenna glued down; <b>U.FL plug secured</b>.</td></tr>
       <tr><td>Designed to self-recover from interruptions</td><td>Linux boots in 10–30 s instead of the Pico's 0.3 s. Target ≤ 10 s, hardware watchdog through systemd, read-only root so a power cut cannot corrupt the card. Sim T19: one 30 s reboot in MRM still delivers the file in 90.8 s.</td></tr>
       <tr><td>ESD and RF exposure compliance</td><td>TVS/ESD protection on the buttons and the 5 V input. RF power is small (≤ 10 mW e.i.r.p.; ≤ 100 mW e.i.r.p. while hopping in SRI/MRM).</td></tr>
@@ -186,7 +186,7 @@ flowchart LR
   RA -- "IPEX" --> ANT["Flex omni&lt;br/&gt;Molex 146153, vertical on a wall"]
   BTN["GO/STOP button"] --> PI
   ROLE["Role switch TX/RX&lt;br/&gt;(Atenea Q8)"] --> PI
-  MODE["Mode switch SRI/MRM ↔ NM"] --> PI
+  MODE["Mode switch SRI / MRM / NM"] --> PI
   PI --> LED["Activity LED (blinks)&lt;br/&gt;+ status LED"]
 </pre>
   </div>
@@ -226,7 +226,7 @@ flowchart LR
       <tr><td>Protection</td><td>TVS + reverse-polarity protection on the 5 V feed; TVS on the button lines</td><td>Feeding the header pins bypasses the Pi's own input protection</td><td class="num r">0.6</td></tr>
       <tr><td>Battery</td><td>1 × protected 18650 Li-ion (3000 mAh or more) with solder tabs, or holder + strap; a second cell in parallel if needed</td><td>Steel can is robust in the drop test; rechargeable (sustainability report)</td><td class="num r">6–8</td></tr>
       <tr><td>Charger</td><td>MCP73831 at 500 mA + USB-C receptacle, charge only</td><td>Charges a 3000 mAh cell overnight (6–7 h). Nothing is plugged in during operation</td><td class="num r">1.2</td></tr>
-      <tr><td>Controls</td><td>Slide power switch, panel GO/STOP pushbutton, TX/RX role switch, optional mode switch, 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
+      <tr><td>Controls</td><td>Slide power switch, panel GO/STOP pushbutton, TX/RX role switch, 3-position mode switch (on-off-on), 2 LEDs</td><td>Required by the rules</td><td class="num r">2.5</td></tr>
       <tr><td>Radio supply</td><td>3.3 V LDO (AP2112K-3.3 or TLV75533, dropout ≤ 0.1 V at 150 mA) from the cell + 100 µF / 10 µF / 100 nF at the module</td><td>SP4 VCC is 2.0–3.6 V (abs. max 3.6 V); PA/LNA modules are sensitive to supply noise; handles the ~120 mA TX bursts. Never the Pi's 3V3 pin</td><td class="num r">1</td></tr>
       <tr><td>PCB</td><td>2-layer HAT-style carrier, 65 × 56 mm (A+ outline), 40-pin header</td><td>ETSETB lab = €15 in the BoM (rule); an external fab is ~€1 per board but adds 1–2 weeks</td><td class="num r">1–15</td></tr>
       <tr><td>Mechanics</td><td>M2.5 standoffs (58 × 49 mm pattern), base plate, cable ties, hot glue, tape for the SD card, IKEA 365+ box</td><td>Drop test; the BoM must list them too</td><td class="num r">5–7</td></tr>

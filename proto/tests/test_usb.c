@@ -242,6 +242,31 @@ static int image_mode(const char *in, const char *out)
     return st == USBM_OK ? 0 : 1;
 }
 
+/* A stick with its lock switch on: the file can still be read, but saving reports USBM_READ_ONLY. */
+static void test_write_protect(void)
+{
+    printf("write-protected stick\n");
+    ramdisk_t rd;
+    usbm_disk_t d;
+    usbm_t *u = calloc(1, sizeof *u);
+    CHECK(ramdisk_init(&rd, 65536) == 0);
+    ramdisk_bind(&rd, &d);
+    usbm_set_disk(&d);
+    CHECK(format(FM_FAT) == 0);
+    CHECK(usbm_mount(u) == USBM_OK);
+    CHECK(usbm_save_buf(u, "in.txt", (const uint8_t *)"line\r\n", 6) == USBM_OK);
+    usbm_unmount(u);
+    rd.wp = 1;
+    CHECK(usbm_mount(u) == USBM_OK);
+    char name[64];
+    uint32_t size = 0, count = 0;
+    CHECK(usbm_find_input(u, NULL, name, sizeof name, &size, &count) == USBM_OK && size == 6);
+    CHECK(usbm_save_buf(u, "out.txt", (const uint8_t *)"x", 1) == USBM_READ_ONLY);
+    usbm_unmount(u);
+    free(u);
+    ramdisk_free(&rd);
+}
+
 int main(int argc, char **argv)
 {
     if (argc == 4 && !strcmp(argv[1], "--image"))
@@ -251,6 +276,7 @@ int main(int argc, char **argv)
     test_format("exFAT, 16 MB", FM_EXFAT, 32768);
     test_full_and_empty();
     test_mbr_and_names();
+    test_write_protect();
     printf("%d checks, %d failures\n", checks, failures);
     return failures ? 1 : 0;
 }

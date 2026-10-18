@@ -78,11 +78,15 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
-  hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 109 usb_msc checks, ~2 s; `--reboot-down S` sets the
+  hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
   downtime per reboot, 0.3 s Pico / 10–30 s Linux); `make usb-xcheck PYTHON=<venv
   python with pyfatfs + setuptools<81>` cross-checks FAT16/32 images. `port/pico/usb_msc_pico.c` = TinyUSB + PIO-USB
   skeleton, obsolete since the Pi 3 switch (18-Oct); the Linux port is still to write.
-  See `proto/README.md`.
+  See `proto/README.md`. **`proto/port/linux/` (18-Oct): `teamc-node`, the complete Pi 3 program** (setup from the
+  stick → GO → SRI/MRM/NM → STOP → save, resume after reboot; radio layer with real hop acquisition = timing estimate +
+  hop-0 beacon; SD store with two-slot CRC record; stick as raw block device; GPIO UI with 3-position mode switch 23/16;
+  MAX17048; systemd notify/watchdog) + `mkstick` + `e2e.sh` (nodes over an emulated UDP radio, `make -C proto e2e`,
+  ~3 min, 6 scenarios). Pi setup/install: `proto/port/linux/README.md`. `port/pico/` removed (git history).
 - Protocol/firmware proposal for PT (artifact, private): https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
   — source `radio/pt_proposal.html` (**v0.4 18-Oct: Linux on the Pi 3: HAL on spidev/libgpiod, threads, SD-card store,
   FatFs on the raw stick, PREEMPT_RT pitfall, T19**; v0.3.7 17-Oct: **Protocol specs section** = where each interface is defined, POLL,
@@ -199,8 +203,8 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
-- [ ] Pi 3 software: ~~`nrf24_hal_t` on spidev~~ (started 18-Oct, `radio/fw/linux/`: run `nrf24_probe init` on the Pi
-      first), `proto_env_t` on timerfd/epoll + the radio thread loop,
+- [ ] Pi 3 software: **written and e2e-tested 18-Oct** (`proto/port/linux/teamc-node`); on a real Pi: `nrf24_probe init`,
+      `timing --rt 3`, T0/T2, then two boxes; tune RADIO_GUARD_US + link timers from measurements. Was:
       SD-card store with fdatasync, `usbm_disk_t` on the raw stick, read-only root, boot ≤ 10 s; hop clock + acquisition
       (only in the simulator so far); measure frame gap/turnaround (T2)
 - [ ] Simulator: MRM scenario with the 4 teams' boxes modelled explicitly (today a loss rate, T14)
@@ -213,6 +217,21 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-18 (evening) — the Pi 3 port finished: teamc-node
+- Santiago: finish porting everything. New `proto/port/linux/` (see its README): `node.c` (round state machine, resume,
+  sd_notify), `radio.c` (queue, proto_env_t, FHSS master/slave), `phy_nrf24.c` / `phy_udp.c` (real radio / emulator),
+  `store.c` (SD card, two-slot CRC record, sync thread that never blocks the radio thread), `stick.c` (raw block device,
+  O_DIRECT, write-protect), `ui.c` (GPIO, 3-position mode switch on 23 + 16, MAX17048), `mkstick.c`, `e2e.sh`,
+  systemd unit + install.sh. usb_msc: optional `write_protected` hook (FatFs STA_PROTECT), test added (116 checks).
+- Hop acquisition on real radios (the sim copies the master clock): first try (late-biased estimate) took 13-23 s to
+  re-sync after a reboot; frames read after a channel change were attributed to the wrong hop (fixed: by start time);
+  final rules = acquisition mid-interval, earlier at once, late-arrival halving, later only by the 8-slot minimum, plus
+  a 1-byte beacon opening hop 0 of each cycle. e2e (2 runs): SRI 3.7 s, MRM 7.4-9.1 s, SRI rx reboot 1.4 s, MRM rx
+  reboot 4.3-4.6 s, MRM tx reboot 8.3-9.5 s, NM 3 nodes 3.2-3.4 s; all files byte-identical.
+- Docs: KiCad brief + Pi 3 page + hw page (mode switch on 2 GPIOs), pt v0.4.1, proto/README, README.
+- Santiago asked for /compact and an ultra review after this (user-run commands: `/compact`, `/code-review ultra`).
+- **Start next session with:** ultra review findings; then real Pi bring-up.
 
 ### 2026-10-18 (later) — Linux HAL port started
 - Santiago: start the Linux HAL port for the Pi 3. Driver: optional `nrf24_hal_t.xfer` (one whole SPI transaction,

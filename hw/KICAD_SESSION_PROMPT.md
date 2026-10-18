@@ -52,7 +52,7 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
 | Power path | Battery → **slide switch** (panel) → boost (Pi) and radio LDO | No ideal diode needed any more (the fuel gauge reads the cell) |
 | Radio supply | **Dedicated 3.3 V LDO** (AP2112K-3.3 or TLV75533, ≥ 300 mA, **dropout ≤ 0.1 V at 150 mA**) from the switched battery rail; **100 µF + 10 µF + 100 nF at the module** | SP4 VCC is 2.0–3.6 V, abs. max 3.6 V (never the 4.2 V battery, **never the Pi's 3V3 pin**). ~120 mA TX peak. PA/LNA modules are supply-noise sensitive: short, wide VCC/GND, keep away from the 5 V boost |
 | Low battery | Fuel gauge + firmware thresholds (≥ 3.5 V ok, 3.4–3.5 V warn, < 3.2 V fsync data every burst), re-measured at T0 under the Pi's load | Below ~3.4 V the LDO passes the cell through (≥ 2.95 V at cutoff, SP4 fine to 2.0 V). Leave room for a **buck-boost option** for the radio (TPS63001/TPS63020 + ferrite/10 µF at the module) in case T0 shows > 2 dB less output at 3.0 V |
-| UI | Tx/Rx pushbutton, TX/RX role switch, SRI/MRM↔NM mode switch, activity LED (blinks), status LED | Switches/button at the board edge; RC + ESD on button lines |
+| UI | Tx/Rx pushbutton, TX/RX role switch, **3-position mode switch SRI / MRM / NM** (on-off-on, two GPIOs), activity LED (blinks), status LED | Switches/button at the board edge; RC + ESD on button lines |
 | Debug | UART console header (GPIO 14/15 + GND), test points | Test points: VBAT, 5V_PI, 3V3_RADIO, GND. No screen or network on the box |
 
 ## Proposed Raspberry Pi 3 pin map (BCM numbering; verify against the Pi pinout before using it)
@@ -69,7 +69,8 @@ choice. This is the radio team's **draft for them to review**. Label the schemat
 | GPIO 25 | 22 | MAX17048 ALRT | Open drain, pull-up |
 | GPIO 17 | 11 | Tx/Rx button | To GND, pull-up, RC + ESD |
 | GPIO 27 | 13 | Role switch TX/RX | Atenea Q8 pending: keep it, it can stay unpopulated |
-| GPIO 23 | 16 | Mode switch SRI/MRM ↔ NM | |
+| GPIO 23 | 16 | Mode switch, NM position | To GND when NM; pull-up. The software (`proto/port/linux/ui.c`) reads 23 low = NM, 16 low = MRM, neither = SRI |
+| GPIO 16 | 36 | Mode switch, MRM position | To GND when MRM; pull-up |
 | GPIO 5 | 29 | Activity LED (blinks in Tx/Rx, rule) | |
 | GPIO 6 | 31 | Status LED | Also "safe to pull the stick" |
 | GPIO 26 | 37 | MCP73831 STAT | With pull-up |
