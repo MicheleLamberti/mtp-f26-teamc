@@ -121,7 +121,7 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.5 · Sun 18 Oct 2026</span></div>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.5.1 · Sun 18 Oct 2026</span></div>
   <div class="lede" style="margin:.7rem 0"><b>New in v0.5 (18 Oct): the micro is now a Raspberry Pi 3</b> (the team's request; the 3 A+ is suggested). The radio side does not change. On the board:
     <ul class="tight">
       <li>The carrier becomes a <b>HAT-style board</b> on the Pi's 40-pin header: SP4, radio LDO, 5 V boost, fuel gauge, charger, switches and LEDs.</li>
@@ -131,6 +131,7 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
       <li>The Pi's <b>WiFi/BT chip</b> is disabled in software or desoldered. That is our working assumption; Atenea Q22 asks.</li>
       <li>Cost goes to about <b>70–90 € per box</b>. The full analysis is on the <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a> page.</li>
     </ul></div>
+  <p class="lede"><b>v0.5.1 (18 Oct, later):</b> the block diagram shows the HAT boundary, the microSD and the GPIO numbers; the pin map adds the mode switch's second GPIO (16), the fuel-gauge alert (25) and the charger status (26).</p>
   <p class="lede"><b>Earlier:</b> v0.4.4 added the TX/RX role switch and the secured U.FL plug. v0.4.3 added low-battery countermeasures. v0.4.2 moved SRI/MRM to 20 dBm hopping on the same hardware. v0.4 chose one Ebyte E01-ML01SP4 and one flex omni per box.</p>
   <p class="lede">The radio baseline is 2.4 GHz with the nRF24L01+. Under our split, the electronics team picks the micro and designs the board. This page is the radio team's <b>suggestion</b>, built around every hardware rule in the competition PDF, to save you time. It is not a decision. Please challenge it.</p>
 </header>
@@ -173,23 +174,37 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
   <div class="mermaid-wrap">
 <pre class="mermaid">
 flowchart LR
-  BAT["18650 Li-ion, protected&lt;br/&gt;3.0–4.2 V"] --> SW["Power slide switch"]
-  CHG["Charger MCP73831&lt;br/&gt;USB-C, charge only"] --> BAT
-  SW --> BST["5.1 V boost, 2.5 A or more&lt;br/&gt;always on"]
-  BST --> PI["Raspberry Pi 3 A+&lt;br/&gt;5 V on header pins 2 and 4&lt;br/&gt;WiFi/BT off or removed"]
-  PI --> USBA["Pi USB-A port&lt;br/&gt;(file stick)"]
-  SW --> LDO["Radio LDO 3.3 V&lt;br/&gt;≥ 300 mA"]
-  LDO --> RA["Radio: E01-ML01SP4&lt;br/&gt;nRF24L01+ PA/LNA"]
-  PI -- "SPI0 + CSN/CE/IRQ" --> RA
-  FG["Fuel gauge MAX17048"] -- "I2C1" --> PI
+  BAT["18650 Li-ion, protected&lt;br/&gt;3.0–4.2 V"]
+  subgraph HAT["HAT carrier on the 40-pin header"]
+    CHG["Charger MCP73831&lt;br/&gt;USB-C, charge only"]
+    SW["Power slide switch"]
+    BST["5.1 V boost, 2.5 A or more&lt;br/&gt;always on"]
+    LDO["Radio LDO 3.3 V&lt;br/&gt;≥ 300 mA, from the cell"]
+    FG["Fuel gauge MAX17048"]
+    RA["Radio: E01-ML01SP4&lt;br/&gt;nRF24L01+ PA/LNA"]
+    UI["GO/STOP button · GPIO 17&lt;br/&gt;Role switch TX/RX · GPIO 27&lt;br/&gt;Mode switch SRI/MRM/NM · GPIO 23 + 16&lt;br/&gt;Activity + status LED · GPIO 5 / 6"]
+  end
+  PI["Raspberry Pi 3 A+&lt;br/&gt;Linux, teamc-node&lt;br/&gt;WiFi/BT off or removed"]
+  SD["microSD&lt;br/&gt;read-only root + /data"]
+  USBA["Pi USB-A port&lt;br/&gt;(file stick)"]
+  ANT["Flex omni&lt;br/&gt;Molex 146153, vertical on a wall"]
+  CHG --> BAT
+  BAT --> SW
+  SW --> BST
+  BST -- "5 V on pins 2 + 4" --> PI
+  SW --> LDO
+  LDO --> RA
+  PI -- "SPI0 GPIO 8–11&lt;br/&gt;CE 22 · IRQ 24" --> RA
   BAT --> FG
-  RA -- "IPEX" --> ANT["Flex omni&lt;br/&gt;Molex 146153, vertical on a wall"]
-  BTN["GO/STOP button"] --> PI
-  ROLE["Role switch TX/RX&lt;br/&gt;(Atenea Q8)"] --> PI
-  MODE["Mode switch SRI / MRM / NM"] --> PI
-  PI --> LED["Activity LED (blinks)&lt;br/&gt;+ status LED"]
+  FG -- "I2C1 GPIO 2/3&lt;br/&gt;alert 25" --> PI
+  CHG -- "STAT 26" --> PI
+  UI <--> PI
+  PI --> SD
+  PI --> USBA
+  RA -- "IPEX / U.FL" --> ANT
 </pre>
   </div>
+  <p class="col sub">The battery, the antenna and the Pi's own parts (microSD, USB port) sit outside the HAT. The software that runs on this hardware, <span class="mono">teamc-node</span>, is written and tested against an emulated radio; it has not run on a Pi yet (Team C Protocol Proposal v0.4.1).</p>
 </section>
 
 <section aria-labelledby="s-micro">
@@ -304,14 +319,14 @@ flowchart LR
   <ol>
     <li>Confirm the Pi 3 model (A+ suggested) and how many boards we already have, by <b>Fri 23 Oct</b>. The radio order (SP4s, antennas, pigtails) goes out now regardless; the Pico 2s are dropped from it.</li>
     <li>Try desoldering the WiFi/BT chip on one spare board, then check that the Pi still boots and that SPI and USB work.</li>
-    <li>Confirm the pin map (proposal: SPI0 on GPIO 9/10/11, CSN = CE0 on GPIO 8, CE GPIO 22, IRQ GPIO 24, I2C1 GPIO 2/3 for the fuel gauge, button GPIO 17, role switch GPIO 27, mode switch GPIO 23, LEDs GPIO 5/6). The full table is on the Pi 3 Switch page.</li>
+    <li>Confirm the pin map (proposal: SPI0 on GPIO 9/10/11, CSN = CE0 on GPIO 8, CE GPIO 22, IRQ GPIO 24, I2C1 GPIO 2/3 for the fuel gauge, button GPIO 17, role switch GPIO 27, mode switch GPIO 23 + 16, LEDs GPIO 5/6, fuel-gauge alert GPIO 25, charger status GPIO 26). The full table is on the Pi 3 Switch page.</li>
     <li>The power tree: 5.1 V boost part, fuel gauge, protection on the 5 V feed. The KiCad brief (<span class="mono">hw/KICAD_SESSION_PROMPT.md</span>) is updated for the HAT.</li>
     <li>The IKEA box's inside height and where the antenna can sit highest.</li>
   </ol></div>
 </section>
 
 <footer>
-  <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.11. Firmware and USB: Team C Protocol Proposal v0.4. Pi 3 analysis: <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a>. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
+  <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.11. Firmware and USB: Team C Protocol Proposal v0.4.1. Pi 3 analysis: <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a>. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
   <p>Sources checked 18 Oct 2026: <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/">Pi 3 A+</a> · <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b/">Pi 3 B</a> · <a href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html">Pi power and USB documentation</a> · <a href="https://pidramble.com/node/27">measured Pi 3 current</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>

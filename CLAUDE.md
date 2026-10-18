@@ -70,7 +70,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   republish to the same URL (v0.11 18-Oct: Pi 3 note, T0 Pi-noise check, T2 frame gap, Pi pins, Q22; v0.10 17-Oct: review fixes, conservative planning case, 37 hops / 30 ms, NM ch 77 + link to
   the NM spec, Q12–Q21; v0.9: options A/B, NM diagram).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (**v0.5 18-Oct: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
+  — source `radio/hw_proposal.html` (**v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session (rewritten 18-Oct
@@ -230,6 +230,7 @@ what's pending.
   a 1-byte beacon opening hop 0 of each cycle. e2e (2 runs): SRI 3.7 s, MRM 7.4-9.1 s, SRI rx reboot 1.4 s, MRM rx
   reboot 4.3-4.6 s, MRM tx reboot 8.3-9.5 s, NM 3 nodes 3.2-3.4 s; all files byte-identical.
 - Docs: KiCad brief + Pi 3 page + hw page (mode switch on 2 GPIOs), pt v0.4.1, proto/README, README.
+- Then: hw page v0.5.1 (block diagram redrawn for the Pi 3 HAT with GPIO numbers + microSD; pin map adds GPIO 16/25/26); PDF re-exported.
 - Santiago asked for /compact and an ultra review after this (user-run commands: `/compact`, `/code-review ultra`).
 - **Start next session with:** ultra review findings; then real Pi bring-up.
 
