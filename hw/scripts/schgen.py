@@ -98,11 +98,53 @@ def _xform(px, py, rot, mirror_x=False):
     return x, -y
 
 
+STANDALONE = False   # set by build_carrier.py --sheet: sheets may add stand-in PWR_FLAGs for nets driven elsewhere
+
+
 def _prop(name, value, x, y, hide=False, angle=0):
     p = ["property", Q(name), Q(value), ["at", x, y, angle], ["effects", ["font", ["size", 1.27, 1.27]]]]
     if hide:
         p[-1].append(["hide", "yes"])
     return p
+
+
+def _bbox(sym, part, body_only=False):
+    """Schematic-space bounding box of the unit: rectangles/polylines/circles (+ pin ends unless body_only)."""
+    pts = []
+    base = sym[1].split(":", 1)[1]
+    for u in find_all(sym, "symbol"):
+        suffix = u[1][len(base) + 1:].split("_")
+        if len(suffix) != 2 or int(suffix[0]) not in (0, part.unit):
+            continue
+        for r in find_all(u, "rectangle"):
+            pts += [(float(find(r, "start")[1]), float(find(r, "start")[2])),
+                    (float(find(r, "end")[1]), float(find(r, "end")[2]))]
+        for pl in find_all(u, "polyline"):
+            pts += [(float(xy[1]), float(xy[2])) for xy in find_all(find(pl, "pts"), "xy")]
+        for c in find_all(u, "circle"):
+            cx, cy, rad = float(find(c, "center")[1]), float(find(c, "center")[2]), float(find(c, "radius")[1])
+            pts += [(cx - rad, cy - rad), (cx + rad, cy + rad)]
+    if not body_only or not pts:
+        pts += [(px, py) for _n, _nm, _t, px, py, _a, _h in symbol_pins(sym, part.unit)]
+    if not pts:
+        pts = [(0, 0)]
+    xy = [_xform(px, py, part.rot) for px, py in pts]
+    xs = [part.at[0] + x for x, _ in xy]
+    ys = [part.at[1] + y for _, y in xy]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _field_spot(sym, part):
+    """Reference/Value position: right of upright two-pin parts, above wide two-pin parts, and right-aligned just
+    outside the top-left corner of the body for everything else (clear of top and left pin labels)."""
+    fang = 90 if part.rot % 180 else 0       # field angles are stored rotated with the symbol: this reads level
+    x0, y0, x1, y1 = _bbox(sym, part)
+    if len(symbol_pins(sym, part.unit)) <= 2:
+        if (y1 - y0) > (x1 - x0):
+            return (snap(x1 + 1.27), snap((y0 + y1) / 2 - 1.27)), fang, "left"
+        return (snap(x0), snap(y0 - 3.81)), fang, "left"
+    bx0, by0, _bx1, _by1 = _bbox(sym, part, body_only=True)
+    return (snap(bx0 - 1.27), snap(by0 - 3.81)), fang, "right"
 
 
 class Part:
@@ -156,9 +198,12 @@ class Sheet:
             inst = ["symbol", ["lib_id", Q(part.lib_id)], ["at", sx, sy, part.rot], ["unit", part.unit],
                     ["exclude_from_sim", "no"], ["in_bom", flag("in_bom")], ["on_board", flag("on_board")],
                     ["dnp", "yes" if part.dnp else "no"], ["uuid", uid(self.name, part.ref, part.unit)]]
-            ry = sy - 2.54
-            inst.append(_prop("Reference", part.ref, sx + 2.54, ry - 5.08))
-            inst.append(_prop("Value", part.value, sx + 2.54, ry - 2.54))
+            (rx, ry), fang, just = _field_spot(sym, part)
+            ref_p = _prop("Reference", part.ref, rx, ry, angle=fang)
+            val_p = _prop("Value", part.value, rx, ry + 2.54, angle=fang)
+            for p_ in (ref_p, val_p):
+                p_[-1].append(["justify", just])
+            inst += [ref_p, val_p]
             inst.append(_prop("Footprint", part.fp, sx, sy, hide=True))
             inst.append(_prop("Datasheet", part.datasheet or (props.get("Datasheet") or [0, 0, Q("")])[2],
                               sx, sy, hide=True))
@@ -190,7 +235,7 @@ class Sheet:
                 if net == "GND":
                     gnd += 1
                     items.append(self._power("power:GND", "#PWR", f"{self.name}_gnd{gnd}", ox, oy, project,
-                                             path_uuid, key))
+                                             path_uuid, key, rot=(ang + 90) % 360))
                 elif net in self.global_nets:
                     just = "right" if ang == 180 or ang == 270 else "left"
                     items.append(["global_label", Q(net), ["shape", "passive"], ["at", ox, oy, ang],
@@ -226,12 +271,12 @@ class Sheet:
                           ["uuid", uid(self.name, "note", i)]])
         return items + self.extra
 
-    def _power(self, lib_id, refbase, key, x, y, project, path_uuid, ukey):
+    def _power(self, lib_id, refbase, key, x, y, project, path_uuid, ukey, rot=0):
         self.lib_syms.setdefault(lib_id, load_symbol(lib_id))
         self._npwr += 1
         ref = f"{refbase}{self.pwr_base + self._npwr:04d}"
         val = lib_id.split(":")[1]
-        return ["symbol", ["lib_id", Q(lib_id)], ["at", x, y, 0], ["unit", 1], ["exclude_from_sim", "no"],
+        return ["symbol", ["lib_id", Q(lib_id)], ["at", x, y, rot], ["unit", 1], ["exclude_from_sim", "no"],
                 ["in_bom", "yes"], ["on_board", "yes"], ["dnp", "no"], ["uuid", uid(*ukey, "pwr")],
                 _prop("Reference", ref, x, y + 3.81 if val == "GND" else y - 3.81, hide=True),
                 _prop("Value", val, x, y + 3.81 if val == "GND" else y - 3.81, hide=val == "GND"),

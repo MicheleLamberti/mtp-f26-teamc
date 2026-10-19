@@ -15,6 +15,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import boardutil as bu  # noqa: E402
+import schgen  # noqa: E402
 from schgen import Project  # noqa: E402
 
 NAME = "teamc-carrier"
@@ -36,6 +37,7 @@ def build(names):
 def one_sheet(name, out):
     """Write one sheet as a stand-alone project in `out` and run ERC on it (for the sheet's owner)."""
     os.makedirs(out, exist_ok=True)
+    schgen.STANDALONE = True
     sh = build([name])[0]
     sh.write_standalone(out, name)
     shutil.copy(PRO, os.path.join(out, name + ".kicad_pro"))
