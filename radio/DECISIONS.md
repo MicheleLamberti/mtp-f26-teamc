@@ -181,8 +181,9 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
     free from €75, else €25, so add it to ET's DigiKey order) or **LCSC C152350** ($3.16, 270 in stock 19-Oct; same
     cart as the SP4 C97340). Mouser and Farnell UK also stock it.
   - **Ordered 19-Oct (Santiago, ebyteiot.com): 4 modules = 2 × + FPC-2509 (the two boxes' antennas) and 2 × + JKS-IPX20
-    (bench pigtails + T5b reference rods); no bare modules, no Molex.** No spare module: if one dies (breakout
-    soldering, drop test), reorder at once (1–3 weeks from China).
+    (bench pigtails + T5b reference rods); no bare modules, no Molex.** 2 boxes + 2 spare modules (the rod-kit
+    SP4s are the same module: bench and T5b reference until needed; if a box module dies, move its flex antenna onto
+    one). The flex antenna has no spare: if one is damaged, use the Molex fallback.
   - The list above (6 modules, 4 FPC, Molex) was the plan before the order; the Molex is now the D-R5c fallback.
   - For T4/T5/T5b: SMA attenuator pads 1, 2, 3, 6, 10 dB (or a lab step attenuator in 1 dB steps).
   - Not needed: E01-ML01DP5, SMA whips.

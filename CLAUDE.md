@@ -188,7 +188,7 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 
 **Next up (17-Oct, roughly in order):**
 - [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
-      antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). No spare SP4. Still to get: 2 × microSD, bench
+      antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). 2 boxes + 2 spare SP4s (the rod-kit ones); no spare flex antenna (Molex if one breaks). Still to get: 2 × microSD, bench
       5.1 V supply, SMA pads 1/2/3/6/10 dB (or the lab's step attenuator); Molex only if T5b fails. Log the delivery dates.
 - [ ] Name owners: SP4 breakout, Pi 3 HAT, Linux port (HAL, timers, store, USB) + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
