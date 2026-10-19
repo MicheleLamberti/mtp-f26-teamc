@@ -64,14 +64,15 @@ def main():
         return
     os.makedirs(os.path.join(DIR, "build"), exist_ok=True)
     bu.write_lib_tables(DIR)
-    bu.set_project_rules(PRO, classes=[("Power", 1.0, ["VBAT", "VBAT_SW", "5V_PI", "/power/*"]),
+    from route_carrier import FINE_NETS
+    bu.set_project_rules(PRO, classes=[("FinePitch", 0.4, FINE_NETS, 0.15), ("Power", 1.0, ["VBAT", "VBAT_SW", "5V_PI", "/power/*"]),
                                        ("Radio3V3", 0.5, ["3V3_RADIO"])])
     Project(NAME, build(SHEETS), title="Team C Pi 3 A+ HAT carrier (DRAFT – for ET review)").write(DIR)
     rpt = os.path.join(DIR, "build", "erc.rpt")
     print(bu.run("kicad-cli", "sch", "erc", "--severity-all", "-o", rpt, SCH))
     bu.run("kicad-cli", "sch", "export", "netlist", "-o", NET, SCH)
     if not a.no_board:
-        print(bu.run(sys.executable, os.path.join(HERE, "netlist2pcb.py"), PCB, NET))
+        print(bu.run(sys.executable, os.path.join(HERE, "netlist2pcb.py"), PCB, NET, "--refresh", "J1"))
 
 
 if __name__ == "__main__":

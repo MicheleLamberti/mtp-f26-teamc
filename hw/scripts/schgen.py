@@ -142,7 +142,8 @@ def _field_spot(sym, part):
     if len(symbol_pins(sym, part.unit)) <= 2:
         if (y1 - y0) > (x1 - x0):
             return (snap(x1 + 1.27), snap((y0 + y1) / 2 - 1.27)), fang, "left"
-        return (snap(x0), snap(y0 - 3.81)), fang, "left"
+        bx0, by0, bx1, _by1 = _bbox(sym, part, body_only=True)
+        return (snap((bx0 + bx1) / 2), snap(by0 - 5.08)), fang, "center"
     bx0, by0, _bx1, _by1 = _bbox(sym, part, body_only=True)
     return (snap(bx0 - 1.27), snap(by0 - 3.81)), fang, "right"
 
@@ -202,7 +203,8 @@ class Sheet:
             ref_p = _prop("Reference", part.ref, rx, ry, angle=fang)
             val_p = _prop("Value", part.value, rx, ry + 2.54, angle=fang)
             for p_ in (ref_p, val_p):
-                p_[-1].append(["justify", just])
+                if just != "center":          # centred is KiCad's default (no justify keyword)
+                    p_[-1].append(["justify", just])
             inst += [ref_p, val_p]
             inst.append(_prop("Footprint", part.fp, sx, sy, hide=True))
             inst.append(_prop("Datasheet", part.datasheet or (props.get("Datasheet") or [0, 0, Q("")])[2],

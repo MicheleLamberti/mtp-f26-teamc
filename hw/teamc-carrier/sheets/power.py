@@ -107,7 +107,7 @@ def build():
     s.add("Power_Protection:SP0504BAHT", "U12", "SP0504BAHTG", fp="Package_TO_SOT_SMD:SOT-23-5", at=(220.98, 76.2),
           rot=90, nets={"1": "CC1", "3": "CC2", "4": "PWR_SW_J", "5": None, "2": "GND"},
           mpn="SP0504BAHTG", mfr="Littelfuse", ds="")
-    s.add("Battery_Management:MCP73831-2-OT", "U1", "MCP73831-2", fp="Package_TO_SOT_SMD:SOT-23-5", at=(266.7, 58.42),
+    s.add("Battery_Management:MCP73831-2-OT", "U1", "MCP73831", fp="Package_TO_SOT_SMD:SOT-23-5", at=(266.7, 58.42),
           nets={"1": "CHG_STAT_RAW", "2": "GND", "3": "VBAT", "4": "VBUS_USB", "5": "PROG"},
           mpn="MCP73831T-2ACI/OT", mfr="Microchip", ds=DS["MCP73831"])
     C(s, "C2", "10u", (299.72, 35.56), "VBAT", "GND")
@@ -202,7 +202,7 @@ def build():
     C(s, "C12", "1u", (106.68, 231.14), "LDO_OUT", "GND")
     R(s, "R14", "0R", (106.68, 246.38), "LDO_OUT", "3V3_RADIO", shown="0R (fit)")
     R(s, "R16", "0R", (106.68, 261.62), "BB_OUT", "3V3_RADIO", dnp=True, shown="0R (DNP)")
-    s.add("Regulator_Switching:TPS63001", "U5", "TPS63001", fp="Package_SON:Texas_DRC0010J_ThermalVias",
+    s.add("Regulator_Switching:TPS63001", "U5", "TPS63001", fp="Package_SON:Texas_DRC0010J",
           at=(180.34, 238.76),
           nets={"1": "BB_OUT", "2": "BB_SW2", "3": "GND", "4": "BB_SW1", "5": "VBAT_SW", "6": "VBAT_SW",
                 "7": "VBAT_SW", "8": "BB_VINA", "9": "GND", "10": "BB_OUT", "11": "GND"},
@@ -238,6 +238,7 @@ def build():
     # Nets driven here only through passive pins (connector, FET, 0R/100R) but feeding power_in pins
     s.pwr_flag("GND", at=(363.22, 233.68))
     s.pwr_flag("VBAT_SW", at=(383.54, 233.68))
+    # no flag on VBAT: U1 pin 3 (MCP73831 VBAT) is a power output and drives it; a PWR_FLAG there is an ERC error
     s.pwr_flag("VBUS_USB", at=(152.4, 68.58))
     s.pwr_flag("BB_VINA", at=(81.28, 248.92))
     s.pwr_flag("3V3_RADIO", at=(139.7, 241.3))

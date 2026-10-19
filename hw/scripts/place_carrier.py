@@ -26,28 +26,73 @@ EDGE_MARGIN = 0.5
 
 # ref: (x, y, rotation, back side)
 FIXED = {
-    "U7": (149.5, 89.5, 0, False),     # SP4 bottom-right, pad row up, IPEX near the bottom edge (Pi x 42-57, y 1-19)
-    "J2": (103.4, 81.0, 270, False),   # USB-C mouth on the left edge (rotation checked below)
-    "J20": (109.0, 93.5, 0, False),    # battery lead, bottom-left
-    "J21": (117.0, 93.5, 0, False),    # 2nd cell (DNP)
-    "J22": (124.5, 95.5, 0, False),    # power toggle lead
-    "J10": (131.0, 95.5, 0, False),    # GO/STOP button lead
-    "J11": (138.0, 95.5, 0, False),    # role toggle lead
-    "J12": (123.5, 88.5, 0, False),    # mode toggle lead
-    "U2": (112.5, 62.0, 0, False),     # boost next to header pins 2/4 (Pi top-left)
-    "L1": (106.0, 62.0, 90, False),
-    "Q4": (112.0, 54.0, 0, False),     # ideal diode right below header pins 2/4
-    "U3": (116.0, 54.0, 0, False),
-    "U4": (141.0, 78.0, 0, False),     # radio LDO beside the SP4
-    "U5": (136.0, 72.0, 0, False),     # buck-boost option (DNP)
-    "U1": (110.0, 75.0, 0, False),     # charger near the USB-C
-    "U6": (114.0, 86.5, 0, False),     # fuel gauge near the battery lead (Kelvin)
-    "Q1": (108.5, 87.0, 0, False),
-    "Q2": (119.0, 80.0, 0, False),
-    "U11": (134.0, 90.0, 0, False),    # ESD at the UI connectors
-    "U12": (108.0, 81.5, 0, False),    # ESD at the USB-C / power toggle
-    "J13": (121.0, 57.0, 90, False),   # UART console
-    "SW1": (128.0, 77.0, 0, False),    # bench button
+    # radio corner (Pi bottom-right, far from the SoC and the Pi's wireless can)
+    "U7": (149.0, 89.5, 0, False),     # SP4: pad row up, IPEX near the bottom edge, clear of MH4's keep-out
+    "C70": (159.8, 68.6, 90, False),   # 100 uF at pad 1
+    "C72": (154.6, 77.3, 0, False),    # 100 nF right at pad 1, above the module's courtyard
+    "C71": (158.9, 77.3, 0, False),    # 10 uF
+    "U4": (141.0, 75.5, 0, False),     # radio LDO
+    "R84": (147.5, 74.5, 90, False),   # MISO series R at the radio end, above the pad escapes
+    "TP10": (161.5, 82.0, 0, False),
+    "U5": (138.5, 68.0, 0, False),     # buck-boost option (DNP)
+    # power corner (Pi top-left, next to header pins 2/4)
+    # boost laid out as TI's RWU example: L1 above the IC (SW pad on the left, VIN on the right), input cap at VIN,
+    # output caps in a row under VOUT; SW_NODE / VBAT_SW / 5V_BOOST are copper areas (BOOST_ZONES)
+    "L1": (109.65, 58.8, 180, False),   # pad 1 (VBAT_SW) right, pad 2 (SW) left
+    "U2": (112.5, 63.6, 0, False),
+    "C4": (116.2, 60.2, 0, False),     # 22 uF at VIN (pin 7)
+    "C6": (107.4, 67.9, 90, False),    # 3 x 22 uF at VOUT (pin 3)
+    "C7": (110.0, 67.9, 90, False),
+    "C8": (112.6, 67.9, 90, False),
+    "C5": (122.5, 63.5, 90, False),    # 100 uF boost input bulk
+    "Q4": (108.0, 52.6, 0, False),     # ideal diode under header pins 2/4
+    "U3": (112.0, 52.6, 0, False),
+    "C9": (121.0, 54.0, 0, False),     # 100 uF at 5V_PI
+    # left edge: battery lead above the USB-C mouth
+    "J20": (103.5, 75.8, 0, False),
+    "J21": (117.5, 75.8, 0, False),    # 2nd cell (DNP)
+    "J2": (103.4, 87.5, 270, False),   # rotation re-checked below so the mouth faces the left edge
+    "U12": (110.5, 90.0, 0, False),    # ESD for CC1/CC2 and the power-toggle line
+    "U1": (116.0, 89.5, 0, False),     # charger between the USB-C and the battery lead
+    "U6": (114.5, 84.0, 0, False),     # fuel gauge next to J20 (Kelvin)
+    "TP1": (110.5, 84.0, 0, False),    # VBAT
+    "Q1": (112.3, 73.0, 0, False),     # reverse-cell FET next to J20
+    "Q2": (112.3, 77.6, 0, False),     # power switch FET
+    # bottom edge: panel leads
+    "J22": (111.5, 95.0, 0, False),    # power toggle
+    "J10": (121.0, 95.0, 0, False),    # GO/STOP button
+    "J11": (130.5, 95.0, 0, False),    # role toggle
+    "J12": (124.0, 86.0, 0, False),    # mode toggle
+    "U11": (136.0, 88.0, 0, False),    # ESD at the leads
+    "SW1": (127.0, 73.0, 0, False),    # bench button
+    # signals next to the header
+    "R83": (131.2, 53.5, 90, False),   # MOSI series R at header pin 19
+    "R82": (136.3, 53.5, 90, False),   # SCK series R at header pin 23
+    "J13": (141.0, 56.0, 90, False),   # UART console
+    "TP2": (128.5, 58.0, 0, False),
+    "TP3": (134.0, 62.0, 0, False),
+}
+# copper areas of the boost (F.Cu, above the GND pour): net, polygon. The SW neck at the IC sits between the GND
+# (pin 1) and VOUT (pin 3) bars; the VBAT_SW area reaches VIN (7) from the right and stops above GND (6);
+# EN (5) is a routed track; the 5V_BOOST area stays 0.45 mm clear of FB (4).
+BOOST_ZONES = [
+    ("/power/SW_NODE", [(106.4, 57.7), (108.75, 57.7), (108.75, 63.375), (112.8, 63.375), (112.8, 63.825),
+                        (106.4, 63.825)]),
+    ("VBAT_SW", [(110.6, 57.7), (116.0, 57.7), (116.0, 62.6), (114.6, 62.6), (114.6, 63.05), (113.15, 63.05),
+                 (113.15, 61.5), (110.6, 61.5)]),
+    ("/power/5V_BOOST", [(106.0, 64.05), (112.8, 64.05), (112.8, 66.95), (106.0, 66.95)]),
+]
+# parts whose own nets are rails: put them next to the part they serve (anchor's pad on the shared net)
+NEAR = {
+    "C1": "J2", "R2": "J2", "R3": "J2", "D1": "J2",
+    "C2": "U1", "R4": "U1", "R5": "U1", "D4": "U1", "Q3": "U1", "R6": "Q3", "R7": "Q3",
+    "R1": "Q1", "D3": "Q1", "R8": "Q2", "R9": "Q2",
+    "C3": "U2", "R10": "U2", "R11": "U2", "C4": "U2", "C6": "U2", "C7": "U2", "C8": "U2",
+    "C10": "C9", "D2": "C9", "R12": "U3", "R13": "U3",
+    "C11": "U4", "C12": "U4", "R14": "U4",
+    "R16": "U5", "C13": "U5", "C14": "U5", "C15": "U5", "C16": "U5", "L2": "U5", "R15": "U5",
+    "C17": "U6", "R17": "U6",
+    "R80": "U7", "R81": "U7",
 }
 # nets too common to pick a neighbour by
 COMMON = {"GND", "VBAT", "VBAT_SW", "3V3_PI", "5V_PI", "3V3_RADIO", "/power/5V_BOOST"}
@@ -74,6 +119,14 @@ def inside_board(r):
         if math.hypot(cx - hx, cy - hy) < HOLE_KEEPOUT_R:
             return False
     return True
+
+
+def pad_gap(a, b):
+    """Copper-to-copper distance of two pads on a layer they share (mm)."""
+    for lay in (pcbnew.F_Cu, pcbnew.B_Cu):
+        if a.IsOnLayer(lay) and b.IsOnLayer(lay):
+            return pcbnew.ToMM(a.GetEffectiveShape(lay).GetClearance(b.GetEffectiveShape(lay)))
+    return 1.0
 
 
 def redraw_outline(board):
@@ -117,6 +170,11 @@ def main():
                 break
         placed["J2"] = courtyard(f)
 
+    # the boost copper areas are not for parts that do not belong to them
+    for i, (_net, pts) in enumerate(BOOST_ZONES):
+        xs, ys = [x for x, _ in pts], [y for _, y in pts]
+        placed[f"zone{i}"] = (min(xs), min(ys), max(xs), max(ys))
+
     # nets per footprint
     nets = {ref: {p.GetNetname() for p in f.Pads() if p.GetNetname()} for ref, f in fps.items()}
     users = {}
@@ -125,54 +183,71 @@ def main():
             users.setdefault(n, set()).add(ref)
 
     def anchor(ref):
-        """The placed part sharing this part's most specific net (fewest users; rails and GND last)."""
+        """NEAR's choice, else the placed part sharing this part's most specific net (rails and GND last)."""
+        if ref in NEAR:
+            a = NEAR[ref]
+            if a not in placed:
+                return None, None
+            shared = sorted(nets[ref] & nets[a], key=lambda n: (n == "GND", len(users[n])))
+            return a, (shared[0] if shared else None)
         order = sorted(nets[ref], key=lambda n: (n in COMMON, len(users[n])))
         for n in order:
-            cands = sorted(r for r in users[n] if r in placed and r != ref and not r.startswith("MH"))
+            cands = sorted(r for r in users[n] if r in placed and r != ref and r in fps
+                           and not r.startswith("MH"))
             if cands:
                 return cands[0], n
         return None, None
 
-    todo = [r for r in sorted(fps) if r not in placed]
-    for _ in range(3):
+    def place_near(ref, a, n):
+        ax, ay = [pcbnew.ToMM(c) for c in (fps[a].GetPosition().x, fps[a].GetPosition().y)]
+        for p in fps[a].Pads():   # aim at the anchor's pad on the shared net
+            if n and p.GetNetname() == n:
+                ax, ay = pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)
+                break
+        for ring in range(0, 120):
+            rad = 1.0 + ring * 0.5
+            steps = max(8, int(2 * math.pi * rad / 0.8))
+            for k in range(steps):
+                t = 2 * math.pi * k / steps
+                x, y = round(ax + rad * math.cos(t), 2), round(ay + rad * math.sin(t), 2)
+                for rot in (0, 90):
+                    bu.place(board, ref, x, y, rot)
+                    r = courtyard(fps[ref])
+                    if inside_board(r) and not any(overlaps(r, o) for o in placed.values()):
+                        placed[ref] = r
+                        return True
+        return False
+
+    # NEAR parts first (in dependency order), then everything else
+    todo = sorted((r for r in fps if r not in placed), key=lambda r: (r not in NEAR, r))
+    for _ in range(4):
         left = []
         for ref in todo:
             a, n = anchor(ref)
-            if a is None:
+            if a is None or not place_near(ref, a, n):
                 left.append(ref)
-                continue
-            ax, ay = [pcbnew.ToMM(c) for c in (fps[a].GetPosition().x, fps[a].GetPosition().y)]
-            # the anchor pad on the shared net, if any, is the better target
-            for p in fps[a].Pads():
-                if p.GetNetname() == n:
-                    ax, ay = pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)
-                    break
-            ok = False
-            for ring in range(0, 80):
-                rad = 1.0 + ring * 0.5
-                steps = max(8, int(2 * math.pi * rad / 0.8))
-                for k in range(steps):
-                    t = 2 * math.pi * k / steps
-                    x, y = round(ax + rad * math.cos(t), 2), round(ay + rad * math.sin(t), 2)
-                    for rot in (0, 90):
-                        bu.place(board, ref, x, y, rot)
-                        r = courtyard(fps[ref])
-                        if inside_board(r) and not any(overlaps(r, o) for o in placed.values()):
-                            placed[ref] = r
-                            ok = True
-                            break
-                    if ok:
-                        break
-                if ok:
-                    break
-            if not ok:
-                left.append(ref)
-                print("could not place", ref)
-        todo = left
-        if not todo:
+        if len(left) == len(todo):
             break
-    for ref in todo:
-        print("UNPLACED", ref)
+        todo = left
+    for i, ref in enumerate(todo):   # park what did not fit to the right of the board, in plain view
+        bu.place(board, ref, X1 + 8.0, Y0 + 4.0 + 5.0 * i, 0)
+        print("UNPLACED (parked right of the board):", ref)
+
+    # fine-pitch footprints (QFN/TDFN 0.5 mm, SOT-363, USB-C): their own pads sit closer than the lab's 0.3 mm,
+    # which is inherent to the package; a footprint-level clearance of 0.15 mm covers exactly those pads
+    # (pad-to-pour and pad-to-track still take the larger 0.3 mm net-class value)
+    for ref, f in fps.items():
+        pads = [p for p in f.Pads() if p.GetNumber()]
+        gap = min((pad_gap(a, b) for i, a in enumerate(pads) for b in pads[i + 1:]
+                   if a.GetNetname() != b.GetNetname()), default=1.0)
+        if gap < bu.LAB_RULES["clearance"]:
+            f.SetLocalClearance(bu.MM(0.15))
+            print(f"fine pitch {ref}: own pad gap {gap:.3f} mm -> footprint clearance 0.15 mm")
+
+    for net, pts in BOOST_ZONES:
+        z = bu.zone(board, net, pcbnew.F_Cu, pts, clearance=0.2, min_width=0.2, name="boost_" + net.split("/")[-1])
+        z.SetAssignedPriority(10)
+        z.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
 
     # ground pours on both layers (the SP4's own rule area keeps tracks out from under it on F.Cu)
     poly = [(X0 + 0.3, Y0 + 0.3), (X1 - 0.3, Y0 + 0.3), (X1 - 0.3, Y1 - 0.3), (X0 + 0.3, Y1 - 0.3)]
@@ -184,7 +259,7 @@ def main():
         ra.SetDoNotAllowTracks(True)
         ra.SetDoNotAllowVias(True)
         ra.SetDoNotAllowZoneFills(True)
-        ra.SetDoNotAllowPads(True)
+        ra.SetDoNotAllowPads(False)
         ra.SetDoNotAllowFootprints(False)
         ra.SetLayerSet(pcbnew.LSET.AllCuMask())
         o = ra.Outline()
@@ -194,7 +269,8 @@ def main():
             o.Append(bu.MM(hx + HOLE_KEEPOUT_R * math.cos(t)), bu.MM(hy + HOLE_KEEPOUT_R * math.sin(t)))
         ra.SetZoneName("hole_keepout")
         board.Add(ra)
-    bu.text(board, "Team C Pi 3 A+ HAT - DRAFT for ET review - 19-Oct-26", 132.5, 98.6, size=0.8, thick=0.12)
+    bu.text(board, "Team C Pi 3 A+ HAT - DRAFT for ET review - 19-Oct-26", 132.5, 66.0, layer=pcbnew.B_SilkS,
+            size=1.0, thick=0.15)
     bu.fill_zones(board)
     board.Save(PCB)
 

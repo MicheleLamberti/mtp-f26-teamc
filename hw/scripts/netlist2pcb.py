@@ -37,7 +37,7 @@ def read_netlist(path):
             "fp": str(fp[1]) if fp else "",
             "value": str(find(c, "value")[1]),
             "path": str(find(sp, "tstamps")[1]) + str(stamps[1]),
-            "dnp": any(str(p[1]) == "dnp" for p in find_all(c, "property")),
+            "dnp": any(str((find(p, "name") or [0, ""])[1]) == "dnp" for p in find_all(c, "property")),
             "fields": {str(find(f, "name")[1]): str(f[2]) if len(f) > 2 else "" for f in find_all(find(c, "fields") or [], "field")
                        if str(find(f, "name")[1]) != "Footprint"},
         }
@@ -54,6 +54,7 @@ def main():
     ap.add_argument("pcb")
     ap.add_argument("netlist")
     ap.add_argument("--keep", nargs="*", default=[])
+    ap.add_argument("--refresh", nargs="*", default=[], help="reload these footprints from the library in place")
     a = ap.parse_args()
     board = pcbnew.LoadBoard(a.pcb)
     comps, pin_nets = read_netlist(a.netlist)
@@ -80,7 +81,7 @@ def main():
             continue
         lib, name = c["fp"].split(":", 1)
         fp = existing.get(ref)
-        if fp is not None and fp.GetFPID().GetUniStringLibId() != c["fp"]:
+        if fp is not None and (fp.GetFPID().GetUniStringLibId() != c["fp"] or ref in a.refresh):
             pos, rot, layer = fp.GetPosition(), fp.GetOrientationDegrees(), fp.GetLayer()
             board.Remove(fp)
             fp = None

@@ -13,7 +13,8 @@ LAB_RULES = {"clearance": 0.3, "track": 0.4, "via_d": 0.8, "via_drill": 0.4, "ed
 
 
 def set_project_rules(pro_path, rules=LAB_RULES, classes=()):
-    """Write the Default net class and the board minimums into the .kicad_pro; classes = [(name, width, nets)]."""
+    """Write the Default net class and the board minimums into the .kicad_pro;
+    classes = [(name, width, nets[, clearance])], highest priority first."""
     with open(pro_path, encoding="utf-8") as f:
         p = json.load(f)
     ns = p["net_settings"]
@@ -22,17 +23,22 @@ def set_project_rules(pro_path, rules=LAB_RULES, classes=()):
                    via_drill=rules["via_drill"])
     ns["classes"] = [default]
     patterns = []
-    for i, (name, width, nets) in enumerate(classes):
+    for i, cl in enumerate(classes):
+        name, width, nets = cl[:3]
         c = dict(default)
         c.update(name=name, track_width=width, priority=i)
+        if len(cl) > 3:
+            c["clearance"] = cl[3]
         ns["classes"].append(c)
         patterns += [{"netclass": name, "pattern": n} for n in nets]
     ns["netclass_patterns"] = patterns
     r = p["board"]["design_settings"]["rules"]
-    r.update(min_clearance=rules["clearance"], min_track_width=min(rules["track"], 0.3),
+    # the net classes carry the lab's 0.3 mm; the board floor only has to admit the pads inside fine-pitch
+    # packages (QFN/TDFN 0.5 mm pitch: 0.2-0.29 mm between their own pads), which get a 0.15 mm footprint clearance
+    r.update(min_clearance=0.15, min_track_width=min(rules["track"], 0.3),
              min_copper_edge_clearance=rules["edge"], min_via_diameter=rules["via_d"],
              min_through_hole_diameter=rules["via_drill"], min_hole_clearance=0.3, min_hole_to_hole=0.5,
-             min_via_annular_width=0.2)
+             min_via_annular_width=0.2, min_resolved_spokes=1)
     with open(pro_path, "w", encoding="utf-8") as f:
         json.dump(p, f, indent=2)
 

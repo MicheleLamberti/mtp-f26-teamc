@@ -60,7 +60,7 @@ def build():
 
     nets = {str(p): HEADER[p][0] for p in HEADER}
     s.add("Connector_Generic:Conn_02x20_Odd_Even", "J1", "RPi 3 A+ GPIO", at=J1_AT,
-          fp="Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_Vertical", nets=nets,
+          fp="teamc:PinSocket_2x20_P2.54mm_Vertical_Pad1.5mm", nets=nets,
           mpn="M20-7832046 (2x20 female, 8.5 mm; 11 mm stack with M2.5x11 standoffs)", mfr="Harwin")
     # pin-function table next to the labels: odd pins on the left, even on the right
     x0, y0 = J1_AT
