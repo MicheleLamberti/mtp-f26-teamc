@@ -171,6 +171,159 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:Fuse"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "F"
+				(at 2.032 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Fuse"
+				(at -1.905 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Fuse"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "fuse"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*Fuse*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Fuse_0_1"
+				(rectangle
+					(start -0.762 -2.54)
+					(end 0.762 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54)
+						(xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Fuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Transistor_FET:AO3401A"
 			(pin_names
 				(hide yes)
@@ -4642,7 +4795,7 @@
 		)
 		(uuid "f82490ae-deb1-566a-a41c-d6a884d6d146")
 	)
-	(label "BAT_RAW"
+	(label "BAT_IN"
 		(at 35.56 38.1 180)
 		(fields_autoplaced yes)
 		(effects
@@ -4808,6 +4961,135 @@
 	)
 	(wire
 		(pts
+			(xy 58.42 25.4)
+			(xy 55.88 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b0a49402-d442-5aff-b556-c587a0610c4a")
+	)
+	(label "BAT_IN"
+		(at 55.88 25.4 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c9006782-6bc7-50d4-8c64-79c61466e11d")
+	)
+	(wire
+		(pts
+			(xy 66.04 25.4)
+			(xy 68.58 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "314ae8e3-7ba1-51b6-98c3-03ad10b71fb6")
+	)
+	(label "BAT_RAW"
+		(at 68.58 25.4 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a67ebde2-e3e7-582c-a36f-45ffac616b89")
+	)
+	(symbol
+		(lib_id "Device:Fuse")
+		(at 62.23 25.4 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a624fea4-67d4-5b77-abfe-ddb6808945f4")
+		(property "Reference" "F1"
+			(at 62.23 19.05 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "5A fast"
+			(at 62.23 21.59 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder"
+			(at 62.23 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 62.23 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Fuse"
+			(at 62.23 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0466005.NR (1206 fast, 5 A; verify)"
+			(at 62.23 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Littelfuse"
+			(at 62.23 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "252de4cc-2a78-57cb-8119-439923d4be0b")
+		)
+		(pin "2"
+			(uuid "87b38420-4349-5707-89b1-641b93431a94")
+		)
+		(instances
+			(project "teamc-carrier"
+				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
+					(reference "F1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
 			(xy 38.1 58.42)
 			(xy 35.56 58.42)
 		)
@@ -4817,7 +5099,7 @@
 		)
 		(uuid "ce6abcb0-1359-5bc4-b880-30aa3fdcc592")
 	)
-	(label "BAT_RAW"
+	(label "BAT_IN"
 		(at 35.56 58.42 180)
 		(fields_autoplaced yes)
 		(effects
@@ -5066,7 +5348,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "AO3401A"
+		(property "Value" "Si2333DDS"
 			(at 76.2 33.02 90)
 			(effects
 				(font
@@ -5102,7 +5384,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "AO3401A"
+		(property "MPN" "Si2333DDS-T1-GE3"
 			(at 80.01 38.1 0)
 			(effects
 				(font
@@ -5111,7 +5393,7 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "Alpha & Omega"
+		(property "Manufacturer" "Vishay"
 			(at 80.01 38.1 0)
 			(effects
 				(font
@@ -5429,7 +5711,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-123F"
+		(property "Footprint" "Diode_SMD:D_SMF"
 			(at 80.01 81.28 0)
 			(effects
 				(font
@@ -5910,7 +6192,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-123F"
+		(property "Footprint" "Diode_SMD:D_SMF"
 			(at 175.26 35.56 0)
 			(effects
 				(font
@@ -8189,7 +8471,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "AO3401A"
+		(property "Value" "Si2333DDS"
 			(at 361.95 36.83 90)
 			(effects
 				(font
@@ -8225,7 +8507,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "AO3401A"
+		(property "MPN" "Si2333DDS-T1-GE3"
 			(at 365.76 40.64 0)
 			(effects
 				(font
@@ -8234,7 +8516,7 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "Alpha & Omega"
+		(property "Manufacturer" "Vishay"
 			(at 365.76 40.64 0)
 			(effects
 				(font
@@ -8452,7 +8734,7 @@
 				)
 			)
 		)
-		(property "Value" "1k 1%"
+		(property "Value" "10k 1%"
 			(at 345.44 74.93 90)
 			(effects
 				(font
@@ -8487,7 +8769,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-071KL"
+		(property "MPN" "RC0805FR-0710KL"
 			(at 345.44 78.74 0)
 			(effects
 				(font
@@ -8515,6 +8797,136 @@
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
 					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 341.63 43.18)
+			(xy 339.09 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95ac0a7b-9db4-5e03-ae55-a54755959cf3")
+	)
+	(label "PWR_G"
+		(at 339.09 43.18 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c31ef64c-2f55-58a3-be65-ea2bb6bbda9d")
+	)
+	(wire
+		(pts
+			(xy 349.25 43.18)
+			(xy 351.79 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ad170222-9a98-59cf-8fc5-fc782191ebd6")
+	)
+	(global_label "VBAT"
+		(shape passive)
+		(at 351.79 43.18 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "05ffbc6e-89fb-51d3-b34e-04c88b5ce086")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 345.44 43.18 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3b0c9485-73ad-59c1-bd54-8ab53ae820cc")
+		(property "Reference" "C18"
+			(at 345.44 35.56 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100n 50V X7R"
+			(at 345.44 38.1 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+			(at 345.44 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 345.44 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 345.44 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GRM21BR71H104KA01L"
+			(at 345.44 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Murata"
+			(at 345.44 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "89c0bfa1-34cc-56f2-aa17-7b5d1d484084")
+		)
+		(pin "2"
+			(uuid "99171ed1-5cf4-525f-9bfc-4de87c0b84a3")
+		)
+		(instances
+			(project "teamc-carrier"
+				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
+					(reference "C18")
 					(unit 1)
 				)
 			)
@@ -8863,62 +9275,17 @@
 		)
 		(uuid "890c7d15-c2c5-52d2-a974-59a7888eb0c0")
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 83.82 162.56 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "79bc2d41-763e-5dde-a1e8-af3c43949457")
-		(property "Reference" "#PWR1019"
-			(at 83.82 166.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+	(global_label "VBAT_SW"
+		(shape passive)
+		(at 83.82 162.56 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify right)
 		)
-		(property "Value" "GND"
-			(at 83.82 166.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 83.82 162.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 83.82 162.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "24b38f7a-b0f0-56a6-a323-4532b0723040")
-		)
-		(instances
-			(project "teamc-carrier"
-				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1019")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "ba64523a-bdc5-50b9-ab3d-9961cd07025c")
 	)
 	(wire
 		(pts
@@ -9218,7 +9585,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "74f8df7d-fe37-547e-8ab3-053d4f38fbfb")
-		(property "Reference" "#PWR1020"
+		(property "Reference" "#PWR1019"
 			(at 46.99 153.67 0)
 			(effects
 				(font
@@ -9260,7 +9627,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1020")
+					(reference "#PWR1019")
 					(unit 1)
 				)
 			)
@@ -9394,7 +9761,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "eed8cf31-9c92-5d7b-b021-98592ef82584")
-		(property "Reference" "#PWR1021"
+		(property "Reference" "#PWR1020"
 			(at 46.99 171.45 0)
 			(effects
 				(font
@@ -9436,7 +9803,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1021")
+					(reference "#PWR1020")
 					(unit 1)
 				)
 			)
@@ -9827,7 +10194,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a65b7e34-c11e-5c0f-9b04-ea8e53de4506")
-		(property "Reference" "#PWR1022"
+		(property "Reference" "#PWR1021"
 			(at 156.21 171.45 0)
 			(effects
 				(font
@@ -9869,7 +10236,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1022")
+					(reference "#PWR1021")
 					(unit 1)
 				)
 			)
@@ -10002,7 +10369,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b63292e9-c7f5-5f44-ad05-979c3b359bfa")
-		(property "Reference" "#PWR1023"
+		(property "Reference" "#PWR1022"
 			(at 201.93 135.89 0)
 			(effects
 				(font
@@ -10044,7 +10411,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1023")
+					(reference "#PWR1022")
 					(unit 1)
 				)
 			)
@@ -10177,7 +10544,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "fb4758b9-2c5d-5c75-b9af-8fc03dce0eaf")
-		(property "Reference" "#PWR1024"
+		(property "Reference" "#PWR1023"
 			(at 201.93 153.67 0)
 			(effects
 				(font
@@ -10219,7 +10586,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1024")
+					(reference "#PWR1023")
 					(unit 1)
 				)
 			)
@@ -10352,7 +10719,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "598b504e-eefd-538d-a5aa-660e422a0537")
-		(property "Reference" "#PWR1025"
+		(property "Reference" "#PWR1024"
 			(at 201.93 171.45 0)
 			(effects
 				(font
@@ -10394,7 +10761,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1025")
+					(reference "#PWR1024")
 					(unit 1)
 				)
 			)
@@ -10726,7 +11093,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "BC857BS"
+		(property "Value" "BCM857BS"
 			(at 238.76 156.21 0)
 			(effects
 				(font
@@ -10762,7 +11129,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "BC857BS,115"
+		(property "MPN" "BCM857BS,115"
 			(at 243.84 160.02 0)
 			(effects
 				(font
@@ -10883,7 +11250,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "BC857BS"
+		(property "Value" "BCM857BS"
 			(at 284.48 156.21 0)
 			(effects
 				(font
@@ -10919,7 +11286,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "BC857BS,115"
+		(property "MPN" "BCM857BS,115"
 			(at 289.56 160.02 0)
 			(effects
 				(font
@@ -10997,7 +11364,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a821bc1d-ec01-57f9-8d47-80b0461b4aab")
-		(property "Reference" "#PWR1026"
+		(property "Reference" "#PWR1025"
 			(at 336.55 135.89 0)
 			(effects
 				(font
@@ -11039,7 +11406,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1026")
+					(reference "#PWR1025")
 					(unit 1)
 				)
 			)
@@ -11172,7 +11539,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8873e8c8-e42e-5f5c-a8d5-4e79671213e5")
-		(property "Reference" "#PWR1027"
+		(property "Reference" "#PWR1026"
 			(at 336.55 153.67 0)
 			(effects
 				(font
@@ -11214,7 +11581,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1027")
+					(reference "#PWR1026")
 					(unit 1)
 				)
 			)
@@ -11348,7 +11715,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c4ee6e1a-9c80-583b-a577-ec6fb772de32")
-		(property "Reference" "#PWR1028"
+		(property "Reference" "#PWR1027"
 			(at 336.55 171.45 0)
 			(effects
 				(font
@@ -11390,7 +11757,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1028")
+					(reference "#PWR1027")
 					(unit 1)
 				)
 			)
@@ -11524,7 +11891,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e02a2feb-78f6-5417-b74b-4e02d94273ec")
-		(property "Reference" "#PWR1029"
+		(property "Reference" "#PWR1028"
 			(at 384.81 135.89 0)
 			(effects
 				(font
@@ -11566,7 +11933,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1029")
+					(reference "#PWR1028")
 					(unit 1)
 				)
 			)
@@ -11700,7 +12067,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "11fe0c25-0af1-563d-8c55-6fdd69bd50a2")
-		(property "Reference" "#PWR1030"
+		(property "Reference" "#PWR1029"
 			(at 384.81 153.67 0)
 			(effects
 				(font
@@ -11742,7 +12109,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1030")
+					(reference "#PWR1029")
 					(unit 1)
 				)
 			)
@@ -11773,7 +12140,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-123F"
+		(property "Footprint" "Diode_SMD:D_SMF"
 			(at 378.46 149.86 0)
 			(effects
 				(font
@@ -11876,7 +12243,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "648b1a47-f5ba-5cd9-8e80-17a9ab5ad409")
-		(property "Reference" "#PWR1031"
+		(property "Reference" "#PWR1030"
 			(at 55.88 237.49 0)
 			(effects
 				(font
@@ -11918,7 +12285,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1031")
+					(reference "#PWR1030")
 					(unit 1)
 				)
 			)
@@ -12108,7 +12475,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "dbfc8e49-f42d-5afa-ba73-ba1b21e22c53")
-		(property "Reference" "#PWR1032"
+		(property "Reference" "#PWR1031"
 			(at 113.03 219.71 0)
 			(effects
 				(font
@@ -12150,7 +12517,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1032")
+					(reference "#PWR1031")
 					(unit 1)
 				)
 			)
@@ -12283,7 +12650,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1a3a8aa0-87be-5888-a096-4937bf4ba767")
-		(property "Reference" "#PWR1033"
+		(property "Reference" "#PWR1032"
 			(at 113.03 234.95 0)
 			(effects
 				(font
@@ -12325,7 +12692,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1033")
+					(reference "#PWR1032")
 					(unit 1)
 				)
 			)
@@ -12740,7 +13107,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "fc68e4a2-9087-55c4-b770-cbf955bacc0c")
-		(property "Reference" "#PWR1034"
+		(property "Reference" "#PWR1033"
 			(at 180.34 260.35 0)
 			(effects
 				(font
@@ -12782,7 +13149,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1034")
+					(reference "#PWR1033")
 					(unit 1)
 				)
 			)
@@ -12921,7 +13288,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b84b7ee4-9de2-52cd-8430-b9d9d3e60c9d")
-		(property "Reference" "#PWR1035"
+		(property "Reference" "#PWR1034"
 			(at 177.8 260.35 0)
 			(effects
 				(font
@@ -12963,7 +13330,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1035")
+					(reference "#PWR1034")
 					(unit 1)
 				)
 			)
@@ -13277,7 +13644,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b3d3fff7-b571-5904-b5b7-382c9183d08f")
-		(property "Reference" "#PWR1036"
+		(property "Reference" "#PWR1035"
 			(at 237.49 234.95 0)
 			(effects
 				(font
@@ -13319,7 +13686,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1036")
+					(reference "#PWR1035")
 					(unit 1)
 				)
 			)
@@ -13452,7 +13819,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "45f3cf26-a06f-522b-b378-ce238e66ce3d")
-		(property "Reference" "#PWR1037"
+		(property "Reference" "#PWR1036"
 			(at 237.49 250.19 0)
 			(effects
 				(font
@@ -13494,7 +13861,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1037")
+					(reference "#PWR1036")
 					(unit 1)
 				)
 			)
@@ -13627,7 +13994,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "39584eb1-0b18-5d66-9dd7-1df4551f554f")
-		(property "Reference" "#PWR1038"
+		(property "Reference" "#PWR1037"
 			(at 237.49 265.43 0)
 			(effects
 				(font
@@ -13669,7 +14036,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1038")
+					(reference "#PWR1037")
 					(unit 1)
 				)
 			)
@@ -13932,7 +14299,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e28511f2-502a-5f1a-afd5-a40d1f926462")
-		(property "Reference" "#PWR1039"
+		(property "Reference" "#PWR1038"
 			(at 62.23 270.51 0)
 			(effects
 				(font
@@ -13974,7 +14341,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1039")
+					(reference "#PWR1038")
 					(unit 1)
 				)
 			)
@@ -14131,7 +14498,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "75f4aea2-06de-54a0-8cc0-f38a225fc08f")
-		(property "Reference" "#PWR1040"
+		(property "Reference" "#PWR1039"
 			(at 287.02 229.87 0)
 			(effects
 				(font
@@ -14173,7 +14540,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1040")
+					(reference "#PWR1039")
 					(unit 1)
 				)
 			)
@@ -14199,7 +14566,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8cb9a372-8a03-5a4a-aa10-904fe388e288")
-		(property "Reference" "#PWR1041"
+		(property "Reference" "#PWR1040"
 			(at 287.02 232.41 0)
 			(effects
 				(font
@@ -14241,7 +14608,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1041")
+					(reference "#PWR1040")
 					(unit 1)
 				)
 			)
@@ -14336,7 +14703,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5d8331be-f5e2-5cbd-82c5-10e0524ef1f9")
-		(property "Reference" "#PWR1042"
+		(property "Reference" "#PWR1041"
 			(at 299.72 240.03 0)
 			(effects
 				(font
@@ -14378,7 +14745,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1042")
+					(reference "#PWR1041")
 					(unit 1)
 				)
 			)
@@ -14404,7 +14771,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "20974efe-ea77-57eb-a135-f8dc4016efef")
-		(property "Reference" "#PWR1043"
+		(property "Reference" "#PWR1042"
 			(at 302.26 240.03 0)
 			(effects
 				(font
@@ -14446,7 +14813,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1043")
+					(reference "#PWR1042")
 					(unit 1)
 				)
 			)
@@ -14603,7 +14970,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "90ebf2c7-77a0-54d7-a4e4-8a812864a283")
-		(property "Reference" "#PWR1044"
+		(property "Reference" "#PWR1043"
 			(at 288.29 247.65 0)
 			(effects
 				(font
@@ -14645,7 +15012,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1044")
+					(reference "#PWR1043")
 					(unit 1)
 				)
 			)
@@ -15083,7 +15450,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "68c848d8-0b38-579b-ba12-6e919d82e3ff")
-		(property "Reference" "#PWR1045"
+		(property "Reference" "#PWR1044"
 			(at 403.86 222.25 0)
 			(effects
 				(font
@@ -15125,7 +15492,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1045")
+					(reference "#PWR1044")
 					(unit 1)
 				)
 			)
@@ -15215,7 +15582,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5e6304f1-bba0-5002-9071-ae0ad104a9cb")
-		(property "Reference" "#FLG1046"
+		(property "Reference" "#FLG1045"
 			(at 363.22 229.87 0)
 			(effects
 				(font
@@ -15256,7 +15623,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#FLG1046")
+					(reference "#FLG1045")
 					(unit 1)
 				)
 			)
@@ -15282,7 +15649,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c213b402-5516-5cd6-b320-932a5abee8ab")
-		(property "Reference" "#PWR1047"
+		(property "Reference" "#PWR1046"
 			(at 363.22 240.03 0)
 			(effects
 				(font
@@ -15324,7 +15691,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#PWR1047")
+					(reference "#PWR1046")
 					(unit 1)
 				)
 			)
@@ -15339,7 +15706,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "56f6233c-fe7d-5c44-8966-3b2e1e5de708")
-		(property "Reference" "#FLG1048"
+		(property "Reference" "#FLG1047"
 			(at 383.54 229.87 0)
 			(effects
 				(font
@@ -15380,7 +15747,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#FLG1048")
+					(reference "#FLG1047")
 					(unit 1)
 				)
 			)
@@ -15418,7 +15785,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "aa59be7f-8be5-558c-a69a-7d1ac2cd0581")
-		(property "Reference" "#FLG1049"
+		(property "Reference" "#FLG1048"
 			(at 152.4 64.77 0)
 			(effects
 				(font
@@ -15459,7 +15826,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#FLG1049")
+					(reference "#FLG1048")
 					(unit 1)
 				)
 			)
@@ -15497,7 +15864,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "faa6a55b-d013-50d8-a2f4-fd25b58ced98")
-		(property "Reference" "#FLG1050"
+		(property "Reference" "#FLG1049"
 			(at 81.28 245.11 0)
 			(effects
 				(font
@@ -15538,7 +15905,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#FLG1050")
+					(reference "#FLG1049")
 					(unit 1)
 				)
 			)
@@ -15575,7 +15942,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d28a8441-6c52-5915-bfdb-f0116d305416")
-		(property "Reference" "#FLG1051"
+		(property "Reference" "#FLG1050"
 			(at 139.7 237.49 0)
 			(effects
 				(font
@@ -15616,7 +15983,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/463c769f-4cef-5df8-bda2-e4730ceb1039"
-					(reference "#FLG1051")
+					(reference "#FLG1050")
 					(unit 1)
 				)
 			)
@@ -15722,7 +16089,7 @@
 		)
 		(uuid "491cda6e-beaa-519e-85da-78eef7b36bc1")
 	)
-	(text "Toggle (E-Switch 100SP1T1B1M1QEH, off-board), closed = ON:\npulls PWR_G low through R9 → Q2 on. Open: R8 holds Q2 off\nand its body diode blocks VBAT → VBAT_SW. The toggle carries\n~40 µA only. ESD on PWR_SW_J: U12 pin 4."
+	(text "Toggle (E-Switch 100SP1T1B1M1QEH, off-board), closed = ON:\npulls PWR_G low through R9 (10 k; C18 makes a ~1 ms soft start) → Q2 on. Open: R8 holds Q2 off\nand its body diode blocks VBAT → VBAT_SW. The toggle carries\n~40 µA only. ESD on PWR_SW_J: U12 pin 4."
 		(exclude_from_sim no)
 		(at 325.12 91.44 0)
 		(effects
@@ -15744,7 +16111,7 @@
 		)
 		(uuid "7a6b8ac6-6fc8-5ec2-94a0-fdf483c89f39")
 	)
-	(text "VOUT = 0.600 V x (1 + 750k/100k) = 5.10 V (PFM 5.15 V; OVP 5.5 V min).\nL1 744316100 is in TI's Table 8-2; peak ~5.7 A at 3.0 V in / 2.5 A out.\nC3 100 pF: feed-forward zero 1/(2π·750k·100p) = 2.1 kHz (§8.2.2.4, COUT_eff\n> 40 µF). EN = VBAT_SW: on with the switch. MODE = GND: auto PFM (light-load\nefficiency, no reverse inductor current). C5 bulk: the cell sits on a lead\n(§8.2.2.5). Tight SW loop, VIN/VOUT caps at the pins; far corner from the SP4."
+	(text "VOUT = 0.600 V x (1 + 750k/100k) = 5.10 V (PFM 5.15 V; OVP 5.5 V min).\nL1 744316100 is in TI's Table 8-2; peak ~5.7 A at 3.0 V in / 2.5 A out.\nC3 100 pF: feed-forward zero 1/(2π·750k·100p) = 2.1 kHz (§8.2.2.4, COUT_eff\n> 40 µF). EN = VBAT_SW: on with the switch. MODE = VIN: forced PWM (layout, 19-Oct: MODE sits\nbetween VIN and EN, so it shares their copper; PFM would only save a few mA below ~100 mA). C5 bulk: the cell sits on a lead\n(§8.2.2.5). Tight SW loop, VIN/VOUT caps at the pins; far corner from the SP4."
 		(exclude_from_sim no)
 		(at 15.24 177.8 0)
 		(effects
@@ -15766,7 +16133,7 @@
 		)
 		(uuid "6d59fae7-db5b-5669-9137-4736b07c269f")
 	)
-	(text "U3A, diode-connected with its emitter on 5V_BOOST, sets ~0.45 mA through R12; U3B mirrors it\nagainst 5V_PI. Forward (5V_BOOST above 5V_PI by more than ~40 mV): U3B starves, R13 pulls ZVD_G\nlow → Q4 on (≈ 0.15 V at 2.5 A). Back-power (micro-USB on the Pi, or the boost off): 5V_PI >\n5V_BOOST, U3B saturates, ZVD_G ≈ 5V_PI → Q4 off, and its body diode (D → S) is reverse biased.\nPi 3B values: 10 k on the mirror base (R12), 47 k on the gate (R13). The Pi 3 A+ has no such\ncircuit and header pins 2/4 bypass its polyfuse. C9/C10/D2 at header pins 2/4.\nQ4: AO3401A (or DMG2305UX as in the Pi). U3: one BC857BS (units A and B)."
+	(text "U3A, diode-connected with its emitter on 5V_BOOST, sets ~0.45 mA through R12; U3B mirrors it\nagainst 5V_PI. Forward (5V_BOOST above 5V_PI by more than ~40 mV): U3B starves, R13 pulls ZVD_G\nlow → Q4 on (≈ 0.15 V at 2.5 A). Back-power (micro-USB on the Pi, or the boost off): 5V_PI >\n5V_BOOST, U3B saturates, ZVD_G ≈ 5V_PI → Q4 off, and its body diode (D → S) is reverse biased.\nPi 3B values: 10 k on the mirror base (R12), 47 k on the gate (R13). The Pi 3 A+ has no such\ncircuit and header pins 2/4 bypass its polyfuse. C9/C10/D2 at header pins 2/4.\nQ4: AO3401A (or DMG2305UX as in the Pi). U3: one BCM857BS, matched pair (units A and B; as on the Pi 3B)."
 		(exclude_from_sim no)
 		(at 220.98 177.8 0)
 		(effects
@@ -15810,7 +16177,7 @@
 		)
 		(uuid "5ebb362d-fdf8-595b-bd36-713070c4740a")
 	)
-	(text "VDD/CELL and GND: Kelvin traces to J20, not along the boost input path.\nNo I2C pull-ups here (the Pi has 1.8 k). Software: never set MODE.EnSleep."
+	(text "VDD/CELL: Kelvin trace from Q1's source (VBAT), GND to J20, not along the boost input path;\nit reads the cell ~I x RDS(Q1) low under load (safe side for the thresholds).\nNo I2C pull-ups here (the Pi has 1.8 k). Software: never set MODE.EnSleep."
 		(exclude_from_sim no)
 		(at 266.7 251.46 0)
 		(effects

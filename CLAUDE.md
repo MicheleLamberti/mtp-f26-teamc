@@ -78,6 +78,13 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
   Tools checked 19-Oct: KiCad 10.0, `pcbnew` Python 10.0.6, `RaspberryPi-HAT` template; the KiCad MCP edits
   schematics, searches/downloads registry parts and runs ERC/DRC, but cannot place or route (use pcbnew scripts).
+  **Built 19-Oct (DRAFT – for ET review), all in `hw/DESIGN_NOTES.md`:** `hw/sp4-breakout/` (single-sided, ERC/DRC 0,
+  gerbers + 1:1 copper PDFs in `fab/` — ready for the lab); `hw/teamc-carrier/` (Pi 3 A+ HAT: 4 generated sheets
+  power/pi_header/radio/ui, ERC 0; placed; power + SPI/radio routed by script, DRC 0 errors, small nets + the boost
+  GND pocket left for ET); `hw/lib/teamc.*` (E01-ML01SP4 from the manual drawing, MAX17048, 2×20 socket with 1.5 mm
+  pads); `hw/BOM.csv` (≈ €103/device); `hw/scripts/` (schgen.py sheets from Python, netlist2pcb.py, build_breakout.py,
+  build_carrier.py, place_carrier.py, route_carrier.py + gridroute.py A* router, build_bom.py). The `.kicad_sch` files
+  are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
@@ -154,7 +161,8 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
 
 **Baseline (2.4 GHz):**
 - D-R1b 2400–2483.5 MHz, **250 kbps GFSK in every mode**.
-- D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, 1.27 mm pads, IPEX), one per box
+- D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD **14.5 × 18 mm** (19-Oct: the manual's drawing; 14.85
+  was a copy-paste error), 8 castellations at 1.27 mm + 2 GND half-holes, IPEX), one per box
   (decided 13-Oct, Santiago with Marcos). RF_PWR −18 (+2..+7 dBm est.) for 10 mW; −12/−6 while hopping. Needs a
   breakout from the first bench test (QM module = final). Not the DP5, not the 2G4M27D (can't do 10 mW), never E01C-*.
 - D-R5c **one flex omni per box, since 19-Oct the Ebyte TX2400-FPC-2509** (25 × 9 mm, "2 dBi", IPEX, came with the
@@ -189,6 +197,12 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
       6-Nov) — the pin map (Pi proposal on the Pi 3 page); microSD = SanDisk Ultra 32 GB A1 (Santiago 19-Oct); bench
       5.1 V supply still to get
 
+**19-Oct-26: KiCad session (hw/).** SP4 breakout ready for the lab; carrier HAT drafted (schematic + placement +
+power/SPI routing) for ET. Choices approved by Santiago: panel-mount controls on JST-XH leads (power toggle drives a
+P-FET), TPS61022 boost. Review-driven changes: Si2333DDS for Q1/Q2, BCM857BS, 5 A fuse at the cell, Q2 soft start,
+TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17), radio pull-ups to 3V3_PI. Rule:
+**HAT on → never plug the Pi's micro-USB** (the A+ has no reverse blocking; silkscreen).
+
 **Next up (17-Oct, roughly in order):**
 - [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
       antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). 2 boxes + 2 spare SP4s (the rod-kit ones); no spare flex antenna (Molex if one breaks). microSD: SanDisk Ultra 32 GB A1 twin
@@ -204,7 +218,11 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 - [ ] QM deliverables (PD, plan, action item list, provisional BoM) + Atenea petition before 17:00 the day before;
       check the Project Definition lists QM, SRI, MRM, NM and cost (rules p.3)
 - [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
-- [ ] ET: SP4 breakout (1.27 → 2.54 mm) for the first bench test; measure the IKEA 365+ inside dimensions
+- [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
+      Santiago: measure the IKEA 365+ inside dimensions
+- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board": boost GND pocket
+      first, then the small nets); ask the lab its limits (0.2 mm necks, 0.15 mm at the QFN/TDFN, plated vias,
+      stencil/hot air) or use a JLCPCB-class fab; check stock (TPS61022, Si2333DDS, fuse)
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
@@ -222,6 +240,25 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-19 (KiCad session) — SP4 breakout ready, Pi 3 A+ HAT carrier drafted
+- Ran `hw/KICAD_SESSION_PROMPT.md` v2 as lead with 7 subagents (research ×3: power, Pi/SP4/mechanics, UI/sensing;
+  library; schematic sheets ×2; adversarial review). Checkpoint 1 (Santiago): panel-mount controls + JST-XH, TPS61022,
+  go. Santiago reminded: Raspberry Pi 3 **Model A+** only (it was already the basis).
+- Findings: **SP4 = 14.5 × 18 mm** with 8 castellations + 2 GND half-holes (docs corrected: HANDOFF_ET, DECISIONS,
+  CLAUDE.md; brief/hw pages and the workbook text still say 14.85 → fix on the next republish/regeneration); the
+  **A+ has no ideal diode on 5 V** (header bypasses its polyfuse); 18650 holder too long for the HAT; TPS61088 gone.
+- **SP4 breakout** `hw/sp4-breakout/`: single-sided, 31 × 37.5 mm, 1×8 header in nRF24 order + 1×2 bench supply,
+  10 µF/100 nF/100 µF, ERC 0, DRC 0, gerbers + drill + 1:1 copper PDFs. Pushed to main early (17af6d8).
+- **Carrier** `hw/teamc-carrier/`: 4 sheets generated from Python (`schgen.py`), ERC 0/0; placement by script (boost to
+  TI's RWU layout, SP4 bottom-right, connectors on the edges); grid router + escapes route the power path and SPI/radio
+  (100 %), copper areas for the boost, GND pours + stitching; DRC 0 errors. Left for ET: the boost GND pocket (fenced
+  by two B.Cu trunks), a few GND vias, ~30 small nets (list in DESIGN_NOTES). No carrier gerbers.
+- Review (no blockers): Q1/Q2 → Si2333DDS, BCM857BS, fuse, soft start, D_SMF footprint, micro-USB rule, pull-ups to
+  3V3_PI; design notes rewritten. KiCad quirks: `kicad-cli` ignores `.kicad_dru`; 1.7 mm header pads block the edge
+  row at 0.3/0.3 mm → 1.5 mm-pad socket. BoM ≈ €103/device (cap €150).
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK.
+- **Start next session with:** box inside dimensions; lab limits; ET owner for the carrier; breakout made? T0.
 
 ### 2026-10-19 — Pi 3 A+ listing, SP4 sourcing, antenna A/B test (T5b)
 - Santiago asked whether a store listing for the "Pi 3 Modelo A+, 1.4 GHz, WiFi 5 GHz" works: yes, it is the board we

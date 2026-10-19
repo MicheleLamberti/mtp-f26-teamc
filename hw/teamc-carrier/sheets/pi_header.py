@@ -11,7 +11,7 @@ from nets import GLOBAL_NETS, DS
 
 # header pin -> (net, BCM GPIO / function) ; None = not connected (no-connect flag)
 HEADER = {
-    1: ("3V3_PI", "3V3"), 2: ("5V_PI", "5V"),
+    1: (None, "3V3 (unused: pin 17 feeds the pull-ups; the Pi ties 1 and 17)"), 2: ("5V_PI", "5V"),
     3: ("I2C_SDA", "GPIO 2 SDA1"), 4: ("5V_PI", "5V"),
     5: ("I2C_SCL", "GPIO 3 SCL1"), 6: ("GND", "GND"),
     7: (None, "GPIO 4"), 8: ("UART_TX", "GPIO 14 TXD0"),
@@ -55,7 +55,7 @@ def build():
            "No ID EEPROM: pins 27/28 (ID_SD/ID_SC) stay unconnected (allowed for a non-'HAT' add-on board).\n"
            "The Pi's WiFi/BT chip is disabled in software or desoldered (rules p.6, Atenea Q22).\n"
            "5V_PI comes from the power sheet's ideal diode (back-feeds the Pi's 5 V after its polyfuse).\n"
-           "3V3_PI = the Pi's own 3.3 V (pins 1/17): pull-ups only, no load. The radio has its own LDO (3V3_RADIO).",
+           "3V3_PI = the Pi's own 3.3 V from pin 17 (pin 1 unused): pull-ups only, no load. The radio has its own LDO (3V3_RADIO).",
            at=(25.4, 27.94))
 
     nets = {str(p): HEADER[p][0] for p in HEADER}

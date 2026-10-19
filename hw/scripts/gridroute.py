@@ -102,6 +102,19 @@ class Router:
         blocked = obs[0] | obs[1]
         img = Image.new("1", (self.nx, self.ny), 0)
         d = ImageDraw.Draw(img)
+        # drilled holes of any net (a via next to a same-net THT pad still needs hole-to-hole room) and vias
+        hole = self.via_d / 2 + 0.3 + self.margin
+        for f in self.b.GetFootprints():
+            for p in f.Pads():
+                if p.GetDrillSize().x > 0:
+                    x, y = self._px(TO(p.GetPosition().x), TO(p.GetPosition().y))
+                    r = (TO(p.GetDrillSize().x) / 2 + hole) / self.g
+                    d.ellipse([x - r, y - r, x + r, y + r], fill=1)
+        for t in self.b.GetTracks():
+            if isinstance(t, pcbnew.PCB_VIA):
+                x, y = self._px(TO(t.GetPosition().x), TO(t.GetPosition().y))
+                r = (self.via_drill / 2 + hole) / self.g
+                d.ellipse([x - r, y - r, x + r, y + r], fill=1)
         areas = [z for z in self.b.Zones() if z.GetIsRuleArea() and z.GetDoNotAllowVias()]
         for z in areas:
             ps = pcbnew.SHAPE_POLY_SET(z.Outline())
@@ -313,10 +326,11 @@ class Router:
         return done, failed
 
     def stitch(self, net, pitch=4.0):
-        """Vias of `net` on a grid wherever one fits (ties the two ground pours together)."""
-        vblock = self.via_block(net)
+        """Vias of `net` on a grid wherever one fits clear of all copper and drills (ties the two ground pours
+        together). Returns the vias; prune() removes those the pours do not reach on both layers."""
+        vblock = self.via_block("__stitch__")   # every pad and track is an obstacle, even the net's own
         ni = self.b.FindNet(net)
-        n = 0
+        made = []
         step = int(round(pitch / self.g))
         for iy in range(step // 2, self.ny, step):
             for ix in range(step // 2, self.nx, step):
@@ -327,5 +341,60 @@ class Router:
                     v.SetDrill(MM(self.via_drill))
                     v.SetNet(ni)
                     self.b.Add(v)
-                    n += 1
-        return n
+                    made.append(v)
+        return made
+
+    def via_to(self, pad, net, width=0.3, reach=3.0):
+        """A via of `net` next to `pad` (F.Cu) with a straight track to it, where both fit; True if placed."""
+        obs = self.obstacles(net, width / 2)[0]
+        vblk = self.via_block(net)
+        fills = [z.GetFilledPolysList(pcbnew.B_Cu) for z in self.b.Zones()
+                 if not z.GetIsRuleArea() and z.GetNetname() == net and z.IsOnLayer(pcbnew.B_Cu)]
+        px, py = self._px(TO(pad.GetPosition().x), TO(pad.GetPosition().y))
+        best = None
+        rmax = int(reach / self.g)
+        for iy in range(int(py) - rmax, int(py) + rmax + 1):
+            for ix in range(int(px) - rmax, int(px) + rmax + 1):
+                if not (0 <= ix < self.nx and 0 <= iy < self.ny) or vblk[iy, ix]:
+                    continue
+                dist = math.hypot(ix - px, iy - py)
+                if dist > rmax or (best and dist >= best[0]):
+                    continue
+                x_, y_ = self.x0 + ix * self.g, self.y0 + iy * self.g
+                if not any(fp.Contains(pcbnew.VECTOR2I(MM(x_), MM(y_))) for fp in fills):
+                    continue   # only where the bottom pour actually is
+                n = max(2, int(dist * 2))
+                if all(not obs[int(round(py + (iy - py) * k / n)), int(round(px + (ix - px) * k / n))]
+                       for k in range(n + 1)):
+                    best = (dist, ix, iy)
+        if best is None:
+            return False
+        _, ix, iy = best
+        x, y = self.x0 + ix * self.g, self.y0 + iy * self.g
+        t = pcbnew.PCB_TRACK(self.b)
+        t.SetStart(pad.GetPosition())
+        t.SetEnd(pcbnew.VECTOR2I(MM(x), MM(y)))
+        t.SetWidth(MM(width))
+        t.SetLayer(pcbnew.F_Cu)
+        t.SetNet(self.b.FindNet(net))
+        self.b.Add(t)
+        v = pcbnew.PCB_VIA(self.b)
+        v.SetPosition(pcbnew.VECTOR2I(MM(x), MM(y)))
+        v.SetWidth(MM(self.via_d))
+        v.SetDrill(MM(self.via_drill))
+        v.SetNet(self.b.FindNet(net))
+        self.b.Add(v)
+        return True
+
+    def prune(self, vias, net):
+        """After a zone fill: delete vias of `net` that do not sit in that net's filled copper on both layers."""
+        zones = [z for z in self.b.Zones() if not z.GetIsRuleArea() and z.GetNetname() == net]
+        gone = 0
+        for v in vias:
+            pos = v.GetPosition()
+            ok = all(any(z.IsOnLayer(lay) and z.GetFilledPolysList(lay).Contains(pos) for z in zones)
+                     for lay in LAYERS)
+            if not ok:
+                self.b.Delete(v)
+                gone += 1
+        return gone

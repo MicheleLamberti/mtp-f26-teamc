@@ -46,7 +46,7 @@ FIXED = {
     "C8": (112.6, 67.9, 90, False),
     "C5": (122.5, 63.5, 90, False),    # 100 uF boost input bulk
     "Q4": (108.0, 52.6, 0, False),     # ideal diode under header pins 2/4
-    "U3": (112.0, 52.6, 0, False),
+    "U3": (113.0, 52.6, 0, False),     # its left escape stubs must clear Q4's drain pad
     "C9": (121.0, 54.0, 0, False),     # 100 uF at 5V_PI
     # left edge: battery lead above the USB-C mouth
     "J20": (103.5, 75.8, 0, False),
@@ -73,12 +73,12 @@ FIXED = {
     "TP3": (134.0, 62.0, 0, False),
 }
 # copper areas of the boost (F.Cu, above the GND pour): net, polygon. The SW neck at the IC sits between the GND
-# (pin 1) and VOUT (pin 3) bars; the VBAT_SW area reaches VIN (7) from the right and stops above GND (6);
-# EN (5) is a routed track; the 5V_BOOST area stays 0.45 mm clear of FB (4).
+# (pin 1) and VOUT (pin 3) bars; the VBAT_SW area covers VIN (7), MODE (6) and EN (5) from the right and
+# stops 0.275 mm above FB (4); the 5V_BOOST area stays 0.45 mm clear of FB.
 BOOST_ZONES = [
     ("/power/SW_NODE", [(106.4, 57.7), (108.75, 57.7), (108.75, 63.375), (112.8, 63.375), (112.8, 63.825),
                         (106.4, 63.825)]),
-    ("VBAT_SW", [(110.6, 57.7), (116.0, 57.7), (116.0, 62.6), (114.6, 62.6), (114.6, 63.05), (113.15, 63.05),
+    ("VBAT_SW", [(110.6, 57.7), (116.0, 57.7), (116.0, 62.6), (114.6, 62.6), (114.6, 63.95), (113.15, 63.95),
                  (113.15, 61.5), (110.6, 61.5)]),
     ("/power/5V_BOOST", [(106.0, 64.05), (112.8, 64.05), (112.8, 66.95), (106.0, 66.95)]),
 ]
@@ -86,7 +86,7 @@ BOOST_ZONES = [
 NEAR = {
     "C1": "J2", "R2": "J2", "R3": "J2", "D1": "J2",
     "C2": "U1", "R4": "U1", "R5": "U1", "D4": "U1", "Q3": "U1", "R6": "Q3", "R7": "Q3",
-    "R1": "Q1", "D3": "Q1", "R8": "Q2", "R9": "Q2",
+    "R1": "Q1", "D3": "Q1", "R8": "Q2", "R9": "Q2", "C18": "Q2", "F1": "J20",
     "C3": "U2", "R10": "U2", "R11": "U2", "C4": "U2", "C6": "U2", "C7": "U2", "C8": "U2",
     "C10": "C9", "D2": "C9", "R12": "U3", "R13": "U3",
     "C11": "U4", "C12": "U4", "R14": "U4",
@@ -169,6 +169,11 @@ def main():
             if min(xs) > FIXED["J2"][0] + 2.0:
                 break
         placed["J2"] = courtyard(f)
+
+    # lanes the escape stubs need (route_carrier.py): the SP4 pad row going up, the header's edge-row pins going
+    # down below the inner row
+    placed["sp4_lane"] = (145.2, 76.6, 154.1, 80.2)
+    placed["header_band"] = (107.0, 49.4, 158.0, 51.2)
 
     # the boost copper areas are not for parts that do not belong to them
     for i, (_net, pts) in enumerate(BOOST_ZONES):
@@ -271,6 +276,8 @@ def main():
         board.Add(ra)
     bu.text(board, "Team C Pi 3 A+ HAT - DRAFT for ET review - 19-Oct-26", 132.5, 66.0, layer=pcbnew.B_SilkS,
             size=1.0, thick=0.15)
+    # review F6: the A+ has no reverse blocking on micro-USB; the boost would back-feed a supply plugged in there
+    bu.text(board, "HAT ON: never plug the Pi's micro-USB", 132.5, 70.0, layer=pcbnew.B_SilkS, size=1.0, thick=0.15)
     bu.fill_zones(board)
     board.Save(PCB)
 

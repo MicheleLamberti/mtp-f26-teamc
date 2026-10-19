@@ -23,7 +23,7 @@ C0805 = "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 C1206 = "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder"
 CP63 = "Capacitor_SMD:CP_Elec_6.3x5.4"
 SOT23 = "Package_TO_SOT_SMD:SOT-23"
-TVS_FP = "Diode_SMD:D_SOD-123F"
+TVS_FP = "Diode_SMD:D_SMF"   # Vishay 85881 p.5 land pattern (review F5)
 TP_FP = "TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm"
 
 # Yageo RC0805FR-07 (1 %, 0805, 150 V) and Murata MLCC part numbers; any equivalent is fine
@@ -61,10 +61,15 @@ def TVS(s, ref, at, net):
                  mpn="SMF5V0A-E3-08", mfr="Vishay", ds="")
 
 
-def pfet(s, ref, at, rot, d, src, g):
-    """AO3401A P-FET. rot 90: D left, S right, G below; rot 270: S left, D right, G above."""
-    return s.add("Transistor_FET:AO3401A", ref, "AO3401A", fp=SOT23, at=at, rot=rot,
-                 nets={"1": g, "2": src, "3": d}, mpn="AO3401A", mfr="Alpha & Omega", ds="")
+def pfet(s, ref, at, rot, d, src, g, mpn="AO3401A", mfr="Alpha & Omega"):
+    """SOT-23 P-FET (1 G, 2 S, 3 D). rot 90: D left, S right, G below; rot 270: S left, D right, G above."""
+    return s.add("Transistor_FET:AO3401A", ref, mpn.split("-")[0], fp=SOT23, at=at, rot=rot,
+                 nets={"1": g, "2": src, "3": d}, mpn=mpn, mfr=mfr, ds="")
+
+
+# Q1/Q2 carry the whole cell current (2 A near a 3.0 V cell, VGS ~ -3 V): RDS(on) <= 40 mOhm at -2.5 V
+# (Vishay Si2333DDS) instead of the AO3401A's 85 mOhm (review F1). AO3401A fits the same footprint as a fallback.
+LOW_RDS = dict(mpn="Si2333DDS-T1-GE3", mfr="Vishay")
 
 
 def build():
@@ -77,12 +82,15 @@ def build():
     # ===== 1. battery & reverse protection ========================================================================
     s.note("1  BATTERY & REVERSE PROTECTION", at=(15.24, 20.32), size=2.0)
     s.add("Connector_Generic:Conn_01x02", "J20", "BATT 18650", at=(43.18, 38.1),
-          fp="Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", nets={"1": "BAT_RAW", "2": "GND"},
+          fp="Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", nets={"1": "BAT_IN", "2": "GND"},
           mpn="B2P-VH", mfr="JST")
+    # review F3: header pins 2/4 bypass the Pi's polyfuse and the boost limits at 6.5-10 A: a fuse at the cell
+    s.add("Device:Fuse", "F1", "5A fast", fp="Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder", at=(62.23, 25.4),
+          rot=90, nets={"1": "BAT_IN", "2": "BAT_RAW"}, mpn="0466005.NR (1206 fast, 5 A; verify)", mfr="Littelfuse")
     s.add("Connector_Generic:Conn_01x02", "J21", "BATT 2 (DNP)", at=(43.18, 58.42),
-          fp="Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", nets={"1": "BAT_RAW", "2": "GND"},
+          fp="Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", nets={"1": "BAT_IN", "2": "GND"},
           mpn="B2P-VH", mfr="JST", dnp=True)
-    pfet(s, "Q1", (80.01, 38.1), 90, d="BAT_RAW", src="VBAT", g="Q1_G")
+    pfet(s, "Q1", (80.01, 38.1), 90, d="BAT_RAW", src="VBAT", g="Q1_G", **LOW_RDS)
     R(s, "R1", "10k", (80.01, 63.5), "Q1_G", "GND")
     TVS(s, "D3", (80.01, 81.28), "VBAT")
     s.note("Cells: protected 18650 (PCM inside) in an MPD BH-18650-PC\n"
@@ -133,14 +141,15 @@ def build():
 
     # ===== 3. power switch ========================================================================================
     s.note("3  POWER SWITCH (P-FET, panel toggle on J22)", at=(325.12, 20.32), size=2.0)
-    pfet(s, "Q2", (365.76, 40.64), 270, d="VBAT_SW", src="VBAT", g="PWR_G")
+    pfet(s, "Q2", (365.76, 40.64), 270, d="VBAT_SW", src="VBAT", g="PWR_G", **LOW_RDS)
     R(s, "R8", "100k", (345.44, 60.96), "PWR_G", "VBAT")
-    R(s, "R9", "1k", (345.44, 78.74), "PWR_G", "PWR_SW_J")
+    R(s, "R9", "10k", (345.44, 78.74), "PWR_G", "PWR_SW_J")
+    C(s, "C18", "100n", (345.44, 43.18), "PWR_G", "VBAT")   # review F4: ~1 ms gate ramp, soft inrush
     s.add("Connector_Generic:Conn_01x02", "J22", "PWR toggle", at=(393.7, 78.74),
           fp="Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical", nets={"1": "PWR_SW_J", "2": "GND"},
           mpn="B2B-XH-A", mfr="JST")
     s.note("Toggle (E-Switch 100SP1T1B1M1QEH, off-board), closed = ON:\n"
-           "pulls PWR_G low through R9 → Q2 on. Open: R8 holds Q2 off\n"
+           "pulls PWR_G low through R9 (10 k; C18 makes a ~1 ms soft start) → Q2 on. Open: R8 holds Q2 off\n"
            "and its body diode blocks VBAT → VBAT_SW. The toggle carries\n"
            "~40 µA only. ESD on PWR_SW_J: U12 pin 4.",
            at=(325.12, 91.44), size=1.27)
@@ -149,7 +158,7 @@ def build():
     s.note("4  5.1 V BOOST (TPS61022, 1 MHz, auto-PFM)", at=(15.24, 119.38), size=2.0)
     s.add("Converter_DCDC:TPS61022", "U2", "TPS61022", fp="Package_DFN_QFN:Texas_RWU0007A_VQFN-7_2x2mm_P0.5mm",
           at=(96.52, 160.02),
-          nets={"1": "GND", "2": "SW_NODE", "3": "5V_BOOST", "4": "FB", "5": "VBAT_SW", "6": "GND", "7": "VBAT_SW"},
+          nets={"1": "GND", "2": "SW_NODE", "3": "5V_BOOST", "4": "FB", "5": "VBAT_SW", "6": "VBAT_SW", "7": "VBAT_SW"},
           mpn="TPS61022RWUR", mfr="Texas Instruments", ds=DS["TPS61022"])
     s.add("Device:L", "L1", "1u Isat 11.5A", fp="Inductor_SMD:L_Wuerth_HCI-5040", at=(40.64, 132.08), rot=90,
           nets={"1": "VBAT_SW", "2": "SW_NODE"}, mpn="744316100", mfr="Würth Elektronik")
@@ -164,19 +173,19 @@ def build():
     s.note("VOUT = 0.600 V x (1 + 750k/100k) = 5.10 V (PFM 5.15 V; OVP 5.5 V min).\n"
            "L1 744316100 is in TI's Table 8-2; peak ~5.7 A at 3.0 V in / 2.5 A out.\n"
            "C3 100 pF: feed-forward zero 1/(2π·750k·100p) = 2.1 kHz (§8.2.2.4, COUT_eff\n"
-           "> 40 µF). EN = VBAT_SW: on with the switch. MODE = GND: auto PFM (light-load\n"
-           "efficiency, no reverse inductor current). C5 bulk: the cell sits on a lead\n"
+           "> 40 µF). EN = VBAT_SW: on with the switch. MODE = VIN: forced PWM (layout, 19-Oct: MODE sits\n"
+           "between VIN and EN, so it shares their copper; PFM would only save a few mA below ~100 mA). C5 bulk: the cell sits on a lead\n"
            "(§8.2.2.5). Tight SW loop, VIN/VOUT caps at the pins; far corner from the SP4.",
            at=(15.24, 177.8), size=1.27)
 
     # ===== 5. back-power ideal diode & header bulk ==================================================================
     s.note("5  BACK-POWER IDEAL DIODE (Pi 3B circuit) & 5V_PI AT THE HEADER", at=(220.98, 119.38), size=2.0)
     pfet(s, "Q4", (264.16, 137.16), 90, d="5V_BOOST", src="5V_PI", g="ZVD_G")
-    s.add("Transistor_BJT:BC857BS", "U3", "BC857BS", fp="Package_TO_SOT_SMD:SOT-363_SC-70-6", at=(243.84, 160.02),
-          rot=180, unit=1, nets={"1": "5V_BOOST", "2": "ZVD_B", "6": "ZVD_B"}, mpn="BC857BS,115", mfr="Nexperia",
+    s.add("Transistor_BJT:BC857BS", "U3", "BCM857BS", fp="Package_TO_SOT_SMD:SOT-363_SC-70-6", at=(243.84, 160.02),
+          rot=180, unit=1, nets={"1": "5V_BOOST", "2": "ZVD_B", "6": "ZVD_B"}, mpn="BCM857BS,115", mfr="Nexperia",
           ds="")
-    s.add("Transistor_BJT:BC857BS", "U3", "BC857BS", fp="Package_TO_SOT_SMD:SOT-363_SC-70-6", at=(289.56, 160.02),
-          rot=180, unit=2, nets={"4": "5V_PI", "5": "ZVD_B", "3": "ZVD_G"}, mpn="BC857BS,115", mfr="Nexperia",
+    s.add("Transistor_BJT:BC857BS", "U3", "BCM857BS", fp="Package_TO_SOT_SMD:SOT-363_SC-70-6", at=(289.56, 160.02),
+          rot=180, unit=2, nets={"4": "5V_PI", "5": "ZVD_B", "3": "ZVD_G"}, mpn="BCM857BS,115", mfr="Nexperia",
           ds="")
     R(s, "R12", "10k", (330.2, 132.08), "ZVD_B", "GND")
     R(s, "R13", "47k", (330.2, 149.86), "ZVD_G", "GND")
@@ -189,7 +198,7 @@ def build():
            "5V_BOOST, U3B saturates, ZVD_G ≈ 5V_PI → Q4 off, and its body diode (D → S) is reverse biased.\n"
            "Pi 3B values: 10 k on the mirror base (R12), 47 k on the gate (R13). The Pi 3 A+ has no such\n"
            "circuit and header pins 2/4 bypass its polyfuse. C9/C10/D2 at header pins 2/4.\n"
-           "Q4: AO3401A (or DMG2305UX as in the Pi). U3: one BC857BS (units A and B).",
+           "Q4: AO3401A (or DMG2305UX as in the Pi). U3: one BCM857BS, matched pair (units A and B; as on the Pi 3B).",
            at=(220.98, 177.8), size=1.27)
 
     # ===== 6. radio supply ========================================================================================
@@ -226,7 +235,7 @@ def build():
                 "8": "I2C_SDA", "9": "GND"}, mpn="MAX17048G+T10", mfr="Analog Devices (Maxim)", ds=DS["MAX17048"])
     C(s, "C17", "100n", (281.94, 243.84), "VBAT", "GND")
     R(s, "R17", "10k", (325.12, 243.84), "FG_ALRT", "3V3_PI")
-    s.note("VDD/CELL and GND: Kelvin traces to J20, not along the boost input path.\n"
+    s.note("VDD/CELL: Kelvin trace from Q1's source (VBAT), GND to J20, not along the boost input path;\nit reads the cell ~I x RDS(Q1) low under load (safe side for the thresholds).\n"
            "No I2C pull-ups here (the Pi has 1.8 k). Software: never set MODE.EnSleep.",
            at=(266.7, 251.46), size=1.27)
 

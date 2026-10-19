@@ -35,7 +35,7 @@ def set_project_rules(pro_path, rules=LAB_RULES, classes=()):
     r = p["board"]["design_settings"]["rules"]
     # the net classes carry the lab's 0.3 mm; the board floor only has to admit the pads inside fine-pitch
     # packages (QFN/TDFN 0.5 mm pitch: 0.2-0.29 mm between their own pads), which get a 0.15 mm footprint clearance
-    r.update(min_clearance=0.15, min_track_width=min(rules["track"], 0.3),
+    r.update(min_clearance=0.15, min_track_width=0.2,
              min_copper_edge_clearance=rules["edge"], min_via_diameter=rules["via_d"],
              min_through_hole_diameter=rules["via_drill"], min_hole_clearance=0.3, min_hole_to_hole=0.5,
              min_via_annular_width=0.2, min_resolved_spokes=1)

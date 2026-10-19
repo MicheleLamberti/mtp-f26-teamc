@@ -1800,28 +1800,9 @@
 			(embedded_fonts no)
 		)
 	)
-	(wire
-		(pts
-			(xy 204.47 124.46)
-			(xy 201.93 124.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62d461a8-fabb-59b0-b898-4015d7c9d30c")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 201.93 124.46 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "5a7f972a-a88f-58c7-be6e-6e9bf25845e1")
+	(no_connect
+		(at 204.47 124.46)
+		(uuid "47bf6118-31a6-5c61-b691-acbe60f549e0")
 	)
 	(wire
 		(pts
@@ -3709,7 +3690,7 @@
 		)
 		(uuid "d723d2fb-77aa-5224-b178-bfe88b92ac27")
 	)
-	(text "DRAFT – for ET review. The HAT sits on the Pi's 40-pin header (J1, socket on the HAT's underside).\nNo ID EEPROM: pins 27/28 (ID_SD/ID_SC) stay unconnected (allowed for a non-'HAT' add-on board).\nThe Pi's WiFi/BT chip is disabled in software or desoldered (rules p.6, Atenea Q22).\n5V_PI comes from the power sheet's ideal diode (back-feeds the Pi's 5 V after its polyfuse).\n3V3_PI = the Pi's own 3.3 V (pins 1/17): pull-ups only, no load. The radio has its own LDO (3V3_RADIO)."
+	(text "DRAFT – for ET review. The HAT sits on the Pi's 40-pin header (J1, socket on the HAT's underside).\nNo ID EEPROM: pins 27/28 (ID_SD/ID_SC) stay unconnected (allowed for a non-'HAT' add-on board).\nThe Pi's WiFi/BT chip is disabled in software or desoldered (rules p.6, Atenea Q22).\n5V_PI comes from the power sheet's ideal diode (back-feeds the Pi's 5 V after its polyfuse).\n3V3_PI = the Pi's own 3.3 V from pin 17 (pin 1 unused): pull-ups only, no load. The radio has its own LDO (3V3_RADIO)."
 		(exclude_from_sim no)
 		(at 25.4 27.94 0)
 		(effects
@@ -3720,7 +3701,7 @@
 		)
 		(uuid "5d233c25-f3ca-5cec-89ca-e7de1950b49b")
 	)
-	(text " 1  3V3"
+	(text " 1  3V3 (unused: pin 17 feeds the pull-ups; the Pi ties 1 and 17)"
 		(exclude_from_sim no)
 		(at 147.32 123.82 0)
 		(effects

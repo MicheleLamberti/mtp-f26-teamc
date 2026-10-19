@@ -1,54 +1,63 @@
 # Team C hardware — design notes (DRAFT – for ET review)
 
-MTP F26 · Team C · started 19-Oct-26 in the KiCad session (`hw/KICAD_SESSION_PROMPT.md` v2).
-Owner of the boards: **ET (Carlos, Michele, Bikash, Guillem)**. Everything here is a proposal from the radio team
-unless `CLAUDE.md` says it is decided. Fixed parts (ordered 19-Oct): Raspberry Pi 3 Model A+, Ebyte E01-ML01SP4,
-Ebyte TX2400-FPC-2509 flex antenna, SanDisk Ultra 32 GB A1 microSD.
+MTP F26 · Team C · KiCad session of 19-Oct-26 (`hw/KICAD_SESSION_PROMPT.md` v2). Owner of the boards: **ET (Carlos,
+Michele, Bikash, Guillem)**. Everything here is a proposal from the radio team unless `CLAUDE.md` says it is decided.
+Fixed parts (ordered 19-Oct): **Raspberry Pi 3 Model A+**, Ebyte E01-ML01SP4, Ebyte TX2400-FPC-2509 flex antenna,
+SanDisk Ultra 32 GB A1 microSD. Approved by Santiago at checkpoint 1: panel-mount controls on JST-XH leads (the power
+toggle drives a P-FET), TPS61022 boost.
 
-## Boards
+## Boards and files
 
-| Board | Folder | Purpose |
+| What | Where | State |
 |---|---|---|
-| SP4 breakout | `hw/sp4-breakout/` | E01-ML01SP4 → 1 × 8 2.54 mm header for the bench (T0/T2) from day one |
-| Pi 3 A+ HAT carrier | `hw/teamc-carrier/` | Radio, power (boost, LDO, charger, fuel gauge), UI connectors, on the Pi's 40-pin header |
-| Project library | `hw/lib/` | `teamc.kicad_sym` + `teamc.pretty/` (E01-ML01SP4 and parts missing from the KiCad libraries) |
-| Generators | `hw/scripts/` | `schgen.py` (schematic from a Python parts list), `netlist2pcb.py` (board update from the netlist) |
+| SP4 breakout (bench, T0/T2) | `hw/sp4-breakout/` | **Ready for the lab**: single-sided F.Cu, 31 × 37.5 mm, ERC 0, DRC 0 (all severities), gerbers + drill + 1:1 copper PDFs (plain and mirrored) in `fab/` and `sp4-breakout_gerbers.zip` |
+| Pi 3 A+ HAT carrier | `hw/teamc-carrier/` | **Draft**: schematic complete (ERC 0 errors, 0 warnings), board placed, power + SPI routed by script, the rest for ET (see "Board") |
+| Project library | `hw/lib/teamc.kicad_sym`, `hw/lib/teamc.pretty/` | E01-ML01SP4 (symbol + footprint from the manual's drawing), MAX17048 (from the registry part, checked against the datasheet pinout), 2×20 socket with 1.5 mm pads |
+| BoM | `hw/BOM.csv` | per device, from the netlist + off-board items; ≈ €102 (cap €150) |
+| Generators | `hw/scripts/` | see below; the `.kicad_sch` files are generated: edit the sheet `.py`, not the schematic |
 
-## Findings from the research (19-Oct) that change our docs
+Scripts (run from the repo root):
 
-1. **The SP4 is 14.5 × 18.0 mm**, not 14.85 × 18 (manual rev 1.7 §3 drawing p.4, photo, cdebyte.com, LCSC, EasyEDA all
-   agree; only the copy-pasted spec table on p.3 says 14.85, next to "Package DIP" and an SP2 page header).
-2. **The SP4 pads are 8 castellations on one 14.5 mm edge** (pins 1–8, 1.27 mm pitch, pin 1 on the right in the top
-   view) **plus two GND half-holes** (pins 9 and 10) on the long edges, 13.0 mm from the pad-row edge. Signal pads
-   0.80 mm wide (0.75 mm deep on top, 1.00 mm on the bottom); GND pads Ø1.5 with a Ø1.0 half-hole. "0.8 × 1.5 mm pad"
-   in our docs mixed the two. The §5.1 "basic circuit" figure uses the generic DIP numbering: ignore it.
-3. **The Pi 3 A+ has no ideal diode on its 5 V input** (reduced schematic rev 1.0: micro-USB → MF-MSMF260 polyfuse →
-   5 V; header pins 2/4 sit after the fuse). Feeding 5 V on the header bypasses the fuse, and a micro-USB supply
-   plugged in at the same time fights our boost. → **back-power protection on the HAT, rated ≥ 2.5 A** (the LM66100
-   named in older docs is a 1.5 A part).
-4. **GPIO 16 (mode MRM) is a legacy-firmware pin** (HAT design guide: GPIO 6/14/16 may be driven at boot): the switch
-   line gets a 1 kΩ series resistor (part of the ESD/RC network anyway).
-5. **The 18650 holder does not fit on the HAT** (≈ 77 mm long > 65 mm). The cell sits on the box floor beside the Pi,
-   with a lead to the HAT.
-6. TPS61088 (our earlier boost): no KiCad symbol, no registry record, datasheet URL 404, DigiKey 0 stock until 2027.
-   → **TPS61022** (1 cell → 5 V / 3 A reference design, internal compensation, 7 pins, symbol + footprint in KiCad).
-7. Keystone 1042/1043 holders are SMT only (bad for the drop test) → **MPD BH-18650-PC** (THT, made for protected
-   cells).
-8. KiCad 3D models are not installed on this machine (`kicad-packages3d`): renders show bare footprints.
+| Script | Does |
+|---|---|
+| `build_breakout.py [--fab]` | breakout schematic → ERC → board, placement, routing, pour → DRC (→ gerbers, drill, PDFs) |
+| `build_carrier.py [--sheet NAME]` | carrier sheets (`hw/teamc-carrier/sheets/*.py`) → ERC → netlist → board footprints/nets (`netlist2pcb.py`); `--sheet` builds one sheet alone for its owner |
+| `place_carrier.py` | outline (template, cutouts removed), fixed placement, auto-placement of the rest, boost copper areas, GND pours, hole keep-outs |
+| `route_carrier.py` | escape stubs (header edge row, SP4 pad row, fine-pitch packages), grid router (`gridroute.py`), GND stitching, fill |
+| `build_bom.py` | `hw/BOM.csv` |
+| `teamc_lib/gen_fp.py`, `gen_sym.py`, `gen_socket.py` | the project library |
+| `schgen.py`, `sexpr.py`, `boardutil.py`, `netlist2pcb.py` | shared: schematic writer, s-expression reader, board helpers, "update PCB from schematic" |
+
+## Findings that changed our docs (19-Oct)
+
+1. **The SP4 is 14.5 × 18.0 mm** (manual rev 1.7 §3 drawing p.4, photo, cdebyte.com, LCSC, EasyEDA), not 14.85: the
+   spec table on p.3 is a copy-paste error ("Package DIP", "SP2" page header).
+2. **SP4 pads:** 8 castellations on one 14.5 mm edge (pins 1–8, 1.27 mm, pin 1 on the right in the top view) + GND
+   half-holes 9/10 on the long edges, 13.0 mm from the pad edge. Ignore the manual's §5.1 DIP-numbered figure.
+   **Measure one module (14.5 mm, IPEX position ±0.5 mm) before the carrier goes to fab.**
+3. **The Pi 3 A+ has no ideal diode on its 5 V input** (A+ reduced schematic rev 1.0): header pins 2/4 sit after its
+   polyfuse → back-power protection on the HAT (the Pi 3B's own circuit), a fuse at the cell, and the rule
+   **"HAT on: never plug the Pi's micro-USB"** (silkscreen; the boost would back-feed that supply).
+4. GPIO 16 (mode MRM) is a legacy-firmware pin → 1 kΩ series resistor (part of the input network).
+5. The 18650 holder (≈ 77 mm) does not fit on the 65 mm HAT → cell on the box floor, JST-VH lead.
+6. TPS61088 → **TPS61022** (no KiCad symbol/registry part, datasheet 404, no stock until 2027 for the 61088).
+7. Keystone 1042/1043 holders are SMT only → **MPD BH-18650-PC** (THT, for protected cells).
+8. KiCad 3D models are not installed here (`kicad-packages3d`): renders show pads, not bodies.
 
 ## Block diagram
 
 ```mermaid
 flowchart LR
-  CELL["18650 protected cell<br/>(box floor, MPD BH-18650-PC)"] -- "JST-VH J20<br/>(J21 = 2nd cell, DNP)" --> RP["Reverse-polarity<br/>P-FET Q1"]
-  USBC["USB-C charge-only J1<br/>CC 5.1 kΩ, TVS"] -- VBUS_USB --> CHG["MCP73831-2<br/>452 mA"]
+  CELL["18650 protected cell<br/>(box floor, BH-18650-PC)"] -- "JST-VH J20<br/>(J21 = 2nd cell, DNP)" --> F1["Fuse F1 5 A"]
+  F1 --> RP["Reverse-cell P-FET Q1<br/>Si2333DDS"]
+  USBC["USB-C charge-only J2<br/>CC 5.1 kΩ, TVS, ESD"] -- VBUS_USB --> CHG["MCP73831-2<br/>452 mA"]
   CHG -- VBAT --> RP
   CHG -- "STAT → 2N7002" --> PI
   RP -- VBAT --> FG["MAX17048<br/>I2C 0x36, ALRT"]
-  RP -- VBAT --> PSW["Load switch P-FET Q2<br/>panel toggle on J22"]
-  PSW -- VBAT_SW --> BST["TPS61022 boost<br/>5.1 V, 1 µH"]
-  PSW -- VBAT_SW --> LDO["TLV75533 3.3 V LDO<br/>(TPS63001 buck-boost DNP)"]
-  BST -- 5V_BOOST --> ZVD["Ideal diode<br/>P-FET + BC857BS"]
+  RP -- VBAT --> PSW["Load switch Q2 Si2333DDS<br/>panel toggle on J22, soft start"]
+  PSW -- VBAT_SW --> BST["TPS61022 boost 5.1 V<br/>1 µH, forced PWM"]
+  PSW -- VBAT_SW --> LDO["TLV75533 3.3 V LDO<br/>(TPS63001 option, DNP)"]
+  BST -- 5V_BOOST --> ZVD["Ideal diode<br/>P-FET + BCM857BS"]
   ZVD -- "5V_PI, TVS, 100 µF" --> PI["Raspberry Pi 3 A+<br/>header pins 2/4"]
   LDO -- 3V3_RADIO --> SP4["E01-ML01SP4<br/>100 µF + 10 µF + 100 nF"]
   PI -- "SPI0 + CE 22 + IRQ 24" --> SP4
@@ -60,38 +69,31 @@ flowchart LR
 
 ## Net table
 
-Global labels between the carrier's sheets use exactly these names.
+Global labels between the carrier's sheets use exactly these names (`sheets/nets.py`).
 
 | Net | What | From → to |
 |---|---|---|
-| `VBAT` | Cell +, after the reverse-polarity FET; charger output | J20/J21 → Q1 → charger, fuel gauge, power switch |
+| `VBAT` | Cell +, after the fuse and the reverse-cell FET; charger output | J20/J21 → F1 → Q1 → charger, fuel gauge, power switch |
 | `VBAT_SW` | Switched cell | Q2 → boost input, radio LDO input |
-| `5V_PI` | 5.1 V for the Pi, after back-power protection | ideal diode → header pins 2/4 |
-| `3V3_RADIO` | Radio supply (never the Pi's 3V3, never the cell) | LDO → SP4 pad 1 |
-| `3V3_PI` | The Pi's own 3.3 V (header 1/17): pull-ups only, no load | header → pull-ups |
-| `VBUS_USB` | USB-C charge input (5 V) | USB-C → TVS → MCP73831 VDD |
-| `GND` | Ground | everywhere |
-| `SPI_SCK` / `SPI_MOSI` / `SPI_MISO` | SPI0 | GPIO 11 / 10 / 9 ↔ SP4 pads 4 / 5 / 6 |
-| `RADIO_CSN` | SPI0 CE0 | GPIO 8 → SP4 pad 3 |
-| `RADIO_CE` | Radio CE | GPIO 22 → SP4 pad 2 |
-| `RADIO_IRQ` | Radio IRQ, active low | SP4 pad 7 → GPIO 24 |
+| `5V_PI` | 5.1 V for the Pi, after the ideal diode | Q4 → header pins 2/4 |
+| `3V3_RADIO` | Radio supply (never the Pi's 3V3, never the cell) | LDO → R14 (0 Ω) → SP4 pad 1 |
+| `3V3_PI` | The Pi's own 3.3 V, **header pin 17 only** (pin 1 unused): pull-ups, no load | header → pull-ups |
+| `VBUS_USB` | USB-C charge input | USB-C → TVS → MCP73831 VDD |
+| `GND` | Ground (pours on both layers) | everywhere |
+| `SPI_SCK` / `SPI_MOSI` / `SPI_MISO` | SPI0, 33 Ω series (SCK/MOSI at the Pi end, MISO at the radio end) | GPIO 11 / 10 / 9 ↔ SP4 pads 4 / 5 / 6 |
+| `RADIO_CSN` / `RADIO_CE` / `RADIO_IRQ` | SPI0 CE0 / CE / IRQ (10 k pull-ups on CSN and IRQ to 3V3_PI) | GPIO 8 / 22 / 24 ↔ SP4 pads 3 / 2 / 7 |
 | `I2C_SDA` / `I2C_SCL` | I2C1 (1.8 kΩ pull-ups on the Pi) | GPIO 2 / 3 ↔ MAX17048 |
 | `FG_ALRT` | Fuel-gauge alert, open drain, 10 kΩ to 3V3_PI | MAX17048 → GPIO 25 |
-| `BTN_TXRX` | GO/STOP button, active low | J10 → ESD/RC → GPIO 17 |
-| `SW_ROLE` | Role switch, low = TX | J11 → ESD/RC → GPIO 27 |
-| `SW_MODE_NM` / `SW_MODE_MRM` | Mode switch, active low; neither = SRI | J12 → ESD/RC → GPIO 23 / GPIO 16 |
-| `LED_ACT` / `LED_STATUS` | LEDs, active high | GPIO 5 / 6 → 330 Ω → LED → GND |
-| `CHG_STAT` | Charger status through a 2N7002: 1 = charging or no USB, 0 = charge complete | → GPIO 26 |
-| `UART_TX` / `UART_RX` | Console | GPIO 14 / 15 ↔ J13 |
+| `BTN_TXRX`, `SW_ROLE`, `SW_MODE_NM`, `SW_MODE_MRM` | Panel inputs, active low (10 k pull-up at the connector, 1 k series, 100 nF at the GPIO, SP0504 ESD) | J10/J11/J12 → GPIO 17 / 27 / 23 / 16 |
+| `LED_ACT` / `LED_STATUS` | LEDs, active high, 330 Ω | GPIO 5 / 6 |
+| `CHG_STAT` | Charger status via 2N7002: 1 = charging **or** no USB, 0 = complete | → GPIO 26 |
+| `UART_TX` / `UART_RX` | Console (J13, bench only, no ESD) | GPIO 14 / 15 |
 
-Local nets inside a sheet (not global): `BAT_RAW`, `PWR_G`, `5V_BOOST`, `SW_NODE`, `FB`, `ZVD_B`, `ZVD_G`, `CHG_STAT_RAW`,
-`CC1`, `CC2`, `PWR_SW_J`, `<line>_J` for each UI input at its connector.
+## Pin map (BCM GPIO, header pin) — unchanged
 
-## Pin map (BCM GPIO, header pin) — unchanged from the KiCad brief
-
-Matches `proto/port/linux/ui.c` (inputs with the Pi's internal pull-up, active low; role low = TX; LEDs active high;
-MAX17048 at I2C address 0x36) and `radio/fw/linux/README.md`. GPIO 25 (ALRT) and 26 (STAT) are not read by the
-software yet; their pull-ups make them safe either way.
+Matches `proto/port/linux/ui.c` (inputs with the Pi's pull-ups, active low; role low = TX; LEDs active high;
+MAX17048 at 0x36) and `radio/fw/linux/README.md` (CE pin 15, CSN = CE0 pin 24, IRQ pin 18, SPI 19/21/23); checked
+against pinout.xyz by the sheet owner and by the reviewer.
 
 | GPIO | Pin | Net | | GPIO | Pin | Net |
 |---|---|---|---|---|---|---|
@@ -104,119 +106,128 @@ software yet; their pull-ups make them safe either way.
 | 10 | 19 | SPI_MOSI | | 25 | 22 | FG_ALRT |
 | 9 | 21 | SPI_MISO | | 26 | 37 | CHG_STAT |
 | 11 | 23 | SPI_SCK | | — | 2, 4 | 5V_PI |
-| 8 | 24 | RADIO_CSN | | — | 1, 17 | 3V3_PI |
+| 8 | 24 | RADIO_CSN | | — | 17 (1 unused) | 3V3_PI |
 | — | 6, 9, 14, 20, 25, 30, 34, 39 | GND | | 0 / 1 | 27 / 28 | ID_SD / ID_SC: not connected (no ID EEPROM) |
 
-Software notes for PT: never set the MAX17048's `MODE.EnSleep` (it would stop tracking while the Pi is off);
-`CHG_STAT` reads 1 while charging **or** with no USB, 0 when the charge is complete.
+Software notes for PT: never set the MAX17048's `MODE.EnSleep`; `CHG_STAT` = 1 while charging or with no USB, 0 when
+complete; GPIO 25/26 are not read yet; the LEDs glow faintly during boot (BCM default pull-ups on GPIO 5/6) — not a status.
 
 ## Power budget
 
-Loads: Pi 3 A+ 0.3–0.5 A at 5 V in use (~0.6 A boot, ~0.8 A all cores busy), USB stick 0.05–0.15 A from the Pi's
-port, SP4 120 mA TX / 26 mA RX at 3.3 V (≈ the same from the cell through the LDO). Realistic 5 V worst case ≈ 1.0 A;
-the HAT guide asks for 2.5 A capability.
-
-Cell current (boost input + 0.12 A radio TX; boost efficiency estimated from the TPS61022 curves):
+Loads: Pi 3 A+ 0.3–0.5 A at 5 V in use (~0.6 A boot, ~0.8 A all cores), USB stick 0.05–0.15 A, SP4 120 mA TX / 26 mA
+RX at 3.3 V. Realistic 5 V worst case ≈ 1 A. Cell current (boost η from the TPS61022 curves, + radio TX):
 
 | 5 V load | 4.2 V | 3.6 V | 3.3 V | 3.0 V |
 |---|---|---|---|---|
 | 0.5 A (typical) | 0.76 A | 0.87 A | 0.94 A | 1.03 A |
 | 1.0 A (realistic peak) | 1.40 A | 1.63 A | 1.78 A | **1.97 A** |
-| 2.5 A (rated) | 3.38 A | 4.01 A | 4.46 A | 4.95 A |
+| 2.5 A (HAT-guide rating) | 3.38 A | 4.01 A | 4.46 A | 4.95 A (not reachable near 3.0 V) |
 
-The 2.5 A rating is not reachable from a cell near 3.0 V (≈ 0.1 Ω of cell, protection circuit, holder springs and
-FETs drops ~0.5 V, and a protected cell may trip at a few amps). **Design point: 2 A from the cell, copper for 5 A.**
+**Design point: 2 A from the cell, copper for more.** Q1 + Q2 (Si2333DDS, ≤ 40 mΩ at −2.5 V) drop ≈ 0.15 V at 2 A
+(the AO3401A fallback ≈ 0.3 V and 0.6 W: rate the board at ~1 A out if it is used). Runtime on one 3000 mAh cell
+(≈ 9.9 Wh usable): 2.0 W ≈ 5.0 h · 2.4 W ≈ 4.1 h · 2.8 W ≈ 3.5 h.
 
-Track widths (IPC-2221 external, 1 oz, ΔT 10 °C): 1 A 0.30 mm · 2 A 0.78 mm · 2.5 A 1.06 mm · 3 A 1.37 mm · 5 A 2.8 mm.
-→ cell → Q1 → Q2 → boost VIN and the SW loop: pour ≥ 3 mm, at least 1.5 mm, both layers with vias;
-5V_BOOST → ideal diode → header pins 2 + 4: ≥ 1.5 mm; 3V3_RADIO: 0.5 mm; signals 0.4 mm (lab-friendly).
+## Parts (carrier)
 
-Runtime on one 3000 mAh cell (≈ 9.9 Wh usable): 2.0 W ≈ 5.0 h · 2.4 W ≈ 4.1 h · 2.8 W ≈ 3.5 h.
+Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
 
-## Parts (carrier) — proposal
+| Ref | Part | Notes |
+|---|---|---|
+| J1 | Harwin M20-7832046 2×20 socket, 8.5 mm (11 mm stack), footprint `teamc:PinSocket_2x20_P2.54mm_Vertical_Pad1.5mm` | 1.5 mm pads (stock: 1.7) so the edge row can be routed at 0.3/0.3 mm and the GND pour reaches the even GND pins |
+| MH1–MH4 | M2.5 NPTH Ø2.7, Ø6.2 copper-free land | Würth 970110155 nylon M2.5 × 11 F/F standoffs + screws |
+| J20 / J21 | JST B2P-VH battery lead (J21 = 2nd cell, DNP) | cell in an MPD BH-18650-PC holder on the box floor |
+| F1 | 5 A fast 1206 fuse (Littelfuse 0466005.NR — **verify part and stock**) | review F3: nothing else limits a short on 5V_PI |
+| Q1, Q2 | Vishay Si2333DDS-T1-GE3 (AO3401A fallback, same footprint) | reverse-cell FET; P-FET load switch (gate R8 100 k to VBAT, R9 10 k to the toggle, C18 100 nF soft start) |
+| J2 | GCT USB4125-GF-A-0190 USB-C, charge only | through-hole shell stakes; reachable with the lid open |
+| U1 | MCP73831T-2ACI/OT, RPROG 2.21 k (452 mA) | no power path: charge with the switch OFF; expect thermal fold-back to ~250–300 mA (review F7) |
+| U2, L1 | TI TPS61022RWUR + Würth 744316100 (1 µH, 11.5 A) | 750 k / 100 k → 5.10 V, 100 pF feed-forward, 22 µF in + 100 µF bulk, 3 × 22 µF out; **MODE tied to VIN (forced PWM)** — layout: MODE sits between VIN and EN; PFM would only save a few mA below ~100 mA |
+| Q4, U3 | P-FET + Nexperia **BCM857BS** matched pair, 10 k mirror / 47 k gate | the Pi 3B's ideal diode |
+| U4 | TI TLV75533PDBVR, 0 Ω R14 to 3V3_RADIO | U5 TPS63001 buck-boost option + R16: DNP (fit one of R14/R16) |
+| U6 | MAX17048G+T10 (footprint `teamc:MAX17048_TDFN-8-1EP_2x2mm`) | on VBAT; Kelvin from Q1's source (reads ~I × RDS low under load); via in the exposed pad |
+| U7 | E01-ML01SP4 (`teamc:E01-ML01SP4`) | 100 µF + 10 µF + 100 nF at pad 1; 33 Ω SPI series; CSN/IRQ pull-ups to 3V3_PI |
+| U11, U12 | Littelfuse SP0504BAHTG | ESD on the four UI lines; CC1, CC2 and the power-toggle line |
+| D1–D3 | Vishay SMF5.0A, footprint `Diode_SMD:D_SMF` | VBUS, 5V_PI, VBAT (5V_PI runs slightly above VRWM: a little leakage) |
+| J10–J12, J22 | JST B2B/B3B-XH-A | panel button E-Switch PS1024ABLK (Ø7.2 mm hole, drill 7.5), toggles 100SP1T1B1M1QEH (power, role) and 100SP3T1B1M1QEH (mode), Ø6.35 mm (drill 6.5) |
+| SW1 | 6 mm THT tactile in parallel with J10 | fitted (bench); harmless in the box |
+| J13 | 1 × 3 UART header | bench only, no ESD |
+| TP1–TP3, TP10 | VBAT, 5V_PI, GND, 3V3_RADIO | wire loops |
 
-Prices: DigiKey.de qty 1 excl. VAT, 19-Oct-26, unless noted; LCSC returned "Access Denied" and Mouser timed out for
-the power parts, so re-check stock before ordering. Symbols and footprints checked to exist in the KiCad 10 libraries
-(`/usr/share/kicad`) unless marked *teamc* (project library) or *registry*.
+## Board (carrier)
 
-### power
+- **Outline:** the KiCad `RaspberryPi-HAT` template, 65 × 56 mm, R3 corners, M2.5 holes on 58 × 49 mm (matches the
+  A+ drawing); the display/camera cutouts are removed (unused). The template's PoE keep-out (B.Cu) is kept: harmless on
+  the A+, it also keeps parts off the PEN/RUN pads.
+- **Placement (Pi coordinates):** SP4 bottom-right, IPEX near the bottom edge, ≥ 45 mm from the Pi's wireless can and
+  ~30 mm from the SoC; LDO and the 100 µF/10 µF/100 nF next to SP4 pad 1. Boost (TI RWU layout: inductor above the IC,
+  input cap at VIN, output caps under VOUT) and the ideal diode top-left next to header pins 2/4. Battery lead and USB-C
+  on the left edge, charger and fuel gauge beside them; panel leads J22/J10/J11 on the bottom edge, J12 above them.
+- **Rules (lab unknown, conservative):** net classes Default 0.4 mm / 0.3 mm clearance, Power 1.0 mm, vias 0.8/0.4 mm,
+  edge 0.5 mm. Exceptions, each forced by a package: **FinePitch** class (0.15 mm clearance) for the nets of the
+  0.5 mm-pitch parts (TPS61022, MAX17048, USB-C, TPS63001) plus a 0.15 mm footprint clearance on those four parts;
+  **0.2–0.3 mm escape tracks** out of those packages, the SOT-363 and the header's edge row; board minimum track 0.2 mm.
+  If the lab can only do 0.3 mm everywhere, the two QFN/TDFN parts need a fab (JLCPCB-class) or a different package.
+- **Copper areas:** SW_NODE (inductor pad → SW pad, 0.45 mm neck at the IC), VBAT_SW (inductor input, VIN, MODE, EN)
+  and 5V_BOOST (VOUT → output caps) on F.Cu above the GND pours; GND pours on both layers with stitching vias.
+- **Routing:** no autorouter is installed and the KiCad MCP cannot route, so `gridroute.py` (A* on a 0.05 mm grid,
+  two layers, 0.3 mm clearance to other nets, rule areas and edge respected) plus exact escape stubs. **Routed:** the
+  whole power path (battery → fuse → Q1 → Q2 → boost → ideal diode → header 5 V; VBAT tree; LDO → 3V3_RADIO) and SPI +
+  radio control. The router has no rip-up, so the remaining small nets are left for ET (list in the DRC report /
+  ratsnest, see the session log in `CLAUDE.md`). The script routing is a working draft, not a layout to fabricate:
+  ET should re-route the signal layer in the GUI (keep the power path, the boost areas and the escapes) and keep the
+  bottom GND pour as whole as possible.
 
-| Ref | Function | MPN | KiCad symbol | KiCad footprint | Price | Notes |
-|---|---|---|---|---|---|---|
-| J20, J21 | Battery lead (J21 = 2nd cell in parallel, DNP) | JST B2P-VH (10 A) | Connector_Generic:Conn_01x02 | Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical | ~€0.3 | Off-board: MPD BH-18650-PC holder (€2.94, THT, 9 786 in stock) on the box floor plate, strapped |
-| Q1 | Reverse-cell P-FET (D → BAT_RAW, S → VBAT, G → 10 kΩ → GND) | AO3401A (pref. Si2333DDS ≤ 40 mΩ @ −2.5 V when back in stock) | Transistor_FET:AO3401A | Package_TO_SOT_SMD:SOT-23 | €0.46 | |
-| Q2 | Load switch P-FET, gate from the panel power toggle | AO3401A | Transistor_FET:AO3401A | SOT-23 | €0.46 | Toggle carries µA only (option B); body diode blocks VBAT → VBAT_SW when off |
-| J22 | Power toggle lead | JST B2B-XH-A | Conn_01x02 | Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical | ~€0.05 | Panel toggle E-Switch 100SP1T1B1M1QEH (TME €2.32) |
-| J1 | USB-C charge-only | GCT USB4125-GF-A-0190 | Connector:USB_C_Receptacle_PowerOnly_6P | Connector_USB:USB_C_Receptacle_GCT_USB4125-xx-x-0190_6P_TopMnt_Horizontal | €0.54 | 1.9 mm through-hole shell stakes (drop test); reachable with the lid open |
-| R | CC1/CC2 Rd | 5.1 kΩ 1 % | Device:R | 0805 HandSolder | | |
-| D1, D2, D3 | TVS on VBUS_USB, 5V_PI, VBAT | SMF5.0A | Diode:SMF5V0A | **Diode_SMD:D_SOD-123F** (not the symbol's default D_SMF) | €0.24–0.44 | VC 9.2 V > MCP73831 VDD abs. max 7 V: ESD only, not a faulty-charger guard |
-| U1 | Charger | MCP73831T-2ACI/OT | Battery_Management:MCP73831-2-OT | SOT-23-5 | €0.67 | RPROG **2.21 kΩ → 452 mA** (2.0 kΩ can reach 550 mA > a USB-2 port); no power path: charge with the switch OFF |
-| D4 + R | Charge LED (lit while charging) | red 0805 + 1 kΩ to VBUS | Device:LED | LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder | | |
-| Q3 | STAT → 3.3 V level (100 kΩ gate pull-down, 10 kΩ drain pull-up to 3V3_PI) | 2N7002 | Transistor_FET:2N7002 | SOT-23 | €0.18 | STAT pushes 5 V: never straight to a GPIO |
-| U2 | 5.1 V boost | **TPS61022RWUR** | Converter_DCDC:TPS61022 | Package_DFN_QFN:Texas_RWU0007A_VQFN-7_2x2mm_P0.5mm | €2.09 | **DigiKey stock 0** (check Mouser/LCSC/TI); EN → VBAT_SW, MODE → GND (PFM, no reverse current); fallback TPS61089 (in stock, KiCad-ready) |
-| L1 | Boost inductor 1 µH, Isat 11.5 A | Würth 744316100 | Device:L | Inductor_SMD:L_Wuerth_HCI-5040 | €2.39 | peak 5.7 A at 3.0 V in / 2.5 A out |
-| R, R, C | FB divider + feed-forward | 750 kΩ / 100 kΩ 1 % (= 5.100 V), 100 pF C0G | Device:R / C | 0805 | | |
-| C | Boost CIN / COUT | 22 µF 25 V X5R 1206 (1 in, 3 out) + 100 µF 16 V electrolytic on VBAT_SW | Device:C / C_Polarized | C_1206 HandSolder / CP_Elec_6.3x5.4 | €0.4 / €0.54 | |
-| Q4, U3 | Ideal diode (Pi 3B circuit): P-FET + matched PNP mirror, 47 kΩ / 10 kΩ | AO3401A (DMG2305UX in the Pi), BCM857BS | Transistor_FET:AO3401A, Transistor_BJT:BC857BS | SOT-23, SOT-363_SC-70-6 | €0.46 + €0.45 | ≈ 0.13 V drop at 2.5 A |
-| C | Bulk at the header | 100 µF 16 V electrolytic + 100 nF | | CP_Elec_6.3x5.4, C_0805 | €0.54 | |
-| U4 | Radio LDO | **TLV75533PDBVR** (AP2112K-3.3 drop-in) | Regulator_Linear:TLV75533PDBV | SOT-23-5 | €0.37 | ≈ 65 mV dropout @ 150 mA; COUT 1–200 µF stated (AP2112 states no max) |
-| U5, L2 | Buck-boost option, **DNP**; 0 Ω links pick U4 or U5 | TPS63001DRCR + 2.2 µH | Regulator_Switching:TPS63001 | Package_SON:Texas_DRC0010J_ThermalVias | €2.41 | only if T0 shows > 2 dB less output at 3.0 V |
-| U6 | Fuel gauge on VBAT (Kelvin traces to J20) | MAX17048G+T10 | *registry* `max17048` (Maxim outline 21-0168, land 90-0065) | *registry* | €4.05 (LCSC $2.17) | TDFN 2×2 0.5 mm: paste + hot air; 3 µA hibernate; no CPU (fixed-function ASIC) |
-| U12 | ESD on the power-toggle line and CC1/CC2 | SP0504BAHTG | Power_Protection:SP0504BAHT | SOT-23-5 | $0.47 (LCSC) | |
-| TP1–4 | VBAT, 5V_PI, 3V3_RADIO, GND | Keystone 5000/5001 or wire loop | Connector:TestPoint | TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm | ~€0.3 | |
+### State of the carrier board at the end of 19-Oct (for ET)
 
-### pi_header
+DRC (`kicad-cli pcb drc --schematic-parity`, report in `hw/teamc-carrier/build/drc.rpt`): **0 errors**, 0 schematic
+parity issues; warnings = silkscreen overlaps (reference designators) and 21 escape stubs waiting for their nets;
+80 unconnected items = the nets below. **No carrier gerbers yet** (not DRC-complete).
 
-| Ref | Function | MPN | Symbol | Footprint | Price | Notes |
-|---|---|---|---|---|---|---|
-| J30 | 2 × 20 socket, 8.5 mm (11 mm stack) | Harwin M20-7832046 | Connector_Generic:Conn_02x20_Odd_Even | Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_Vertical (bottom side) | ~€3.5 | as in the template |
-| MH1–4 | M2.5 holes, NPTH Ø2.7, Ø6.2 copper-free | — | Mechanical:MountingHole | MountingHole:MountingHole_2.7mm_M2.5 | — | Standoffs Würth 970110155 (nylon F/F M2.5 × 11) × 4 + screws |
-| J13 | UART console (1 GND, 2 TX, 3 RX) | 1 × 3 pin header | Conn_01x03 | PinHeader_1x03_P2.54mm_Vertical | €0.1 | |
+To do in the KiCad GUI, in this order:
+1. **U2 pin 1 (boost power GND):** it has a via to the bottom pour, but the bottom pocket under the boost is fenced in by
+   the 5V_BOOST trunk (B.Cu, x ≈ 112.5) and a long VBAT run to D3 (B.Cu, x ≈ 105). Move D3 (VBAT TVS) next to Q1 and/or
+   re-route the 5V_BOOST trunk so that pocket joins the main bottom pour. **Must be solid before anything is built.**
+2. R4 (RPROG) GND pad, C15 and the DNP buck-boost U5 GND pins: a via each (no room found by the script).
+3. Route the small nets (KiCad's interactive router): 3V3_PI pull-ups, VBUS_USB, CC1/CC2, BTN_TXRX(_J), SW_ROLE(_J),
+   SW_MODE_NM(_J), SW_MODE_MRM(_J), LED_ACT(_A), LED_STATUS(_A), I2C_SDA, I2C_SCL, FG_ALRT, UART_TX/RX, CHG_STAT(_RAW),
+   CHG_LED_A, PROG, PWR_G, PWR_SW_J, Q1_G, ZVD_B, ZVD_G, and the DNP buck-boost nets (BB_*). The escape stubs out of
+   the header's edge row, the SP4 pad row, U3 and U6 are already there: start from their ends.
+4. Keep: the power path, SPI/radio routing, the boost copper areas, the GND pours; add GND vias next to every
+   decoupling cap; thermal copper around U1 (MCP73831).
+5. Tidy the silkscreen (references), check the box inside dimensions and the panel-lead positions, then DRC to 0
+   errors and 0 unconnected → gerbers.
 
-No ID EEPROM (only needed to call the board a "HAT"); pins 27/28 not connected. HAT display/camera cutouts omitted.
+## Review (independent, 19-Oct) and what was done
 
-### radio
+| # | Severity | Finding | Done |
+|---|---|---|---|
+| F1 | major | AO3401A Q1/Q2: ~0.3 V / 0.6 W at 2 A from a 3 V cell | Si2333DDS (AO3401A fallback; then rate ~1 A out); Kelvin from Q1's source documented |
+| F2 | minor | BC857BS lacks VBE matching | BCM857BS,115 |
+| F3 | minor | nothing limits a short on 5V_PI except the cell's PCM | F1 5 A fuse at the battery lead |
+| F4 | minor (suspicion) | Q2 turn-on inrush could trip the cell's PCM | R9 10 k + C18 100 nF (~1 ms soft start); bench-check with the real cell |
+| F5 | minor | SMF5.0A footprint | `D_SMF` (Vishay land pattern) |
+| F6 | minor | boost back-feeds a micro-USB supply on the A+ | silkscreen + operating rule |
+| F7 | note | MCP73831 thermal fold-back | copper around U1 (ET), or accept ~10 h charge |
+| F8 | note | charging with the switch ON never terminates; CHG_STAT 1 = charging or no USB | operating rule; add a VBUS divider to a spare GPIO if PT needs it |
+| F9 | note | radio pull-ups back-feed an unpowered Pi | pull-ups moved to 3V3_PI; avoid "Pi on micro-USB, HAT off" on the bench |
+| F10–F14 | note | LED boot glow, TVS leakage at 5.1 V, U3 VEBO margin (as on the Pi 3B), no hardware UVLO (software thresholds + PCM), no ESD on J13/BAT (internal) | documented |
+| F15 | minor | design-notes drift | this version |
 
-| Ref | Function | MPN | Symbol | Footprint | Price | Notes |
-|---|---|---|---|---|---|---|
-| U7 | Radio | Ebyte E01-ML01SP4 | *teamc* E01-ML01SP4 | *teamc* E01-ML01SP4 (from the manual's drawing, hand-solder lands) | ordered | |
-| C | 100 µF + 10 µF + 100 nF at pad 1 | electrolytic 6.3 × 5.4 + X5R 0805 + X7R 0805 | | | | 110 µF total, within the LDO's 200 µF |
-| R | CSN and IRQ pull-ups 10 kΩ to 3V3_RADIO | | | 0805 | | CSN high while the Pi boots |
-| R | 33 Ω series on SCK, MOSI (Pi end) and MISO (radio end) | | | 0805 | | 30–40 mm lines, cheap ringing control |
-| TP | 3V3_RADIO at the module | | | | | |
+Checked correct by the reviewer: every IC pinout (symbol ↔ footprint ↔ datasheet), the netlist vs the sheet sources,
+the header map vs `ui.c` / the radio README / pinout.xyz, boot states (CE low, CSN high), rails (SP4 only on
+3V3_RADIO), one CPU only (MAX17048 is a fixed-function gauge), no wireless chip added.
 
-### ui
+## What the tools could not do
 
-| Ref | Function | MPN | Symbol | Footprint | Price | Notes |
-|---|---|---|---|---|---|---|
-| J10 | GO/STOP button lead | B2B-XH-A | Conn_01x02 | JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical | €0.05 | Panel button E-Switch PS1024ABLK (TME €1.17, Ø7.2 mm hole) |
-| SW1 | Bench button in parallel with J10, DNP in the box | Omron B3F-1000 | Switch:SW_Push | Button_Switch_THT:SW_PUSH_6mm | €0.2 | |
-| J11 | Role toggle lead (may stay unfitted, Q8) | B2B-XH-A | Conn_01x02 | as J10 | | E-Switch 100SP1T1B1M1QEH (TME €2.32) |
-| J12 | Mode toggle lead: 1 NM, 2 GND, 3 MRM | B3B-XH-A | Conn_01x03 | JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical | | E-Switch 100SP3T1B1M1QEH ON-OFF-ON (TME €2.89) |
-| U11 | ESD, 4 lines, 1 nA leakage | SP0504BAHTG | Power_Protection:SP0504BAHT | SOT-23-5 | $0.47 | at the connectors |
-| R, R, C × 4 | 10 kΩ pull-up to 3V3_PI at the connector, 1 kΩ series, 100 nF at the GPIO | | | 0805 | | overrides the BCM boot pull-downs; 1 kΩ also covers GPIO 16 |
-| D10, D11 | Activity (green) and status (red) LEDs + 330 Ω | Würth 150080VS75000 / 150080RS75000 | Device:LED | LED_SMD:LED_0805_2012Metric | €0.2 | ≈ 4 mA from 3.3 V; no InGaN (Vf too high) |
-
-## Placement plan (Pi coordinates, origin bottom-left, header along the top edge)
-
-- **SP4 bottom-right** (x ≈ 44–58.5, y ≈ 2–20): ≥ 45 mm from the Pi's wireless can (top-left), 25–30 mm from the
-  SoC; pad row towards the header, IPEX end towards the bottom edge for the antenna cable; LDO and its caps beside it.
-  Clear of the (61.5, 3.5) hole's Ø6.2 keep-out. GND pour on both layers under it, no tracks on top under it.
-- **Boost, inductor and ideal diode top-left** next to header pins 2/4 (x ≈ 3–22, y ≈ 32–48), the far corner from
-  the SP4.
-- **USB-C and the battery connector on the left edge** (over the Pi's display connector), charger and MAX17048 next to
-  them (Kelvin traces from J20).
-- **JST-XH UI connectors along the bottom edge** between the boost and the radio, ESD array at the connectors, LEDs
-  at the bottom edge.
-- Pi's USB-A (stick) sits under the HAT's right edge (Z 7 mm vs the HAT's 11 mm underside): nothing on the HAT bottom
-  there; clip THT leads to ≤ 2.5 mm.
-- Height: Pi + 11 mm stack + HAT + tallest part ≈ 24–28 mm (inductor/JST/electrolytics ≤ 6 mm).
+- The KiCad MCP cannot place, route, pour or edit footprints: all of that is `pcbnew` Python in `hw/scripts/`.
+- `kicad-cli` (10.0.6) ignored a project `.kicad_dru` custom-rules file entirely, so the fine-pitch exceptions are
+  footprint clearances + a net class instead of custom rules.
+- No autorouter: see "Routing". No 3D models installed: renders show bare pads.
 
 ## Open questions for ET and the lab
 
-- Boost: TPS61022 stock (DigiKey 0) → Mouser / LCSC / TI store, else TPS61089 (values in the research notes).
-- Two QFN-type parts (TPS61022 2 × 2 mm, MAX17048 2 × 2 mm): stencil + paste + hot air/hot plate in the lab, or a
-  JLCPCB-class fab with assembly of those two only.
-- P-FETs: AO3401A everywhere for availability; Si2333DDS (lower Rds at low VGS) when stock returns.
-- Lab rules (Prof. Chávez / Prof. Jiménez): minimum track/clearance, plated vias, solder mask, turnaround.
-- Box inside dimensions (Santiago to measure) before freezing the outline and the panel-hole positions.
+- Lab limits (Prof. Chávez / Prof. Jiménez): minimum track/clearance (the carrier needs 0.2 mm necks and 0.15 mm at
+  the QFN/TDFN), plated vias (the carrier needs them; the breakout does not), solder mask, stencil + hot air for the
+  QFN/TDFN, turnaround. Else a JLCPCB-class 2-layer fab (~€1/board + 1–2 weeks).
+- Stock: TPS61022 (DigiKey 0 on 19-Oct; Mouser/LCSC/TI), Si2333DDS (0 until Jan-27; AO3401A fallback), fuse part number.
+- Box inside dimensions and panel-hole positions (Santiago to measure) before freezing the outline/connector edges.
+- Atenea Q22 (Pi wireless chip), Q6 (foil at the USB port), Q8 (role switch).

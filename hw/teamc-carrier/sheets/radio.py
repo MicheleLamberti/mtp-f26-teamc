@@ -74,10 +74,10 @@ def build():
            "0 Ω if the bench shows no need (spidev runs at ≤ 8 MHz).", at=(25.4, 144.78), size=1.27)
 
     # --- pull-ups ---------------------------------------------------------------------------------------------
-    s.note("PULL-UPS TO 3V3_RADIO", at=(25.4, 172.72), size=2.0)
-    s.add("Device:R", "R80", "10k", at=(63.5, 190.5), rot=90, fp=R0805, nets={"1": "3V3_RADIO", "2": "RADIO_CSN"},
+    s.note("PULL-UPS TO 3V3_PI", at=(25.4, 172.72), size=2.0)
+    s.add("Device:R", "R80", "10k", at=(63.5, 190.5), rot=90, fp=R0805, nets={"1": "3V3_PI", "2": "RADIO_CSN"},
           mpn="RC0805FR-0710KL", mfr="Yageo")
-    s.add("Device:R", "R81", "10k", at=(63.5, 208.28), rot=90, fp=R0805, nets={"1": "3V3_RADIO", "2": "RADIO_IRQ"},
+    s.add("Device:R", "R81", "10k", at=(63.5, 208.28), rot=90, fp=R0805, nets={"1": "3V3_PI", "2": "RADIO_IRQ"},
           mpn="RC0805FR-0710KL", mfr="Yageo")
     s.note("R80: CSN high = radio deselected while the Pi boots (GPIO 8 is an input\n"
            "with its default pull-up until spidev takes it).\n"

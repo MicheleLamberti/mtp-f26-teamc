@@ -13,7 +13,7 @@ GLOBAL_NETS = [
 
 # Reference designators per sheet (keeps the sheets independent; the template's J1 and MH1-MH4 keep their places)
 REF_RANGES = {
-    "power": "J2 (USB-C), J20-J29, U1-U6, U12, Q1-Q9, L1-L9, D1-D9, C1-C49, R1-R49, TP1-TP9, JP1-JP9",
+    "power": "J2 (USB-C), J20-J29, F1, U1-U6, U12, Q1-Q9, L1-L9, D1-D9, C1-C49, R1-R49, TP1-TP9, JP1-JP9",
     "pi_header": "J1 (40-pin socket), MH1-MH4, J13 (UART), C90-C99, R90-R99",
     "ui": "J10-J12, SW1-SW9, U11, D10-D19, C50-C69, R50-R79",
     "radio": "U7, C70-C79, R80-R89, TP10-TP19",
