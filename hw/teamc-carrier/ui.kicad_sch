@@ -171,172 +171,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Switch:SW_Push"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "SW"
-				(at 1.27 2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "SW_Push"
-				(at 0 -1.524 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Push button switch, generic, two pins"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "switch normally-open pushbutton push-button"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "SW_Push_0_1"
-				(circle
-					(center -2.032 0)
-					(radius 0.508)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 1.27)
-						(xy 0 3.048)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 2.032 0)
-					(radius 0.508)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27)
-						(xy -2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Connector_Generic:Conn_01x03"
 			(pin_names
 				(offset 1.016)
@@ -1785,181 +1619,6 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 114.3)
-			(xy 71.12 114.3)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3e9992c7-a1b1-52ee-b3b8-57546058f23e")
-	)
-	(label "BTN_TXRX_J"
-		(at 71.12 114.3 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c0a540f3-4bf1-52d7-aca7-c509e04be411")
-	)
-	(wire
-		(pts
-			(xy 83.82 114.3)
-			(xy 86.36 114.3)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e2c61f51-c8a4-5efa-a3f0-bcc9c5eed8be")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 86.36 114.3 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "6bde6d16-a233-5ca6-a379-43b806b387e2")
-		(property "Reference" "#PWR4002"
-			(at 86.36 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 86.36 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 86.36 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 86.36 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7e925791-6275-52f0-a19d-69bff04f2c04")
-		)
-		(instances
-			(project "teamc-carrier"
-				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4002")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Switch:SW_Push")
-		(at 78.74 114.3 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e625c35d-a45b-5608-a920-977ba475b995")
-		(property "Reference" "SW1"
-			(at 78.74 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "bench GO/STOP"
-			(at 78.74 109.22 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm"
-			(at 78.74 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 78.74 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Push button switch, generic, two pins"
-			(at 78.74 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "B3F-1000 (or any 6 x 6 mm THT tactile)"
-			(at 78.74 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Omron"
-			(at 78.74 114.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a892ccf5-efa0-52a6-9a31-21148e497afb")
-		)
-		(pin "2"
-			(uuid "4969d160-571d-5e9e-a74b-fe82eb304cd5")
-		)
-		(instances
-			(project "teamc-carrier"
-				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "SW1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
 			(xy 73.66 139.7)
 			(xy 71.12 139.7)
 		)
@@ -2000,7 +1659,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1490ec6d-6909-5f68-8b28-61dbe8107fcc")
-		(property "Reference" "#PWR4003"
+		(property "Reference" "#PWR4002"
 			(at 71.12 146.05 0)
 			(effects
 				(font
@@ -2042,7 +1701,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4003")
+					(reference "#PWR4002")
 					(unit 1)
 				)
 			)
@@ -2184,7 +1843,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9ab46bdf-e914-586d-ae78-e537c873c3fd")
-		(property "Reference" "#PWR4004"
+		(property "Reference" "#PWR4003"
 			(at 71.12 168.91 0)
 			(effects
 				(font
@@ -2226,7 +1885,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4004")
+					(reference "#PWR4003")
 					(unit 1)
 				)
 			)
@@ -2656,7 +2315,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "53e9e538-7998-50cc-af24-95e49ec1d038")
-		(property "Reference" "#PWR4005"
+		(property "Reference" "#PWR4004"
 			(at 293.37 102.87 0)
 			(effects
 				(font
@@ -2698,7 +2357,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4005")
+					(reference "#PWR4004")
 					(unit 1)
 				)
 			)
@@ -3092,7 +2751,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f43e054c-5b4c-5b9b-a5b6-2b7817d0d9ec")
-		(property "Reference" "#PWR4006"
+		(property "Reference" "#PWR4005"
 			(at 293.37 123.19 0)
 			(effects
 				(font
@@ -3134,7 +2793,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4006")
+					(reference "#PWR4005")
 					(unit 1)
 				)
 			)
@@ -3528,7 +3187,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ef5f435e-7ae8-5eb1-b063-7eb71670807e")
-		(property "Reference" "#PWR4007"
+		(property "Reference" "#PWR4006"
 			(at 293.37 143.51 0)
 			(effects
 				(font
@@ -3570,7 +3229,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4007")
+					(reference "#PWR4006")
 					(unit 1)
 				)
 			)
@@ -3964,7 +3623,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "62cd9150-5fdd-5b1c-9e00-a1e3ee400201")
-		(property "Reference" "#PWR4008"
+		(property "Reference" "#PWR4007"
 			(at 293.37 163.83 0)
 			(effects
 				(font
@@ -4006,7 +3665,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4008")
+					(reference "#PWR4007")
 					(unit 1)
 				)
 			)
@@ -4117,7 +3776,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1daf9784-9213-5623-9741-f7a25ae1fc1e")
-		(property "Reference" "#PWR4009"
+		(property "Reference" "#PWR4008"
 			(at 162.56 207.01 0)
 			(effects
 				(font
@@ -4159,7 +3818,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4009")
+					(reference "#PWR4008")
 					(unit 1)
 				)
 			)
@@ -4499,7 +4158,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2c858a3e-5361-5861-a55f-258fce7b8b52")
-		(property "Reference" "#PWR4010"
+		(property "Reference" "#PWR4009"
 			(at 293.37 201.93 0)
 			(effects
 				(font
@@ -4541,7 +4200,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4010")
+					(reference "#PWR4009")
 					(unit 1)
 				)
 			)
@@ -4804,7 +4463,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6d3939fe-e495-5b03-b6d4-7ba3020a14d6")
-		(property "Reference" "#PWR4011"
+		(property "Reference" "#PWR4010"
 			(at 293.37 219.71 0)
 			(effects
 				(font
@@ -4846,7 +4505,7 @@
 		(instances
 			(project "teamc-carrier"
 				(path "/3d2c0c9d-1f09-5bfb-89c5-acf8beb7078d/c652765f-2e9c-57aa-92ca-769195d452bf"
-					(reference "#PWR4011")
+					(reference "#PWR4010")
 					(unit 1)
 				)
 			)
@@ -4992,7 +4651,7 @@
 		)
 		(uuid "f7fbe73d-e134-5394-814e-cc088bd61a32")
 	)
-	(text "J10: panel button E-Switch PS1024ABLK (momentary).\nSW1: bench button in parallel with J10.\nJ11: role toggle E-Switch 100SP1T1B1M1QEH, closed = TX;\n  may stay unfitted until Atenea Q8 (open = RX).\nJ12: mode toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON:\n  1 NM, 2 common (GND), 3 MRM; centre = SRI."
+	(text "J10: panel button E-Switch PS1024ABLK (momentary).\nBench: plug the panel button into J10 (or bridge its two pins); no on-board button.\nJ11: role toggle E-Switch 100SP1T1B1M1QEH, closed = TX;\n  may stay unfitted until Atenea Q8 (open = RX).\nJ12: mode toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON:\n  1 NM, 2 common (GND), 3 MRM; centre = SRI."
 		(exclude_from_sim no)
 		(at 25.4 182.88 0)
 		(effects

@@ -313,9 +313,9 @@
 		(uuid "8b95034c-b92e-52e5-8192-fd09ebe4cbcd")
 	)
 	(zone
-		(layer "F.Cu")
+		(layers "F.Cu" "B.Cu")
 		(uuid "798db566-6c5f-53e4-afad-3dd14965afe5")
-		(name "SP4 no top tracks")
+		(name "SP4 no tracks")
 		(hatch edge 0.5)
 		(connect_pads
 			(clearance 0)

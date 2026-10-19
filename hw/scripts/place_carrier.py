@@ -35,6 +35,7 @@ FIXED = {
     "R84": (147.5, 74.5, 90, False),   # MISO series R at the radio end, above the pad escapes
     "TP10": (161.5, 82.0, 0, False),
     "U5": (138.5, 68.0, 0, False),     # buck-boost option (DNP)
+    "L2": (133.5, 67.8, 0, False),     # its inductor, beside the L1/L2 pins
     # power corner (Pi top-left, next to header pins 2/4)
     # boost laid out as TI's RWU example: L1 above the IC (SW pad on the left, VIN on the right), input cap at VIN,
     # output caps in a row under VOUT; SW_NODE / VBAT_SW / 5V_BOOST are copper areas (BOOST_ZONES)
@@ -44,32 +45,44 @@ FIXED = {
     "C6": (107.4, 67.9, 90, False),    # 3 x 22 uF at VOUT (pin 3)
     "C7": (110.0, 67.9, 90, False),
     "C8": (112.6, 67.9, 90, False),
-    "C5": (122.5, 63.5, 90, False),    # 100 uF boost input bulk
+    "C5": (124.0, 63.5, 90, False),    # 100 uF boost input bulk
     "Q4": (108.0, 52.6, 0, False),     # ideal diode under header pins 2/4
-    "U3": (113.0, 52.6, 0, False),     # its left escape stubs must clear Q4's drain pad
-    "C9": (121.0, 54.0, 0, False),     # 100 uF at 5V_PI
+    "U3": (112.4, 52.6, 0, False),     # its left escape stubs must clear Q4's drain pad
+    "R12": (116.6, 52.8, 90, False),   # mirror base resistor right at U3
+    "R13": (104.3, 53.8, 90, False),   # gate resistor at Q4
+    "C9": (123.0, 54.0, 0, False),     # 100 uF at 5V_PI
+    "C10": (104.4, 58.5, 90, False),   # 100 nF at 5V_PI, left strip under header pin 2
+    "D2": (104.4, 63.6, 90, False),    # 5V_PI TVS
     # left edge: battery lead above the USB-C mouth
-    "J20": (103.5, 75.8, 0, False),
-    "J21": (117.5, 75.8, 0, False),    # 2nd cell (DNP)
+    "J20": (107.46, 76.3, 180, False),  # battery lead, + (pin 1) on the right, towards the fuse
     "J2": (103.4, 87.5, 270, False),   # rotation re-checked below so the mouth faces the left edge
-    "U12": (110.5, 90.0, 0, False),    # ESD for CC1/CC2 and the power-toggle line
-    "U1": (116.0, 89.5, 0, False),     # charger between the USB-C and the battery lead
-    "U6": (114.5, 84.0, 0, False),     # fuel gauge next to J20 (Kelvin)
-    "TP1": (110.5, 84.0, 0, False),    # VBAT
-    "Q1": (112.3, 73.0, 0, False),     # reverse-cell FET next to J20
-    "Q2": (112.3, 77.6, 0, False),     # power switch FET
+    "F1": (113.5, 73.7, 0, False),     # battery path: J20 -> F1 -> Q1 -> Q2, stacked beside J20
+    "Q1": (113.0, 77.2, 0, False),
+    "Q2": (113.0, 81.2, 0, False),
+    # boost feedback divider right of U2 (FB pin 4 escapes to the right), clear of the FB stub
+    "R10": (116.0, 67.3, 90, False),
+    "C3": (118.5, 67.3, 90, False),
+    "R11": (117.0, 71.0, 0, False),
+    # charger + USB-C below the battery path: CC resistors at the CC pins, ESD array under the charger
+    "U1": (115.0, 85.4, 0, False),
+    "U12": (113.6, 89.6, 0, False),
+    "R2": (110.5, 84.6, 0, False),
+    "R3": (109.6, 89.4, 90, False),
+    "R4": (119.6, 83.4, 0, False),     # PROG at U1 pin 5
+    "C1": (119.3, 86.9, 90, False),    # 10 uF at U1 VDD (pin 4)
+    "C2": (122.0, 89.8, 90, False),    # 10 uF at the charger output (VBAT)
+    "U6": (120.5, 74.5, 0, False),     # fuel gauge in the open part of the battery area (its escapes need room)
     # bottom edge: panel leads
     "J22": (111.5, 95.0, 0, False),    # power toggle
     "J10": (121.0, 95.0, 0, False),    # GO/STOP button
     "J11": (130.5, 95.0, 0, False),    # role toggle
-    "J12": (124.0, 86.0, 0, False),    # mode toggle
-    "U11": (136.0, 88.0, 0, False),    # ESD at the leads
-    "SW1": (127.0, 73.0, 0, False),    # bench button
+    "J12": (126.5, 86.0, 0, False),    # mode toggle
+    "U11": (137.6, 88.0, 0, False),    # ESD at the leads
     # signals next to the header
     "R83": (131.2, 53.5, 90, False),   # MOSI series R at header pin 19
     "R82": (136.3, 53.5, 90, False),   # SCK series R at header pin 23
     "J13": (141.0, 56.0, 90, False),   # UART console
-    "TP2": (128.5, 58.0, 0, False),
+    "TP2": (129.8, 59.0, 0, False),
     "TP3": (134.0, 62.0, 0, False),
 }
 # copper areas of the boost (F.Cu, above the GND pour): net, polygon. The SW neck at the IC sits between the GND
@@ -82,9 +95,28 @@ BOOST_ZONES = [
                  (113.15, 61.5), (110.6, 61.5)]),
     ("/power/5V_BOOST", [(106.0, 64.05), (112.8, 64.05), (112.8, 66.95), (106.0, 66.95)]),
 ]
+# functional clusters: each member goes next to its anchor (a part: its pad on the shared net; or a point),
+# inside the cluster's region only, so one cluster cannot take another's room. Placed before everything else.
+CLUSTERS = [
+    ("battery", (110.4, 72.0, 128.0, 84.0), [("R1", "Q1"), ("D3", "Q1"), ("C17", "U6"),
+                                             ("C18", "Q2"), ("R8", "Q2"), ("R9", "Q2")]),
+    ("charger", (108.2, 82.6, 122.5, 92.1), []),
+    # UI inputs: pull-up and series R at the connector side with the ESD array, the 100 nF at the GPIO pin; the
+    # GPIO line runs as one track to the header
+    ("ui_bot", (128.0, 76.0, 140.2, 92.1), [("R50", "U11"), ("R51", "U11"), ("R52", "U11"), ("R53", "U11"),
+                                            ("R54", "U11"), ("R55", "U11"), ("R56", "U11"), ("R57", "U11")]),
+    # under the header: LEDs, and the pull-ups to 3V3_PI next to their GPIO pins (short 3V3_PI from pin 17)
+    ("ui_top", (127.5, 51.2, 158.5, 60.6), [("C50", "J1"), ("C51", "J1"), ("C52", "J1"), ("C53", "J1"),
+                                            ("R80", "J1"), ("R81", "J1"), ("R17", "J1"), ("R7", "J1"),
+                                            ("R60", "J1"), ("R61", "J1"), ("D10", "R60"), ("D11", "R61")]),
+    ("mid", (126.0, 60.6, 157.0, 78.8), [("C11", "U4"), ("C12", "U4"), ("R14", "U4"),
+                                         ("Q3", (130.0, 73.5)), ("R6", "Q3"), ("D4", "Q3"), ("R5", "D4"),
+                                         ("TP1", (126.5, 70.5)), ("R16", "U5"), ("R15", "U5"), ("C13", "U5"),
+                                         ("C14", "U5"), ("C15", "U5"), ("C16", "U5"), ("L2", "U5")]),
+]
 # parts whose own nets are rails: put them next to the part they serve (anchor's pad on the shared net)
 NEAR = {
-    "C1": "J2", "R2": "J2", "R3": "J2", "D1": "J2",
+    "C1": "J2", "R2": "J2", "R3": "J2",
     "C2": "U1", "R4": "U1", "R5": "U1", "D4": "U1", "Q3": "U1", "R6": "Q3", "R7": "Q3",
     "R1": "Q1", "D3": "Q1", "R8": "Q2", "R9": "Q2", "C18": "Q2", "F1": "J20",
     "C3": "U2", "R10": "U2", "R11": "U2", "C4": "U2", "C6": "U2", "C7": "U2", "C8": "U2",
@@ -92,7 +124,7 @@ NEAR = {
     "C11": "U4", "C12": "U4", "R14": "U4",
     "R16": "U5", "C13": "U5", "C14": "U5", "C15": "U5", "C16": "U5", "L2": "U5", "R15": "U5",
     "C17": "U6", "R17": "U6",
-    "R80": "U7", "R81": "U7",
+
 }
 # nets too common to pick a neighbour by
 COMMON = {"GND", "VBAT", "VBAT_SW", "3V3_PI", "5V_PI", "3V3_RADIO", "/power/5V_BOOST"}
@@ -174,6 +206,9 @@ def main():
     # down below the inner row
     placed["sp4_lane"] = (145.2, 76.6, 154.1, 80.2)
     placed["header_band"] = (107.0, 49.4, 158.0, 51.2)
+    placed["fb_stub"] = (113.2, 64.4, 114.8, 65.4)       # U2 FB escape (route_carrier.boost_escapes)
+    placed["u2_gnd_via"] = (109.3, 61.7, 110.7, 63.1)    # U2 power-GND via
+    placed["u6_escapes"] = (117.6, 72.6, 123.4, 76.4)     # MAX17048 escape stubs + its EP via
 
     # the boost copper areas are not for parts that do not belong to them
     for i, (_net, pts) in enumerate(BOOST_ZONES):
@@ -203,12 +238,15 @@ def main():
                 return cands[0], n
         return None, None
 
-    def place_near(ref, a, n):
-        ax, ay = [pcbnew.ToMM(c) for c in (fps[a].GetPosition().x, fps[a].GetPosition().y)]
-        for p in fps[a].Pads():   # aim at the anchor's pad on the shared net
-            if n and p.GetNetname() == n:
-                ax, ay = pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)
-                break
+    def place_near(ref, a, n, region=None):
+        if isinstance(a, tuple):
+            ax, ay = a
+        else:
+            ax, ay = [pcbnew.ToMM(c) for c in (fps[a].GetPosition().x, fps[a].GetPosition().y)]
+            for p in fps[a].Pads():   # aim at the anchor's pad on the shared net
+                if n and p.GetNetname() == n:
+                    ax, ay = pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)
+                    break
         for ring in range(0, 120):
             rad = 1.0 + ring * 0.5
             steps = max(8, int(2 * math.pi * rad / 0.8))
@@ -216,14 +254,32 @@ def main():
                 t = 2 * math.pi * k / steps
                 x, y = round(ax + rad * math.cos(t), 2), round(ay + rad * math.sin(t), 2)
                 for rot in (0, 90):
+                    if region and not (region[0] <= x <= region[2] and region[1] <= y <= region[3]):
+                        continue
                     bu.place(board, ref, x, y, rot)
                     r = courtyard(fps[ref])
+                    if region and not (region[0] - 0.25 <= r[0] and r[2] <= region[2] + 0.25
+                                       and region[1] - 0.25 <= r[1] and r[3] <= region[3] + 0.25):
+                        continue
                     if inside_board(r) and not any(overlaps(r, o) for o in placed.values()):
                         placed[ref] = r
                         return True
         return False
 
-    # NEAR parts first (in dependency order), then everything else
+    # clusters first, each inside its region; a member that does not fit falls back to the general pass
+    for name, region, members in CLUSTERS:
+        for ref, a in members:
+            if ref not in fps or ref in placed:
+                continue
+            if isinstance(a, tuple):
+                n = None
+            else:
+                shared = sorted(nets[ref] & nets.get(a, set()), key=lambda n: (n == "GND", len(users[n])))
+                n = shared[0] if shared else None
+            if not place_near(ref, a, n, region):
+                print(f"cluster {name}: {ref} did not fit its region, placed in the general pass")
+
+    # NEAR parts next (in dependency order), then everything else
     todo = sorted((r for r in fps if r not in placed), key=lambda r: (r not in NEAR, r))
     for _ in range(4):
         left = []
@@ -245,7 +301,7 @@ def main():
         pads = [p for p in f.Pads() if p.GetNumber()]
         gap = min((pad_gap(a, b) for i, a in enumerate(pads) for b in pads[i + 1:]
                    if a.GetNetname() != b.GetNetname()), default=1.0)
-        if gap < bu.LAB_RULES["clearance"]:
+        if gap < bu.FAB_RULES["clearance"]:
             f.SetLocalClearance(bu.MM(0.15))
             print(f"fine pitch {ref}: own pad gap {gap:.3f} mm -> footprint clearance 0.15 mm")
 

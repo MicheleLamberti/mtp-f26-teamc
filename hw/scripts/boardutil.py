@@ -8,8 +8,11 @@ import pcbnew
 HW = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 MM = pcbnew.FromMM
 
-# Conservative rules while the lab's limits are unknown (KiCad brief §4 Phase D)
+# Conservative rules while the lab's limits are unknown (KiCad brief §4 Phase D): the SP4 breakout
 LAB_RULES = {"clearance": 0.3, "track": 0.4, "via_d": 0.8, "via_drill": 0.4, "edge": 0.5}
+# The carrier (20-Oct): a JLCPCB-class 2-layer fab (it needs plated vias and 0.15 mm at its QFN/TDFN anyway);
+# 0.2 mm clearance and 0.25 mm signals are well inside such a fab's limits (0.1/0.1 mm), power stays wide
+FAB_RULES = {"clearance": 0.2, "track": 0.25, "via_d": 0.8, "via_drill": 0.4, "edge": 0.5}
 
 
 def set_project_rules(pro_path, rules=LAB_RULES, classes=()):

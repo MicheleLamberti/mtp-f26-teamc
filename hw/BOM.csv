@@ -11,9 +11,9 @@ C50 C51 C52 C53,4,100n X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSo
 C70,1,100u 10V,Capacitor_SMD:CP_Elec_6.3x5.4,"EEE-HA1A101WP (100 µF 10 V, 6.3 x 5.4 mm, 105 °C)",Panasonic,est.,0.50,0.50,yes
 C71,1,10u X5R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,CL21A106KAYNNNE (10 µF 25 V X5R 0805),Samsung,generic MLCC (LCSC),0.05,0.05,yes
 C72,1,100n X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,CL21B104KBCNNNC (100 nF 50 V X7R 0805),Samsung,generic MLCC (LCSC),0.05,0.05,yes
-D1 D2 D3,3,SMF5.0A,Diode_SMD:D_SMF,SMF5V0A-E3-08,Vishay,DigiKey.de,0.30,0.90,yes
 D10,1,green,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080VS75000,Würth Elektronik,DigiKey,0.15,0.15,yes
 D11,1,red,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080RS75000,Würth Elektronik,DigiKey,0.20,0.20,yes
+D2 D3,2,SMF5.0A,Diode_SMD:D_SMF,SMF5V0A-E3-08,Vishay,DigiKey.de,0.30,0.60,yes
 D4,1,red CHG,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080RS75000,Würth Elektronik,DigiKey,0.20,0.20,yes
 F1,1,5A fast,Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder,"0466005.NR (1206 fast, 5 A; verify)",Littelfuse,est. (Littelfuse 0466 1206 fast; verify part and stock),0.45,0.45,yes
 J1,1,RPi 3 A+ GPIO,teamc:PinSocket_2x20_P2.54mm_Vertical_Pad1.5mm,"M20-7832046 (2x20 female, 8.5 mm; 11 mm stack with M2.5x11 standoffs)",Harwin,DigiKey/Mouser (aggregator),3.50,3.50,yes
@@ -23,7 +23,6 @@ J12,1,mode toggle,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,B3B-XH-A(L
 J13,1,UART console,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,61300311121 (1x03 2.54 mm pin header),Würth Elektronik,generic pin header,0.10,0.10,yes
 J2,1,USB-C charge,Connector_USB:USB_C_Receptacle_GCT_USB4125-xx-x-0190_6P_TopMnt_Horizontal,USB4125-GF-A-0190,GCT,DigiKey.de,0.54,0.54,yes
 J20,1,BATT 18650,Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical,B2P-VH,JST,est. (JST VH),0.25,0.25,yes
-J21,0,BATT 2 (DNP),Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical,B2P-VH,JST,est. (JST VH),0.25,0.00,yes
 J22,1,PWR toggle,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,B2B-XH-A,JST,LCSC C158012,0.05,0.05,yes
 L1,1,1u Isat 11.5A,Inductor_SMD:L_Wuerth_HCI-5040,744316100,Würth Elektronik,DigiKey.de,2.39,2.39,yes
 L2,0,2u2 (DNP),Inductor_SMD:L_Coilcraft_LPS4018,LPS4018-222MRB,Coilcraft,Coilcraft/Mouser est. (DNP),1.20,0.00,yes
@@ -45,7 +44,6 @@ R6 R8 R11,3,100k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0
 R60 R61,2,330,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-07330RL,Yageo,generic 0805 1 % (LCSC),0.02,0.04,yes
 R50 R51 R52 R53 R80 R81,6,10k,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0710KL,Yageo,generic 0805 1 % (LCSC),0.02,0.12,yes
 R82 R83 R84,3,33,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0733RL,Yageo,generic 0805 1 % (LCSC),0.02,0.06,yes
-SW1,1,bench GO/STOP,Button_Switch_THT:SW_PUSH_6mm,B3F-1000 (or any 6 x 6 mm THT tactile),Omron,est.,0.20,0.20,yes
 TP1,1,VBAT,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
 TP10,1,3V3_RADIO,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop or Keystone 5000,Keystone,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
 TP2,1,5V_PI,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
@@ -80,7 +78,7 @@ U7,1,E01-ML01SP4,teamc:E01-ML01SP4,E01-ML01SP4,Ebyte,"ebyteiot.com, bundle with 
 (off-board),1,"Solder, flux",,,,lab stock (est.),0.50,0.50,no
 (off-board),1,PCB: carrier made at the ETSETB lab (rules: counts EUR 15),,,,ETSETB lab,15.00,15.00,no
 
-"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,102.72,
-of which purchased by the team,,,,,,,,85.72,
+"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,102.22,
+of which purchased by the team,,,,,,,,85.22,
 of which owned / lab stock / lab PCB (non-purchased),,,,,,,,17.00,
 "Cap per device (rules): EUR 150. DRAFT – for ET review; prices 19-Oct-26, verify before ordering"

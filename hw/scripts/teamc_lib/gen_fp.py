@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Write teamc.pretty footprints (E01-ML01SP4, MAX17048 TDFN-8) as KiCad 10 text."""
+"""Write teamc.pretty footprints (E01-ML01SP4, MAX17048 TDFN-8) as KiCad 10 text.
+
+    python3 hw/scripts/teamc_lib/gen_fp.py [output .pretty folder]
+"""
 import os
 import sys
 import uuid
 
-OUT = sys.argv[1]
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                                                         "lib", "teamc.pretty")
 NS = uuid.UUID("a4c1e0f2-2b7d-4c59-8d4e-1f0c3b6e9a77")
 
 
@@ -112,9 +116,10 @@ def sp4():
             s += pad(n, i, "roundrect", x, -9.10, 0.80, 2.20, lay, rr=0.25)
     s += pad(n, 9, "roundrect", -7.35, 4.00, 2.20, 1.60, lay, rr=0.25)
     s += pad(n, 10, "roundrect", 7.35, 4.00, 2.20, 1.60, lay, rr=0.25)
-    # keep-out: no tracks on F.Cu under the module body
-    s += (f'\t(zone\n\t\t(layer "F.Cu")\n\t\t(uuid "{U(n, "keepout")}")\n'
-          '\t\t(name "SP4 no top tracks")\n\t\t(hatch edge 0.5)\n\t\t(connect_pads\n\t\t\t(clearance 0)\n\t\t)\n'
+    # keep-out: no tracks under the module body on either layer (Ebyte manual 4.1: no digital, analog or power
+    # routing under the module, solid ground there); ground vias and the pours stay allowed
+    s += (f'\t(zone\n\t\t(layers "F.Cu" "B.Cu")\n\t\t(uuid "{U(n, "keepout")}")\n'
+          '\t\t(name "SP4 no tracks")\n\t\t(hatch edge 0.5)\n\t\t(connect_pads\n\t\t\t(clearance 0)\n\t\t)\n'
           '\t\t(min_thickness 0.25)\n\t\t(keepout\n\t\t\t(tracks not_allowed)\n'
           '\t\t\t(vias allowed)\n\t\t\t(pads allowed)\n\t\t\t(copperpour allowed)\n\t\t\t(footprints allowed)\n\t\t)\n'
           '\t\t(placement\n\t\t\t(enabled no)\n\t\t\t(sheetname "")\n\t\t)\n'

@@ -48,9 +48,9 @@ Scripts (run from the repo root):
 
 ```mermaid
 flowchart LR
-  CELL["18650 protected cell<br/>(box floor, BH-18650-PC)"] -- "JST-VH J20<br/>(J21 = 2nd cell, DNP)" --> F1["Fuse F1 5 A"]
+  CELL["18650 protected cell<br/>(box floor, BH-18650-PC)"] -- "JST-VH J20<br/>(2nd cell: parallel in the harness)" --> F1["Fuse F1 5 A"]
   F1 --> RP["Reverse-cell P-FET Q1<br/>Si2333DDS"]
-  USBC["USB-C charge-only J2<br/>CC 5.1 kΩ, TVS, ESD"] -- VBUS_USB --> CHG["MCP73831-2<br/>452 mA"]
+  USBC["USB-C charge-only J2<br/>CC 5.1 kΩ, ESD array"] -- VBUS_USB --> CHG["MCP73831-2<br/>452 mA"]
   CHG -- VBAT --> RP
   CHG -- "STAT → 2N7002" --> PI
   RP -- VBAT --> FG["MAX17048<br/>I2C 0x36, ALRT"]
@@ -73,12 +73,12 @@ Global labels between the carrier's sheets use exactly these names (`sheets/nets
 
 | Net | What | From → to |
 |---|---|---|
-| `VBAT` | Cell +, after the fuse and the reverse-cell FET; charger output | J20/J21 → F1 → Q1 → charger, fuel gauge, power switch |
+| `VBAT` | Cell +, after the fuse and the reverse-cell FET; charger output | J20 → F1 → Q1 → charger, fuel gauge, power switch |
 | `VBAT_SW` | Switched cell | Q2 → boost input, radio LDO input |
 | `5V_PI` | 5.1 V for the Pi, after the ideal diode | Q4 → header pins 2/4 |
 | `3V3_RADIO` | Radio supply (never the Pi's 3V3, never the cell) | LDO → R14 (0 Ω) → SP4 pad 1 |
 | `3V3_PI` | The Pi's own 3.3 V, **header pin 17 only** (pin 1 unused): pull-ups, no load | header → pull-ups |
-| `VBUS_USB` | USB-C charge input | USB-C → TVS → MCP73831 VDD |
+| `VBUS_USB` | USB-C charge input | USB-C → ESD (U12) → MCP73831 VDD |
 | `GND` | Ground (pours on both layers) | everywhere |
 | `SPI_SCK` / `SPI_MOSI` / `SPI_MISO` | SPI0, 33 Ω series (SCK/MOSI at the Pi end, MISO at the radio end) | GPIO 11 / 10 / 9 ↔ SP4 pads 4 / 5 / 6 |
 | `RADIO_CSN` / `RADIO_CE` / `RADIO_IRQ` | SPI0 CE0 / CE / IRQ (10 k pull-ups on CSN and IRQ to 3V3_PI) | GPIO 8 / 22 / 24 ↔ SP4 pads 3 / 2 / 7 |
@@ -135,7 +135,7 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
 |---|---|---|
 | J1 | Harwin M20-7832046 2×20 socket, 8.5 mm (11 mm stack), footprint `teamc:PinSocket_2x20_P2.54mm_Vertical_Pad1.5mm` | 1.5 mm pads (stock: 1.7) so the edge row can be routed at 0.3/0.3 mm and the GND pour reaches the even GND pins |
 | MH1–MH4 | M2.5 NPTH Ø2.7, Ø6.2 copper-free land | Würth 970110155 nylon M2.5 × 11 F/F standoffs + screws |
-| J20 / J21 | JST B2P-VH battery lead (J21 = 2nd cell, DNP) | cell in an MPD BH-18650-PC holder on the box floor |
+| J20 | JST B2P-VH battery lead (a 2nd cell = a 2nd holder wired in parallel into the same lead) | cell in an MPD BH-18650-PC holder on the box floor |
 | F1 | 5 A fast 1206 fuse (Littelfuse 0466005.NR — **verify part and stock**) | review F3: nothing else limits a short on 5V_PI |
 | Q1, Q2 | Vishay Si2333DDS-T1-GE3 (AO3401A fallback, same footprint) | reverse-cell FET; P-FET load switch (gate R8 100 k to VBAT, R9 10 k to the toggle, C18 100 nF soft start) |
 | J2 | GCT USB4125-GF-A-0190 USB-C, charge only | through-hole shell stakes; reachable with the lid open |
@@ -145,10 +145,9 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
 | U4 | TI TLV75533PDBVR, 0 Ω R14 to 3V3_RADIO | U5 TPS63001 buck-boost option + R16: DNP (fit one of R14/R16) |
 | U6 | MAX17048G+T10 (footprint `teamc:MAX17048_TDFN-8-1EP_2x2mm`) | on VBAT; Kelvin from Q1's source (reads ~I × RDS low under load); via in the exposed pad |
 | U7 | E01-ML01SP4 (`teamc:E01-ML01SP4`) | 100 µF + 10 µF + 100 nF at pad 1; 33 Ω SPI series; CSN/IRQ pull-ups to 3V3_PI |
-| U11, U12 | Littelfuse SP0504BAHTG | ESD on the four UI lines; CC1, CC2 and the power-toggle line |
-| D1–D3 | Vishay SMF5.0A, footprint `Diode_SMD:D_SMF` | VBUS, 5V_PI, VBAT (5V_PI runs slightly above VRWM: a little leakage) |
+| U11, U12 | Littelfuse SP0504BAHTG | ESD on the four UI lines; CC1, CC2, the power-toggle line and VBUS (U12's 4th channel replaced the VBUS SMF5.0A on 20-Oct: no room at the connector, and the SMF only covered ESD anyway) |
+| D2, D3 | Vishay SMF5.0A, footprint `Diode_SMD:D_SMF` | 5V_PI, VBAT (5V_PI runs slightly above VRWM: a little leakage) |
 | J10–J12, J22 | JST B2B/B3B-XH-A | panel button E-Switch PS1024ABLK (Ø7.2 mm hole, drill 7.5), toggles 100SP1T1B1M1QEH (power, role) and 100SP3T1B1M1QEH (mode), Ø6.35 mm (drill 6.5) |
-| SW1 | 6 mm THT tactile in parallel with J10 | fitted (bench); harmless in the box |
 | J13 | 1 × 3 UART header | bench only, no ESD |
 | TP1–TP3, TP10 | VBAT, 5V_PI, GND, 3V3_RADIO | wire loops |
 
@@ -161,40 +160,55 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
   ~30 mm from the SoC; LDO and the 100 µF/10 µF/100 nF next to SP4 pad 1. Boost (TI RWU layout: inductor above the IC,
   input cap at VIN, output caps under VOUT) and the ideal diode top-left next to header pins 2/4. Battery lead and USB-C
   on the left edge, charger and fuel gauge beside them; panel leads J22/J10/J11 on the bottom edge, J12 above them.
-- **Rules (lab unknown, conservative):** net classes Default 0.4 mm / 0.3 mm clearance, Power 1.0 mm, vias 0.8/0.4 mm,
-  edge 0.5 mm. Exceptions, each forced by a package: **FinePitch** class (0.15 mm clearance) for the nets of the
-  0.5 mm-pitch parts (TPS61022, MAX17048, USB-C, TPS63001) plus a 0.15 mm footprint clearance on those four parts;
-  **0.2–0.3 mm escape tracks** out of those packages, the SOT-363 and the header's edge row; board minimum track 0.2 mm.
-  If the lab can only do 0.3 mm everywhere, the two QFN/TDFN parts need a fab (JLCPCB-class) or a different package.
+- **Rules (20-Oct): a JLCPCB-class 2-layer fab, not the ETSETB lab** (`boardutil.FAB_RULES`): Default net class
+  0.25 mm tracks / **0.2 mm clearance**, Power 1.0 mm, vias 0.8/0.4 mm, edge 0.5 mm. Reason: under the lab-safe
+  0.3 mm / 0.3–0.4 mm rules this 65 × 56 mm board does not route (rip-up and a 78-min negotiated-congestion run both
+  stalled), and the carrier needs plated vias and 0.15 mm at its QFN/TDFN anyway. Package-forced exceptions:
+  **FinePitch** class (0.15 mm) for the nets of the 0.5 mm-pitch parts (TPS61022, MAX17048, USB-C, TPS63001) plus a
+  0.15 mm footprint clearance on those parts; 0.2–0.3 mm escape tracks; board minimum track 0.2 mm. All well inside
+  JLCPCB's 0.1/0.1 mm. (The SP4 breakout keeps the lab-safe 0.3/0.4 mm rules.)
 - **Copper areas:** SW_NODE (inductor pad → SW pad, 0.45 mm neck at the IC), VBAT_SW (inductor input, VIN, MODE, EN)
   and 5V_BOOST (VOUT → output caps) on F.Cu above the GND pours; GND pours on both layers with stitching vias.
-- **Routing:** no autorouter is installed and the KiCad MCP cannot route, so `gridroute.py` (A* on a 0.05 mm grid,
-  two layers, 0.3 mm clearance to other nets, rule areas and edge respected) plus exact escape stubs. **Routed:** the
-  whole power path (battery → fuse → Q1 → Q2 → boost → ideal diode → header 5 V; VBAT tree; LDO → 3V3_RADIO) and SPI +
-  radio control. The router has no rip-up, so the remaining small nets are left for ET (list in the DRC report /
-  ratsnest, see the session log in `CLAUDE.md`). The script routing is a working draft, not a layout to fabricate:
-  ET should re-route the signal layer in the GUI (keep the power path, the boost areas and the escapes) and keep the
-  bottom GND pour as whole as possible.
+- **SP4:** no tracks under the module on either layer (footprint keep-out, Ebyte §4.1), GND pour + vias under it.
+- **Routing by script** (no autorouter here, the KiCad MCP cannot route): `gridroute.py` (A* on a 0.05 mm grid, two
+  layers) + exact escape stubs (header edge row, SP4 pad row, U2 FB/GND, SOT-363, TDFN/VSON). The script reliably
+  routes the **power path and SPI/radio** (100 %, every run); the small signal nets are left for ET, see below.
 
-### State of the carrier board at the end of 19-Oct (for ET)
+### State of the carrier board on 20-Oct (hand-off to ET)
 
-DRC (`kicad-cli pcb drc --schematic-parity`, report in `hw/teamc-carrier/build/drc.rpt`): **0 errors**, 0 schematic
-parity issues; warnings = silkscreen overlaps (reference designators) and 21 escape stubs waiting for their nets;
-80 unconnected items = the nets below. **No carrier gerbers yet** (not DRC-complete).
+DRC (`kicad-cli pcb drc --schematic-parity`, report `hw/teamc-carrier/build/drc.rpt`): **0 errors, 0 schematic-parity
+issues**; warnings = silkscreen overlaps (reference designators) and escape stubs waiting for their nets.
+**76 unconnected items** = the small nets below. **No carrier gerbers yet.**
 
-To do in the KiCad GUI, in this order:
-1. **U2 pin 1 (boost power GND):** it has a via to the bottom pour, but the bottom pocket under the boost is fenced in by
-   the 5V_BOOST trunk (B.Cu, x ≈ 112.5) and a long VBAT run to D3 (B.Cu, x ≈ 105). Move D3 (VBAT TVS) next to Q1 and/or
-   re-route the 5V_BOOST trunk so that pocket joins the main bottom pour. **Must be solid before anything is built.**
-2. R4 (RPROG) GND pad, C15 and the DNP buck-boost U5 GND pins: a via each (no room found by the script).
-3. Route the small nets (KiCad's interactive router): 3V3_PI pull-ups, VBUS_USB, CC1/CC2, BTN_TXRX(_J), SW_ROLE(_J),
-   SW_MODE_NM(_J), SW_MODE_MRM(_J), LED_ACT(_A), LED_STATUS(_A), I2C_SDA, I2C_SCL, FG_ALRT, UART_TX/RX, CHG_STAT(_RAW),
-   CHG_LED_A, PROG, PWR_G, PWR_SW_J, Q1_G, ZVD_B, ZVD_G, and the DNP buck-boost nets (BB_*). The escape stubs out of
-   the header's edge row, the SP4 pad row, U3 and U6 are already there: start from their ends.
-4. Keep: the power path, SPI/radio routing, the boost copper areas, the GND pours; add GND vias next to every
-   decoupling cap; thermal copper around U1 (MCP73831).
-5. Tidy the silkscreen (references), check the box inside dimensions and the panel-lead positions, then DRC to 0
-   errors and 0 unconnected → gerbers.
+Routed (keep): battery → F1 → Q1 → Q2 → VBAT_SW, the boost (copper areas + U2 GND via, connected), 5V_BOOST →
+ideal diode → 5V_PI → header pins 2/4, VBAT tree, LDO → 3V3_RADIO, all SPI lines with their 33 Ω, CSN/CE/IRQ, GND
+pours on both layers + 67 stitching vias. Escape stubs are in place for every fine-pitch pad and every used
+edge-row header pin: start from their ends.
+
+To do in the KiCad GUI (interactive router, push-and-shove), roughly an hour:
+1. Small signal nets: 3V3_PI (pull-ups R7, R17, R50–R53, R80, R81 from header pin 17), VBUS_USB, CC1/CC2,
+   BTN_TXRX(_J), SW_ROLE(_J), SW_MODE_NM(_J), SW_MODE_MRM(_J), LED_ACT(_A), LED_STATUS(_A), I2C_SDA, I2C_SCL,
+   FG_ALRT, UART_TX/RX, CHG_STAT(_RAW), CHG_LED_A, PROG, PWR_G, PWR_SW_J, Q1_G, ZVD_B (U3 pin 2 ↔ pins 5/6 already
+   linked under the package; R12), ZVD_G (Q4 gate, U3 pin 3, R13), and the DNP buck-boost nets (BB_*).
+2. GND islands: the MAX17048's GND (pin 4 stub + its exposed-pad via at 120.5, 74.5 sit in a small bottom-pour
+   island: join it to the main pour), J13 pin 1, the DNP U5's pins 3/9.
+3. Keep the bottom GND pour as whole as possible (route signals on top where you can); add a GND via next to each
+   decoupling cap; thermal copper around U1 (MCP73831, review F7).
+4. Tidy the silkscreen, check the box inside dimensions and the panel-lead positions, DRC to 0 errors and
+   0 unconnected → gerbers + drill for the fab (JLCPCB: 2 layers, 1.6 mm, HASL, 1 oz).
+
+## Layout-driven changes (20-Oct, routing pass)
+
+- **SP4 keep-out on both layers:** no tracks under the module on F.Cu *or* B.Cu (Ebyte §4.1); ground vias and both
+  pours stay. The first routing had bottom-layer signals under the module.
+- **Removed:** SW1 (bench button; on the bench plug the panel button into J10 or bridge its pins), J21 (2nd-cell
+  connector; a 2nd cell = a 2nd holder wired in parallel into the same J20 lead), D1 (VBUS TVS → U12's spare channel).
+- **TPS61022 MODE → VIN** (forced PWM; MODE sits between VIN and EN) and **header pin 1 unused** (3V3 from pin 17)
+  were already in the 19-Oct version.
+- Placement: functional clusters in fixed regions (`place_carrier.py` CLUSTERS), key parts pinned by hand (battery
+  path J20 → F1 → Q1 → Q2, charger + USB-C below it, feedback divider beside U2, ideal diode at the header).
+- Routing: grid router with rip-up and reroute (`route_carrier.py --rounds`, power and radio never ripped) or
+  negotiated congestion (`--negotiate`); neither finished the small nets on this board, so they go to ET.
 
 ## Review (independent, 19-Oct) and what was done
 

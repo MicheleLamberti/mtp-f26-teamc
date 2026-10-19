@@ -58,8 +58,6 @@ def build():
     s.add("Connector_Generic:Conn_01x02", "J10", "GO/STOP button", at=(78.74, ROW0), fp=XH2,
           nets={"1": "BTN_TXRX_J", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST",
           Panel="E-Switch PS1024ABLK momentary, Ø7.5 mm hole")
-    s.add("Switch:SW_Push", "SW1", "bench GO/STOP", at=(78.74, ROW0 + ROWSTEP * 0.75), fp="Button_Switch_THT:SW_PUSH_6mm",
-          nets={"1": "BTN_TXRX_J", "2": "GND"}, mpn="B3F-1000 (or any 6 x 6 mm THT tactile)", mfr="Omron")
     s.add("Connector_Generic:Conn_01x02", "J11", "role toggle", at=(78.74, ROW0 + ROWSTEP * 2), fp=XH2,
           nets={"1": "SW_ROLE_J", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST",
           Panel="E-Switch 100SP1T1B1M1QEH SPST, closed = TX, Ø6.5 mm hole")
@@ -67,7 +65,7 @@ def build():
           nets={"1": "SW_MODE_NM_J", "2": "GND", "3": "SW_MODE_MRM_J"}, mpn="B3B-XH-A(LF)(SN)", mfr="JST",
           Panel="E-Switch 100SP3T1B1M1QEH ON-OFF-ON, common = pin 2, Ø6.5 mm hole")
     s.note("J10: panel button E-Switch PS1024ABLK (momentary).\n"
-           "SW1: bench button in parallel with J10.\n"
+           "Bench: plug the panel button into J10 (or bridge its two pins); no on-board button.\n"
            "J11: role toggle E-Switch 100SP1T1B1M1QEH, closed = TX;\n"
            "  may stay unfitted until Atenea Q8 (open = RX).\n"
            "J12: mode toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON:\n"

@@ -23,6 +23,7 @@ class Router:
     def __init__(self, board, x0, y0, x1, y1, grid=0.1, clearance=0.3, edge=0.5, via_d=0.8, via_drill=0.4,
                  via_cost=4.0, margin=0.08, fine_refs=(), fine_nets=(), fine_clearance=0.15):
         self.b, self.g = board, grid
+        self.owned = {}   # net -> tracks/vias this router made (rip-up removes only these)
         # nets in the fine-pitch net class may pass the pads of fine-pitch footprints at fine_clearance
         self.fine_refs, self.fine_nets, self.fine_c = set(fine_refs), set(fine_nets), fine_clearance
         self.x0, self.y0, self.x1, self.y1 = x0, y0, x1, y1
@@ -53,8 +54,9 @@ class Router:
         for t in self.b.GetTracks():
             yield t, t.GetNetname()
 
-    def obstacles(self, net, half_width):
-        """Per-layer boolean grids: True where a track centre (half_width) of `net` may not go."""
+    def obstacles(self, net, half_width, soft=()):
+        """Per-layer boolean grids: True where a track centre (half_width) of `net` may not go.
+        Tracks and vias of nets in `soft` are ignored (pads never are)."""
         inflate = half_width + self.c + self.margin
         fine = half_width + self.fine_c + self.margin
         out = []
@@ -63,6 +65,8 @@ class Router:
             d = ImageDraw.Draw(img)
             for item, n in self._copper_items():
                 if n == net and n != "":
+                    continue
+                if n in soft and not isinstance(item, pcbnew.PAD):
                     continue
                 if not item.IsOnLayer(layer):
                     continue
@@ -96,9 +100,9 @@ class Router:
             out.append(a)
         return out
 
-    def via_block(self, net):
+    def via_block(self, net, soft=()):
         """True where a via of `net` may not sit (on either layer)."""
-        obs = self.obstacles(net, self.via_d / 2)
+        obs = self.obstacles(net, self.via_d / 2, soft)
         blocked = obs[0] | obs[1]
         img = Image.new("1", (self.nx, self.ny), 0)
         d = ImageDraw.Draw(img)
@@ -111,7 +115,7 @@ class Router:
                     r = (TO(p.GetDrillSize().x) / 2 + hole) / self.g
                     d.ellipse([x - r, y - r, x + r, y + r], fill=1)
         for t in self.b.GetTracks():
-            if isinstance(t, pcbnew.PCB_VIA):
+            if isinstance(t, pcbnew.PCB_VIA) and t.GetNetname() not in soft:
                 x, y = self._px(TO(t.GetPosition().x), TO(t.GetPosition().y))
                 r = (self.via_drill / 2 + hole) / self.g
                 d.ellipse([x - r, y - r, x + r, y + r], fill=1)
@@ -183,7 +187,7 @@ class Router:
         return cells
 
     # ---- search -----------------------------------------------------------------------------------------------
-    def astar(self, sources, targets, obs, vblock, tx, ty, limit=3_000_000):
+    def astar(self, sources, targets, obs, vblock, tx, ty, limit=3_000_000, cost=None):
         nx = self.nx
         blk = [o.ravel() for o in obs]           # True = a track centre may not go there
         vblk = vblock.ravel()
@@ -212,21 +216,27 @@ class Router:
                     continue
                 if dx and dy and (blk[li][y * nx + X] and blk[li][Y * nx + x]):
                     continue   # no squeezing diagonally between two blocked cells
-                cost = gc + (1.41421 if dx and dy else 1.0) + (0.6 if pdir not in (-1, di) else 0.0)
+                step = (1.41421 if dx and dy else 1.0)
+                if cost is not None:
+                    step *= cost[li][Y * nx + X]
+                cost_ = gc + step + (0.6 if pdir not in (-1, di) else 0.0)
                 ns = (li, X, Y)
-                if cost < g.get(ns, 1e18):
-                    g[ns] = cost
+                if cost_ < g.get(ns, 1e18):
+                    g[ns] = cost_
                     parent[ns] = s
-                    heapq.heappush(openq, (cost + self._h(X, Y, tx, ty), cost, ns, di))
+                    heapq.heappush(openq, (cost_ + self._h(X, Y, tx, ty), cost_, ns, di))
             # layer change through a via
             ol = 1 - li
             if not vblk[y * nx + x] and not blk[ol][y * nx + x]:
                 ns = (ol, x, y)
-                cost = gc + self.via_cost
-                if cost < g.get(ns, 1e18):
-                    g[ns] = cost
+                vc = self.via_cost
+                if cost is not None:
+                    vc *= max(cost[0][y * nx + x], cost[1][y * nx + x])
+                cost_ = gc + vc
+                if cost_ < g.get(ns, 1e18):
+                    g[ns] = cost_
                     parent[ns] = s
-                    heapq.heappush(openq, (cost + self._h(x, y, tx, ty), cost, ns, -1))
+                    heapq.heappush(openq, (cost_ + self._h(x, y, tx, ty), cost_, ns, -1))
         return None
 
     def _mm(self, c):
@@ -249,6 +259,7 @@ class Router:
     def commit(self, path, net, width):
         """Turn a cell path into tracks and vias on the board."""
         ni = self.b.FindNet(net)
+        own = self.owned.setdefault(net, [])
         mm = lambda c: (self.x0 + c[1] * self.g, self.y0 + c[2] * self.g)  # noqa: E731
         segs, start = [], path[0]
         prev, pdir = path[0], None
@@ -263,6 +274,7 @@ class Router:
                 v.SetDrill(MM(self.via_drill))
                 v.SetNet(ni)
                 self.b.Add(v)
+                own.append(v)
                 start, prev, pdir = c, c, None
                 continue
             d = (c[1] - prev[1], c[2] - prev[2])
@@ -280,7 +292,28 @@ class Router:
             t.SetLayer(LAYERS[a[0]])
             t.SetNet(ni)
             self.b.Add(t)
+            own.append(t)
         return [c for c in path]
+
+    def rip(self, net):
+        """Remove everything this router made for `net` (escape stubs and fixed copper stay)."""
+        for item in self.owned.pop(net, []):
+            self.b.Delete(item)
+
+    def near(self, net, x, y, radius):
+        """True if copper this router made for `net` comes within `radius` mm of (x, y)."""
+        for item in self.owned.get(net, []):
+            if isinstance(item, pcbnew.PCB_VIA):
+                a = b = (TO(item.GetPosition().x), TO(item.GetPosition().y))
+            else:
+                a = (TO(item.GetStart().x), TO(item.GetStart().y))
+                b = (TO(item.GetEnd().x), TO(item.GetEnd().y))
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            L = dx * dx + dy * dy
+            t = 0.0 if L == 0 else max(0.0, min(1.0, ((x - a[0]) * dx + (y - a[1]) * dy) / L))
+            if math.hypot(a[0] + t * dx - x, a[1] + t * dy - y) <= radius:
+                return True
+        return False
 
     def route_net(self, net, widths, limit=3_000_000):
         """Connect every pad of `net` (Prim order); each connection takes the first width in `widths` that fits.
@@ -324,6 +357,74 @@ class Router:
             else:
                 failed.append(name(nxt))
         return done, failed
+
+    def route_net_soft(self, net, width, obs, vblock, cost, limit=1_500_000):
+        """Like route_net, but with a congestion cost map and without committing: returns (paths, failed)."""
+        pads = [p for f in self.b.GetFootprints() for p in f.Pads() if p.GetNetname() == net]
+        if len(pads) < 2:
+            return [], []
+        cells = {id(p): self.pad_cells(p) for p in pads}
+        pos = {id(p): (TO(p.GetPosition().x), TO(p.GetPosition().y)) for p in pads}
+        tree_pads, rest = [pads[0]], pads[1:]
+        tree = list(cells[id(pads[0])])
+        paths, failed = [], []
+        name = lambda p: f"{p.GetParentFootprint().GetReference()}.{p.GetNumber()}"  # noqa: E731
+        while rest:
+            nxt = min(rest, key=lambda p: min(math.dist(pos[id(p)], pos[id(q)]) for q in tree_pads))
+            rest.remove(nxt)
+            tx, ty = self._px(*pos[id(nxt)])
+            path = self.astar(tree, cells[id(nxt)], obs, vblock, tx, ty, limit, cost)
+            if path is None:
+                failed.append(name(nxt))
+                continue
+            paths.append(path)
+            tree += path + cells[id(nxt)]
+            tree_pads.append(nxt)
+        return paths, failed
+
+    def footprint_mask(self, paths, r_track, r_via):
+        """uint8 (2, ny, nx): cells within r_track of the paths' centre lines (per layer), r_via of their vias
+        (both layers). Another net's centre line inside this mask would break the clearance."""
+        imgs = [Image.new("L", (self.nx, self.ny), 0) for _ in LAYERS]
+        draws = [ImageDraw.Draw(i) for i in imgs]
+        wt = max(1, int(round(2 * r_track / self.g)))
+        rv = r_via / self.g
+        for path in paths:
+            run = [path[0]]
+            for c in path[1:] + [None]:
+                if c is not None and c[0] == run[-1][0]:
+                    run.append(c)
+                    continue
+                pts = [(p[1], p[2]) for p in run]
+                d = draws[run[0][0]]
+                if len(pts) > 1:
+                    d.line(pts, fill=1, width=wt, joint="curve")
+                d.ellipse([pts[0][0] - wt / 2, pts[0][1] - wt / 2, pts[0][0] + wt / 2, pts[0][1] + wt / 2], fill=1)
+                d.ellipse([pts[-1][0] - wt / 2, pts[-1][1] - wt / 2, pts[-1][0] + wt / 2, pts[-1][1] + wt / 2],
+                          fill=1)
+                if c is not None:   # layer change = via at run[-1]
+                    vx, vy = run[-1][1], run[-1][2]
+                    for dd in draws:
+                        dd.ellipse([vx - rv, vy - rv, vx + rv, vy + rv], fill=1)
+                    run = [c]
+        return np.stack([np.array(i, dtype=np.uint8) for i in imgs])
+
+    @staticmethod
+    def centre_cells(paths):
+        """(layer, y, x) index arrays of the paths' cells (vias count on both layers)."""
+        ls, ys, xs = [], [], []
+        for path in paths:
+            prev = None
+            for c in path:
+                ls.append(c[0])
+                ys.append(c[2])
+                xs.append(c[1])
+                if prev is not None and prev[0] != c[0]:
+                    ls.append(1 - c[0])
+                    ys.append(c[2])
+                    xs.append(c[1])
+                prev = c
+        return np.array(ls, dtype=np.intp), np.array(ys, dtype=np.intp), np.array(xs, dtype=np.intp)
 
     def stitch(self, net, pitch=4.0):
         """Vias of `net` on a grid wherever one fits clear of all copper and drills (ties the two ground pours

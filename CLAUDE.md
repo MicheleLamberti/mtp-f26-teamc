@@ -80,9 +80,10 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   schematics, searches/downloads registry parts and runs ERC/DRC, but cannot place or route (use pcbnew scripts).
   **Built 19-Oct (DRAFT – for ET review), all in `hw/DESIGN_NOTES.md`:** `hw/sp4-breakout/` (single-sided, ERC/DRC 0,
   gerbers + 1:1 copper PDFs in `fab/` — ready for the lab); `hw/teamc-carrier/` (Pi 3 A+ HAT: 4 generated sheets
-  power/pi_header/radio/ui, ERC 0; placed; power + SPI/radio routed by script, DRC 0 errors, small nets + the boost
-  GND pocket left for ET); `hw/lib/teamc.*` (E01-ML01SP4 from the manual drawing, MAX17048, 2×20 socket with 1.5 mm
-  pads); `hw/BOM.csv` (≈ €103/device); `hw/scripts/` (schgen.py sheets from Python, netlist2pcb.py, build_breakout.py,
+  power/pi_header/radio/ui, ERC 0; placed in functional clusters; power + SPI/radio routed by script, DRC 0 errors;
+  the small signal nets are left for ET's interactive router; **designed for a JLCPCB-class fab: 0.2 mm clearance**,
+  0.25 mm signals); `hw/lib/teamc.*` (E01-ML01SP4 from the manual drawing with a no-tracks keep-out on both layers,
+  MAX17048, 2×20 socket with 1.5 mm pads); `hw/BOM.csv` (≈ €102/device); `hw/scripts/` (schgen.py sheets from Python, netlist2pcb.py, build_breakout.py,
   build_carrier.py, place_carrier.py, route_carrier.py + gridroute.py A* router, build_bom.py). The `.kicad_sch` files
   are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
@@ -201,7 +202,9 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 power/SPI routing) for ET. Choices approved by Santiago: panel-mount controls on JST-XH leads (power toggle drives a
 P-FET), TPS61022 boost. Review-driven changes: Si2333DDS for Q1/Q2, BCM857BS, 5 A fuse at the cell, Q2 soft start,
 TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17), radio pull-ups to 3V3_PI. Rule:
-**HAT on → never plug the Pi's micro-USB** (the A+ has no reverse blocking; silkscreen).
+**HAT on → never plug the Pi's micro-USB** (the A+ has no reverse blocking; silkscreen). Evening (routing pass):
+SP4 keep-out on both layers, SW1/J21/D1 removed (bench button → J10; 2nd cell paralleled in the harness; VBUS ESD on
+U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not route at the lab-safe 0.3 mm).
 
 **Next up (17-Oct, roughly in order):**
 - [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
@@ -220,9 +223,9 @@ TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17
 - [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
-- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board": boost GND pocket
-      first, then the small nets); ask the lab its limits (0.2 mm necks, 0.15 mm at the QFN/TDFN, plated vias,
-      stencil/hot air) or use a JLCPCB-class fab; check stock (TPS61022, Si2333DDS, fuse)
+- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board on 20-Oct": the
+      small signal nets + 3 GND islands, ~1 h with the interactive router), then gerbers for a JLCPCB-class fab
+      (0.2 mm rules); check stock (TPS61022, Si2333DDS, fuse)
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
@@ -259,6 +262,18 @@ what's pending.
   row at 0.3/0.3 mm → 1.5 mm-pad socket. BoM ≈ €103/device (cap €150).
 - Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK.
 - **Start next session with:** box inside dimensions; lab limits; ET owner for the carrier; breakout made? T0.
+
+### 2026-10-19 (KiCad, evening) — carrier routing pass; hand-off to ET
+- Santiago: fix the boost GND pocket and route the rest, then commit/push for the electronics team.
+- Boost GND pocket **fixed** (D3 and the battery path re-placed; U2 GND via in the free pocket left of the IC).
+- Placement redone in functional clusters (battery path J20 → F1 → Q1 → Q2 beside J20, charger + USB-C below it,
+  feedback divider beside U2, UI networks at the connectors, pull-ups under the header). Found and fixed: signal
+  tracks ran under the SP4 on the bottom layer → keep-out on both layers. Removed SW1, J21, D1 (see DESIGN_NOTES).
+- Routing: rip-up/reroute and a 78-min negotiated-congestion (PathFinder) run both stalled on ~10 small nets at the
+  lab-safe 0.3 mm; carrier rules moved to JLCPCB-class 0.2 mm (it needs a fab anyway). Santiago then chose the
+  hand-off: power + SPI/radio routed by script (100 %), DRC 0 errors, 76 unconnected items = small nets for ET.
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK.
+- **Start next session with:** who on ET routes the carrier's small nets; box inside dimensions; breakout made? T0.
 
 ### 2026-10-19 — Pi 3 A+ listing, SP4 sourcing, antenna A/B test (T5b)
 - Santiago asked whether a store listing for the "Pi 3 Modelo A+, 1.4 GHz, WiFi 5 GHz" works: yes, it is the board we

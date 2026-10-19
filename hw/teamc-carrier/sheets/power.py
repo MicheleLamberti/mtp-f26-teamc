@@ -87,15 +87,12 @@ def build():
     # review F3: header pins 2/4 bypass the Pi's polyfuse and the boost limits at 6.5-10 A: a fuse at the cell
     s.add("Device:Fuse", "F1", "5A fast", fp="Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder", at=(62.23, 25.4),
           rot=90, nets={"1": "BAT_IN", "2": "BAT_RAW"}, mpn="0466005.NR (1206 fast, 5 A; verify)", mfr="Littelfuse")
-    s.add("Connector_Generic:Conn_01x02", "J21", "BATT 2 (DNP)", at=(43.18, 58.42),
-          fp="Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", nets={"1": "BAT_IN", "2": "GND"},
-          mpn="B2P-VH", mfr="JST", dnp=True)
     pfet(s, "Q1", (80.01, 38.1), 90, d="BAT_RAW", src="VBAT", g="Q1_G", **LOW_RDS)
     R(s, "R1", "10k", (80.01, 63.5), "Q1_G", "GND")
     TVS(s, "D3", (80.01, 81.28), "VBAT")
     s.note("Cells: protected 18650 (PCM inside) in an MPD BH-18650-PC\n"
            "holder on the box floor (off-board), lead to J20 (JST-VH, 10 A).\n"
-           "J21 = second cell in parallel (DNP; only matched cells).\n"
+           "2nd cell: a 2nd holder wired in parallel into the same J20 lead (harness; matched cells only).\n"
            "Q1: the body diode conducts for a correct cell, then VGS = -VBAT\n"
            "turns it on; a reversed cell is blocked. D3: ESD/hot-plug clamp.\n"
            "Do not plug USB with a reversed cell (the charger, current-limited,\n"
@@ -108,12 +105,13 @@ def build():
           fp="Connector_USB:USB_C_Receptacle_GCT_USB4125-xx-x-0190_6P_TopMnt_Horizontal",
           nets={"A5": "CC1", "B5": "CC2", "A9": "VBUS_USB", "B9": "VBUS_USB", "A12": "GND", "B12": "GND",
                 "SH": "GND"}, mpn="USB4125-GF-A-0190", mfr="GCT", ds="")
-    TVS(s, "D1", (175.26, 35.56), "VBUS_USB")
+    # VBUS ESD: U12's 4th channel (SP0504: 5.5 V stand-off, <= 100 nA, IEC 61000-4-2 level 4) right at the
+    # connector, instead of an SMF5.0A (whose 9.2 V clamp only covered ESD anyway; layout, 20-Oct)
     C(s, "C1", "10u", (220.98, 35.56), "VBUS_USB", "GND")
     R(s, "R2", "5k1", (175.26, 58.42), "CC1", "GND")
     R(s, "R3", "5k1", (175.26, 76.2), "CC2", "GND")
     s.add("Power_Protection:SP0504BAHT", "U12", "SP0504BAHTG", fp="Package_TO_SOT_SMD:SOT-23-5", at=(220.98, 76.2),
-          rot=90, nets={"1": "CC1", "3": "CC2", "4": "PWR_SW_J", "5": None, "2": "GND"},
+          rot=90, nets={"1": "CC1", "3": "CC2", "4": "PWR_SW_J", "5": "VBUS_USB", "2": "GND"},
           mpn="SP0504BAHTG", mfr="Littelfuse", ds="")
     s.add("Battery_Management:MCP73831-2-OT", "U1", "MCP73831", fp="Package_TO_SOT_SMD:SOT-23-5", at=(266.7, 58.42),
           nets={"1": "CHG_STAT_RAW", "2": "GND", "3": "VBAT", "4": "VBUS_USB", "5": "PROG"},

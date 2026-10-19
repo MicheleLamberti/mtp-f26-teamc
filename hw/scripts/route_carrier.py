@@ -131,10 +131,77 @@ def isolated_gnd_pads(board):
             if (f.GetReference(), p.GetNumber()) in want and p.GetAttribute() == pcbnew.PAD_ATTRIB_SMD]
 
 
+def negotiate(r, board, nets, report, iterations, width=0.3):
+    """Negotiated-congestion routing (PathFinder) of the small signal nets: every round re-routes all of them on
+    hard obstacles (pads, fixed copper) plus a cost that grows where nets would break each other's clearance;
+    cells that stay contested get a lasting history cost. Commits when no two nets conflict (or after the last
+    round, keeping the conflict-free nets and leaving the others' conflicting connections unrouted)."""
+    import numpy as np
+    t0 = time.time()
+    # the small nets' own routes stay off the board until the end, so everything on it (pads, power and radio
+    # copper, all escape stubs) is a hard obstacle
+    obs = {n: r.obstacles(n, width / 2) for n in nets}
+    vbl = {n: r.via_block(n) for n in nets}
+    shape = (2, r.ny, r.nx)
+    hist = np.zeros(shape, dtype=np.float32)
+    occ = np.zeros(shape, dtype=np.int16)
+    masks, paths, failed = {}, {}, {}
+    r_track = width / 2 + r.c + width / 2 + 0.05          # centre-to-centre distance two 0.3 mm tracks need
+    r_via = r.via_d / 2 + r.c + max(width / 2, r.via_d / 2) + 0.05
+    pres = 0.5
+    print(f"negotiated routing of {len(nets)} nets (obstacle maps {time.time() - t0:.0f} s)", flush=True)
+    for it in range(iterations):
+        for n in nets:
+            if n in masks:
+                occ -= masks[n]
+            cost = (1.0 + hist) * (1.0 + pres * occ.astype(np.float32))
+            cl = [cost[0].ravel().tolist(), cost[1].ravel().tolist()]
+            paths[n], failed[n] = r.route_net_soft(n, width, obs[n], vbl[n], cl)
+            masks[n] = r.footprint_mask(paths[n], r_track, r_via) if paths[n] else np.zeros(shape, np.uint8)
+            occ += masks[n]
+        bad = []
+        for n in nets:
+            if not paths[n]:
+                continue
+            li, yi, xi = r.centre_cells(paths[n])
+            other = occ[li, yi, xi] - masks[n][li, yi, xi]
+            hit = other > 0
+            if hit.any():
+                bad.append(n)
+                np.add.at(hist, (li[hit], yi[hit], xi[hit]), 1.0)
+        nf = sum(1 for n in nets if failed[n])
+        print(f"  round {it}: {len(bad)} nets in conflict, {nf} with blocked connections, pres {pres:.1f} "
+              f"({time.time() - t0:.0f} s)", flush=True)
+        if not bad:
+            break
+        pres *= 1.7
+    # commit: conflict-free nets entirely; a net still in conflict loses its conflicting connections
+    for n in nets:
+        keep = []
+        for path in paths[n]:
+            m = r.footprint_mask([path], r_track, r_via)
+            li, yi, xi = r.centre_cells([path])
+            own = masks[n][li, yi, xi]          # contested = another net's footprint covers the cell
+            if (occ[li, yi, xi] - own > 0).any():
+                failed[n].append("(conflict)")
+                continue
+            keep.append(path)
+        for path in keep:
+            r.commit(path, n, width)
+        report[n] = ([(width, "")] * len(keep), failed[n])
+        print(f"{n:22s} {len(keep)} connections {'FAILED ' + ', '.join(failed[n]) if failed[n] else 'ok'}",
+              flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default="power,radio,rest")
     ap.add_argument("--grid", type=float, default=0.05, help="router grid (mm)")
+    ap.add_argument("--rounds", type=int, default=6, help="rip-up and reroute rounds")
+    ap.add_argument("--negotiate", action="store_true",
+                    help="route the small signal nets with negotiated congestion instead of rip-up and reroute "
+                         "(slow; did not converge on 20-Oct at 0.3 mm clearance)")
+    ap.add_argument("--iterations", type=int, default=30, help="negotiated-congestion rounds")
     ap.add_argument("--margin", type=float, default=0.04, help="extra clearance against rasterization error (mm)")
     a = ap.parse_args()
     groups = a.only.split(",")
@@ -146,9 +213,20 @@ def main():
     boost_escapes(board)
     package_escapes(board, "U3", 0.25, 0.8)          # BC857BS, SOT-363
     package_escapes(board, "U6", 0.2, 0.7)           # MAX17048, TDFN 0.5 mm
+    package_escapes(board, "U5", 0.2, 0.6)           # TPS63001 (DNP option), VSON 0.5 mm
+    ex, ey = bu.pad_xy(board, "U5", 11)
+    bu.via(board, ex, ey, "GND")                      # its exposed pad to the bottom ground pour
+    # BCM857BS (SOT-363): the base B1 (pin 2) joins B2/C1 (pins 5/6) straight under the package; 0.325 mm from
+    # the neighbouring pins at 0.25 mm wide (the corner between Q4, U3 and the header is too tight for the grid)
+    x2, y2 = bu.pad_xy(board, "U3", 2)
+    x5, y5 = bu.pad_xy(board, "U3", 5)
+    x6, y6 = bu.pad_xy(board, "U3", 6)
+    bu.track(board, [(x2, y2), (x5, y5)], 0.25, "/power/ZVD_B")
+    bu.track(board, [(x5, y5), (x6, y6)], 0.25, "/power/ZVD_B")
     ex, ey = bu.pad_xy(board, "U6", 9)
     bu.via(board, ex, ey, "GND")                      # exposed pad to the bottom ground pour
-    r = Router(board, X0, Y0, X1, Y1, grid=a.grid, margin=a.margin, fine_refs=FINE_REFS, fine_nets=FINE_NETS)
+    r = Router(board, X0, Y0, X1, Y1, grid=a.grid, margin=a.margin, clearance=bu.FAB_RULES["clearance"],
+               fine_refs=FINE_REFS, fine_nets=FINE_NETS)
     plan = []
     if "power" in groups:
         plan += POWER
@@ -160,15 +238,50 @@ def main():
                         - named - {"", "GND"})
         # alphabetical order: it routed more nets than longest-first (15 vs 21 left over on 19-Oct)
         others = sorted(n for n in others if not n.startswith("unconnected-"))
-        plan += [(n, [0.4, 0.3, 0.25]) for n in others]
-    report = []
-    for net, widths in plan:
-        t = time.time()
-        done, failed = r.route_net(net, widths)
-        report.append((net, done, failed))
-        ws = sorted({w for w, _ in done})
-        print(f"{net:22s} widths {ws} {'FAILED ' + ', '.join(failed) if failed else 'ok'} ({time.time() - t:.1f} s)",
+        plan += [(n, [0.3, 0.25]) for n in others]
+    report = {}
+    fixed_nets = {n for n, _ in POWER + RADIO}
+    if a.negotiate and "rest" in groups:
+        soft = [n for n, _ in plan if n not in fixed_nets]
+        plan = [(n, w) for n, w in plan if n in fixed_nets]
+    else:
+        soft = []
+    widths_of = dict(plan)
+    queue = [n for n, _ in plan]
+    for rnd in range(a.rounds):
+        failed_now = {}
+        for net in queue:
+            t = time.time()
+            r.rip(net)
+            done, failed = r.route_net(net, widths_of[net],
+                                       limit=3_000_000 if net in fixed_nets else 800_000)
+            report[net] = (done, failed)
+            ws = sorted({w for w, _ in done})
+            print(f"[{rnd}] {net:22s} widths {ws} {'FAILED ' + ', '.join(failed) if failed else 'ok'} "
+                  f"({time.time() - t:.1f} s)", flush=True)
+            if failed:
+                failed_now[net] = failed
+        if not failed_now or rnd == a.rounds - 1:
+            break
+        # rip up the small nets that sit around each failed pad, then route the failed nets first
+        victims = []
+        for net, pads in failed_now.items():
+            for name in pads:
+                ref, num = name.split(".", 1)
+                x, y = bu.pad_xy(board, ref, num)
+                for other in list(r.owned):
+                    if other not in fixed_nets and other != net and other not in victims \
+                            and r.near(other, x, y, 2.5):
+                        victims.append(other)
+        print(f"round {rnd}: {len(failed_now)} nets failed; ripping up {len(victims)}: {', '.join(victims)}",
               flush=True)
+        for v in victims:
+            r.rip(v)
+        queue = list(failed_now) + [v for v in victims if v not in failed_now]   # fixed nets retry, never ripped
+        if not queue:
+            break
+    if soft:
+        negotiate(r, board, soft, report, a.iterations)
     vias = r.stitch("GND", pitch=4.0)
     bu.fill_zones(board)
     gone = r.prune(vias, "GND")
@@ -188,7 +301,7 @@ def main():
         bu.fill_zones(board)
         board.Save(PCB)
     board.Save(PCB)
-    bad = [(n, f) for n, _, f in report if f]
+    bad = [(n, f) for n, (_, f) in report.items() if f]
     print("UNROUTED:", bad if bad else "none")
 
 
