@@ -108,7 +108,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   `hw_proposal.html`). Assumes the WiFi/BT chip is disabled or desoldered (Atenea Q22).
 - PDF/HTML exports of the pages: `briefs/` (PDF) and the Windows folder (HTML + PDF + workbooks), light theme, headless
   Chromium from `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the export
-  script lived in the job scratch dir (wraps each page in a doctype with `data-theme="light"`) — recreate if needed. No poppler here: check PDFs with pypdf text.
+  script is `tools/export_page.py <page.html> <out-dir> "<name>" [img.png=path ...]` (wraps the page in a doctype with
+  `data-theme="light"`, renders mermaid, inlines images). No poppler here: check PDFs with pypdf text.
 
 ## Working rules
 
