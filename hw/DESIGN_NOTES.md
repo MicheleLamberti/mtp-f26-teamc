@@ -145,7 +145,7 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
 | U4 | TI TLV75533PDBVR, 0 Ω R14 to 3V3_RADIO | U5 TPS63001 buck-boost option + R16: DNP (fit one of R14/R16) |
 | U6 | MAX17048G+T10 (footprint `teamc:MAX17048_TDFN-8-1EP_2x2mm`) | on VBAT; Kelvin from Q1's source (reads ~I × RDS low under load); via in the exposed pad |
 | U7 | E01-ML01SP4 (`teamc:E01-ML01SP4`) | 100 µF + 10 µF + 100 nF at pad 1; 33 Ω SPI series; CSN/IRQ pull-ups to 3V3_PI |
-| U11, U12 | Littelfuse SP0504BAHTG | ESD on the four UI lines; CC1, CC2, the power-toggle line and VBUS (U12's 4th channel replaced the VBUS SMF5.0A on 20-Oct: no room at the connector, and the SMF only covered ESD anyway) |
+| U11, U12 | Littelfuse SP0504BAHTG | ESD on the four UI lines; CC1, CC2, the power-toggle line and VBUS (U12's 4th channel replaced the VBUS SMF5.0A on 19-Oct: no room at the connector, and the SMF only covered ESD anyway) |
 | D2, D3 | Vishay SMF5.0A, footprint `Diode_SMD:D_SMF` | 5V_PI, VBAT (5V_PI runs slightly above VRWM: a little leakage) |
 | J10–J12, J22 | JST B2B/B3B-XH-A | panel button E-Switch PS1024ABLK (Ø7.2 mm hole, drill 7.5), toggles 100SP1T1B1M1QEH (power, role) and 100SP3T1B1M1QEH (mode), Ø6.35 mm (drill 6.5) |
 | J13 | 1 × 3 UART header | bench only, no ESD |
@@ -160,7 +160,7 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
   ~30 mm from the SoC; LDO and the 100 µF/10 µF/100 nF next to SP4 pad 1. Boost (TI RWU layout: inductor above the IC,
   input cap at VIN, output caps under VOUT) and the ideal diode top-left next to header pins 2/4. Battery lead and USB-C
   on the left edge, charger and fuel gauge beside them; panel leads J22/J10/J11 on the bottom edge, J12 above them.
-- **Rules (20-Oct): a JLCPCB-class 2-layer fab, not the ETSETB lab** (`boardutil.FAB_RULES`): Default net class
+- **Rules (19-Oct): a JLCPCB-class 2-layer fab, not the ETSETB lab** (`boardutil.FAB_RULES`): Default net class
   0.25 mm tracks / **0.2 mm clearance**, Power 1.0 mm, vias 0.8/0.4 mm, edge 0.5 mm. Reason: under the lab-safe
   0.3 mm / 0.3–0.4 mm rules this 65 × 56 mm board does not route (rip-up and a 78-min negotiated-congestion run both
   stalled), and the carrier needs plated vias and 0.15 mm at its QFN/TDFN anyway. Package-forced exceptions:
@@ -174,7 +174,7 @@ Full list with MPNs, suppliers and prices: `hw/BOM.csv`. Key parts and why:
   layers) + exact escape stubs (header edge row, SP4 pad row, U2 FB/GND, SOT-363, TDFN/VSON). The script reliably
   routes the **power path and SPI/radio** (100 %, every run); the small signal nets are left for ET, see below.
 
-### State of the carrier board on 20-Oct (hand-off to ET)
+### State of the carrier board on 19-Oct (hand-off to ET)
 
 DRC (`kicad-cli pcb drc --schematic-parity`, report `hw/teamc-carrier/build/drc.rpt`): **0 errors, 0 schematic-parity
 issues**; warnings = silkscreen overlaps (reference designators) and escape stubs waiting for their nets.
@@ -197,7 +197,7 @@ To do in the KiCad GUI (interactive router, push-and-shove), roughly an hour:
 4. Tidy the silkscreen, check the box inside dimensions and the panel-lead positions, DRC to 0 errors and
    0 unconnected → gerbers + drill for the fab (JLCPCB: 2 layers, 1.6 mm, HASL, 1 oz).
 
-## Layout-driven changes (20-Oct, routing pass)
+## Layout-driven changes (19-Oct, routing pass)
 
 - **SP4 keep-out on both layers:** no tracks under the module on F.Cu *or* B.Cu (Ebyte §4.1); ground vias and both
   pours stay. The first routing had bottom-layer signals under the module.

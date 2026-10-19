@@ -70,7 +70,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   republish to the same URL (v0.11 18-Oct: Pi 3 note, T0 Pi-noise check, T2 frame gap, Pi pins, Q22; v0.10 17-Oct: review fixes, conservative planning case, 37 hops / 30 ms, NM ch 77 + link to
   the NM spec, Q12–Q21; v0.9: options A/B, NM diagram).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (**v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
+  — source `radio/hw_proposal.html` (**v0.6 19-Oct: the KiCad carrier (status table, renders, BoM-based parts ≈ €102, fab rules, asks to ET), SP4 14.5 mm, Ebyte flex antenna; v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
@@ -223,7 +223,7 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
 - [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
-- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board on 20-Oct": the
+- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board on 19-Oct": the
       small signal nets + 3 GND islands, ~1 h with the interactive router), then gerbers for a JLCPCB-class fab
       (0.2 mm rules); check stock (TPS61022, Si2333DDS, fuse)
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;

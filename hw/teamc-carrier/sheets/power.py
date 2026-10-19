@@ -106,7 +106,7 @@ def build():
           nets={"A5": "CC1", "B5": "CC2", "A9": "VBUS_USB", "B9": "VBUS_USB", "A12": "GND", "B12": "GND",
                 "SH": "GND"}, mpn="USB4125-GF-A-0190", mfr="GCT", ds="")
     # VBUS ESD: U12's 4th channel (SP0504: 5.5 V stand-off, <= 100 nA, IEC 61000-4-2 level 4) right at the
-    # connector, instead of an SMF5.0A (whose 9.2 V clamp only covered ESD anyway; layout, 20-Oct)
+    # connector, instead of an SMF5.0A (whose 9.2 V clamp only covered ESD anyway; layout, 19-Oct)
     C(s, "C1", "10u", (220.98, 35.56), "VBUS_USB", "GND")
     R(s, "R2", "5k1", (175.26, 58.42), "CC1", "GND")
     R(s, "R3", "5k1", (175.26, 76.2), "CC2", "GND")

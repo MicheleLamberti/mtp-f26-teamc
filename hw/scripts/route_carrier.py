@@ -200,7 +200,7 @@ def main():
     ap.add_argument("--rounds", type=int, default=6, help="rip-up and reroute rounds")
     ap.add_argument("--negotiate", action="store_true",
                     help="route the small signal nets with negotiated congestion instead of rip-up and reroute "
-                         "(slow; did not converge on 20-Oct at 0.3 mm clearance)")
+                         "(slow; did not converge on 19-Oct at 0.3 mm clearance)")
     ap.add_argument("--iterations", type=int, default=30, help="negotiated-congestion rounds")
     ap.add_argument("--margin", type=float, default=0.04, help="extra clearance against rasterization error (mm)")
     a = ap.parse_args()
