@@ -11,8 +11,9 @@ the micro. This sheet lists what the micro and board must provide.
 
 ## Part
 
-- **Ebyte E01-ML01SP4**, one per box: genuine Nordic nRF24L01P + PA/LNA, SMD **14.85 × 18 mm**, 10 pads
-  at **1.27 mm** pitch, **IPEX (U.FL) antenna socket on the module**. Not the E01C-* parts (Si24R1 clone).
+- **Ebyte E01-ML01SP4**, one per box: genuine Nordic nRF24L01P + PA/LNA, SMD **14.5 × 18 mm** (19-Oct: the
+  manual's drawing; the 14.85 in its spec table is a copy-paste error), **8 castellated pads at 1.27 mm on one short
+  edge + 2 GND half-holes on the long edges**, **IPEX (U.FL) antenna socket on the module**. Not the E01C-* parts (Si24R1 clone).
 - Antenna (19-Oct): **Ebyte TX2400-FPC-2509** flex (25 × 9 mm, 100 mm cable, IPEX) plugged straight into the module,
   stuck vertically on a box wall. No RF trace or RF connector on our PCB. Fallback if it fails TEST_PLAN T5b: the
   **Molex 146153-0100** (34.9 × 9 mm, same plug), so leave 35 mm on the wall.
@@ -34,7 +35,10 @@ the micro. This sheet lists what the micro and board must provide.
 | 8–10 | GND | — | Solid ground under the module; no traces under it on the top layer (Ebyte §4.1) |
 
 The module drives its own PA/LNA switch from the nRF24, so there is **no TXEN/RXEN** to wire.
-Check the pad drawing (1.27 mm pitch, pad 0.8 × 1.5 mm per the manual) before making the footprint.
+Footprint (19-Oct, `hw/lib/teamc.pretty/E01-ML01SP4.kicad_mod`, from the manual rev 1.7 §3 drawing): pins 1–8 are
+castellations on one 14.5 mm edge (0.80 mm wide, pin 1 on the right in the top view), pins 9/10 are Ø1.5 GND
+half-holes on the long edges, 13.0 mm from the pad edge. Measure one module (14.5 mm) before the carrier goes to fab.
+The breakout for the bench is ready: `hw/sp4-breakout/` (DRC-clean, gerbers + 1:1 copper PDF).
 
 ## Power
 

@@ -159,8 +159,8 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
 
 **Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **Owner:** RT → handed to ET
 
-- Same radio as the DP5 (genuine Nordic nRF24L01P, PA + LNA, FCC/CE), SMD **14.85 × 18 mm, 10 pads at
-  1.27 mm**: 1 VCC, 2 CE, 3 CSN, 4 SCK, 5 MOSI, 6 MISO, 7 IRQ, 8–10 GND. Supply 2.0–3.6 V (abs. max 3.6 V).
+- Same radio as the DP5 (genuine Nordic nRF24L01P, PA + LNA, FCC/CE), SMD **14.5 × 18 mm** (corrected 19-Oct from the
+  manual's drawing; the spec table's 14.85 is a copy-paste error), **8 castellations at 1.27 mm + 2 GND half-holes**: 1 VCC, 2 CE, 3 CSN, 4 SCK, 5 MOSI, 6 MISO, 7 IRQ, 8–10 GND. Supply 2.0–3.6 V (abs. max 3.6 V).
   TX 120 mA, RX 26 mA. Max output +20 dBm. **Sensitivity −96 dBm typ at 250 kbps** (datasheet).
 - **IPEX (U.FL) socket on the module**: the omni's cable plugs in directly, so no SMA adapter and its loss.
 - Why not the DP5 (SMA): it would need an SMA-male to U.FL-jack adapter (~0.5 dB) for the flex omni.
@@ -269,7 +269,7 @@ T5b** (acceptance, before Quick Mode, Fri 6-Nov) · **Owner:** RT
   (+8 dBm e.i.r.p.). **T0 must measure the real output** with a power meter / SA before any field test.
 - Sensitivity in the model: chip value (−94 dBm @250 kbps), LNA ignored. Ebyte quotes ~−96 for the
   SMD sister part; T2 decides.
-- **Backup:** E01-ML01SP4 (same radio, SMD 14.85 × 18 mm, u.FL) if ET prefers to solder it to the carrier.
+- **Backup:** E01-ML01SP4 (same radio, SMD 14.5 × 18 mm, u.FL) if ET prefers to solder it to the carrier.
 - **Do not buy** E01C-* parts or no-name "nRF24L01+PA+LNA" boards: Ebyte's own E01C manual says
   Si24R1 clone. Check the chip on arrival (register behaviour, RPD bit).
 - The Adafruit RFM69HCW order (old D-R2) is **cancelled**.
