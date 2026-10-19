@@ -131,6 +131,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
+- **19-Oct-26, Guillem: encoding/file-stream test layer.** `proto/test_encoding_text/` adds equivalent Python and C++17 APIs for binary streams, checked file reconstruction, BOM/candidate inspection and separate UTF-8 decoding. Native host and interoperability tests pass; Linux CI and ARM cross-builds are included. It is standalone and does not change the radio or `teamc-node` runtime. Usage is in `proto/test_encoding_text/guide/main.pdf` with LaTeX source alongside. The local documentation is organised under `docs/course_material`, `docs/encoding_references` and `docs/task_11_unicode`; original course sources remain git-ignored.
+
 **9-Oct-26: BAND SWITCH to 2.4 GHz.** All four teams (us + 3 others) chose 2.4 GHz for every mode;
 868 MHz is dropped (kept in `radio/DECISIONS.md` as superseded history). Everything below is the 2.4 GHz baseline.
 
@@ -237,6 +239,12 @@ TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17
       before installing; `mcp-openems` as a free cross-check. Nothing installed yet.
 
 ## Session log
+
+### 2026-10-19 — Guillem: file streaming and Unicode test layer
+- Added `proto/test_encoding_text/` with matching Python and C++17 APIs/CLIs, generated samples, receiver checks and differential/interoperability tests. Raw bytes, BOMs, NULs and line endings are preserved; decoding writes a separate UTF-8 copy and does not silently choose an ambiguous format.
+- The receiver validates length and CRC-32, checks saved bytes and publishes without overwriting an existing file. It expects ordered payloads from the transport; radio framing, retries, compression and partial-prefix scoring remain with the existing protocol.
+- Local Windows host validation: C++ API checks and all 12 Python/interoperability test methods passed. Added Linux CI for the new tests, existing radio/protocol suites and both Pi ARM cross-builds. Physical Pi/USB/radio validation is still required.
+- Added a three-page LaTeX usage and integration guide. Migrated local course sources, encoding references and Task 11 report/validation into separate `docs/` subfolders; these remain ignored by Git.
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.

@@ -37,6 +37,7 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
 | `tools/make_sample.py` | 10 000 × 100 B test file from the course PDFs (UTF-8 or UTF-16). |
+| `test_encoding_text/` | Python/C++ byte-stream and Unicode test layer for Pi 3: discovery, BOM inspection, checked file reconstruction and separate UTF-8 decoding. Run `make -C test_encoding_text test`; usage and integration notes are in `test_encoding_text/guide/main.pdf` (LaTeX source alongside). |
 
 Scoring follows the rules: at STOP the receiver's bytes are decompressed and compared with
 the original, and only the first continuous run of identical lines counts.
