@@ -1,0 +1,347 @@
+(footprint "E01-ML01SP4"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Ebyte E01-ML01SP4 nRF24L01P + PA/LNA 2.4 GHz module, castellated SMD 14.5x18.0 mm, IPEX; per Ebyte E01-ML01SP4 user manual rev 1.7 sect. 3 p.4 (pads 1-8 P1.27 on the short edge, GND 9/10 on the long edges 13.0 mm from the pad edge); hand-solder lands (signal pads 1.2 mm outside the outline); top-layer keep-out for tracks under the module (manual sect. 4.1)")
+	(tags "Ebyte E01-ML01SP4 nRF24L01P nRF24L01+ PA LNA 2.4GHz castellated hand-solder")
+	(property "Reference" "REF**"
+		(at 0 -11.6 0)
+		(layer "F.SilkS")
+		(uuid "b5302d92-47de-5e7f-a2ab-970a0e45b0db")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "E01-ML01SP4"
+		(at 0 10.4 0)
+		(layer "F.Fab")
+		(uuid "8f981271-d4d7-5616-9b55-fb750722a093")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.cdebyte.com/products/E01-ML01SP4"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "af214637-309b-5d24-8c6a-9f7e445ea88f")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Ebyte nRF24L01P + PA/LNA 2.4 GHz module, SMD castellated 14.5x18 mm, IPEX"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "25d935c5-7a0d-562a-9b39-18cbf4307cad")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_poly
+		(pts
+			(xy -7.25 -9) (xy 6.25 -9) (xy 7.25 -8) (xy 7.25 9) (xy -7.25 9)
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "1ec2ee4e-79f0-5db3-b4db-53d748e13e2d")
+	)
+	(fp_circle
+		(center -4.9 6.7)
+		(end -3.9 6.7)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "7ed546b1-306b-55e6-9fc6-d1265f401b64")
+	)
+	(fp_text user "IPEX"
+		(at -4.9 8.25 0)
+		(layer "F.Fab")
+		(uuid "02773d9d-dcbe-530b-ae36-5e1b0fcb8fc8")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.08)
+			)
+		)
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "5498c7bc-53f6-57ab-8245-1115507cd8b2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_line
+		(start -7.4 -9.15)
+		(end -5.15 -9.15)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "0bceda96-97c0-550f-b8c8-c84c5d07d44f")
+	)
+	(fp_line
+		(start 5.15 -9.15)
+		(end 7.4 -9.15)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "573db8fa-99bc-5404-8fe8-9a25b9cc48da")
+	)
+	(fp_line
+		(start -7.4 -9.15)
+		(end -7.4 2.94)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "85ec3f75-978a-5d9d-b12b-cbe48cbc49fa")
+	)
+	(fp_line
+		(start 7.4 -9.15)
+		(end 7.4 2.94)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "3fdf158a-d177-5cd1-8f69-783011e8c2ba")
+	)
+	(fp_line
+		(start -7.4 5.06)
+		(end -7.4 9.15)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "03ea447d-6614-5dda-8a95-f46f022ecda3")
+	)
+	(fp_line
+		(start 7.4 5.06)
+		(end 7.4 9.15)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "9cc27333-86c9-5406-b6bf-64c42e75283d")
+	)
+	(fp_line
+		(start -7.4 9.15)
+		(end 7.4 9.15)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "cebddb0f-fe80-5a13-b069-9c841b4b0fed")
+	)
+	(fp_circle
+		(center 5.6 -10)
+		(end 5.85 -10)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "2b45a3fe-aba0-5861-b93a-f4e9209f4002")
+	)
+	(fp_text user "IPEX"
+		(at -8.1 7 90)
+		(layer "F.SilkS")
+		(uuid "f4b77206-93c0-580f-b8c0-2e998fae33ba")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_line
+		(start -8.7 -10.45)
+		(end 8.7 -10.45)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "96ae5bb7-5f6d-54be-8b87-c99ff30cce25")
+	)
+	(fp_line
+		(start 8.7 -10.45)
+		(end 8.7 9.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "0d0f9eb1-d3b6-5f6b-9a2a-7987de745dd8")
+	)
+	(fp_line
+		(start 8.7 9.25)
+		(end -8.7 9.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "0f90cd87-41f9-5283-bc2f-2eb6a862844d")
+	)
+	(fp_line
+		(start -8.7 9.25)
+		(end -8.7 -10.45)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "fdd01b7a-6076-547f-89bd-79b5db4abec6")
+	)
+	(fp_text user "Ebyte manual rev1.7 p.4;\nmeasure a module (14.5 mm) before fab;\nIPEX position ±0.5 mm"
+		(at 0 -3 0)
+		(layer "Cmts.User")
+		(uuid "c9ca89b5-488d-5831-98de-846b88dffa72")
+		(effects
+			(font
+				(size 0.45 0.45)
+				(thickness 0.07)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at 4.445 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "73876205-d410-5bb9-ad31-39499aee79b0")
+	)
+	(pad "2" smd roundrect
+		(at 3.175 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "ad615baf-97c3-5bbb-8f90-e39d1291597c")
+	)
+	(pad "3" smd roundrect
+		(at 1.905 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "70848439-c865-5a44-a88d-18e759dc8021")
+	)
+	(pad "4" smd roundrect
+		(at 0.635 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "72be01dc-ba01-5601-98d3-0dab90b65985")
+	)
+	(pad "5" smd roundrect
+		(at -0.635 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "224dcc9d-6da6-5045-9685-56c78698724a")
+	)
+	(pad "6" smd roundrect
+		(at -1.905 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "8087d445-4f52-5c33-a947-bc4b3933e13a")
+	)
+	(pad "7" smd roundrect
+		(at -3.175 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "797b7a75-cdec-527f-b761-10eb7ee14770")
+	)
+	(pad "8" smd roundrect
+		(at -4.445 -9.1)
+		(size 0.8 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "8b52119d-3019-537d-bf6c-4a67c022f369")
+	)
+	(pad "9" smd roundrect
+		(at -7.35 4)
+		(size 2.2 1.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "cc90b9db-e298-5189-b919-4d6868d95200")
+	)
+	(pad "10" smd roundrect
+		(at 7.35 4)
+		(size 2.2 1.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "8b95034c-b92e-52e5-8192-fd09ebe4cbcd")
+	)
+	(zone
+		(layer "F.Cu")
+		(uuid "798db566-6c5f-53e4-afad-3dd14965afe5")
+		(name "SP4 no top tracks")
+		(hatch edge 0.5)
+		(connect_pads
+			(clearance 0)
+		)
+		(min_thickness 0.25)
+		(keepout
+			(tracks not_allowed)
+			(vias allowed)
+			(pads allowed)
+			(copperpour allowed)
+			(footprints allowed)
+		)
+		(placement
+			(enabled no)
+			(sheetname "")
+		)
+		(fill
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+			(island_removal_mode 0)
+		)
+		(polygon
+			(pts
+				(xy -7.25 -7.8) (xy 7.25 -7.8) (xy 7.25 9) (xy -7.25 9)
+			)
+		)
+	)
+	(embedded_fonts no)
+)

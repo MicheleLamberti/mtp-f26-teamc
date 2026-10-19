@@ -1,0 +1,7 @@
+# KiCad scratch
+*-backups/
+fp-info-cache
+*.kicad_prl
+*.lck
+__pycache__/
+hw/**/build/sheet/

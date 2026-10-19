@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "teamc")(type "KiCad")(uri "${KIPRJMOD}/../lib/teamc.pretty")(options "")(descr "Team C project footprints"))
+)

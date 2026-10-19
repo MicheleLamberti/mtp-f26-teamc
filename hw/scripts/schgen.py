@@ -152,8 +152,9 @@ class Sheet:
             sym = self.lib_syms[part.lib_id]
             sx, sy = part.at
             props = {p[1]: p for p in find_all(sym, "property")}
+            flag = lambda k: (find(sym, k) or [k, "yes"])[1]  # noqa: E731  (the library symbol's own flags)
             inst = ["symbol", ["lib_id", Q(part.lib_id)], ["at", sx, sy, part.rot], ["unit", part.unit],
-                    ["exclude_from_sim", "no"], ["in_bom", "yes"], ["on_board", "yes"],
+                    ["exclude_from_sim", "no"], ["in_bom", flag("in_bom")], ["on_board", flag("on_board")],
                     ["dnp", "yes" if part.dnp else "no"], ["uuid", uid(self.name, part.ref, part.unit)]]
             ry = sy - 2.54
             inst.append(_prop("Reference", part.ref, sx + 2.54, ry - 5.08))
