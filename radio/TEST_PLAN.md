@@ -1,6 +1,6 @@
 # Radio test plan — nRF24L01+ / Ebyte E01-ML01SP4 + flex omni, 2.4 GHz
 
-Version 0.5, 16-Oct-26 (v0.5: 20 dBm hopping is the SRI/MRM baseline; v0.4 added T0 all power steps, T17 CCA
+Version 0.6, 19-Oct-26 (v0.6: T5b antenna A/B, Molex vs Ebyte flex; v0.5: 20 dBm hopping is the SRI/MRM baseline; v0.4 added T0 all power steps, T17 CCA
 threshold, T18 hopping;
 v0.3 SP4 + omni; v0.2 the DP5 + patches; v0.1 the RFM69 at 868 MHz) · Owner: RT · Expected
 values come from `linkbudget.py` (flat earth, worst-case ground bounce, antennas at 0.75 m,
@@ -91,6 +91,34 @@ box rotated 0 / 90 / 180° (omni pattern in the box, effect of the battery and P
 Pass: closed-box margin to failure ≥ 6 dB at 260 m (pads as in T4), and the worst azimuth within 6 dB of the best.
 If it fails, raise the antenna and re-check before anything else.
 
+## T5b — Antenna A/B: Molex vs Ebyte flex (campus, before Quick Mode) — **decides D-R5c**
+
+Antennas are fixed from Quick Mode on (same antenna in every mode), so this runs as soon as the modules and both
+antennas are here, after T0/T2 and **before Fri 6-Nov**. A = Molex 146153-0100 (baseline), B = Ebyte
+TX2400-FPC-2509. The nRF24 has no RSSI, so the comparison is by attenuation to failure: change only the antenna under
+test and put the pads on the other end.
+
+1. **Boxes.** Test box: SP4 on its breakout, closed box, antenna mounted as D-R5c (vertical, high on a side wall, same
+   spot and same tape for A and B; mark the spot). Reference box: SP4 with the Ebyte TX2400-JKS-IPX20 rod on its
+   IPEX-to-SMA cable, **pads between the cable and the rod**. Never touch the reference box during the test.
+   Both boxes on ~70 cm supports, line of sight, **~70 m** (indoors the multipath swamps a 1 dB difference).
+2. **Link.** `TEAM_250K`, RF_PWR −18, RF_CH 74, 1 000 frames of 32 B per point (`nrf24_probe tx` / `rx`).
+3. **Attenuation to failure, both directions.** Add pads in 1 dB steps (1/2/3/6/10 dB pads or the lab step
+   attenuator) until PER > 1 %. The last pad value with PER ≤ 1 % is the margin. Measure test box → reference and
+   reference → test box. The two should agree within 1 dB (reciprocity); if they don't, look for a loose plug or
+   a person in the path.
+4. **Order:** A, B, A, B at each of 4 azimuths of the test box (0/90/180/270°), so slow changes (people, WiFi,
+   the sun on the box) average out. Swap only the antenna's IPEX plug on the same module, straight up and down
+   with the tool. U.FL is rated for ~30 mating cycles, so count the swaps (≤ 20 on one module) and use a spare SP4
+   if the socket loosens.
+5. **Optional, lab:** S11 of each antenna mounted in the closed box with a VNA, through the TX2400-JKS-IPX20 cable
+   (calibrate at the SMA end). Expected ≤ −10 dB across 2400–2483.5 MHz. A dip outside the band means the plastic
+   detunes it.
+6. **Result:** per azimuth, B − A = median(margin with B) − median(margin with A). Take B (Ebyte) if the average
+   over the 4 azimuths is **≥ −1 dB** and B's worst azimuth is within 6 dB of its best (as in T5). Otherwise keep A
+   (Molex). Record both tables; Santiago and Marcos sign off D-R5c. Whichever wins goes into T13 (radiated
+   e.i.r.p. and harmonics) and all later field tests. `phy_config.py` keeps 3 dBi peak for the cap.
+
 ## T13 — Spectrum and e.i.r.p. (lab, spectrum analyser)
 
 1. Carrier offset of each module (CW mode: `RF_SETUP` CONT_WAVE + PLL_LOCK): replaces the ±60 ppm
@@ -167,7 +195,7 @@ corrected for the antenna gain).
 
 ## Order
 
-T0 → T2 (before QM) → T14 (survey) → T13 + T17 + T18 (one lab booking) → T4 with `TEAM_FHSS` (260 m model
+T0 → T2 → T5b (antenna A/B; all three before QM) → T14 (survey) → T13 + T17 + T18 (one lab booking) → T4 with `TEAM_FHSS` (260 m model
 +13.9 dB at RF_PWR −6, +8.4 dB at −12; `TEAM_250K` as the 10 mW reference) → T5 → T15 (with our hopping box
 hopping at 20 dBm too, 10 m from ours) → T16. **Go/no-go for hopping in MRM: Fri 20-Nov** (T17, T18 and a
 260 m transfer with `TEAM_FHSS` passed); otherwise MRM runs `TEAM_250K`. SRI runs `TEAM_250K` in any case.

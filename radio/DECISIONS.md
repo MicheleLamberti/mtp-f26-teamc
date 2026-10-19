@@ -27,6 +27,10 @@ session and no later than Fri 16-Oct.
 > profiles, margins, NM spec). The controller, its power tree and the software port change; see D-H1 and
 > `radio/pi3_impact.html`.
 
+> **19-Oct-26: antenna A/B test (Santiago).** The Molex flex omni stays the D-R5c baseline; Ebyte's own flex antenna
+> (TX2400-FPC-2509, sold as a +$0.49 bundle with the SP4) is ordered with the modules and compared in **T5b** before
+> Quick Mode. It replaces the Molex only if T5b finds it within 1 dB. See D-R5c.
+
 ## D-H1 — Micro module: Raspberry Pi 3 (Model A+ suggested), WiFi/BT chip disabled or removed
 
 **Status:** **Team request 18-Oct-26** (reported by Santiago); ET owns the choice of model; working assumption until
@@ -168,13 +172,27 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   adaptive FHSS (≤ 20 dBm e.i.r.p.); −18 stays for NM, Quick Mode and the fallback.
 - **SMD consequence:** modules shown at Quick Mode are final, so the SP4 needs a breakout (lab-made or the
   carrier PCB) from the first bench test. No breadboard stage with a different module.
-- **Shopping (order by Fri 16-Oct; price and EU lead time to verify):** 6 × E01-ML01SP4 (2 boxes, 2 bench,
-  2 spare), 4 × Molex 146153-0100, 2 × U.FL-plug to SMA-female pigtails (for T0/T13 on the spectrum
-  analyser). Not needed any more: E01-ML01DP5, SMA pads, SMA whips.
+- **Shopping (was due Fri 16-Oct; updated 19-Oct for the antenna A/B test, D-R5c):**
+  - Ebyte: 6 × E01-ML01SP4 (2 boxes, 2 bench, 2 spare) as **4 × "E01-ML01SP4+TX2400-FPC-2509"** (module + Ebyte
+    flex antenna, $3.88) and **2 × "E01-ML01SP4+TX2400-JKS-IPX20"** (module + a 2.4 GHz SMA rod on an IPEX-to-SMA
+    cable, $5.79; check the photo: the cable is the T0/T13 pigtail and the rod is T5b's reference antenna). Module
+    alone $3.39.
+  - Distributor in the EU (2–3 days): 4 × Molex 146153-0100 (MHF, not MHF4), the baseline antenna.
+  - For T4/T5/T5b: SMA attenuator pads 1, 2, 3, 6, 10 dB (or a lab step attenuator in 1 dB steps).
+  - Not needed: E01-ML01DP5, SMA whips.
+- **Where to buy the SP4 (checked 19-Oct):** no EU distributor stocks it (not at TME, Botland, Mouser or DigiKey;
+  Kamami not readable). All sources ship from China:
+  - ebyteiot.com (official, $3.39, all three bundles in stock, China Post 7–15 working days; take express if offered);
+  - Ebyte's AliExpress store (~$3.2, VAT charged at checkout);
+  - LCSC C97340 (~$2.5–4.5, express couriers 3–5 days; JLCPCB can also place it on a HAT it assembles);
+  - Amazon.es listing B07P9Y1LW1 (~€5, fastest if "Enviado por Amazon"; check the seller live).
+  Buy only the genuine Ebyte part, never E01C-* (Si24R1 clone). Import VAT (21 %) applies from the first euro:
+  keep the invoice for the BoM.
 
 ## D-R5c — Antenna: one flex omni per box (Molex 146153-0100)
 
-**Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **Owner:** RT
+**Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **19-Oct-26: Molex = baseline, Ebyte TX2400-FPC-2509
+under test (T5b)**; final pick by Santiago with Marcos before Quick Mode (Fri 6-Nov) · **Owner:** RT
 
 - Molex 146153-0100: flex dipole (2.4/5 GHz), 34.9 × 9 mm, 0.1 mm, adhesive, 100 mm cable, U.FL/MHF
   (check the part is MHF, not MHF4). Datasheet peak gain 2.4–3.0 dBi (distributors disagree), efficiency
@@ -189,6 +207,17 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   41 dB near-far at 10 m vs −50 dB selectivity), but there is no extra isolation from the antenna.
 - Quick Mode: the same flex antenna (simplest; the rules would allow a different one).
 - T5 measures the in-box gain (whip reference vs flex, box open vs closed).
+- **Candidate (19-Oct): Ebyte TX2400-FPC-2509.** Flex omni, 25 × 9 mm, 100 mm cable, IPEX-1 (= U.FL, plugs into the
+  SP4), "2 dBi", VSWR ≤ 2.0. Ebyte publishes no pattern or efficiency, and cheap flex antennas often detune on
+  plastic. It costs +$0.49 per module, comes from the module's supplier and is smaller. If it really has 1 dB less
+  gain than the Molex, every link loses ~1 dB on the RX side (the TX side only gets it back when a 6 dB RF_PWR
+  step allows it). That matters in the planning case (MRM +0.9, NM −3.1 dB).
+  - **Rule:** T5b measures B − A (Ebyte − Molex) by attenuation to failure in the closed box. Take the Ebyte if
+    the azimuth average is ≥ −1 dB and its worst azimuth is within 6 dB of its best (as T5). Otherwise keep the Molex.
+  - `phy_config.py` keeps 3 dBi peak for the e.i.r.p. cap either way; T13 checks the radiated e.i.r.p. and
+    harmonics with whichever antenna wins.
+  - Not a candidate: the Ebyte TX2400-JKS-IPX20 rod (only connectors, switches and buttons may stick out of the box;
+    likely ~5 dBi). It is T5b's bench reference.
 
 ## D-R1b — Band: 2.4 GHz ISM (2400–2483.5 MHz), all modes, 250 kbps
 
@@ -387,6 +416,6 @@ Fallback: Si4463 (same band, same link budget, more effort).
 | D-H1 | Raspberry Pi 3 as the micro: Atenea Q22 (WiFi/BT chip disabled vs removed); ET picks the model (A+ suggested) | Q22 before QM 6-Nov |
 | D-R3 | NM PHY + protocol shared by all teams: agree `NM_SPEC.md` v1.0 (nRF24, RF_CH 77, Trickle gossip, test vector) and learn every team's chip | inter-team meeting by 23-Oct; first interop test by 6-Nov |
 | D-R4 | Superseded for MRM (every team hops); fixed plan 24/49/74/82 kept for the 10 mW fallback and option B | — |
-| D-R5c | In-box gain of the flex omni (T5), mounting height | week 8 |
+| D-R5c | Antenna A/B: Molex (baseline) vs Ebyte TX2400-FPC-2509 (T5b); in-box gain (T5), mounting height | T5b before QM 6-Nov; T5 week 8 |
 | D-R6b | Option B (20 dBm on one fixed channel, no hopping): ask Atenea Q11; use only on an explicit yes | Q11 now |
 | D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pi 3; ≥ 10 m between teams' boxes at MRM | bench by week 8 |

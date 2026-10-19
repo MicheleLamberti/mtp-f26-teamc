@@ -63,7 +63,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   D-R4 fixed plan = 10 mW fallback only; D-R2b/D-R5b and the 868 records superseded),
   `HANDOFF_ET.md` (SP4 interface for electronics), **`NM_SPEC.md` (NM interop spec v1.0 for all teams: registers, frame,
   gossip, CRC, test vector; `NM_PHY_PROPOSAL.md` is now a pointer)**, `TEST_PLAN.md`
-  (T0 gate at all RF_PWR steps, T2, T4, T5, T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
+  (T0 gate at all RF_PWR steps, T2, T4, T5, T5b antenna A/B Molex vs Ebyte flex, T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
   has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 answered yes 16-Oct: 20 dBm confirmed).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
@@ -156,7 +156,8 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
   (decided 13-Oct, Santiago with Marcos). RF_PWR −18 (+2..+7 dBm est.) for 10 mW; −12/−6 while hopping. Needs a
   breakout from the first bench test (QM module = final). Not the DP5, not the 2G4M27D (can't do 10 mW), never E01C-*.
 - D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) in the SP4, vertical, high on a wall.
-  Same antenna for SRI/MRM/NM and QM.
+  Same antenna for SRI/MRM/NM and QM. **19-Oct: Ebyte TX2400-FPC-2509 (25 × 9 mm, "2 dBi", +$0.49 as an SP4 bundle)
+  under test: TEST_PLAN T5b before QM; it replaces the Molex only if it is within 1 dB.**
 - **D-R6 MRM: `TEAM_FHSS`** — 37 hops, even RF_CH 4–78 without 26 (BLE advertising 2/26/80 left out), stride 7, 30 ms
   slots, RPD as the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`**
   (RF_CH 77 = 0x4D, 10 mW; `NM_SPEC.md`). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
@@ -186,8 +187,11 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
       Atenea Q22 before QM 6-Nov) — and the pin map (Pi proposal on the Pi 3 page)
 
 **Next up (17-Oct, roughly in order):**
-- [ ] **Order now** (one batch, QM modules are final): 6 × E01-ML01SP4, 4 × Molex 146153-0100 (MHF, not MHF4),
-      2 × U.FL-to-SMA pigtails. ~~3–4 × Pico 2~~ (18-Oct: Pi 3 instead; count the boards we have). Verify EU seller + lead time. Not needed: DP5, SMA pads, whips, RFM69.
+- [ ] **Order now** (one batch, QM modules are final; 19-Oct list in DECISIONS D-R2c): from Ebyte (ebyteiot.com, ships
+      from China 1–3 weeks, take express) 4 × SP4 + TX2400-FPC-2509 and 2 × SP4 + TX2400-JKS-IPX20 (pigtail + reference
+      rod); from an EU distributor 4 × Molex 146153-0100 (MHF, not MHF4); SMA pads 1/2/3/6/10 dB. No EU distributor stocks
+      the SP4 (19-Oct); alternatives LCSC C97340 (express), AliExpress Ebyte store, Amazon.es B07P9Y1LW1. Pi 3 A+ boards
+      (count the ones we have). Not needed: DP5, whips, RFM69.
 - [ ] Name owners: SP4 breakout, Pi 3 HAT, Linux port (HAL, timers, store, USB) + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
 - [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
@@ -217,6 +221,19 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-19 — Pi 3 A+ listing, SP4 sourcing, antenna A/B test (T5b)
+- Santiago asked whether a store listing for the "Pi 3 Modelo A+, 1.4 GHz, WiFi 5 GHz" works: yes, it is the board we
+  suggested (CYW43455 chip still off/desoldered until Atenea Q22; add a microSD; WiFi on for SSH only while developing).
+- Ebyte store link checked: the variant in Santiago's link is the module alone ($3.39, in stock); bundles + TX2400-FPC-2509
+  ($3.88) and + TX2400-JKS-IPX20 ($5.79). Ships from China (China Post 7–15 working days), after our 16-Oct order date.
+- Santiago: why not Ebyte's own flex antenna, test both? → yes. Molex stays the D-R5c baseline, Ebyte FPC-2509 under
+  test: TEST_PLAN v0.6 **T5b** (closed box, ~70 m, pads on a reference box with the JKS rod, A/B/A/B at 4 azimuths,
+  Ebyte wins if ≥ −1 dB on average). DECISIONS D-R5c/D-R2c (order list, sources), HANDOFF_ET, KiCad brief updated.
+- EU sources for the SP4: none found at TME, Botland, Mouser, DigiKey (Kamami/TME behind Cloudflare). Options listed
+  in D-R2c: ebyteiot.com, AliExpress Ebyte store, LCSC C97340, Amazon.es B07P9Y1LW1 (~€5, seller to check live).
+- Pages (brief, hw) still say Molex only in the BoM; update on the next republish.
+- **Start next session with:** order placed (where, delivery date)? Molex ordered from an EU distributor? T0 → T2 → T5b.
 
 ### 2026-10-18 (evening) — the Pi 3 port finished: teamc-node
 - Santiago: finish porting everything. New `proto/port/linux/` (see its README): `node.c` (round state machine, resume,
