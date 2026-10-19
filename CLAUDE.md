@@ -187,6 +187,9 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
       Atenea Q22 before QM 6-Nov) — and the pin map (Pi proposal on the Pi 3 page)
 
 **Next up (17-Oct, roughly in order):**
+- [ ] **19-Oct: Santiago is ordering 6 × SP4 from ebyteiot.com** (2 + TX2400-FPC-2509, 2 + TX2400-JKS-IPX20, 2 bare;
+      suggested: the 2 bare as FPC bundles too, +$0.49 each). Still to buy: Molex for T5b (LCSC C152350 or with ET's
+      DigiKey order), SMA pads 1/2/3/6/10 dB. Log the delivery date. Original plan:
 - [ ] **Order now** (one batch, QM modules are final; 19-Oct list in DECISIONS D-R2c): from Ebyte (ebyteiot.com, ships
       from China 1–3 weeks, take express) 4 × SP4 + TX2400-FPC-2509 and 2 × SP4 + TX2400-JKS-IPX20 (pigtail + reference
       rod); from an EU distributor 4 × Molex 146153-0100 (MHF, not MHF4); SMA pads 1/2/3/6/10 dB. No EU distributor stocks
@@ -235,6 +238,11 @@ what's pending.
 - Santiago asked for nRF24L01+ modules from DigiKey/Mouser instead of Ebyte: only Talon Tango-24PA-PCBANT (genuine
   nRF24L01+ + 100 mW PA/LNA, trace antenna, DigiKey 38 in stock, €14.46; RP-SMA version out of stock, 8 weeks); the
   rest are 0 dBm boards (MRM fails). Recorded in D-R2c; not decided (SP4 stays the D-R2c baseline).
+- Molex sources: DigiKey charges €25 shipping below €75 → LCSC C152350 ($3.16) or ET's DigiKey order. Soldered
+  101219 at Mouser = plain nRF24L01+ (no PA), bench only. Generic Amazon "nRF24L01+PA+LNA" boards: likely Si24R1
+  (RF_SETUP 0x20/0x22 = −12/−4 dBm there → over the legal caps); genuine on Amazon = Ebyte E01-ML01DP5/SP4 sold by EBYTE;
+  check with the RF_SETUP bit-0 power test at T0.
+- Santiago then: buying from Ebyte, 6 modules (2 FPC, 2 JKS-IPX20, 2 bare).
 - Pages (brief, hw) still say Molex only in the BoM; update on the next republish.
 - **Start next session with:** order placed (where, delivery date)? Molex ordered from an EU distributor? T0 → T2 → T5b.
 

@@ -180,6 +180,7 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   - 4 × Molex 146153-0100 (MHF, not MHF4), the baseline antenna: DigiKey WM12218-ND (€2.27; shipping to Spain
     free from €75, else €25, so add it to ET's DigiKey order) or **LCSC C152350** ($3.16, 270 in stock 19-Oct; same
     cart as the SP4 C97340). Mouser and Farnell UK also stock it.
+  - **Placed by Santiago 19-Oct (ebyteiot.com):** 2 × + FPC-2509, 2 × + JKS-IPX20, 2 × module alone.
   - For T4/T5/T5b: SMA attenuator pads 1, 2, 3, 6, 10 dB (or a lab step attenuator in 1 dB steps).
   - Not needed: E01-ML01DP5, SMA whips.
 - **Where to buy the SP4 (checked 19-Oct):** no EU distributor stocks it (not at TME, Botland, Mouser or DigiKey;
