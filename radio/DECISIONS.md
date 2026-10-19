@@ -177,7 +177,9 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
     flex antenna, $3.88) and **2 × "E01-ML01SP4+TX2400-JKS-IPX20"** (module + a 2.4 GHz SMA rod on an IPEX-to-SMA
     cable, $5.79; check the photo: the cable is the T0/T13 pigtail and the rod is T5b's reference antenna). Module
     alone $3.39.
-  - Distributor in the EU (2–3 days): 4 × Molex 146153-0100 (MHF, not MHF4), the baseline antenna.
+  - 4 × Molex 146153-0100 (MHF, not MHF4), the baseline antenna: DigiKey WM12218-ND (€2.27; shipping to Spain
+    free from €75, else €25, so add it to ET's DigiKey order) or **LCSC C152350** ($3.16, 270 in stock 19-Oct; same
+    cart as the SP4 C97340). Mouser and Farnell UK also stock it.
   - For T4/T5/T5b: SMA attenuator pads 1, 2, 3, 6, 10 dB (or a lab step attenuator in 1 dB steps).
   - Not needed: E01-ML01DP5, SMA whips.
 - **Where to buy the SP4 (checked 19-Oct):** no EU distributor stocks it (not at TME, Botland, Mouser or DigiKey;
