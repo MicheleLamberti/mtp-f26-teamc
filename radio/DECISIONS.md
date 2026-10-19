@@ -186,6 +186,13 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   - Ebyte's AliExpress store (~$3.2, VAT charged at checkout);
   - LCSC C97340 (~$2.5–4.5, express couriers 3–5 days; JLCPCB can also place it on a HAT it assembles);
   - Amazon.es listing B07P9Y1LW1 (~€5, fastest if "Enviado por Amazon"; check the seller live).
+  **DigiKey/Mouser alternatives (checked 19-Oct):** only the **Talon (Sierra Wireless) Tango-24PA** keeps the design:
+  genuine nRF24L01+ with a 100 mW PA/LNA, auto PA control (VDD_PA → TXEN, pull-up on RXEN, no driver change),
+  27 × 14 × 10 mm. DigiKey 1788-1006-ND = **TANGO-24PA-PCBANT** (trace antenna, 38 in stock, €14.46); the
+  **-RPSMA** version has 0 in stock (8-week lead time). The datasheet (rev 2.7, 2017) gives no sensitivity and no
+  trace-antenna gain. The trace version can't take the Molex or Ebyte flex, so the module itself would have to sit
+  vertical, high on a wall. The rest have no PA (0 dBm, −94 dBm; Seeed 113990011, MikroE nRF C/T click, Soldered at
+  Mouser): ~9 dB less on the 10 mW links and ~19 dB less than 20 dBm hopping, so MRM fails. Not used.
   Buy only the genuine Ebyte part, never E01C-* (Si24R1 clone). Import VAT (21 %) applies from the first euro:
   keep the invoice for the BoM.
 

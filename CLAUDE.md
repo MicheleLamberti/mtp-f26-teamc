@@ -232,6 +232,9 @@ what's pending.
   Ebyte wins if ≥ −1 dB on average). DECISIONS D-R5c/D-R2c (order list, sources), HANDOFF_ET, KiCad brief updated.
 - EU sources for the SP4: none found at TME, Botland, Mouser, DigiKey (Kamami/TME behind Cloudflare). Options listed
   in D-R2c: ebyteiot.com, AliExpress Ebyte store, LCSC C97340, Amazon.es B07P9Y1LW1 (~€5, seller to check live).
+- Santiago asked for nRF24L01+ modules from DigiKey/Mouser instead of Ebyte: only Talon Tango-24PA-PCBANT (genuine
+  nRF24L01+ + 100 mW PA/LNA, trace antenna, DigiKey 38 in stock, €14.46; RP-SMA version out of stock, 8 weeks); the
+  rest are 0 dBm boards (MRM fails). Recorded in D-R2c; not decided (SP4 stays the D-R2c baseline).
 - Pages (brief, hw) still say Molex only in the BoM; update on the next republish.
 - **Start next session with:** order placed (where, delivery date)? Molex ordered from an EU distributor? T0 → T2 → T5b.
 
