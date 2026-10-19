@@ -89,7 +89,8 @@ int main(int argc,char** argv) {
 #ifdef _WIN32
                 else _setmode(_fileno(stdin),_O_BINARY);
 #endif
-                std::unique_ptr<std::FILE,decltype(&std::fclose)> owned(input==stdin?nullptr:input,&std::fclose);
+                const auto close_file=[](std::FILE* file) { std::fclose(file); };
+                std::unique_ptr<std::FILE,decltype(close_file)> owned(input==stdin?nullptr:input,close_file);
                 std::cout<<mt::json(mt::receive_stream(input,target,expected,chunk))<<'\n';
             }
         }

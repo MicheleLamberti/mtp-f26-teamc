@@ -241,6 +241,7 @@ TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17
 ## Session log
 
 ### 2026-10-19 — Guillem: file streaming and Unicode test layer
+- Work continues on `unworthyzeus/mtp-f26-teamc` until team-repository write access is available. The first Linux CI run exposed a GCC warning/error in the CLI's `fclose` deleter; replaced its function-pointer template argument with a lambda while retaining `-Werror`.
 - Added `proto/test_encoding_text/` with matching Python and C++17 APIs/CLIs, generated samples, receiver checks and differential/interoperability tests. Raw bytes, BOMs, NULs and line endings are preserved; decoding writes a separate UTF-8 copy and does not silently choose an ambiguous format.
 - The receiver validates length and CRC-32, checks saved bytes and publishes without overwriting an existing file. It expects ordered payloads from the transport; radio framing, retries, compression and partial-prefix scoring remain with the existing protocol.
 - Local Windows host validation: C++ API checks and all 12 Python/interoperability test methods passed. Added Linux CI for the new tests, existing radio/protocol suites and both Pi ARM cross-builds. Physical Pi/USB/radio validation is still required.
