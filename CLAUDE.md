@@ -73,9 +73,11 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   — source `radio/hw_proposal.html` (**v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
-- `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the brief for the KiCad MCP design session (rewritten 18-Oct
-  for a Pi 3 HAT: pin map, power, mechanics)
-  (constraints, parts, pin map, power, mechanics, checkpoints, deliverables).
+- `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
+  agent with ~8 subagents**: research of power / Pi + SP4 footprint / UI parts with verified symbols and footprints,
+  SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
+  Tools checked 19-Oct: KiCad 10.0, `pcbnew` Python 10.0.6, `RaspberryPi-HAT` template; the KiCad MCP edits
+  schematics, searches/downloads registry parts and runs ERC/DRC, but cannot place or route (use pcbnew scripts).
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
@@ -184,12 +186,13 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
       interop test by 6-Nov (NM win gates the cost category)
 - [ ] D-R6 go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K, or option B on a Q11 yes
 - [ ] ET: micro — **2 × Raspberry Pi 3 A+ ordered 19-Oct** (WiFi/BT chip disabled or desoldered, Atenea Q22 before QM
-      6-Nov) — the pin map (Pi proposal on the Pi 3 page); 2 × microSD + bench 5.1 V supply still to get
+      6-Nov) — the pin map (Pi proposal on the Pi 3 page); microSD = SanDisk Ultra 32 GB A1 (Santiago 19-Oct); bench
+      5.1 V supply still to get
 
 **Next up (17-Oct, roughly in order):**
 - [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
-      antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). 2 boxes + 2 spare SP4s (the rod-kit ones); no spare flex antenna (Molex if one breaks). Still to get: 2 × microSD, bench
-      5.1 V supply, SMA pads 1/2/3/6/10 dB (or the lab's step attenuator); Molex only if T5b fails. Log the delivery dates.
+      antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). 2 boxes + 2 spare SP4s (the rod-kit ones); no spare flex antenna (Molex if one breaks). microSD: SanDisk Ultra 32 GB A1 twin
+      pack (2 packs suggested: boxes, flashed spare, dev). Still to get: bench 5.1 V supply, SMA pads 1/2/3/6/10 dB (or the lab's step attenuator); Molex only if T5b fails. Log the delivery dates.
 - [ ] Name owners: SP4 breakout, Pi 3 HAT, Linux port (HAL, timers, store, USB) + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
 - [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
@@ -242,7 +245,13 @@ what's pending.
   (VNA S11 + substitution gain if the lab has them; 70 m attenuation to failure vs the model and vs the JKS rod;
   Molex A/B only on a fail). D-H1: 2 × A+ ordered. HANDOFF_ET, KiCad brief, phy_config comment updated.
 - Pages (brief, hw) still say Molex only in the BoM; update on the next republish.
-- **Start next session with:** delivery dates (Ebyte, Pi)? microSD + bench supply + pads? Then T0 → T2 → T5b on arrival.
+- microSD: unbranded "TF183" rejected; PNY Elite 16 GB OK but no A1; **SanDisk Ultra 32 GB A1 twin pack** chosen
+  (Santiago). Test each card with H2testw/f3, tape it in for the drop test.
+- Santiago closed the session and asked for a detailed prompt for an Opus lead + subagents using the KiCad MCP:
+  `hw/KICAD_SESSION_PROMPT.md` v2 (tools verified: KiCad 10.0, pcbnew Python, HAT template; MCP has no placement/routing).
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK (docs-only changes after the first commit).
+- **Start next session with:** the KiCad session (paste `hw/KICAD_SESSION_PROMPT.md`); delivery dates (Ebyte, Pi)?
+  bench supply + pads? Then T0 → T2 → T5b on arrival.
 
 ### 2026-10-18 (evening) — the Pi 3 port finished: teamc-node
 - Santiago: finish porting everything. New `proto/port/linux/` (see its README): `node.c` (round state machine, resume,
