@@ -63,7 +63,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   D-R4 fixed plan = 10 mW fallback only; D-R2b/D-R5b and the 868 records superseded),
   `HANDOFF_ET.md` (SP4 interface for electronics), **`NM_SPEC.md` (NM interop spec v1.0 for all teams: registers, frame,
   gossip, CRC, test vector; `NM_PHY_PROPOSAL.md` is now a pointer)**, `TEST_PLAN.md`
-  (T0 gate at all RF_PWR steps, T2, T4, T5, T5b antenna A/B Molex vs Ebyte flex, T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
+  (T0 gate at all RF_PWR steps, T2, T4, T5, T5b Ebyte flex acceptance (Molex fallback), T13–T18; T17/T18 = CCA threshold and hopping, gates for TEAM_FHSS outdoors; PER-based, nRF24
   has no RSSI), `ATENEA_QUESTIONS.md` (for Marcos; Q3 answered yes 16-Oct: 20 dBm confirmed).
 - Radio brief (artifact, private — Santiago shares it with the team):
   https://claude.ai/artifact/MqP1rz4NzHmGTgJCYMYGqw — source `radio/brief.html`; edit it and
@@ -155,9 +155,9 @@ as adaptive FHSS + LBT; NM stays at 10 mW on one channel (UN-85 b). **Confirmed:
 - D-R2c **Ebyte E01-ML01SP4** (genuine nRF24L01P + PA/LNA, SMD 14.85 × 18 mm, 1.27 mm pads, IPEX), one per box
   (decided 13-Oct, Santiago with Marcos). RF_PWR −18 (+2..+7 dBm est.) for 10 mW; −12/−6 while hopping. Needs a
   breakout from the first bench test (QM module = final). Not the DP5, not the 2G4M27D (can't do 10 mW), never E01C-*.
-- D-R5c **one Molex 146153-0100 flex omni** (34.9 × 9 mm, 2.4–3.0 dBi, U.FL) in the SP4, vertical, high on a wall.
-  Same antenna for SRI/MRM/NM and QM. **19-Oct: Ebyte TX2400-FPC-2509 (25 × 9 mm, "2 dBi", +$0.49 as an SP4 bundle)
-  under test: TEST_PLAN T5b before QM; it replaces the Molex only if it is within 1 dB.**
+- D-R5c **one flex omni per box, since 19-Oct the Ebyte TX2400-FPC-2509** (25 × 9 mm, "2 dBi", IPEX, came with the
+  SP4s) in the SP4, vertical, high on a wall. Same antenna for SRI/MRM/NM and QM. Acceptance test TEST_PLAN T5b before
+  QM; **Molex 146153-0100 (34.9 × 9 mm, 2.4–3.0 dBi) = fallback, bought only if the Ebyte flex fails.**
 - **D-R6 MRM: `TEAM_FHSS`** — 37 hops, even RF_CH 4–78 without 26 (BLE advertising 2/26/80 left out), stride 7, 30 ms
   slots, RPD as the CCA (170 µs), COT 50 ms + 2.5 ms idle, power cap per profile in the driver. **NM: `NM_COMMON`**
   (RF_CH 77 = 0x4D, 10 mW; `NM_SPEC.md`). **QM/bench/fallback: `TEAM_250K`** (RF_CH 74, 10 mW).
@@ -183,18 +183,13 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
 - [ ] D-R3 NM common PHY + protocol: agree `NM_SPEC.md` v1.0 with the teams by 23-Oct; every team's chip in writing;
       interop test by 6-Nov (NM win gates the cost category)
 - [ ] D-R6 go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K, or option B on a Q11 yes
-- [ ] ET: micro choice — **18-Oct: the team wants a Raspberry Pi 3** (A+ suggested; WiFi/BT chip disabled or desoldered,
-      Atenea Q22 before QM 6-Nov) — and the pin map (Pi proposal on the Pi 3 page)
+- [ ] ET: micro — **2 × Raspberry Pi 3 A+ ordered 19-Oct** (WiFi/BT chip disabled or desoldered, Atenea Q22 before QM
+      6-Nov) — the pin map (Pi proposal on the Pi 3 page); 2 × microSD + bench 5.1 V supply still to get
 
 **Next up (17-Oct, roughly in order):**
-- [ ] **19-Oct: Santiago is ordering 6 × SP4 from ebyteiot.com** (2 + TX2400-FPC-2509, 2 + TX2400-JKS-IPX20, 2 bare;
-      suggested: the 2 bare as FPC bundles too, +$0.49 each). Still to buy: Molex for T5b (LCSC C152350 or with ET's
-      DigiKey order), SMA pads 1/2/3/6/10 dB. Log the delivery date. Original plan:
-- [ ] **Order now** (one batch, QM modules are final; 19-Oct list in DECISIONS D-R2c): from Ebyte (ebyteiot.com, ships
-      from China 1–3 weeks, take express) 4 × SP4 + TX2400-FPC-2509 and 2 × SP4 + TX2400-JKS-IPX20 (pigtail + reference
-      rod); from an EU distributor 4 × Molex 146153-0100 (MHF, not MHF4); SMA pads 1/2/3/6/10 dB. No EU distributor stocks
-      the SP4 (19-Oct); alternatives LCSC C97340 (express), AliExpress Ebyte store, Amazon.es B07P9Y1LW1. Pi 3 A+ boards
-      (count the ones we have). Not needed: DP5, whips, RFM69.
+- [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
+      antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). No spare SP4. Still to get: 2 × microSD, bench
+      5.1 V supply, SMA pads 1/2/3/6/10 dB (or the lab's step attenuator); Molex only if T5b fails. Log the delivery dates.
 - [ ] Name owners: SP4 breakout, Pi 3 HAT, Linux port (HAL, timers, store, USB) + hop sync, NM inter-team talks (PT),
       sustainability report, BoM + invoices, mechanics/drop test (secure the U.FL plug)
 - [ ] Santiago: share the NM Interop Spec page (artifact Share menu) with the other teams; brief v0.10 / hw v0.4.4 /
@@ -242,9 +237,12 @@ what's pending.
   101219 at Mouser = plain nRF24L01+ (no PA), bench only. Generic Amazon "nRF24L01+PA+LNA" boards: likely Si24R1
   (RF_SETUP 0x20/0x22 = −12/−4 dBm there → over the legal caps); genuine on Amazon = Ebyte E01-ML01DP5/SP4 sold by EBYTE;
   check with the RF_SETUP bit-0 power test at T0.
-- Santiago then: buying from Ebyte, 6 modules (2 FPC, 2 JKS-IPX20, 2 bare).
+- **Ordered (Santiago): 2 × Pi 3 A+ and 4 × SP4 from Ebyte (2 + FPC-2509, 2 + JKS-IPX20).** "If they don't work we
+  switch to the Molex" → D-R5c: Ebyte flex = working antenna, Molex = fallback; T5b rewritten as an acceptance test
+  (VNA S11 + substitution gain if the lab has them; 70 m attenuation to failure vs the model and vs the JKS rod;
+  Molex A/B only on a fail). D-H1: 2 × A+ ordered. HANDOFF_ET, KiCad brief, phy_config comment updated.
 - Pages (brief, hw) still say Molex only in the BoM; update on the next republish.
-- **Start next session with:** order placed (where, delivery date)? Molex ordered from an EU distributor? T0 → T2 → T5b.
+- **Start next session with:** delivery dates (Ebyte, Pi)? microSD + bench supply + pads? Then T0 → T2 → T5b on arrival.
 
 ### 2026-10-18 (evening) — the Pi 3 port finished: teamc-node
 - Santiago: finish porting everything. New `proto/port/linux/` (see its README): `node.c` (round state machine, resume,

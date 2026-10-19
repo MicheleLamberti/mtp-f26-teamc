@@ -97,7 +97,7 @@ def max_chip_dbm_for(eirp_max: float) -> int:
 # Antenna path (D-R5c): gain dBi, cable/connector dB, pad dB. Same path for TX and RX. The e.i.r.p.
 # check uses the datasheet PEAK gain (worst case); linkbudget.py uses 2 dBi for the antenna in the box.
 ANTENNAS = {
-    "omni": (3.0, -0.5, 0.0),     # Molex 146153-0100 flex dipole (2.4-3.0 dBi), 10 cm cable, IPEX on the SP4
+    "omni": (3.0, -0.5, 0.0),     # Ebyte TX2400-FPC-2509 flex ("2 dBi"; Molex 146153-0100 fallback, 2.4-3.0), IPEX
 }
 
 RATES = {250_000: 0b100000, 1_000_000: 0b000000, 2_000_000: 0b001000}

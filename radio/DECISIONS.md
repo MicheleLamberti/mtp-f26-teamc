@@ -27,14 +27,14 @@ session and no later than Fri 16-Oct.
 > profiles, margins, NM spec). The controller, its power tree and the software port change; see D-H1 and
 > `radio/pi3_impact.html`.
 
-> **19-Oct-26: antenna A/B test (Santiago).** The Molex flex omni stays the D-R5c baseline; Ebyte's own flex antenna
-> (TX2400-FPC-2509, sold as a +$0.49 bundle with the SP4) is ordered with the modules and compared in **T5b** before
-> Quick Mode. It replaces the Molex only if T5b finds it within 1 dB. See D-R5c.
+> **19-Oct-26: ordered (Santiago): 2 × Raspberry Pi 3 A+ and 4 × E01-ML01SP4 from Ebyte** (2 with Ebyte's flex antenna
+> TX2400-FPC-2509, 2 with the TX2400-JKS-IPX20 rod + IPEX-to-SMA cable). **The Ebyte flex is now the working antenna
+> (D-R5c); the Molex is the fallback**, bought only if the Ebyte flex fails its acceptance test **T5b** before Quick Mode.
 
 ## D-H1 — Micro module: Raspberry Pi 3 (Model A+ suggested), WiFi/BT chip disabled or removed
 
-**Status:** **Team request 18-Oct-26** (reported by Santiago); ET owns the choice of model; working assumption until
-Atenea Q22 is answered · **Owner:** ET (board, model) + PT (Linux software) + RT (radio checks)
+**Status:** **Team request 18-Oct-26** (reported by Santiago); **2 × Pi 3 A+ ordered 19-Oct (Santiago)**; working
+assumption until Atenea Q22 is answered · **Owner:** ET (board, model) + PT (Linux software) + RT (radio checks)
 
 - **Rule.** The rules allow "one but only one module including a microprocessor (e.g. Arduino, BeagleBone,
   Raspberry…)" but ban "any chip implementing a standard wireless access protocol (e.g. WiFi, Bluetooth…)". Every
@@ -180,7 +180,10 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   - 4 × Molex 146153-0100 (MHF, not MHF4), the baseline antenna: DigiKey WM12218-ND (€2.27; shipping to Spain
     free from €75, else €25, so add it to ET's DigiKey order) or **LCSC C152350** ($3.16, 270 in stock 19-Oct; same
     cart as the SP4 C97340). Mouser and Farnell UK also stock it.
-  - **Placed by Santiago 19-Oct (ebyteiot.com):** 2 × + FPC-2509, 2 × + JKS-IPX20, 2 × module alone.
+  - **Ordered 19-Oct (Santiago, ebyteiot.com): 4 modules = 2 × + FPC-2509 (the two boxes' antennas) and 2 × + JKS-IPX20
+    (bench pigtails + T5b reference rods); no bare modules, no Molex.** No spare module: if one dies (breakout
+    soldering, drop test), reorder at once (1–3 weeks from China).
+  - The list above (6 modules, 4 FPC, Molex) was the plan before the order; the Molex is now the D-R5c fallback.
   - For T4/T5/T5b: SMA attenuator pads 1, 2, 3, 6, 10 dB (or a lab step attenuator in 1 dB steps).
   - Not needed: E01-ML01DP5, SMA whips.
 - **Where to buy the SP4 (checked 19-Oct):** no EU distributor stocks it (not at TME, Botland, Mouser or DigiKey;
@@ -199,12 +202,16 @@ recover): then MRM falls back to TEAM_250K at RF_PWR −18 (or option B if Atene
   Buy only the genuine Ebyte part, never E01C-* (Si24R1 clone). Import VAT (21 %) applies from the first euro:
   keep the invoice for the BoM.
 
-## D-R5c — Antenna: one flex omni per box (Molex 146153-0100)
+## D-R5c — Antenna: one flex omni per box (Ebyte TX2400-FPC-2509 since 19-Oct; Molex 146153-0100 fallback)
 
-**Status:** Decided 13-Oct-26 (Santiago, with Marcos) · **19-Oct-26: Molex = baseline, Ebyte TX2400-FPC-2509
-under test (T5b)**; final pick by Santiago with Marcos before Quick Mode (Fri 6-Nov) · **Owner:** RT
+**Status:** Decided 13-Oct-26 (Santiago, with Marcos: one flex omni per box, Molex) · **19-Oct-26 (Santiago): the
+Ebyte TX2400-FPC-2509 bought with the modules is the working antenna; the Molex is bought only if the Ebyte flex fails
+T5b** (acceptance, before Quick Mode, Fri 6-Nov) · **Owner:** RT
 
-- Molex 146153-0100: flex dipole (2.4/5 GHz), 34.9 × 9 mm, 0.1 mm, adhesive, 100 mm cable, U.FL/MHF
+- **Working antenna: Ebyte TX2400-FPC-2509.** Flex omni, 25 × 9 mm, 100 mm cable, IPEX-1 (= U.FL, plugs straight
+  into the SP4), "2 dBi", VSWR ≤ 2.0. Ebyte publishes no pattern or efficiency, and cheap flex antennas often detune
+  on plastic, so T5b checks it before QM. Same mounting as below.
+- **Fallback: Molex 146153-0100**, the 13-Oct pick: flex dipole (2.4/5 GHz), 34.9 × 9 mm, 0.1 mm, adhesive, 100 mm cable, U.FL/MHF
   (check the part is MHF, not MHF4). Datasheet peak gain 2.4–3.0 dBi (distributors disagree), efficiency
   > 66 % at 2.4 GHz. Backup: Taoglas FXP73.07.0100A (47 × 7 mm, 2.5 dBi, 50 %).
 - Mounting: **vertical** (vertical polarisation, as agreed for NM), as high as possible on a side wall,
@@ -217,17 +224,16 @@ under test (T5b)**; final pick by Santiago with Marcos before Quick Mode (Fri 6-
   41 dB near-far at 10 m vs −50 dB selectivity), but there is no extra isolation from the antenna.
 - Quick Mode: the same flex antenna (simplest; the rules would allow a different one).
 - T5 measures the in-box gain (whip reference vs flex, box open vs closed).
-- **Candidate (19-Oct): Ebyte TX2400-FPC-2509.** Flex omni, 25 × 9 mm, 100 mm cable, IPEX-1 (= U.FL, plugs into the
-  SP4), "2 dBi", VSWR ≤ 2.0. Ebyte publishes no pattern or efficiency, and cheap flex antennas often detune on
-  plastic. It costs +$0.49 per module, comes from the module's supplier and is smaller. If it really has 1 dB less
-  gain than the Molex, every link loses ~1 dB on the RX side (the TX side only gets it back when a 6 dB RF_PWR
-  step allows it). That matters in the planning case (MRM +0.9, NM −3.1 dB).
-  - **Rule:** T5b measures B − A (Ebyte − Molex) by attenuation to failure in the closed box. Take the Ebyte if
-    the azimuth average is ≥ −1 dB and its worst azimuth is within 6 dB of its best (as T5). Otherwise keep the Molex.
-  - `phy_config.py` keeps 3 dBi peak for the e.i.r.p. cap either way; T13 checks the radiated e.i.r.p. and
-    harmonics with whichever antenna wins.
-  - Not a candidate: the Ebyte TX2400-JKS-IPX20 rod (only connectors, switches and buttons may stick out of the box;
-    likely ~5 dBi). It is T5b's bench reference.
+- **Why the Ebyte flex is acceptable (19-Oct):** +$0.49 per module, same supplier, smaller. Risk: if it has ~1 dB
+  less gain than the model's 2 dBi in the box, every link loses ~1 dB on the RX side (the TX side only gets it back
+  when a 6 dB RF_PWR step allows it), which matters in the planning case (MRM +0.9, NM −3.1 dB). T5b decides.
+  - **Rule (T5b):** keep the Ebyte flex if it is matched in the closed box (S11 ≤ −10 dB, if a VNA is available), its
+    lab gain is ≥ 1 dBi (if measured), and the 70 m field margin is within 3 dB of the model with the worst azimuth
+    within 6 dB of the best. Otherwise buy the Molex (LCSC C152350 or DigiKey WM12218-ND) and compare them (T5b, A/B).
+  - `phy_config.py` keeps 3 dBi peak for the e.i.r.p. cap (≥ both antennas' claimed peak); T13 checks the radiated
+    e.i.r.p. and harmonics with the antenna in use.
+  - Not a box antenna: the Ebyte TX2400-JKS-IPX20 rod (only connectors, switches and buttons may stick out of the
+    box; likely ~5 dBi). It is the bench reference in T5b.
 
 ## D-R1b — Band: 2.4 GHz ISM (2400–2483.5 MHz), all modes, 250 kbps
 
@@ -423,9 +429,9 @@ Fallback: Si4463 (same band, same link budget, more effort).
 
 | ID | Decision | Target |
 |---|---|---|
-| D-H1 | Raspberry Pi 3 as the micro: Atenea Q22 (WiFi/BT chip disabled vs removed); ET picks the model (A+ suggested) | Q22 before QM 6-Nov |
+| D-H1 | Raspberry Pi 3 as the micro: Atenea Q22 (WiFi/BT chip disabled vs removed); 2 × A+ ordered 19-Oct | Q22 before QM 6-Nov |
 | D-R3 | NM PHY + protocol shared by all teams: agree `NM_SPEC.md` v1.0 (nRF24, RF_CH 77, Trickle gossip, test vector) and learn every team's chip | inter-team meeting by 23-Oct; first interop test by 6-Nov |
 | D-R4 | Superseded for MRM (every team hops); fixed plan 24/49/74/82 kept for the 10 mW fallback and option B | — |
-| D-R5c | Antenna A/B: Molex (baseline) vs Ebyte TX2400-FPC-2509 (T5b); in-box gain (T5), mounting height | T5b before QM 6-Nov; T5 week 8 |
+| D-R5c | Ebyte TX2400-FPC-2509 acceptance (T5b); Molex only if it fails; in-box gain (T5), mounting height | T5b before QM 6-Nov; T5 week 8 |
 | D-R6b | Option B (20 dBm on one fixed channel, no hopping): ask Atenea Q11; use only on an explicit yes | Q11 now |
 | D-R6 | 20 dBm hopping is the baseline (Atenea Q3 = yes, 16-Oct): T0 all steps, T17, T18; hop sync on the Pi 3; ≥ 10 m between teams' boxes at MRM | bench by week 8 |

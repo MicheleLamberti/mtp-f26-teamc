@@ -13,12 +13,12 @@ the micro. This sheet lists what the micro and board must provide.
 
 - **Ebyte E01-ML01SP4**, one per box: genuine Nordic nRF24L01P + PA/LNA, SMD **14.85 × 18 mm**, 10 pads
   at **1.27 mm** pitch, **IPEX (U.FL) antenna socket on the module**. Not the E01C-* parts (Si24R1 clone).
-- Antenna: **Molex 146153-0100** flex dipole (34.9 × 9 mm, 100 mm cable, U.FL) plugged straight into the
-  module, stuck vertically on a box wall. No RF trace or RF connector on our PCB. **19-Oct:** Ebyte's
-  TX2400-FPC-2509 flex (25 × 9 mm, 100 mm cable, IPEX) is under test against it (TEST_PLAN T5b, before Quick
-  Mode). Leave room on the wall for the 34.9 mm Molex; the Ebyte one is shorter and fits the same spot.
-- Order (D-R2c, 19-Oct): 4 × SP4 + TX2400-FPC-2509 and 2 × SP4 + TX2400-JKS-IPX20 from Ebyte (ships from China),
-  4 × Molex 146153-0100 from an EU distributor, SMA pads 1–10 dB.
+- Antenna (19-Oct): **Ebyte TX2400-FPC-2509** flex (25 × 9 mm, 100 mm cable, IPEX) plugged straight into the module,
+  stuck vertically on a box wall. No RF trace or RF connector on our PCB. Fallback if it fails TEST_PLAN T5b: the
+  **Molex 146153-0100** (34.9 × 9 mm, same plug), so leave 35 mm on the wall.
+- **Ordered 19-Oct (Santiago):** 2 × Raspberry Pi 3 A+; 4 × SP4 from Ebyte (2 with the FPC-2509, 2 with the
+  TX2400-JKS-IPX20 rod + IPEX-to-SMA cable for the bench). No spare SP4: solder the breakout carefully. Still needed:
+  2 × microSD (8–16 GB, A1), a 5.1 V ≥ 2.5 A micro-USB supply for the bench, SMA pads 1–10 dB.
 
 ## Electrical interface (Ebyte E01-ML01SP4 user manual, section 3)
 
