@@ -137,7 +137,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
-- **20-Oct-26, Guillem: file/Unicode layer integrated into `teamc-node`.** C ABI links the C++17 module into the C node. Setup caches and sender reads check length/CRC; complete reception checks stream CRC and complete zlib decoding before SD/USB export. Encoding reports and strict UTF-8 views remain on the SD card; ambiguous/invalid text still transfers unchanged. `--text-encoding` and `--text-bom-policy` select view policy. Partial STOP and the existing resume store remain in place. CI includes whole-node encoding cases plus the existing SRI/MRM/reboot/NM e2e suite; physical Pi/USB validation is still pending.
+- **20-Oct-26, Guillem: file/Unicode layer integrated into `teamc-node`.** C ABI links the C++17 module into the C node. Setup caches and sender reads check length/CRC; complete reception checks stream CRC and complete zlib decoding before SD/USB export. Encoding reports and strict UTF-8 views remain on the SD card; ambiguous/invalid text still transfers unchanged. `--text-encoding` and `--text-bom-policy` select view policy. Partial STOP and the existing resume store remain in place. CI includes whole-node encoding cases plus the existing SRI/MRM/reboot/NM e2e suite; physical Pi/USB validation is still pending. Root/protocol/node READMEs now describe the integrated path, dependencies, commands, cache files and LaTeX reports.
 
 - **20-Oct-26, Guillem: team-repository migration.** Write access is available. The encoding/file-stream work is incorporated into `SantiBarrios2002/mtp-f26-teamc`, retaining both its original commits and the team's newer hardware/export changes. Task 11's own report and validation are now versioned under `docs/task_11_unicode/`; external sources remain local. Continue work directly on this repository's `main`.
 
@@ -251,6 +251,10 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
       before installing; `mcp-openems` as a free cross-check. Nothing installed yet.
 
 ## Session log
+
+### 2026-10-20 — Guillem: refresh the repository READMEs
+- Updated the main status/layout and links for the integrated Linux node, file/Unicode APIs, Task 11 report and current hardware proposal. Added C++17 dependencies and the standalone/integrated test commands.
+- Documented node encoding flags, original USB bytes versus SD reports/UTF-8 views, partial STOP behaviour and staging-file recovery. Clarified that physical Pi/radio/USB validation remains pending.
 
 ### 2026-10-20 — Guillem: integrate the file/Unicode module into the node
 - Added a C ABI around the existing C++ implementation and linked it into `teamc-node` without compiling its C sources as C++. Application-owned SD caches use verified staging before replacement; prepared sender caches are rechecked at GO.

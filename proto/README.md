@@ -1,6 +1,6 @@
 # Team C protocol code + PC simulator
 
-The protocol code that runs on the Raspberry Pi 3 (`port/linux/teamc-node`, Linux; the Pico 2 until 18-Oct), plus a laptop simulator that runs that
+The protocol code that runs on the Raspberry Pi 3 (`build/teamc-node`, Linux; the Pico 2 until 18-Oct), plus a laptop simulator that runs that
 same code against a modelled radio channel in simulated time. A 2-minute round takes
 milliseconds, so protocols & software can develop, measure and break the protocol
 before any hardware exists. Proposal it implements:
@@ -11,6 +11,7 @@ make test                     # build, generate sample files, run the simulator 
 make linux                    # the Pi 3 program build/teamc-node + build/mkstick (port/linux/README.md)
 make e2e                      # whole nodes against each other over the emulated UDP radio (~3 min)
 make encoding-e2e             # node file/Unicode integration, corruption checks and partial STOP
+make -C test_encoding_text test  # standalone Python/C++ file and Unicode tests
 make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip install pyfatfs "setuptools<81")
 ./build/sim sri --loss 0.1 --blackout 20:30 --rx-reboot 40
 ./build/sim sri --codec none --profile 1m --file my_file.txt
@@ -96,6 +97,7 @@ outlasted the receiver's idle-ACK timer. Timeouts still derive from the bit rate
   boxes; tune the hop guard (`RADIO_GUARD_US`) and the link timers from measured turnaround and jitter.
 - The simulator still copies the master's hop clock exactly; the real acquisition (beacon + timing estimate,
   `port/linux/radio.h`) is only exercised by the e2e tests.
-- Output file name and encoding on the stick: Atenea Q9 (today `RX_<name>`, `NM_FILE.TXT`, `NM_LOG.TXT`).
+- Output filenames still await Atenea Q9 (today `RX_<name>`, `NM_FILE.TXT`, `NM_LOG.TXT`). Original file encoding,
+  BOM and line endings are preserved; optional decoding produces a separate SD-card UTF-8 view.
 - USB sticks: FAT12/16/32 and exFAT, MBR or GPT (macOS) tables, UTF-8 names all work; NTFS/APFS/HFS+ sticks do not.
   The team brings its own FAT32/exFAT sticks.

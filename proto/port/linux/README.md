@@ -6,8 +6,9 @@ stick, and resuming by itself after a reboot. It links the same protocol code th
 the Linux HAL in `radio/fw/linux/`).
 Its C sources use the C++17 file/Unicode layer through `test_encoding_text/encoding_stream_c.h`.
 Setup and sender reads verify the SD caches. At STOP, complete streams are checked before saving;
-optional strict decoding writes separate UTF-8 views to the SD card. The LaTeX/PDF guide in
-`proto/test_encoding_text/guide/` documents policies, cache files and CLI options.
+optional strict decoding writes separate UTF-8 views to the SD card. The
+[file/Unicode guide](../../test_encoding_text/guide/main.pdf)
+([LaTeX](../../test_encoding_text/guide/main.tex)) documents the APIs and integration.
 
 | File | Job |
 |---|---|
@@ -20,6 +21,7 @@ optional strict decoding writes separate UTF-8 views to the SD card. The LaTeX/P
 | `ui.c` | Button, role switch, mode switch (SRI/MRM/NM), LEDs on GPIO; MAX17048 battery gauge; simulated UI for tests |
 | `mkstick.c` | FAT/exFAT stick images for the tests (also reads a real stick without mounting it) |
 | `e2e.sh` | Whole nodes against each other over the UDP radio: `make -C proto e2e` |
+| `test_text_integration.py` | FatFs/UDP tests of the integrated file/Unicode path: `make -C proto encoding-e2e` |
 | `teamc-node.service`, `install.sh` | systemd unit and installer for the Pi |
 
 ## How a round runs
@@ -39,6 +41,38 @@ optional strict decoding writes separate UTF-8 views to the SD card. The LaTeX/P
   resumes it without GO. The sender re-reads its stored file and HELLOs; the receiver resumes from the last length
   the sync thread recorded (every 200 ms; anything after it is simply sent again).
 
+## Encoding options and SD files
+
+The default is `--text-encoding auto --text-bom-policy strict`. The node validates UTF-8, UTF-16 LE/BE and
+UTF-32 LE/BE candidates. A missing BOM does not imply UTF-8; overlapping signatures can also remain ambiguous.
+Unresolved or malformed text still transfers and saves unchanged. A decoded copy is produced only when the
+selected interpretation validates.
+
+| Option | Behaviour |
+|---|---|
+| `--text-encoding auto` | Select from the supported encodings using strict validation; leave ambiguity unresolved |
+| `--text-encoding utf-8`, `utf-16-le`, `utf-16-be`, `utf-32-le`, `utf-32-be` | Use the explicitly agreed input encoding |
+| `--text-encoding none` | Disable encoding inspection and decoded text views; file integrity checks remain active |
+| `--text-bom-policy longest` | Opt into longest-signature matching for automatic selection, when that convention is agreed |
+
+Files in `--data` (default `/var/lib/teamc`; the installed service uses `/data/teamc`):
+
+| File | Contents |
+|---|---|
+| `in.bin`, `tx.bin` | Original input bytes and the raw/compressed stream prepared for transmission |
+| `in.encoding.json`, `in.utf8.txt` | Input encoding report and, when decoding succeeds, a separate UTF-8 view |
+| `received.bin` | Original bytes from the last complete saved reception |
+| `received.encoding.json`, `received.utf8.txt` | Complete-reception encoding report and optional UTF-8 view |
+| `received-prefix.bin` | Bytes recovered from an incomplete transfer at STOP; decoding is deferred |
+
+Decoded views consume only the initial BOM and preserve line endings and interior U+FEFF. They are never
+substituted for the original USB output. A partial STOP removes the previous reception's decoded view/report;
+`received.bin` may still contain the last complete round. With text processing disabled, reports/views are absent.
+
+Internal cache writes stage `path.new` and `path.new.part` before replacement. A crash can leave staging files;
+existing staging files are refused and require inspection before retrying. The normal radio resume store
+(`rx.bin` and `rx.state`) is separate from these caches.
+
 ## Hop sync (TEAM_FHSS) on real radios
 
 The simulator copies the master's clock; real radios cannot. Here the slave parks on the first hop channel until
@@ -49,6 +83,16 @@ parked or rebooted slave locks within one cycle (1.1 s). A slave changes channel
 the slave parks again (a rebooted sender comes back on a new phase).
 
 ## Tests on a PC (no radio)
+
+Run from the repository root on Linux:
+
+```sh
+make -C proto encoding-e2e
+```
+
+This checks the C bridge and complete zlib validation, then starts real sender/receiver processes with
+FatFs stick images and UDP radios. Cases cover all five BOM encodings, explicit/strict/longest policies,
+BOM-less and malformed text, empty files, disabled decoding, a corrupt sender cache and partial STOP.
 
 `make -C proto e2e` (~3 min) runs real nodes as processes against each other over the UDP radio, with stick images
 from `mkstick`, and checks that the receiver's stick holds a byte-identical file. 18-Oct results (1500 lines,
