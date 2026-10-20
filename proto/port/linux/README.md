@@ -1,9 +1,13 @@
 # teamc-node: the Raspberry Pi 3 transceiver program (D-H1)
 
-One C program runs the whole box: setup from the USB stick, the round (SRI, MRM or NM), STOP, saving to the
+One program runs the whole box: setup from the USB stick, the round (SRI, MRM or NM), STOP, saving to the
 stick, and resuming by itself after a reboot. It links the same protocol code the simulator tests
 (`src/link.c`, `src/nm_gossip.c`, `src/codec.c`, `src/usb_msc.c`) and the radio driver (`radio/fw/nrf24.c` with
 the Linux HAL in `radio/fw/linux/`).
+Its C sources use the C++17 file/Unicode layer through `test_encoding_text/encoding_stream_c.h`.
+Setup and sender reads verify the SD caches. At STOP, complete streams are checked before saving;
+optional strict decoding writes separate UTF-8 views to the SD card. The LaTeX/PDF guide in
+`proto/test_encoding_text/guide/` documents policies, cache files and CLI options.
 
 | File | Job |
 |---|---|

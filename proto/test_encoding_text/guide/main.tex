@@ -159,11 +159,67 @@ The repository already supplies \texttt{proto/src/codec.c} and
 operates on the original byte stream and decompression precedes this receiver's
 file checks. Existing radio frames, retransmission state and compressed-stream
 metadata are unchanged. This package is a test harness and reusable API; it is
-not wired into \texttt{teamc-node} automatically.
+also linked into \texttt{teamc-node} through the C interface in
+\texttt{encoding\_stream\_c.h}. The node's C sources compile as C; only the
+file/Unicode implementation and its bridge compile as C++17.
 
 This harness uses files on a mounted filesystem. The existing node accesses its
 USB stick through FatFs as a raw block device. Do not use both paths concurrently
 on the same mounted device. Integration must use one ownership model consistently.
+
+\subsection{The integrated node}
+During SETUP, FatFs reads the USB file without interpreting its contents.
+The C++ receiver verifies staged SD-card caches \texttt{in.bin} and
+\texttt{tx.bin} before they replace the previous caches. At GO, the sender reads
+the selected cache through \texttt{send\_file}, checking its stored size and CRC-32.
+The node retains its existing whole-file buffers and 4 MiB input limit; linking
+the streaming API does not make the full node use constant memory.
+
+At STOP, a complete SRI/MRM stream must match the CRC-32 announced in HELLO.
+A compressed complete file must also reach the zlib stream end, pass its checksum,
+consume all input and fit the 4 MiB output limit. The recovered bytes are saved
+through \texttt{FileReceiver} to \texttt{received.bin} on the SD card, then written
+unchanged to the USB stick through FatFs with its existing read-back check.
+NM uses the same cache/text path once a full file is available.
+
+The node's internal cache adapter stages \texttt{path.new} using the ordinary
+no-overwrite receiver, validates it and then atomically replaces \texttt{path}.
+This replacement applies to application-owned caches only. Existing staging files
+are refused and may need inspection after a crash. A directory-sync error can be
+reported after publication. The radio thread's resume store is unchanged.
+
+Encoding inspection produces \texttt{in.encoding.json} at SETUP and
+\texttt{received.encoding.json} after complete reception. A successful strict
+decode produces a separate \texttt{in.utf8.txt} or \texttt{received.utf8.txt} on the
+SD card. Neither reports nor decoded copies are written onto the competition USB.
+Ambiguous or malformed text still transfers and saves in its original form.
+Decoding failures are logged; the original remains available.
+
+\begin{verbatim}
+make -C proto linux
+proto/build/teamc-node --data /data/teamc \
+    --text-encoding auto --text-bom-policy strict
+# A format explicitly agreed for the input files:
+proto/build/teamc-node --data /data/teamc \
+    --text-encoding utf-16-le
+\end{verbatim}
+The default is strict automatic selection. These optional settings disable text
+processing or select the previously described longest-signature convention:
+\begin{verbatim}
+--text-encoding none
+--text-bom-policy longest
+\end{verbatim}
+These options affect text views only. Discovery
+on the raw USB stick keeps the node's existing largest-\texttt{.txt} rule; the
+standalone directory-discovery command still requires a single candidate.
+
+STOP before completion retains the existing prefix-scoring behaviour. A raw prefix,
+or the decompressed prefix of an incomplete compressed stream, is saved to USB
+and cached as \texttt{received-prefix.bin}. It is not automatically decoded because
+it may end inside a character. Any previous UTF-8 view and inspection report are
+removed. \texttt{received.bin} may still hold the last complete round; the prefix
+cache records this partial round. Malformed or truncated streams are never
+classified as complete merely because a decompressor produced some bytes.
 
 \section{Validation}
 \texttt{make test} builds the C++ program and API checks, then runs Python unit
@@ -173,6 +229,18 @@ overlapping and incomplete signatures; malformed sequences; short writes;
 truncation, corruption and excess data; existing destinations and publication
 races; offsets and file discovery. Differential tests compare both inspectors on
 fixed and deterministic random inputs. Streaming tests cover multi-megabyte files.
+
+The node integration suite runs with:
+\begin{verbatim}
+make -C proto encoding-e2e
+\end{verbatim}
+It checks the C ABI and complete-stream zlib
+validation, then runs real sender/receiver processes over the UDP radio backend
+with FatFs stick images. It verifies all five BOM encodings, overlapping signatures
+with strict/declared/longest policies, invalid and BOM-less text, empty files,
+disabled decoding, sender-cache corruption and STOP during a partial transfer.
+\texttt{make -C proto e2e} additionally exercises the existing SRI, MRM, reboot and
+three-node NM scenarios. CI runs both suites.
 
 Run the tests on both Pis and on the actual destination filesystem before hardware
 integration. Host tests and ARM compilation do not verify radio timing, physical

@@ -5,6 +5,8 @@
 #   make linux       the Raspberry Pi 3 node (build/teamc-node) and the stick-image tool (build/mkstick)
 #   make e2e         whole nodes against each other over the emulated UDP radio (port/linux/e2e.sh, ~1-2 min)
 CC ?= cc
+CXX ?= c++
+CXXFLAGS ?= -std=c++17 -O2 -g -Wall -Wextra -Werror
 RADIO = ../radio/fw
 FATFS = third_party/fatfs
 CFLAGS ?= -std=c11 -O2 -g -Wall -Wextra -Werror
@@ -22,8 +24,11 @@ LNX = port/linux
 LINUX_SRC = $(LNX)/node.c $(LNX)/radio.c $(LNX)/phy_udp.c $(LNX)/phy_nrf24.c $(LNX)/store.c $(LNX)/stick.c \
 	$(LNX)/ui.c $(RADIO)/linux/nrf24_hal_linux.c
 LINUX_FLAGS = -I$(LNX) -I$(RADIO)/linux
+TEXT = test_encoding_text
+TEXT_OBJ = build/text/encoding_stream.o build/text/encoding_stream_c.o
+LINUX_FLAGS += -I$(TEXT)
 
-.PHONY: test sim usb sample usb-xcheck clean linux e2e
+.PHONY: test sim usb sample usb-xcheck clean linux e2e encoding-e2e
 
 ifeq ($(shell uname -s),Linux)
 test: sim usb sample linux
@@ -35,9 +40,13 @@ endif
 
 linux: build/teamc-node build/mkstick
 
-build/teamc-node: $(PROTO) $(RADIO_SRC) $(USB) $(LINUX_SRC) $(FATFS_OBJ) $(wildcard src/*.h $(LNX)/*.h) $(RADIO)/nrf24_config.h
+build/teamc-node: $(PROTO) $(RADIO_SRC) $(USB) $(LINUX_SRC) $(FATFS_OBJ) $(TEXT_OBJ) $(wildcard src/*.h $(LNX)/*.h) $(TEXT)/encoding_stream_c.h $(RADIO)/nrf24_config.h
 	mkdir -p build
-	$(CC) $(CPPFLAGS) $(LINUX_FLAGS) $(CFLAGS) -o $@ $(PROTO) $(RADIO_SRC) $(USB) $(LINUX_SRC) $(FATFS_OBJ) -lz -lpthread
+	$(CC) $(CPPFLAGS) $(LINUX_FLAGS) $(CFLAGS) -o $@ $(PROTO) $(RADIO_SRC) $(USB) $(LINUX_SRC) $(FATFS_OBJ) $(TEXT_OBJ) -lz -lpthread -lstdc++
+
+build/text/%.o: $(TEXT)/%.cpp $(TEXT)/encoding_stream.hpp $(TEXT)/encoding_stream_c.h
+	mkdir -p build/text
+	$(CXX) -D_FILE_OFFSET_BITS=64 $(CXXFLAGS) -c -o $@ $<
 
 build/mkstick: $(LNX)/mkstick.c $(LNX)/stick.c $(USB) $(FATFS_OBJ) $(LNX)/stick.h src/usb_msc.h
 	mkdir -p build
@@ -45,6 +54,14 @@ build/mkstick: $(LNX)/mkstick.c $(LNX)/stick.c $(USB) $(FATFS_OBJ) $(LNX)/stick.
 
 e2e: linux sample
 	sh $(LNX)/e2e.sh
+
+build/test_text_bridge: tests/test_text_bridge.c src/codec.c src/codec.h $(TEXT_OBJ) $(TEXT)/encoding_stream_c.h
+	mkdir -p build
+	$(CC) $(CPPFLAGS) -I$(TEXT) $(CFLAGS) -o $@ tests/test_text_bridge.c src/codec.c $(TEXT_OBJ) -lz -lstdc++
+
+encoding-e2e: linux build/test_text_bridge
+	./build/test_text_bridge
+	$(PYTHON) $(LNX)/test_text_integration.py
 
 sim: build/sim
 

@@ -33,6 +33,7 @@
 #include <unistd.h>
 
 #include "codec.h"
+#include "encoding_stream_c.h"
 #include "link.h"
 #include "nm_gossip.h"
 #include "nm_log.h"
@@ -44,7 +45,7 @@
 #include "ui.h"
 #include "usb_msc.h"
 
-#define FIRMWARE "teamc-node 0.1 (Pi 3, 18-Oct-26)"
+#define FIRMWARE "teamc-node 0.2 (Pi 3, file/Unicode layer)"
 #define MAX_FILE (4u << 20)
 #define NM_FILE_NAME "NM_FILE.TXT"
 #define NM_LOG_NAME "NM_LOG.TXT"
@@ -55,6 +56,7 @@ static const nrf24_profile_t *const PROFILES[] = {&NRF24_PROFILE_TEAM_250K, &NRF
 
 typedef struct {
     const char *radio, *stick, *stick_out, *data, *box, *out_name, *i2c, *gpiochip;
+    const char *text_encoding, *text_bom_policy;
     const nrf24_profile_t *sri, *mrm;
     phy_nrf24_opts_t nrf;
     phy_udp_opts_t udp;
@@ -176,6 +178,77 @@ static void round_get(store_t *s, round_t *r)
 
 /* ---------------------------------------------------------------- stick */
 
+/* These fixed cache names belong to the application, never to the USB directory.
+ * The C++ layer checks the staged file before replacing a previous cache. */
+static int cache_path(store_t *st, const char *name, char *path, size_t capacity)
+{
+    int n = snprintf(path, capacity, "%s/%s", st->dir, name);
+    return n < 0 || (size_t)n >= capacity ? -1 : 0;
+}
+
+static int cache_write(store_t *st, const char *name, const uint8_t *p, uint32_t len, uint32_t crc)
+{
+    char path[256], error[256];
+    if (cache_path(st, name, path, sizeof path))
+        return -1;
+    mtp_text_file_info expected = {len, crc};
+    if (mtp_text_write_cache(path, p, expected, error, sizeof error)) {
+        logf_("file cache %s: %s", name, error);
+        return -1;
+    }
+    return 0;
+}
+
+static int cache_read(store_t *st, const char *name, const meta_t *m, uint8_t **p)
+{
+    char path[256], error[256];
+    *p = NULL;
+    if (m->len > MAX_FILE || cache_path(st, name, path, sizeof path))
+        return -1;
+    uint8_t *bytes = malloc(m->len ? m->len : 1u);
+    if (!bytes)
+        return -1;
+    mtp_text_file_info expected = {m->len, m->crc};
+    if (mtp_text_read_verified(path, expected, bytes, m->len, error, sizeof error)) {
+        logf_("file cache %s: %s", name, error);
+        free(bytes);
+        return -1;
+    }
+    *p = bytes;
+    return 0;
+}
+
+/* Text is an optional view on an already verified cache. An unresolved or invalid
+ * encoding never changes the original bytes or prevents their USB hand-in. */
+static void process_text(const opts_t *o, store_t *st, const char *base, int complete)
+{
+    char raw_name[64], json_name[64], text_name[64], source[256], destination[256];
+    char report[2048], error[256];
+    snprintf(raw_name, sizeof raw_name, "%s.bin", base);
+    snprintf(json_name, sizeof json_name, "%s.encoding.json", base);
+    snprintf(text_name, sizeof text_name, "%s.utf8.txt", base);
+    store_del(st, json_name);
+    store_del(st, text_name); /* A previous round's decoded text must not appear current. */
+    if (!complete || !strcmp(o->text_encoding, "none")) {
+        logf_("text %s: %s", base, complete ? "decoding disabled" : "partial file; decoding deferred");
+        return;
+    }
+    if (cache_path(st, raw_name, source, sizeof source) ||
+        cache_path(st, text_name, destination, sizeof destination))
+        return;
+    if (mtp_text_inspect(source, report, sizeof report, error, sizeof error)) {
+        logf_("text %s: inspection failed: %s", base, error);
+        return;
+    }
+    if (store_put(st, json_name, report, (uint32_t)strlen(report)))
+        logf_("text %s: cannot save encoding report", base);
+    logf_("text %s: %s", base, report);
+    if (mtp_text_decode_cache(source, destination, o->text_encoding, o->text_bom_policy, error, sizeof error))
+        logf_("text %s: UTF-8 view unavailable: %s", base, error);
+    else
+        logf_("text %s: UTF-8 view saved as %s (original bytes preserved)", base, text_name);
+}
+
 typedef struct {
     uint8_t *buf;
     uint32_t cap;
@@ -218,8 +291,12 @@ static int load_from_stick(const opts_t *o, store_t *st)
     }
     meta_t in = {{0}, len, crc, CODEC_NONE, len};
     snprintf(in.name, sizeof in.name, "%s", name);
-    store_put(st, "in.bin", m.buf, len);
-    meta_put(st, "in.meta", &in);
+    store_del(st, "in.meta");
+    store_del(st, "tx.meta");
+    if (cache_write(st, "in.bin", m.buf, len, crc)) {
+        free(m.buf);
+        return -1;
+    }
 
     /* One deflate stream at level 9; raw when that does not save at least 5 %. */
     uint8_t *z = NULL;
@@ -229,12 +306,18 @@ static int load_from_stick(const opts_t *o, store_t *st)
         tx.codec = CODEC_DEFLATE;
         tx.len = zlen;
         tx.crc = codec_crc32(z, zlen);
-        store_put(st, "tx.bin", z, zlen);
     } else {
         tx.crc = codec_crc32(m.buf, len);
-        store_put(st, "tx.bin", m.buf, len);
     }
-    meta_put(st, "tx.meta", &tx);
+    if (cache_write(st, "tx.bin", tx.codec == CODEC_DEFLATE ? z : m.buf, tx.len, tx.crc) ||
+        meta_put(st, "in.meta", &in) || meta_put(st, "tx.meta", &tx)) {
+        store_del(st, "in.meta");
+        store_del(st, "tx.meta");
+        free(z);
+        free(m.buf);
+        return -1;
+    }
+    process_text(o, st, "in", 1);
     logf_("setup: loaded %s (%u B, %u .txt on the stick) -> %u B to send (%s, %.2fx)", name, len, count, tx.len,
           tx.codec == CODEC_DEFLATE ? "deflate" : "raw", tx.len ? (double)len / tx.len : 0.0);
     free(z);
@@ -343,7 +426,15 @@ static int start_round(run_t *R, int fresh)
         nm_init(&R->nm, env, &nc);
         uint8_t *f = NULL;
         uint32_t n = 0;
-        if ((tx && store_get(R->st, "in.bin", &f, &n) == 0) || (!tx && store_get(R->st, "nm_rx.bin", &f, &n) == 0)) {
+        meta_t in;
+        int loaded = 0;
+        if (tx && meta_get(R->st, "in.meta", &in) == 0 && cache_read(R->st, "in.bin", &in, &f) == 0) {
+            n = in.len;
+            loaded = 1;
+        } else if (!tx && store_get(R->st, "nm_rx.bin", &f, &n) == 0) {
+            loaded = 1;
+        }
+        if (loaded) {
             if (nm_set_file(&R->nm, f, n))
                 logf_("NM: the file (%u B) is larger than %u chunks of %u B", n, NM_MAX_CHUNKS, NM_CHUNK);
             else
@@ -357,12 +448,12 @@ static int start_round(run_t *R, int fresh)
         radio_set_hooks(&R->radio, &h);
     } else if (tx) {
         uint32_t n = 0;
-        if (meta_get(R->st, "tx.meta", &R->tx_meta) || store_get(R->st, "tx.bin", &R->tx_data, &n) ||
-            n != R->tx_meta.len) {
+        if (meta_get(R->st, "tx.meta", &R->tx_meta) || cache_read(R->st, "tx.bin", &R->tx_meta, &R->tx_data)) {
             logf_("sender without a file: load one from a stick at setup");
             R->phy.close(R->phy.ctx);
             return -1;
         }
+        n = R->tx_meta.len;
         link_tx_init(&R->tx, env, &R->cfg, R->tx_data, n, R->tx_meta.crc, (uint8_t)R->tx_meta.codec, R->tx_meta.name);
         radio_hooks_t h = {&R->tx, h_tx_frame, h_tx_timer, h_tx_idle};
         radio_set_hooks(&R->radio, &h);
@@ -407,7 +498,7 @@ static int run_round(run_t *R)
             store_publish(R->st);
         int done = R->round.mode == MODE_NM ? nm_complete(&R->nm)
                    : R->round.role_tx    ? R->tx.state == LTX_DONE
-                                         : R->st->rx.committed && R->st->rx.committed == R->st->rx.len;
+                                         : R->st->rx.valid && R->st->rx.committed == R->st->rx.len;
         ui_leds(R->ui, (int)((now / 250000u) & 1u), done);   /* pilot light blinks while in Tx/Rx */
         if (done && !R->done_logged) {
             R->done_logged = 1;
@@ -453,7 +544,7 @@ static void stop_round(run_t *R)
 }
 
 /* After STOP: the receiver's file, or the NM copy and log, onto a stick. Returns when saved (or quit). */
-static void save_round(run_t *R)
+static int save_round(run_t *R)
 {
     const opts_t *o = R->o;
     const char *path = o->stick_out ? o->stick_out : o->stick;
@@ -466,17 +557,35 @@ static void save_round(run_t *R)
         uint32_t len = nm_complete(&R->nm) ? nm_get_file(&R->nm, nmf, sizeof nmf) : 0;
         nm_log_info_t info = {"Team C", o->box, FIRMWARE, len ? NM_FILE_NAME : ""};
         size_t ll = nm_log_format(&R->nm, &info, log, sizeof log);
-        if (len)
+        if (len) {
+            if (cache_write(R->st, "received.bin", nmf, len, codec_crc32(nmf, len)))
+                return -1;
+            process_text(o, R->st, "received", 1);
             files[n++] = (out_file_t){NM_FILE_NAME, nmf, len};
+        }
         files[n++] = (out_file_t){NM_LOG_NAME, (const uint8_t *)log, (uint32_t)ll};
     } else if (!R->round.role_tx) {
         link_rx_store_t *s = &R->st->rx;
         uint32_t len = s->committed;
         const uint8_t *data = s->buf;
-        if (s->codec == CODEC_DEFLATE && len) {
-            uint32_t cap = len * 20u > (16u << 20) ? len * 20u : (16u << 20);
-            raw = malloc(cap);
-            len = raw ? codec_inflate_prefix(s->buf, s->committed, raw, cap) : 0;
+        int complete = s->valid && s->committed == s->len;
+        if (complete && codec_crc32(s->buf, s->committed) != s->crc32) {
+            logf_("receiver: complete stream failed CRC-32; refusing to save corrupt data");
+            return -1;
+        }
+        if (s->codec != CODEC_NONE && s->codec != CODEC_DEFLATE) {
+            logf_("receiver: unsupported codec %u", s->codec);
+            return -1;
+        }
+        if (s->codec == CODEC_DEFLATE) {
+            raw = malloc(MAX_FILE);
+            if (!raw || (complete && codec_inflate_complete(s->buf, s->committed, raw, MAX_FILE, &len))) {
+                logf_("receiver: cannot recover a complete deflate stream");
+                free(raw);
+                return -1;
+            }
+            if (!complete)
+                len = codec_inflate_prefix(s->buf, s->committed, raw, MAX_FILE);
             data = raw;
         }
         if (o->out_name)
@@ -484,12 +593,24 @@ static void save_round(run_t *R)
         else
             snprintf(name, sizeof name, "RX_%s", s->name[0] ? s->name : "FILE.TXT");
         logf_("receiver: %u B received in order%s -> %s, %u B", s->committed, s->done ? " (complete)" : "", name, len);
-        if (s->valid)
+        if (s->valid) {
+            const char *base = complete ? "received" : "received-prefix";
+            const char *cache = complete ? "received.bin" : "received-prefix.bin";
+            if (!complete) {
+                store_del(R->st, "received.utf8.txt");
+                store_del(R->st, "received.encoding.json");
+            }
+            if (cache_write(R->st, cache, data, len, codec_crc32(data, len))) {
+                free(raw);
+                return -1;
+            }
+            process_text(o, R->st, base, complete);
             files[n++] = (out_file_t){name, data, len};
+        }
     }
     if (!n) {
         free(raw);
-        return;   /* the sender has nothing to hand in */
+        return 0;   /* the sender has nothing to hand in */
     }
     logf_("save: plug in the stick (%s)", path);
     int saved = 0, tried = 0;
@@ -514,6 +635,7 @@ static void save_round(run_t *R)
         ui_leds(R->ui, 0, 1);
     }
     free(raw);
+    return saved ? 0 : -1;
 }
 
 /* ---------------------------------------------------------------- main */
@@ -531,6 +653,8 @@ static void usage(void)
     fprintf(stderr, "usage: teamc-node [--radio nrf24|udp:PORT:PEER[,PEER]] [--stick DEV] [--stick-out DEV] [--data DIR]\n"
                     "  [--box NAME] [--sri-profile P] [--mrm-profile P] [--out-name NAME] [--rt CPU] [--i2c DEV]\n"
                     "  [--spidev DEV] [--gpiochip DEV] [--ce N] [--irq N]\n"
+                    "  [--text-encoding auto|none|utf-8|utf-16-le|utf-16-be|utf-32-le|utf-32-be]\n"
+                    "  [--text-bom-policy strict|longest] (decoded UTF-8 copies stay on the SD card)\n"
                     "  tests: [--sim-ui tx|rx sri|mrm|nm] [--go-after S] [--stop-after S] [--exit-after-save]\n"
                     "         [--loss P] [--busy P] [--seed N]\n");
 }
@@ -542,6 +666,8 @@ static int parse(opts_t *o, int argc, char **argv)
     o->stick = "/dev/sda";
     o->data = "/var/lib/teamc";
     o->box = "C1";
+    o->text_encoding = "auto";
+    o->text_bom_policy = "strict";
     o->gpiochip = "/dev/gpiochip0";
     o->i2c = "/dev/i2c-1";
     o->sri = &NRF24_PROFILE_TEAM_250K;
@@ -571,6 +697,15 @@ static int parse(opts_t *o, int argc, char **argv)
             o->box = v;
         } else if (!strcmp(a, "--out-name")) {
             o->out_name = v;
+        } else if (!strcmp(a, "--text-encoding")) {
+            if (strcmp(v, "auto") && strcmp(v, "none") && strcmp(v, "utf-8") && strcmp(v, "utf-16-le") &&
+                strcmp(v, "utf-16-be") && strcmp(v, "utf-32-le") && strcmp(v, "utf-32-be"))
+                return -1;
+            o->text_encoding = v;
+        } else if (!strcmp(a, "--text-bom-policy")) {
+            if (strcmp(v, "strict") && strcmp(v, "longest"))
+                return -1;
+            o->text_bom_policy = v;
         } else if (!strcmp(a, "--i2c")) {
             o->i2c = v;
         } else if (!strcmp(a, "--rt")) {
@@ -676,8 +811,8 @@ int main(int argc, char **argv)
                 int present = stick_present(o.stick);
                 if (present && !stick_seen) {
                     stick_seen = 1;
-                    if (load_from_stick(&o, &st) == 0)
-                        loaded = 1;
+                    int result = load_from_stick(&o, &st);
+                    loaded = result == 0 || meta_get(&st, "in.meta", &in) == 0;
                 } else if (!present) {
                     stick_seen = 0;
                 }
@@ -708,11 +843,13 @@ int main(int argc, char **argv)
         if (!run_round(R))
             break;   /* quit: the round stays active, so the next start resumes it */
         stop_round(R);
-        save_round(R);
+        int save_result = save_round(R);
         free(R->tx_data);
         R->tx_data = NULL;
-        if (o.exit_after_save)
+        if (o.exit_after_save) {
+            rc = save_result ? 1 : 0;
             break;
+        }
     }
     ui_close(&ui);
     store_close(&st);

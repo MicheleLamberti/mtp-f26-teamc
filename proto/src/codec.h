@@ -30,6 +30,8 @@ uint32_t codec_inflate_stream(uint32_t in_len, codec_src_fn src, void *sctx, cod
 /* Convenience wrappers over memory buffers (the simulator), built on the streaming calls. */
 int codec_deflate(const uint8_t *in, uint32_t n, int level, uint8_t **out, uint32_t *out_len);
 uint32_t codec_inflate_prefix(const uint8_t *in, uint32_t n, uint8_t *out, uint32_t cap);
+/* Complete files must reach the zlib end/checksum, consume all input and fit cap. */
+int codec_inflate_complete(const uint8_t *in, uint32_t n, uint8_t *out, uint32_t cap, uint32_t *out_len);
 uint32_t codec_crc32(const uint8_t *data, uint32_t n);
 
 #endif /* CODEC_H */

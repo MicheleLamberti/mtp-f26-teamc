@@ -137,6 +137,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
+- **20-Oct-26, Guillem: file/Unicode layer integrated into `teamc-node`.** C ABI links the C++17 module into the C node. Setup caches and sender reads check length/CRC; complete reception checks stream CRC and complete zlib decoding before SD/USB export. Encoding reports and strict UTF-8 views remain on the SD card; ambiguous/invalid text still transfers unchanged. `--text-encoding` and `--text-bom-policy` select view policy. Partial STOP and the existing resume store remain in place. CI includes whole-node encoding cases plus the existing SRI/MRM/reboot/NM e2e suite; physical Pi/USB validation is still pending.
+
 - **20-Oct-26, Guillem: team-repository migration.** Write access is available. The encoding/file-stream work is incorporated into `SantiBarrios2002/mtp-f26-teamc`, retaining both its original commits and the team's newer hardware/export changes. Task 11's own report and validation are now versioned under `docs/task_11_unicode/`; external sources remain local. Continue work directly on this repository's `main`.
 
 - **19-Oct-26, Guillem: encoding/file-stream test layer.** `proto/test_encoding_text/` adds equivalent Python and C++17 APIs for binary streams, checked file reconstruction, BOM/candidate inspection and separate UTF-8 decoding. Native host and interoperability tests pass; Linux CI and ARM cross-builds are included. It is standalone and does not change the radio or `teamc-node` runtime. Usage is in `proto/test_encoding_text/guide/main.pdf` with LaTeX source alongside. The local documentation is organised under `docs/course_material`, `docs/encoding_references` and `docs/task_11_unicode`; original course sources remain git-ignored.
@@ -249,6 +251,11 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
       before installing; `mcp-openems` as a free cross-check. Nothing installed yet.
 
 ## Session log
+
+### 2026-10-20 — Guillem: integrate the file/Unicode module into the node
+- Added a C ABI around the existing C++ implementation and linked it into `teamc-node` without compiling its C sources as C++. Application-owned SD caches use verified staging before replacement; prepared sender caches are rechecked at GO.
+- Complete reception checks the announced stream CRC and requires a complete valid zlib stream before exporting original bytes. Partial STOP still hands in the ordered/decompressed prefix. Optional strict decoding produces separate SD-card views and reports; unknown encodings never block byte-preserving hand-in.
+- Added C bridge/complete-deflate checks and whole-node FatFs/UDP tests for Unicode/BOM policies, empty/malformed files, disabled decoding, a corrupt sender cache and partial STOP. CI also runs existing reboot and NM scenarios; updated the LaTeX usage/integration guide. Hardware testing remains pending.
 
 ### 2026-10-20 — Guillem: consolidate the fork into the team repository
 - Cloned the current team repository and merged the fork's two commits without rewriting either history. Kept Santiago's newer carrier, hardware proposal and export tooling changes.

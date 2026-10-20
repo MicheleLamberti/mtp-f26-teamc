@@ -120,3 +120,22 @@ uint32_t codec_crc32(const uint8_t *data, uint32_t n)
 {
     return (uint32_t)crc32(0L, data, n);
 }
+
+int codec_inflate_complete(const uint8_t *in, uint32_t n, uint8_t *out, uint32_t cap, uint32_t *out_len)
+{
+    z_stream z;
+    memset(&z, 0, sizeof z);
+    *out_len = 0;
+    if (inflateInit(&z) != Z_OK)
+        return -1;
+    z.next_in = (Bytef *)(uintptr_t)in;
+    z.avail_in = n;
+    z.next_out = out;
+    z.avail_out = cap;
+    int result = inflate(&z, Z_FINISH);
+    int ok = result == Z_STREAM_END && z.avail_in == 0;
+    if (ok)
+        *out_len = (uint32_t)z.total_out;
+    inflateEnd(&z);
+    return ok ? 0 : -1;
+}

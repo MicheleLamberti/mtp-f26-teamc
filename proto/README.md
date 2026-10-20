@@ -10,6 +10,7 @@ https://claude.ai/artifact/6g1P41SGs1eGf9Jme8YsAK
 make test                     # build, generate sample files, run the simulator suite and the usb_msc tests (~2 s)
 make linux                    # the Pi 3 program build/teamc-node + build/mkstick (port/linux/README.md)
 make e2e                      # whole nodes against each other over the emulated UDP radio (~3 min)
+make encoding-e2e             # node file/Unicode integration, corruption checks and partial STOP
 make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip install pyfatfs "setuptools<81")
 ./build/sim sri --loss 0.1 --blackout 20:30 --rx-reboot 40
 ./build/sim sri --codec none --profile 1m --file my_file.txt
@@ -18,6 +19,7 @@ make usb-xcheck PYTHON=...    # usb_msc vs pyfatfs on FAT16/FAT32 images (pip in
 ./build/sim nm --nodes 12 --p1 0.2 --p2 0.8 --seed 7
 ```
 Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator only).
+The Linux node also needs a C++17 compiler and libstdc++; `build-essential` supplies both on Raspberry Pi OS.
 
 ## Layout
 
@@ -37,7 +39,7 @@ Needs gcc, make, zlib (`libz-dev`) and Python 3 with `pypdf` (sample generator o
 | `sim/sim.c` | Discrete-event channel: half-duplex radios, airtime from `radio/fw` (nRF24), collisions, loss, bursts, blackout, reboots; FHSS + LBT radio layer (D-R6, the SRI/MRM baseline). |
 | `sim/main.c` | Scenarios, competition-style scoring, CLI, test suite. |
 | `tools/make_sample.py` | 10 000 × 100 B test file from the course PDFs (UTF-8 or UTF-16). |
-| `test_encoding_text/` | Python/C++ byte-stream and Unicode test layer for Pi 3: discovery, BOM inspection, checked file reconstruction and separate UTF-8 decoding. Run `make -C test_encoding_text test`; usage and integration notes are in `test_encoding_text/guide/main.pdf` (LaTeX source alongside). |
+| `test_encoding_text/` | Python/C++ file/Unicode layer and C bridge linked into `teamc-node`: verified SD caches, sender reads, BOM inspection and separate UTF-8 views. Run `make -C test_encoding_text test` and `make encoding-e2e`; usage is in `test_encoding_text/guide/main.pdf` (LaTeX source alongside). |
 
 Scoring follows the rules: at STOP the receiver's bytes are decompressed and compared with
 the original, and only the first continuous run of identical lines counts.
