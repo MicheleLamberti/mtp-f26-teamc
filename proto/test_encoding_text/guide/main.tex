@@ -1,0 +1,180 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage[margin=22mm]{geometry}
+\usepackage{booktabs,tabularx,hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\title{File Streaming and Unicode Tests\\\large Raspberry Pi 3 -- Team C}
+\author{Guillem Moreno}
+\date{October 2026}
+\begin{document}
+\maketitle
+\section{Scope}
+This directory provides equivalent Python 3.10+ and C++17 implementations for
+reading a file as bytes, supplying a transport stream, reconstructing the original
+file, identifying Unicode encoding candidates and producing a separate UTF-8 text
+copy. Both endpoints may run Raspberry Pi OS on a Pi 3.
+
+The transmitted stream is exactly the source file, including any BOM, NUL bytes
+and original line endings. It contains no new header, filename or encoding tag.
+The caller supplies the original byte count and CRC-32 separately. These values
+are application metadata for this test harness, not a proposed radio frame format.
+CRC-32 detects accidental corruption; it is not authentication.
+
+The implementation uses bounded buffers: 4,096 bytes by default, configurable from
+1 byte to 1 MiB. Inspection makes several streaming validation passes rather than
+loading the whole file. Source files must remain unchanged during inspection and
+transfer. A size/CRC check detects changes between preparation and transmission.
+
+\section{Build and run on Raspberry Pi OS}
+Run from the repository root:
+\begin{verbatim}
+sudo apt-get install build-essential python3
+make -C proto/test_encoding_text test
+cd proto/test_encoding_text
+python3 generate_samples.py build/samples
+python3 encoding_stream.py inspect build/samples/utf-8_bom.txt
+./build/encoding_stream inspect build/samples/utf-8_bom.txt
+\end{verbatim}
+The Python implementation uses only the standard library. The C++ implementation
+has no external library dependencies. Build it with a native Pi compiler;
+the supplied CI also builds ARM32 hard-float and AArch64 executables. Cross-builds
+are compile checks, not evidence of execution on a Pi or a physical USB stick.
+
+Both command-line programs expose the same commands and emit JSON results.
+Use \texttt{--help} for arguments. The examples below use the Python script.
+The C++ executable is \texttt{build/encoding\_stream}.
+
+\begin{verbatim}
+python3 encoding_stream.py discover /media/pi/INPUT
+python3 encoding_stream.py copy input.txt recovered.txt
+python3 encoding_stream.py send input.txt stream.bin
+\end{verbatim}
+Discovery accepts exactly one regular \texttt{.txt} file in the specified directory
+(case-insensitive extension). It ignores directories and symlinks, and rejects
+zero or multiple candidates. An explicit source path bypasses discovery.
+
+\texttt{send} prints the byte count and CRC-32. Pass those exact values to
+\texttt{receive}; for example, the nine bytes \texttt{123456789} have length 9 and
+CRC-32 \texttt{cbf43926}:
+\begin{verbatim}
+python3 encoding_stream.py receive stream.bin recovered.txt \
+    --size 9 --crc32 cbf43926
+\end{verbatim}
+Use \texttt{-} as the stream path to read standard input or write standard output.
+When sending to stdout, metadata is printed to stderr so it cannot contaminate
+the byte stream. The stream may be moved between machines by the existing
+transport; a pipe or stream file is sufficient for local testing.
+
+\section{Encoding selection}
+The supported encodings are UTF-8, UTF-16 LE/BE and UTF-32 LE/BE. The operating
+system reads bytes; the application chooses how those bytes are interpreted.
+The inspection result includes all matching BOM signatures, all syntactically
+valid encodings, the automatic selection if available, and a detection status.
+
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Status & Meaning\\
+\midrule
+\texttt{bom} & One valid BOM interpretation.\\
+\texttt{ambiguous\_bom} & Multiple valid interpretations of an initial signature.\\
+\texttt{invalid\_bom} & Recognised signature, but no valid matching text.\\
+\texttt{unique\_valid} & Exactly one valid candidate within the five supported encodings.\\
+\texttt{ambiguous} & No BOM and several valid candidates.\\
+\texttt{invalid} & No supported encoding validates.\\
+\texttt{empty} & No bytes from which to infer an encoding.\\
+\bottomrule
+\end{tabularx}
+
+Automatic selection is conservative. Missing BOMs do not imply UTF-8.
+For example, \texttt{41 00} can be UTF-8 A followed by NUL or UTF-16 LE A.
+Similarly, \texttt{FF FE 00 00 41 00 00 00} permits a UTF-32 LE BOM plus A,
+or a UTF-16 LE BOM plus NUL, A, NUL. Strict automatic decoding rejects this
+overlap. Use an explicitly declared encoding to resolve it:
+\begin{verbatim}
+python3 encoding_stream.py decode recovered.txt display.txt \
+    --encoding utf-16-le --chunk-size 3
+\end{verbatim}
+The optional \texttt{--bom-policy longest} applies a conventional longest-signature
+rule. It is suitable only when that convention is agreed for the input files;
+it does not prove the source encoding. A unique valid candidate without a BOM is
+also a conclusion limited to the supported set, not a universal detector.
+
+Decoding validates strictly: malformed sequences, truncated code units, isolated
+surrogates, overlong UTF-8 and values above U+10FFFF cause an error. NUL and Unicode
+noncharacters remain valid. The decoder maintains state across chunks, including
+split UTF-8 sequences and UTF-16 surrogate pairs.
+
+The decoded output is a separate UTF-8 file. One initial BOM is consumed by
+default; \texttt{--keep-bom} retains the initial U+FEFF as text. Interior U+FEFF,
+combining sequences and line endings are preserved. The original file is never
+normalised, re-encoded or overwritten.
+
+\section{Receiver and filesystem behaviour}
+\texttt{FileReceiver} accepts ordered data with byte offsets. Gaps, duplicate
+offsets, out-of-order chunks and excess data are rejected. The transport must
+perform ordering, deduplication and retries before delivering bytes to this layer.
+Finalisation checks the expected length and CRC-32, flushes and syncs the file,
+then reads it back for verification.
+
+Data is first written to \texttt{destination.part}, created exclusively.
+An existing final file or partial file is never overwritten. On success, Linux
+\texttt{renameat2(RENAME\_NOREPLACE)} publishes the result, and the parent directory
+is synced. Raspberry Pi OS must provide this operation on the destination
+filesystem. Unsupported publication or sync operations are reported as errors.
+
+A normal exception removes the partial file owned by that operation. A killed
+process or power loss can leave a partial file; inspect it and remove it explicitly
+before retrying. This test layer does not implement resume. If directory sync fails
+after publication, the complete final file can exist although the operation
+reports failure. It must be inspected before a retry. Safely unmount USB media
+after files are closed.
+
+Incomplete transfers are not published as complete files. The existing competition
+node can save a received prefix at STOP; that policy is separate from this
+complete-file receiver and must not be silently replaced by it.
+
+\section{API integration}
+Python exposes \texttt{file\_info}, \texttt{file\_chunks}, \texttt{send\_file},
+\texttt{FileReceiver}, \texttt{inspect\_file} and \texttt{decode\_file}.
+C++ exposes equivalent functions in namespace \texttt{mtp\_text}.
+\begin{verbatim}
+# Python: ordered payload delivery by the existing transport.
+info = file_info(source_path)
+with FileReceiver(destination_path, info) as receiver:
+    for offset, payload in transport_payloads:
+        receiver.accept(offset, payload)
+    receiver.finish()
+\end{verbatim}
+Here \texttt{transport\_payloads} represents the transport adapter, not a function
+implemented by this test package. The C++ sender takes a byte-sink callback; the
+receiver takes \texttt{accept(offset, data, length)}. Both expose a finalisation
+call that the adapter invokes only when transfer completion has been established.
+
+The repository already supplies \texttt{proto/src/codec.c} and
+\texttt{proto/port/linux/store.c}. When using its compression path, compression
+operates on the original byte stream and decompression precedes this receiver's
+file checks. Existing radio frames, retransmission state and compressed-stream
+metadata are unchanged. This package is a test harness and reusable API; it is
+not wired into \texttt{teamc-node} automatically.
+
+This harness uses files on a mounted filesystem. The existing node accesses its
+USB stick through FatFs as a raw block device. Do not use both paths concurrently
+on the same mounted device. Integration must use one ownership model consistently.
+
+\section{Validation}
+\texttt{make test} builds the C++ program and API checks, then runs Python unit
+tests and cross-language tests. Cases include all five encodings with and without
+BOMs; empty and BOM-only files; NUL, combining marks, emoji and mixed line endings;
+overlapping and incomplete signatures; malformed sequences; short writes;
+truncation, corruption and excess data; existing destinations and publication
+races; offsets and file discovery. Differential tests compare both inspectors on
+fixed and deterministic random inputs. Streaming tests cover multi-megabyte files.
+
+Run the tests on both Pis and on the actual destination filesystem before hardware
+integration. Host tests and ARM compilation do not verify radio timing, physical
+USB behaviour or resilience to a real power interruption.
+\end{document}

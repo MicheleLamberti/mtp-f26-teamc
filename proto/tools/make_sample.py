@@ -40,7 +40,10 @@ def corpus_words() -> list[str]:
         import pypdf
         logging.getLogger("pypdf").setLevel(logging.ERROR)
         for name in PDFS:
-            for page in pypdf.PdfReader(DOCS / name).pages:
+            path = DOCS / "course_material" / name
+            if not path.is_file():
+                path = DOCS / name  # Existing checkouts may still use the original layout.
+            for page in pypdf.PdfReader(path).pages:
                 text.append(page.extract_text() or "")
     except (ImportError, FileNotFoundError, OSError):
         print("course PDFs not found in docs/: using this repository's own documents as the corpus")

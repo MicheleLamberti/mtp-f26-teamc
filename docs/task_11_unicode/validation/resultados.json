@@ -1,0 +1,707 @@
+{
+  "python": "3.12.14",
+  "sample_files": 21,
+  "fragment_sizes_bytes": [
+    1,
+    2,
+    3,
+    7,
+    31,
+    64,
+    255
+  ],
+  "fragmentation_cases": 147,
+  "passed": 172,
+  "total": 172,
+  "scope": "Software local; sin validacion de hardware, radio, CRC ni retransmisiones.",
+  "checks": [
+    {
+      "prueba": "BOM y validacion estricta utf-8",
+      "ok": true
+    },
+    {
+      "prueba": "BOM y validacion estricta utf-16-le",
+      "ok": true
+    },
+    {
+      "prueba": "BOM y validacion estricta utf-16-be",
+      "ok": true
+    },
+    {
+      "prueba": "BOM y validacion estricta utf-32-le",
+      "ok": true
+    },
+    {
+      "prueba": "BOM y validacion estricta utf-32-be",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-8_con_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-le_con_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-16-be_con_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-le_con_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf-32-be_con_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: ascii_sin_bom.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: vacio.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_invalido.bin, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_incompleto.bin, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_surrogate_aislado.bin, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf32le_fuera_rango.bin, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nul_y_sin_salto_final.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfc.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf8_nfd.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: utf16le_falso_lf.txt, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 1",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 2",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 3",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 7",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 31",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 64",
+      "ok": true
+    },
+    {
+      "prueba": "Bytes exactos: todos_los_bytes.bin, bloque 255",
+      "ok": true
+    },
+    {
+      "prueba": "Sin BOM no se afirma una codificacion",
+      "ok": true
+    },
+    {
+      "prueba": "ASCII par tambien admite lecturas UTF-16",
+      "ok": true
+    },
+    {
+      "prueba": "BOM largo antes del corto",
+      "ok": true
+    },
+    {
+      "prueba": "Se conserva ambiguedad de firma FF FE",
+      "ok": true
+    },
+    {
+      "prueba": "UTF-8 overlong se rechaza",
+      "ok": true
+    },
+    {
+      "prueba": "UTF-16 surrogate aislado se rechaza",
+      "ok": true
+    },
+    {
+      "prueba": "UTF-32 mayor que U+10FFFF se rechaza",
+      "ok": true
+    },
+    {
+      "prueba": "BOM invalido no dispara conversion",
+      "ok": true
+    },
+    {
+      "prueba": "Equivalencia visual no implica bytes iguales",
+      "ok": true
+    },
+    {
+      "prueba": "Convertir CRLF a LF cambia el archivo",
+      "ok": true
+    },
+    {
+      "prueba": "Un fragmento UTF-8 puede ser invalido aunque el texto completo sea valido",
+      "ok": true
+    },
+    {
+      "prueba": "Decodificacion incremental conserva un caracter partido",
+      "ok": true
+    },
+    {
+      "prueba": "0A suelto da un falso salto en UTF-16",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador exacto: iguales",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador exacto: byte alterado",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador exacto: truncado",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador exacto: byte extra",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador exacto: vacio",
+      "ok": true
+    },
+    {
+      "prueba": "Comparador: ambos vacios",
+      "ok": true
+    },
+    {
+      "prueba": "Archivo de 1 MB y bloques de 255 bytes",
+      "ok": true
+    }
+  ]
+}

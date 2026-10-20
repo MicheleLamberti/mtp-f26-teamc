@@ -1,0 +1,11 @@
+{
+  "compiler": "tectonic",
+  "exit_code": 0,
+  "pdf": "docs/task_11_unicode/report/main.pdf",
+  "pages": 3,
+  "visual_review": "Three-page report compiled successfully. Updated Section 5 on filesystem APIs, binary reading and BOM-based decoder selection reviewed on page 3; no clipping, overlaps, missing glyphs or layout warnings.",
+  "layout_warnings": [],
+  "bom_overlap_example_verified": true,
+  "no_bom_ambiguity_example_verified": true,
+  "binary_save_example_samples_verified": 21
+}

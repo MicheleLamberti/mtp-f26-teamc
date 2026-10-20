@@ -1,6 +1,11 @@
 # Course material (copyrighted: rules, slides, AN5142, CNAF poster) - get it from Atenea
 docs/*
 !docs/README.md
+!docs/AGENTS.md
+!docs/.gitattributes
+!docs/.gitignore
+!docs/task_11_unicode/
+docs/task_11_unicode/source_images/
 
 # Build output and generated test data
 build/

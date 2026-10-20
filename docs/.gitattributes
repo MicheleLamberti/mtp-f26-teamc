@@ -1,0 +1,7 @@
+# Keep authored text portable; preserve encoding fixtures byte-for-byte.
+task_11_unicode/report/*.tex text eol=lf
+task_11_unicode/research_tools/*.py text eol=lf
+task_11_unicode/validation/*.json text eol=lf
+task_11_unicode/validation/muestras/** binary
+course_material/** -text
+encoding_references/** -text

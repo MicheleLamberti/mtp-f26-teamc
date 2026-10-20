@@ -39,6 +39,9 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - `docs/` — course material: competition rules PDF, Session #1 and PM slides, AN5142
   (annotated PDF + course-corrected `.xls`), CNAF poster, Project Definition example, `.mpp`
   example plan.
+  Guillem's own Task 11 report, LaTeX sources, research tools and validation are tracked in
+  `docs/task_11_unicode/`. Local originals are organised in `docs/course_material/`,
+  `docs/encoding_references/` and `docs/task_11_unicode/source_images/` and remain ignored.
 - `radio/linkbudget.py` — course-corrected AN5142 model (no 1/2 factor in flat-earth,
   |cos| worst-case ground bounce). `SCENARIOS` and `FRAMING` live here. Run
   `python3 radio/linkbudget.py`.
@@ -128,10 +131,15 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - Treat anything not in the Project Definition or confirmed by Santiago as a proposal.
 - Git repo: https://github.com/SantiBarrios2002/mtp-f26-teamc (public, created 9-Oct-26). Early commits
   may go straight to main (Santiago, 9-Oct); never force-push. **Keep one branch, `main`** (Santiago, 16-Oct): a
-  session that works in a worktree branch fast-forwards `main` to it at the end and deletes the branch. `docs/` is
-  git-ignored (copyrighted course material). Put PDF exports of the pages in `briefs/` too.
+  session that works in a worktree branch fast-forwards `main` to it at the end and deletes the branch.
+  Original course material and downloaded reference files in `docs/` are git-ignored;
+  the team's own Task 11 report and reproducible validation are tracked. Put PDF exports of the pages in `briefs/` too.
 
 ## Status (keep current)
+
+- **20-Oct-26, Guillem: team-repository migration.** Write access is available. The encoding/file-stream work is incorporated into `SantiBarrios2002/mtp-f26-teamc`, retaining both its original commits and the team's newer hardware/export changes. Task 11's own report and validation are now versioned under `docs/task_11_unicode/`; external sources remain local. Continue work directly on this repository's `main`.
+
+- **19-Oct-26, Guillem: encoding/file-stream test layer.** `proto/test_encoding_text/` adds equivalent Python and C++17 APIs for binary streams, checked file reconstruction, BOM/candidate inspection and separate UTF-8 decoding. Native host and interoperability tests pass; Linux CI and ARM cross-builds are included. It is standalone and does not change the radio or `teamc-node` runtime. Usage is in `proto/test_encoding_text/guide/main.pdf` with LaTeX source alongside. The local documentation is organised under `docs/course_material`, `docs/encoding_references` and `docs/task_11_unicode`; original course sources remain git-ignored.
 
 **9-Oct-26: BAND SWITCH to 2.4 GHz.** All four teams (us + 3 others) chose 2.4 GHz for every mode;
 868 MHz is dropped (kept in `radio/DECISIONS.md` as superseded history). Everything below is the 2.4 GHz baseline.
@@ -241,6 +249,19 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
       before installing; `mcp-openems` as a free cross-check. Nothing installed yet.
 
 ## Session log
+
+### 2026-10-20 — Guillem: consolidate the fork into the team repository
+- Cloned the current team repository and merged the fork's two commits without rewriting either history. Kept Santiago's newer carrier, hardware proposal and export tooling changes.
+- Versioned the Task 11 report/PDF, LaTeX source, research tools and validation; retained local course/reference originals in separate ignored folders. Added the report's 172 checks to the Linux workflow alongside the encoding, radio/protocol and ARM build checks.
+- The simulator's sample generator accepts course PDFs in `docs/course_material/` and retains support for the original `docs/` layout.
+- Preserved a verified Git bundle and a hash-checked archive of ignored/local files before retiring the fork checkout. Use the team repository as the sole working remote after migration.
+
+### 2026-10-19 — Guillem: file streaming and Unicode test layer
+- Work continues on `unworthyzeus/mtp-f26-teamc` until team-repository write access is available. The first Linux CI run exposed a GCC warning/error in the CLI's `fclose` deleter; replaced its function-pointer template argument with a lambda while retaining `-Werror`.
+- Added `proto/test_encoding_text/` with matching Python and C++17 APIs/CLIs, generated samples, receiver checks and differential/interoperability tests. Raw bytes, BOMs, NULs and line endings are preserved; decoding writes a separate UTF-8 copy and does not silently choose an ambiguous format.
+- The receiver validates length and CRC-32, checks saved bytes and publishes without overwriting an existing file. It expects ordered payloads from the transport; radio framing, retries, compression and partial-prefix scoring remain with the existing protocol.
+- Local Windows host validation: C++ API checks and all 12 Python/interoperability test methods passed. Added Linux CI for the new tests, existing radio/protocol suites and both Pi ARM cross-builds. Physical Pi/USB/radio validation is still required.
+- Added a three-page LaTeX usage and integration guide. Migrated local course sources, encoding references and Task 11 report/validation into separate `docs/` subfolders; these remain ignored by Git.
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
