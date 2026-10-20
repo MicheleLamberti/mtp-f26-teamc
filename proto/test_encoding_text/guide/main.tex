@@ -203,12 +203,14 @@ proto/build/teamc-node --data /data/teamc \
 proto/build/teamc-node --data /data/teamc \
     --text-encoding utf-16-le
 \end{verbatim}
+\begin{minipage}{\linewidth}
 The default is strict automatic selection. These optional settings disable text
 processing or select the previously described longest-signature convention:
 \begin{verbatim}
 --text-encoding none
 --text-bom-policy longest
 \end{verbatim}
+\end{minipage}
 These options affect text views only. Discovery
 on the raw USB stick keeps the node's existing largest-\texttt{.txt} rule; the
 standalone directory-discovery command still requires a single candidate.
