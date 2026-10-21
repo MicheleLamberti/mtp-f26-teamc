@@ -263,28 +263,6 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 ## Session log
 
-### 2026-10-20 — Guillem: refresh the repository READMEs
-- Updated the main status/layout and links for the integrated Linux node, file/Unicode APIs, Task 11 report and current hardware proposal. Added C++17 dependencies and the standalone/integrated test commands.
-- Documented node encoding flags, original USB bytes versus SD reports/UTF-8 views, partial STOP behaviour and staging-file recovery. Clarified that physical Pi/radio/USB validation remains pending.
-
-### 2026-10-20 — Guillem: integrate the file/Unicode module into the node
-- Added a C ABI around the existing C++ implementation and linked it into `teamc-node` without compiling its C sources as C++. Application-owned SD caches use verified staging before replacement; prepared sender caches are rechecked at GO.
-- Complete reception checks the announced stream CRC and requires a complete valid zlib stream before exporting original bytes. Partial STOP still hands in the ordered/decompressed prefix. Optional strict decoding produces separate SD-card views and reports; unknown encodings never block byte-preserving hand-in.
-- Added C bridge/complete-deflate checks and whole-node FatFs/UDP tests for Unicode/BOM policies, empty/malformed files, disabled decoding, a corrupt sender cache and partial STOP. CI also runs existing reboot and NM scenarios; updated the LaTeX usage/integration guide. Hardware testing remains pending.
-
-### 2026-10-20 — Guillem: consolidate the fork into the team repository
-- Cloned the current team repository and merged the fork's two commits without rewriting either history. Kept Santiago's newer carrier, hardware proposal and export tooling changes.
-- Versioned the Task 11 report/PDF, LaTeX source, research tools and validation; retained local course/reference originals in separate ignored folders. Added the report's 172 checks to the Linux workflow alongside the encoding, radio/protocol and ARM build checks.
-- The simulator's sample generator accepts course PDFs in `docs/course_material/` and retains support for the original `docs/` layout.
-- Preserved a verified Git bundle and a hash-checked archive of ignored/local files before retiring the fork checkout. Use the team repository as the sole working remote after migration.
-
-### 2026-10-19 — Guillem: file streaming and Unicode test layer
-- Work continues on `unworthyzeus/mtp-f26-teamc` until team-repository write access is available. The first Linux CI run exposed a GCC warning/error in the CLI's `fclose` deleter; replaced its function-pointer template argument with a lambda while retaining `-Werror`.
-- Added `proto/test_encoding_text/` with matching Python and C++17 APIs/CLIs, generated samples, receiver checks and differential/interoperability tests. Raw bytes, BOMs, NULs and line endings are preserved; decoding writes a separate UTF-8 copy and does not silently choose an ambiguous format.
-- The receiver validates length and CRC-32, checks saved bytes and publishes without overwriting an existing file. It expects ordered payloads from the transport; radio framing, retries, compression and partial-prefix scoring remain with the existing protocol.
-- Local Windows host validation: C++ API checks and all 12 Python/interoperability test methods passed. Added Linux CI for the new tests, existing radio/protocol suites and both Pi ARM cross-builds. Physical Pi/USB/radio validation is still required.
-- Added a three-page LaTeX usage and integration guide. Migrated local course sources, encoding references and Task 11 report/validation into separate `docs/` subfolders; these remain ignored by Git.
-
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
 
@@ -306,6 +284,28 @@ what's pending.
 - Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK; carrier ERC unchanged (schematic not touched).
 - **Start next session with:** ET owner for the review + order (early Nov)? box inside dimensions; SP4 measured;
   breakout made? T0.
+
+### 2026-10-20 — Guillem: refresh the repository READMEs
+- Updated the main status/layout and links for the integrated Linux node, file/Unicode APIs, Task 11 report and current hardware proposal. Added C++17 dependencies and the standalone/integrated test commands.
+- Documented node encoding flags, original USB bytes versus SD reports/UTF-8 views, partial STOP behaviour and staging-file recovery. Clarified that physical Pi/radio/USB validation remains pending.
+
+### 2026-10-20 — Guillem: integrate the file/Unicode module into the node
+- Added a C ABI around the existing C++ implementation and linked it into `teamc-node` without compiling its C sources as C++. Application-owned SD caches use verified staging before replacement; prepared sender caches are rechecked at GO.
+- Complete reception checks the announced stream CRC and requires a complete valid zlib stream before exporting original bytes. Partial STOP still hands in the ordered/decompressed prefix. Optional strict decoding produces separate SD-card views and reports; unknown encodings never block byte-preserving hand-in.
+- Added C bridge/complete-deflate checks and whole-node FatFs/UDP tests for Unicode/BOM policies, empty/malformed files, disabled decoding, a corrupt sender cache and partial STOP. CI also runs existing reboot and NM scenarios; updated the LaTeX usage/integration guide. Hardware testing remains pending.
+
+### 2026-10-20 — Guillem: consolidate the fork into the team repository
+- Cloned the current team repository and merged the fork's two commits without rewriting either history. Kept Santiago's newer carrier, hardware proposal and export tooling changes.
+- Versioned the Task 11 report/PDF, LaTeX source, research tools and validation; retained local course/reference originals in separate ignored folders. Added the report's 172 checks to the Linux workflow alongside the encoding, radio/protocol and ARM build checks.
+- The simulator's sample generator accepts course PDFs in `docs/course_material/` and retains support for the original `docs/` layout.
+- Preserved a verified Git bundle and a hash-checked archive of ignored/local files before retiring the fork checkout. Use the team repository as the sole working remote after migration.
+
+### 2026-10-19 — Guillem: file streaming and Unicode test layer
+- Work continues on `unworthyzeus/mtp-f26-teamc` until team-repository write access is available. The first Linux CI run exposed a GCC warning/error in the CLI's `fclose` deleter; replaced its function-pointer template argument with a lambda while retaining `-Werror`.
+- Added `proto/test_encoding_text/` with matching Python and C++17 APIs/CLIs, generated samples, receiver checks and differential/interoperability tests. Raw bytes, BOMs, NULs and line endings are preserved; decoding writes a separate UTF-8 copy and does not silently choose an ambiguous format.
+- The receiver validates length and CRC-32, checks saved bytes and publishes without overwriting an existing file. It expects ordered payloads from the transport; radio framing, retries, compression and partial-prefix scoring remain with the existing protocol.
+- Local Windows host validation: C++ API checks and all 12 Python/interoperability test methods passed. Added Linux CI for the new tests, existing radio/protocol suites and both Pi ARM cross-builds. Physical Pi/USB/radio validation is still required.
+- Added a three-page LaTeX usage and integration guide. Migrated local course sources, encoding references and Task 11 report/validation into separate `docs/` subfolders; these remain ignored by Git.
 
 ### 2026-10-19 (KiCad session) — SP4 breakout ready, Pi 3 A+ HAT carrier drafted
 - Ran `hw/KICAD_SESSION_PROMPT.md` v2 as lead with 7 subagents (research ×3: power, Pi/SP4/mechanics, UI/sensing;
