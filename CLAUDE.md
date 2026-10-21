@@ -114,6 +114,10 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 - **Pi 3 switch page** (artifact, private — for the whole team): https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw
   — source `radio/pi3_impact.html` (v0.1 18-Oct: what a Raspberry Pi 3 instead of the Pico 2 changes; styles copied from
   `hw_proposal.html`). Assumes the WiFi/BT chip is disabled or desoldered (Atenea Q22).
+- **Carrier rev A page** (artifact, private — for ET / the whole team): https://claude.ai/artifact/NeS65Jp2GF4pEAVRZ6z5ER
+  — source `radio/carrier_breakdown.html` (21-Oct: full hardware breakdown of one box and the carrier, power chain,
+  pin map, net classes, cost, the routing decisions of 21-Oct, 5 review points; renders as page files; styles from
+  `hw_proposal.html`). Keep in sync with `hw/DESIGN_NOTES.md`.
 - PDF/HTML exports of the pages: `briefs/` (PDF) and the Windows folder (HTML + PDF + workbooks), light theme, headless
   Chromium from `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`, mermaid@11.4.1 from jsDelivr; the export
   script is `tools/export_page.py <page.html> <out-dir> "<name>" [img.png=path ...]` (wraps the page in a doctype with

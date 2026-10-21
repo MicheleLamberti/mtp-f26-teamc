@@ -1,0 +1,294 @@
+<title>Team C Carrier Rev A</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the team pages' system (radio brief, hardware proposal): one reading column (~74ch), wide tables and figures break out to 1040px. */
+:root{
+  --bg:#f6f7f7; --panel:#ffffff; --ink:#14191b; --ink-2:#4b5559; --ink-3:#768186;
+  --rule:#dfe3e4; --rule-2:#eceff0; --accent:#0e5b6b; --accent-wash:#e3eff1;
+  --ok:#0b7a3b; --ok-wash:#e4f3ea; --warn:#9a5b00; --warn-wash:#fbf0dc; --mute-wash:#eceff0;
+  --f-display:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121617; --panel:#1a1f21; --ink:#eef2f3; --ink-2:#b4bec2; --ink-3:#8a969b;
+  --rule:#2d3538; --rule-2:#232a2c; --accent:#6cc3d3; --accent-wash:#16343a;
+  --ok:#5fd18d; --ok-wash:#173327; --warn:#f0b452; --warn-wash:#3a2c13; --mute-wash:#232a2c;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121617; --panel:#1a1f21; --ink:#eef2f3; --ink-2:#b4bec2; --ink-3:#8a969b;
+  --rule:#2d3538; --rule-2:#232a2c; --accent:#6cc3d3; --accent-wash:#16343a;
+  --ok:#5fd18d; --ok-wash:#173327; --warn:#f0b452; --warn-wash:#3a2c13; --mute-wash:#232a2c;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.col{max-width:74ch}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,4.4vw,2.9rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:700;margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--rule)}
+h3{font-size:1.05rem;font-weight:700;margin-top:1.6rem}
+p{margin:.7rem 0}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+.eyebrow{font:500 .75rem/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:.9rem;color:var(--ink-2);font-size:.9rem}
+.meta b{font-weight:600;color:var(--ink)}
+.lede{font-size:1.08rem;color:var(--ink-2);margin-top:1rem}
+.mono{font-family:var(--f-mono);font-size:.92em}
+.num{font-family:var(--f-mono);font-size:.92em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sub{color:var(--ink-3);font-size:.84rem}
+
+.status{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.2rem}
+.chip{display:inline-flex;align-items:baseline;gap:8px;background:var(--panel);border:1px solid var(--rule);border-radius:999px;padding:5px 12px;font-size:.88rem}
+.chip b{font-family:var(--f-mono);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;align-self:center}
+.dot.warn{background:var(--warn)}
+
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px;margin-top:1.4rem}
+figure{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:10px;min-width:0}
+figure img{display:block;width:100%;height:auto;border-radius:3px}
+figcaption{margin-top:6px}
+
+.tbl{overflow-x:auto;margin-top:1rem;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule-2)}
+th{font:600 .74rem/1.3 var(--f-body);letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+td.total{font-weight:600;border-top:2px solid var(--rule)}
+
+.mermaid-wrap{margin-top:1.2rem;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto}
+ol.steps,ul.tight{padding-left:1.25rem}
+ol.steps li,ul.tight li{margin:.35rem 0}
+ol.steps li::marker{font-family:var(--f-mono);color:var(--ink-3)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-wash);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:1rem;font-size:.93rem}
+pre.cmd{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;overflow-x:auto;font:400 .84rem/1.5 var(--f-mono);margin:.8rem 0}
+footer{margin-top:3rem;color:var(--ink-3);font-size:.82rem;border-top:1px solid var(--rule);padding-top:1rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="col">
+  <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
+  <h1>The Pi 3 A+ HAT carrier, rev A</h1>
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>State</b> Wed 21 Oct 2026</span></div>
+  <p class="lede">The full hardware of one Team C box, the board that carries it, and every layout decision made while finishing the routing on 21 Oct. The schematic and the part choices are the 19 Oct ones, already reviewed. This page explains what is on the board and why, so you can review it and place the fab order.</p>
+  <div class="status" aria-label="Board status">
+    <span class="chip"><span class="dot"></span>DRC <b>0</b> violations · <b>0</b> unconnected · <b>0</b> parity</span>
+    <span class="chip"><span class="dot"></span>ERC <b>0</b></span>
+    <span class="chip"><span class="dot"></span>Gerbers + drill + placement ready</span>
+    <span class="chip"><span class="dot"></span>≈ <b>€102</b> per box (cap €150)</span>
+    <span class="chip"><span class="dot warn"></span>ET review: <b>5</b> points, then order early Nov</span>
+  </div>
+</header>
+
+<div class="figs">
+  <figure><img src="carrier_top.png" alt="Top view of the routed carrier: the 40-pin header along the top edge, the boost converter and ideal diode top-left, the battery connector and USB-C on the left edge, three panel connectors along the bottom, the SP4 radio module bottom-right with its antenna socket at the corner" loading="lazy"><figcaption class="sub">Top, 65 × 56 mm. The buck-boost option (not fitted) shows as bare pads in the middle.</figcaption></figure>
+  <figure><img src="carrier_stack.png" alt="The carrier mounted on a Raspberry Pi 3 A+, the 2 × 20 socket filling the 11 mm gap between the boards" loading="lazy"><figcaption class="sub">On the Pi 3 A+ (simplified Pi model): 11 mm stack on an 8.5 mm socket.</figcaption></figure>
+</div>
+
+<section class="col" aria-labelledby="s-box">
+  <h2 id="s-box">What goes in one box</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Computer</td><td>Raspberry Pi 3 Model A+ (ordered)</td><td>Linux, our program <span class="mono">teamc-node</span>. Its WiFi/BT chip is disabled in software or desoldered (Atenea Q22 still open).</td></tr>
+      <tr><td>Storage</td><td>SanDisk Ultra 32 GB A1 microSD (ordered)</td><td>Read-only root plus a data partition; taped in for the drop test.</td></tr>
+      <tr><td>Carrier</td><td>Our 2-layer HAT on the 40-pin header</td><td>Power, radio, fuel gauge, charger, protection, panel connectors. This page.</td></tr>
+      <tr><td>Radio</td><td>Ebyte E01-ML01SP4 (ordered)</td><td>Genuine nRF24L01+ with PA and LNA, 14.5 × 18 mm, soldered on the carrier.</td></tr>
+      <tr><td>Antenna</td><td>Ebyte TX2400-FPC-2509 flex (ordered)</td><td>Stuck on a box wall, vertical, plugged into the module's IPEX socket. Molex 146153 is the fallback.</td></tr>
+      <tr><td>Battery</td><td>One protected 18650, ≥ 3000 mAh</td><td>MPD BH-18650-PC holder on the box floor, JST-VH lead to the carrier. A second cell goes in parallel in the harness.</td></tr>
+      <tr><td>Panel</td><td>Power toggle, GO/STOP button, TX/RX role toggle, 3-position mode toggle</td><td>Nut-clamped in the box wall, JST-XH leads to the carrier.</td></tr>
+      <tr><td>Box</td><td>IKEA 365+ (15 × 15 × 7 cm)</td><td>Pi on M2.5 standoffs, HAT on four 11 mm standoffs.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="s-power">
+  <div class="col"><h2 id="s-power">Power</h2>
+  <p>Everything runs from one Li-ion cell, 3.0–4.2 V. The Pi needs a steady 5 V and draws 0.3–1 A; the radio needs its own clean 3.3 V and pulls 120 mA bursts when it transmits.</p></div>
+  <div class="mermaid-wrap">
+<pre class="mermaid">
+flowchart LR
+  CELL["18650 cell&lt;br/&gt;3.0–4.2 V"] -- "J20 JST-VH" --> F1["F1 fuse 5 A"]
+  F1 --> Q1["Q1 Si2333DDS&lt;br/&gt;reverse-cell FET"]
+  USBC["USB-C, charge only&lt;br/&gt;ESD on CC1/CC2/VBUS"] --> CHG["U1 MCP73831&lt;br/&gt;charger 452 mA"]
+  CHG --> Q1
+  Q1 -- VBAT --> FG["U6 MAX17048&lt;br/&gt;fuel gauge"]
+  Q1 -- VBAT --> Q2["Q2 Si2333DDS&lt;br/&gt;load switch, soft start"]
+  TGL["Panel power toggle"] --> Q2
+  Q2 -- VBAT_SW --> BST["U2 TPS61022&lt;br/&gt;boost 5.1 V"]
+  BST -- 5V_BOOST --> ZVD["Ideal diode&lt;br/&gt;Q4 + U3 BCM857BS"]
+  ZVD -- "5V_PI" --> PI["Pi header&lt;br/&gt;pins 2 + 4"]
+  Q2 -- VBAT_SW --> LDO["U4 TLV75533&lt;br/&gt;LDO 3.3 V"]
+  LDO -- "R14 0 Ω" --> RAD["3V3_RADIO&lt;br/&gt;SP4 pad 1"]
+  Q2 -. "option, not fitted" .-> BB["U5 TPS63001&lt;br/&gt;buck-boost"]
+  BB -. "R16 0 Ω" .-> RAD
+</pre>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Stage</th><th>Parts</th><th>Why this way</th></tr></thead>
+    <tbody>
+      <tr><td>Cell input</td><td>J20 JST-VH, F1 5 A fast fuse, D3 TVS</td><td>Header pins 2/4 bypass the Pi's own polyfuse, so nothing else would limit a short on 5 V.</td></tr>
+      <tr><td>Reverse cell</td><td>Q1 Si2333DDS P-FET</td><td>A cell put in backwards does nothing. ≤ 40 mΩ at −2.5 V, so it still works near an empty cell.</td></tr>
+      <tr><td>Power switch</td><td>Q2 Si2333DDS P-FET, R8 100 k, R9 10 k, C18 100 nF</td><td>The panel toggle only carries the gate current. About 1 ms soft start, so a protected cell does not trip on the inrush. Q1 + Q2 drop ≈ 0.15 V at 2 A (AO3401A fits the same footprint, at about twice the drop).</td></tr>
+      <tr><td>Pi 5 V</td><td>U2 TPS61022, L1 Würth 1 µH / 11.5 A, 750 k / 100 k divider, 3 × 22 µF + 100 µF out</td><td>5.10 V, forced PWM (MODE tied to VIN). Sized for 2 A from the cell at 3.0 V; copper areas around the IC as in TI's layout.</td></tr>
+      <tr><td>Back-power block</td><td>Q4 P-FET + U3 BCM857BS (the Pi 3B's ideal diode), D2 TVS, 100 µF</td><td>The A+ has no ideal diode. With it, a micro-USB supply plugged into the Pi cannot push current into our boost. Rule still: HAT on, never plug the micro-USB.</td></tr>
+      <tr><td>Radio 3.3 V</td><td>U4 TLV75533 LDO, R14 0 Ω, 100 µF + 10 µF + 100 nF at the module</td><td>Never the cell, never the Pi's 3V3 pin. ≈ 65 mV dropout at 150 mA: clean 3.3 V down to a 3.4 V cell, 2.95 V at the 3.0 V cutoff, still inside the SP4's 2.0–3.6 V.</td></tr>
+      <tr><td>Buck-boost option</td><td>U5 TPS63001, L2, C13–C16, R15, R16 (all not fitted)</td><td>Fit R16 instead of R14 only if the T0 bench test shows more than 2 dB less output at a 3.0 V cell.</td></tr>
+      <tr><td>Charger</td><td>U1 MCP73831-2, RPROG 2.21 k, J2 USB-C (GCT USB4125), CC 5.1 kΩ, U12 SP0504 ESD</td><td>452 mA (expect 250–300 mA when it warms up). No power path: charge with the box switched off.</td></tr>
+      <tr><td>Battery sense</td><td>U6 MAX17048 on I2C1 (0x36), alert to GPIO 25</td><td>The Pi has no ADC. It reads cell voltage and state of charge; never set its sleep mode.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="s-radio">
+  <div class="col"><h2 id="s-radio">Radio and Pi interface</h2>
+  <p>The SP4 sits bottom-right, its IPEX socket at the board corner and at least 45 mm from the Pi's wireless chip. No track runs under the module on either layer (Ebyte's layout rule); ground pour and vias do. SPI has 33 Ω series resistors; CSN and IRQ have 10 kΩ pull-ups to the Pi's own 3.3 V, so an unpowered Pi is not fed through them.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Function</th><th>BCM GPIO</th><th>Header pin</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>SPI0 SCK / MOSI / MISO</td><td class="num">11 / 10 / 9</td><td class="num">23 / 19 / 21</td><td>To SP4 pads 4 / 5 / 6</td></tr>
+      <tr><td>Radio CSN / CE / IRQ</td><td class="num">8 / 22 / 24</td><td class="num">24 / 15 / 18</td><td>CSN is SPI0 CE0</td></tr>
+      <tr><td>I2C SDA / SCL</td><td class="num">2 / 3</td><td class="num">3 / 5</td><td>Fuel gauge</td></tr>
+      <tr><td>GO/STOP button</td><td class="num">17</td><td class="num">11</td><td rowspan="3">Inputs active low: 10 k pull-up, 1 k series, 100 nF, SP0504 ESD at the connector. Mode on two GPIOs (SRI / MRM / NM).</td></tr>
+      <tr><td>TX/RX role toggle</td><td class="num">27</td><td class="num">13</td></tr>
+      <tr><td>Mode toggle</td><td class="num">23 + 16</td><td class="num">16 + 36</td></tr>
+      <tr><td>LEDs activity / status</td><td class="num">5 / 6</td><td class="num">29 / 31</td><td>Active high, 330 Ω</td></tr>
+      <tr><td>Fuel-gauge alert</td><td class="num">25</td><td class="num">22</td><td>Open drain, 10 k pull-up</td></tr>
+      <tr><td>Charger status</td><td class="num">26</td><td class="num">37</td><td>Through a 2N7002: 1 = charging or no USB, 0 = done</td></tr>
+      <tr><td>Console UART TX / RX</td><td class="num">14 / 15</td><td class="num">8 / 10</td><td>J13, bench only</td></tr>
+      <tr><td>Power</td><td>—</td><td class="num">2 + 4, 17</td><td>5V_PI in; 3V3 from pin 17 for pull-ups only (pin 1 unused)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="s-board">
+  <div class="col"><h2 id="s-board">The board</h2>
+  <p>65 × 56 mm in the official HAT outline with M2.5 holes on 58 × 49 mm, 2 layers, 1.6 mm. 696 track segments (1.67 m), 146 vias, ground pours on both layers. It is drawn for a JLCPCB-class fab: at the lab-safe 0.3 mm rules this board does not route, and its two 0.5 mm-pitch chips need 0.15 mm and plated vias anyway.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Net class</th><th class="r">Track</th><th class="r">Clearance</th><th>Nets</th></tr></thead>
+    <tbody>
+      <tr><td>Power</td><td class="num r">1.0 mm</td><td class="num r">0.2 mm</td><td>5V_PI, BAT_IN, BAT_RAW (the battery path itself is 1.0–1.5 mm)</td></tr>
+      <tr><td>PowerFine</td><td class="num r">0.4 mm</td><td class="num r">0.15 mm</td><td>Power nets that land on a 0.5 mm-pitch pad: SW_NODE, 5V_BOOST, VBAT_SW, VBAT, buck-boost VOUT/SW</td></tr>
+      <tr><td>Radio3V3</td><td class="num r">0.5 mm</td><td class="num r">0.2 mm</td><td>3V3_RADIO, LDO_OUT</td></tr>
+      <tr><td>FinePitch</td><td class="num r">0.2 mm</td><td class="num r">0.15 mm</td><td>Signals on the small chips and the USB-C: FB, I2C, FG_ALRT, CC1/CC2, VBUS_USB, VINA</td></tr>
+      <tr><td>Ground</td><td class="num r">—</td><td class="num r">—</td><td>GND: pours on both layers, not routed</td></tr>
+      <tr><td>Default</td><td class="num r">0.25 mm</td><td class="num r">0.2 mm</td><td>Everything else, including SPI and the radio lines</td></tr>
+    </tbody>
+  </table></div>
+  <p class="col sub">Board minimums: 0.2 mm track, 0.8 / 0.4 mm vias, 0.5 mm to the edge, 0.8 mm text. JLCPCB allows 0.1 / 0.1 mm.</p>
+
+  <h3 class="col">Where things sit</h3>
+  <ul class="tight col">
+    <li><b>Top-left, by header pins 2/4:</b> the boost in TI's layout (inductor above the IC, input cap at VIN, output caps under VOUT) and the ideal diode.</li>
+    <li><b>Left edge:</b> battery lead J20 → fuse → Q1 → Q2, then the charger and the USB-C below them.</li>
+    <li><b>Middle:</b> fuel gauge U6, radio LDO U4, the buck-boost option U5 (not fitted), test points TP1–TP3.</li>
+    <li><b>Bottom edge:</b> panel connectors J22 (power), J10 (button), J11 (role), J12 (mode).</li>
+    <li><b>Bottom-right:</b> the SP4 with its IPEX at the corner; under the header: the pull-ups and the UART header J13.</li>
+  </ul>
+
+  <h3 class="col">The SP4 breakout (bench board)</h3>
+  <p class="col">Single-sided, 31 × 37.5 mm, lab-safe 0.3 / 0.4 mm rules, DRC 0. A 1 × 8 header in the usual nRF24 pin order plus a 1 × 2 bench-supply header, with 10 µF + 100 nF + 100 µF at the supply. It is ready to etch in the lab (gerbers and 1:1 copper PDFs in <span class="mono">hw/sp4-breakout/fab/</span>) and carries the radio for the T0 and T2 bench tests before the carrier exists.</p>
+</section>
+
+<section aria-labelledby="s-budget">
+  <div class="col"><h2 id="s-budget">Power budget and cost</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>5 V load</th><th class="r">Cell 4.2 V</th><th class="r">3.6 V</th><th class="r">3.3 V</th><th class="r">3.0 V</th></tr></thead>
+    <tbody>
+      <tr><td>0.5 A (typical)</td><td class="num r">0.76 A</td><td class="num r">0.87 A</td><td class="num r">0.94 A</td><td class="num r">1.03 A</td></tr>
+      <tr><td>1.0 A (realistic peak)</td><td class="num r">1.40 A</td><td class="num r">1.63 A</td><td class="num r">1.78 A</td><td class="num r">1.97 A</td></tr>
+    </tbody>
+  </table></div>
+  <p class="col">Design point: 2 A from the cell. One 3000 mAh cell holds about 9.9 Wh usable: <b>≈ 5.0 h at 2.0 W, 4.1 h at 2.4 W</b>. A competition day fits on one cell if the box is switched off between rounds (boot ≤ 10 s target), or on two cells in parallel.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Group</th><th class="r">€ / box</th></tr></thead>
+    <tbody>
+      <tr><td>Raspberry Pi 3 A+</td><td class="num r">27.00</td></tr>
+      <tr><td>PCB (counted at the lab's fixed €15 by the rules; a fab is ≈ €1)</td><td class="num r">15.00</td></tr>
+      <tr><td>Battery and holder</td><td class="num r">10.94</td></tr>
+      <tr><td>Panel controls</td><td class="num r">8.70</td></tr>
+      <tr><td>Harness and mechanics (box, standoffs, crimps, glue)</td><td class="num r">8.56</td></tr>
+      <tr><td>5 V boost and back-power block</td><td class="num r">7.51</td></tr>
+      <tr><td>microSD</td><td class="num r">6.00</td></tr>
+      <tr><td>Radio module and antenna</td><td class="num r">4.31</td></tr>
+      <tr><td>Fuel gauge</td><td class="num r">4.05</td></tr>
+      <tr><td>Header, UART, test points</td><td class="num r">3.75</td></tr>
+      <tr><td>Battery path (fuse, FETs, TVS, connectors)</td><td class="num r">2.21</td></tr>
+      <tr><td>Charger and USB-C</td><td class="num r">1.88</td></tr>
+      <tr><td>On-board UI (connectors, ESD, LEDs)</td><td class="num r">1.87</td></tr>
+      <tr><td>Radio LDO</td><td class="num r">0.44</td></tr>
+      <tr><td class="total">Total, against the €150 cap</td><td class="num r total">≈ 102</td></tr>
+    </tbody>
+  </table></div>
+  <p class="col sub">Prices excluding VAT, 19 Oct, from <span class="mono">hw/BOM.csv</span>. Check stock before ordering: the TPS61022 and Si2333DDS showed 0 at DigiKey.</p>
+</section>
+
+<section aria-labelledby="s-decisions">
+  <div class="col"><h2 id="s-decisions">Decisions made finishing the routing (21 Oct)</h2>
+  <p>On 19 Oct the power path and SPI were routed and about 30 small nets were left for you. Finishing them changed the layout in the places below. The schematic, the parts, the outline and the rule values did not change.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Decision</th><th>Why</th><th>Effect for you</th></tr></thead>
+    <tbody>
+      <tr><td><b>Net classes rewritten</b></td><td>A <span class="mono">/power/*</span> pattern had put every net of the power sheet in the 1 mm class: FET gates, the charge LED, PROG, the charger status. The fine-pitch class was 0.4 mm wide. This, not board space, is why no router could finish.</td><td>Classes as in the table above, in <span class="mono">build_carrier.py</span>.</td></tr>
+      <tr><td><b>An autorouter for the small nets</b></td><td>Freerouting routed every net except power and ground. The power copper stayed fixed; ground is left to the pours. Its clearances were padded by 10–20 µm, because it rounds a few µm under the rule, and its 0.19 mm neck-downs at pads were widened back to 0.2 mm.</td><td>Correct but not pretty: some lines detour (about 60 mm on the mode, role and charger-status lines). Tidy with push-and-shove if you like.</td></tr>
+      <tr><td><b>SPI and radio lines autorouted at 0.25 mm</b></td><td>Of about 10 routing variants, keeping only the power copper fixed left the fewest open connections.</td><td>7–64 mm long, fine for SPI at a few MHz; the 33 Ω series resistors are in place.</td></tr>
+      <tr><td><b>Fuel gauge ground pins tied to its exposed pad</b></td><td>U6 pins 1, 4 and 6 are GND. Short 0.2 mm tracks under the package join them to the centre pad, which has a via. Pin 6's outward stub went, which freed the way out for FG_ALRT (pin 5).</td><td>Standard practice; FG_ALRT now leaves east to a via.</td></tr>
+      <tr><td><b>Buck-boost option rearranged</b> (all not fitted)</td><td>L2 turned 90° and moved 0.5 mm, as in TI's layout, so each pad faces its pin. C15 turned 180°. U5's GND pins tied to its centre pad. One 3V3_RADIO via moved onto R16's pad edge (R16 is a 0 Ω link, not fitted). R15's VBAT_SW feed became a 0.25 mm track instead of a 1 mm branch, which is enough for a 100 Ω filter.</td><td>Only matters if T0 says to fit the buck-boost.</td></tr>
+      <tr><td><b>Two FET gates routed by hand</b></td><td>The ideal-diode gate (ZVD_G) and the power-switch gate (PWR_G) sit inside the wide power copper, so the autorouter could not reach them; the project's own grid router did.</td><td>None.</td></tr>
+      <tr><td><b>Ground joined explicitly</b></td><td>Signal tracks cut the pours into pieces. 71 GND vias plus 57 short GND tracks (76 mm in total) join every piece to the main ground. KiCad's own connectivity checked it, not an estimate.</td><td>Two places hang on these thin links: review point 1 below.</td></tr>
+      <tr><td><b>Silkscreen</b></td><td>Labels at 1.0 mm, or 0.8 mm where tight (the board's minimum), kept clear of pads, vias and other silk.</td><td>59 labels on the board; 26 with no room are on the assembly drawing only.</td></tr>
+      <tr><td><b>3D models</b></td><td>Our own models for the SP4, the MAX17048, the JST-VH connector and a simplified Pi 3 A+. Four stock models do not exist in KiCad's library and have close stand-ins (renders only).</td><td>Renders with every part body.</td></tr>
+      <tr><td><b>Fab outputs for a JLCPCB-class fab</b></td><td>2 layers, 1.6 mm, HASL, 1 oz, green mask, white silk. The placement file uses JLCPCB's columns and leaves the not-fitted parts out.</td><td>The zip uploads as-is.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="col" aria-labelledby="s-review">
+  <h2 id="s-review">Before you order</h2>
+  <ol class="steps">
+    <li><b>Ground links.</b> The radio LDO's ground (U4 pin 2, C11, C12) and the area under the middle of the header (J1 pins 20/25, C50–C52, J13) reach the main ground through short GND tracks and vias. Thicken them or add vias if you see a better path.</li>
+    <li><b>Charger heat.</b> U1 (MCP73831) only has the pour around it; add copper if you want the full 452 mA instead of its thermal fold-back.</li>
+    <li><b>Track tidy-up</b> (optional). Shorten the autorouter's detours; run DRC after every change.</li>
+    <li><b>Box.</b> Measure the IKEA box inside and fix the panel-connector positions (J10–J12, J22) before freezing the outline.</li>
+    <li><b>One SP4 measured</b> (14.5 mm, IPEX position ±0.5 mm) before the order.</li>
+  </ol>
+  <div class="callout"><b>Still open outside the board:</b> stock for TPS61022 and Si2333DDS (AO3401A fallback) and the fuse part number; Atenea Q22 on the Pi's WiFi/BT chip, before Quick Mode on 6 Nov. Order in early November to have boards in week 8–9.</div>
+</section>
+
+<section class="col" aria-labelledby="s-files">
+  <h2 id="s-files">Files</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>Where in the repo</th></tr></thead>
+    <tbody>
+      <tr><td>Design notes (start here)</td><td class="mono">hw/DESIGN_NOTES.md</td></tr>
+      <tr><td>KiCad project, schematic PDF</td><td class="mono">hw/teamc-carrier/</td></tr>
+      <tr><td>Gerbers + drill, ready to upload</td><td class="mono">hw/teamc-carrier/teamc-carrier_gerbers.zip</td></tr>
+      <tr><td>Placement, assembly PDF, copper PDFs, BoM</td><td class="mono">hw/teamc-carrier/fab/</td></tr>
+      <tr><td>Renders</td><td class="mono">hw/teamc-carrier/teamc-carrier_render_*.png</td></tr>
+      <tr><td>Breakout (lab)</td><td class="mono">hw/sp4-breakout/fab/</td></tr>
+      <tr><td>Full BoM</td><td class="mono">hw/BOM.csv</td></tr>
+    </tbody>
+  </table></div>
+  <p>The schematic is generated from Python: edit <span class="mono">hw/teamc-carrier/sheets/*.py</span>, then run the build. The board scripts run in this order:</p>
+<pre class="cmd">python3 hw/scripts/build_carrier.py        # schematic, ERC, board footprints
+python3 hw/scripts/place_carrier.py        # placement, pours
+python3 hw/scripts/route_carrier.py        # power path
+python3 hw/scripts/autoroute_carrier.py    # Freerouting (needs Java 25 + the jar)
+python3 hw/scripts/finish_carrier.py       # last pins, ground, clean-up
+python3 hw/scripts/silk_carrier.py
+python3 hw/scripts/fab_carrier.py
+python3 hw/scripts/render_board.py hw/teamc-carrier/teamc-carrier.kicad_pcb --with-pi</pre>
+  <p class="sub">The autorouter is not deterministic: a rerun gives a different, equivalent board, and the hand fixes are tied to today's placement. Check DRC after every rerun, or edit the board in the KiCad GUI instead.</p>
+</section>
+
+<footer>
+  <p>Repository: <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw">github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw</a>. Context: <a href="https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb">Team C Hardware Proposal v0.7</a> (rules, micro options, risks, build stages) and the <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a> page.</p>
+  <p>Carrier rev A, 21 Oct 2026. A proposal from the radio team; electronics owns the board.</p>
+</footer>
+</div>
