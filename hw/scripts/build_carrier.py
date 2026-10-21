@@ -29,6 +29,21 @@ NET = os.path.join(DIR, "build", NAME + ".net")
 POWER_NETS = ["VBAT", "VBAT_SW", "BAT_RAW", "5V_BOOST", "5V_PI", "SW_NODE", "/power/BAT_RAW", "/power/5V_BOOST",
               "/power/SW_NODE", "/power/BAT2_RAW"]
 
+# (name, track width, nets, clearance), highest priority first. Only the real power nets are wide: a "/power/*"
+# pattern (19-Oct) also caught the gate, LED and status nets and gave them 1 mm tracks the autorouter could not fit.
+NET_CLASSES = [
+    # power nets that reach a 0.5 mm-pitch pad (TPS61022, TPS63001, MAX17048): 0.4 mm, necked at the pad
+    ("PowerFine", 0.4, ["/power/SW_NODE", "/power/5V_BOOST", "VBAT_SW", "VBAT", "/power/BB_OUT", "/power/BB_SW1",
+                        "/power/BB_SW2"], 0.15),
+    # signals on those parts and the USB-C
+    ("FinePitch", 0.2, ["/power/FB", "/power/BB_VINA", "FG_ALRT", "I2C_SCL", "I2C_SDA", "/power/CC1", "/power/CC2",
+                        "VBUS_USB"], 0.15),
+    ("Power", 1.0, ["5V_PI", "/power/BAT_IN", "/power/BAT_RAW"]),
+    ("Radio3V3", 0.5, ["3V3_RADIO", "/power/LDO_OUT"]),
+    # the pours; its own class so the autorouter can be told to leave it alone
+    ("Ground", 0.4, ["GND"]),
+]
+
 
 def build(names):
     return [importlib.import_module(n).build() for n in names]
@@ -58,15 +73,16 @@ def main():
     ap.add_argument("--sheet", help="build one sheet alone into --out and run ERC")
     ap.add_argument("--out", default=os.path.join(DIR, "build", "sheet"))
     ap.add_argument("--no-board", action="store_true")
+    ap.add_argument("--rules-only", action="store_true", help="only rewrite the net classes in the .kicad_pro")
     a = ap.parse_args()
     if a.sheet:
         one_sheet(a.sheet, a.out)
         return
     os.makedirs(os.path.join(DIR, "build"), exist_ok=True)
     bu.write_lib_tables(DIR)
-    from route_carrier import FINE_NETS
-    bu.set_project_rules(PRO, rules=bu.FAB_RULES, classes=[("FinePitch", 0.4, FINE_NETS, 0.15), ("Power", 1.0, ["VBAT", "VBAT_SW", "5V_PI", "/power/*"]),
-                                       ("Radio3V3", 0.5, ["3V3_RADIO"])])
+    bu.set_project_rules(PRO, rules=bu.FAB_RULES, classes=NET_CLASSES)
+    if a.rules_only:
+        return
     Project(NAME, build(SHEETS), title="Team C Pi 3 A+ HAT carrier (DRAFT – for ET review)").write(DIR)
     rpt = os.path.join(DIR, "build", "erc.rpt")
     print(bu.run("kicad-cli", "sch", "erc", "--severity-all", "-o", rpt, SCH))

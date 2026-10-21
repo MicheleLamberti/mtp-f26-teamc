@@ -61,6 +61,12 @@ def pad(fp, num, shape, x, y, w, h, layers, rr=None, extra=""):
             f'\t\t(layers {lay}){r}\n\t\t(uuid "{U(fp, "pad", num, x, y)}")\n\t)\n')
 
 
+def model(name):
+    """3D model from hw/lib/teamc.3dshapes (gen_3d.py); both boards sit one level below hw/."""
+    return (f'\t(model "${{KIPRJMOD}}/../lib/teamc.3dshapes/{name}.wrl"\n\t\t(offset\n\t\t\t(xyz 0 0 0)\n\t\t)\n'
+            '\t\t(scale\n\t\t\t(xyz 1 1 1)\n\t\t)\n\t\t(rotate\n\t\t\t(xyz 0 0 0)\n\t\t)\n\t)\n')
+
+
 def header(name, descr, tags):
     return (f'(footprint "{name}"\n\t(version 20260206)\n\t(generator "pcbnew")\n\t(generator_version "10.0")\n'
             f'\t(layer "F.Cu")\n\t(descr "{descr}")\n\t(tags "{tags}")\n')
@@ -125,7 +131,8 @@ def sp4():
           '\t\t(placement\n\t\t\t(enabled no)\n\t\t\t(sheetname "")\n\t\t)\n'
           '\t\t(fill\n\t\t\t(thermal_gap 0.5)\n\t\t\t(thermal_bridge_width 0.5)\n\t\t\t(island_removal_mode 0)\n\t\t)\n'
           '\t\t(polygon\n\t\t\t(pts\n\t\t\t\t(xy -7.25 -7.8) (xy 7.25 -7.8) (xy 7.25 9) (xy -7.25 9)\n\t\t\t)\n\t\t)\n\t)\n')
-    s += "\t(embedded_fonts no)\n)\n"
+    s += "\t(embedded_fonts no)\n"
+    s += model(n) + ")\n"
     return n, s
 
 
@@ -165,7 +172,8 @@ def max17048():
     for x in (-0.2, 0.2):
         for y in (-0.33, 0.33):
             s += pad(n, "", "roundrect", x, y, 0.32, 0.52, ["F.Paste"], rr=0.25)
-    s += "\t(embedded_fonts no)\n)\n"
+    s += "\t(embedded_fonts no)\n"
+    s += model(n) + ")\n"
     return n, s
 
 

@@ -243,4 +243,15 @@
 		(uuid "549c6cea-405e-5c0c-aa59-50bfcb9d7105")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/../lib/teamc.3dshapes/MAX17048_TDFN-8-1EP_2x2mm.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

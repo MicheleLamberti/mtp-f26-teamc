@@ -21,3 +21,6 @@ __pycache__/
 # Windows download markers
 *:Zone.Identifier
 *Zone.Identifier
+
+# KiCad stock 3D models fetched by hw/scripts/fetch_3d.py
+hw/.3dmodels/
