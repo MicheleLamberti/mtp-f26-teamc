@@ -536,6 +536,396 @@
 			)
 		)
 	)
+	(footprint "teamc:E01-ML01SP4"
+		(layer "F.Cu")
+		(uuid "477b9582-859a-4709-94d9-0484034584f7")
+		(at 100 100)
+		(descr "Ebyte E01-ML01SP4 nRF24L01P + PA/LNA 2.4 GHz module, castellated SMD 14.5x18.0 mm, IPEX; per Ebyte E01-ML01SP4 user manual rev 1.7 sect. 3 p.4 (pads 1-8 P1.27 on the short edge, GND 9/10 on the long edges 13.0 mm from the pad edge); hand-solder lands (signal pads 1.2 mm outside the outline); top-layer keep-out for tracks under the module (manual sect. 4.1)")
+		(tags "Ebyte E01-ML01SP4 nRF24L01P nRF24L01+ PA LNA 2.4GHz castellated hand-solder")
+		(property "Reference" "U1"
+			(at 0 -11.6 0)
+			(layer "F.SilkS")
+			(uuid "dff1c0b2-ab8f-43e9-a934-288e10c61944")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "E01-ML01SP4"
+			(at 0 10.4 0)
+			(layer "F.Fab")
+			(uuid "01ef5668-df69-4e2c-b28e-c875622076ff")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.cdebyte.com/products/E01-ML01SP4"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e79a4a69-0da8-4b37-aa41-9172fe84450b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Ebyte nRF24L01P + PA/LNA 2.4 GHz module, SMD castellated 14.5x18 mm, IPEX"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ecb4dcb9-aaaa-4f31-ad07-c9d6a13bd5ce")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "MPN" "E01-ML01SP4"
+			(at 0 0 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "9c81d63e-f98c-44b1-ac46-b26401ad59e7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "Ebyte"
+			(at 0 0 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "00a13eae-246f-4014-bead-e516b5bda6ea")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(path "/fefddb77-29ff-5542-b6ec-590538f11619")
+		(attr smd)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_line
+			(start -7.4 -9.15)
+			(end -7.4 2.94)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "389b768e-fb9f-468d-b6e3-f2be0b1170d5")
+		)
+		(fp_line
+			(start -7.4 -9.15)
+			(end -5.15 -9.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "999893c5-d46a-402d-8b5b-6d16daa20c7b")
+		)
+		(fp_line
+			(start -7.4 5.06)
+			(end -7.4 9.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ca0c30a9-317d-481b-a99f-033bc2e24f2d")
+		)
+		(fp_line
+			(start -7.4 9.15)
+			(end 7.4 9.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1b080c0c-eead-4d75-9a1d-bc05d6aceafa")
+		)
+		(fp_line
+			(start 5.15 -9.15)
+			(end 7.4 -9.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3c64dfbc-2600-428c-8e5b-ec13d34a5a21")
+		)
+		(fp_line
+			(start 7.4 -9.15)
+			(end 7.4 2.94)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "6da86ce6-84c5-4143-a587-030e1b6dcf9c")
+		)
+		(fp_line
+			(start 7.4 5.06)
+			(end 7.4 9.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "cf1428d6-6eeb-4265-bcd4-486edc2f8831")
+		)
+		(fp_circle
+			(center 5.6 -10)
+			(end 5.85 -10)
+			(stroke
+				(width 0)
+				(type solid)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "0c997184-d243-4094-b81e-1a852c96bf42")
+		)
+		(fp_line
+			(start -8.7 -10.45)
+			(end 8.7 -10.45)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "cf766417-8d64-43c0-aa21-6bcc390f9870")
+		)
+		(fp_line
+			(start -8.7 9.25)
+			(end -8.7 -10.45)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "a99f3fd0-fa12-4cf7-a3d0-dde64ac4b190")
+		)
+		(fp_line
+			(start 8.7 -10.45)
+			(end 8.7 9.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "55cfe545-a720-4623-88fc-94d6a7934437")
+		)
+		(fp_line
+			(start 8.7 9.25)
+			(end -8.7 9.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "137bc672-3ec0-4735-a9ef-45c9f2d5cc1f")
+		)
+		(fp_circle
+			(center -4.9 6.7)
+			(end -3.9 6.7)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "e3b4bf90-4cc9-4ee1-bd76-c7b1f5d47379")
+		)
+		(fp_poly
+			(pts
+				(xy -7.25 -9) (xy 6.25 -9) (xy 7.25 -8) (xy 7.25 9) (xy -7.25 9)
+			)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "1c20f89d-9afb-439c-8df6-acd47496b285")
+		)
+		(fp_text user "IPEX"
+			(at -8.1 7 90)
+			(layer "F.SilkS")
+			(uuid "3674b837-4658-4d26-b54c-e503e001b57b")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(fp_text user "Ebyte manual rev1.7 p.4;\nmeasure a module (14.5 mm) before fab;\nIPEX position ±0.5 mm"
+			(at 0 -3 0)
+			(layer "Cmts.User")
+			(uuid "700e3733-634b-4956-a0c9-9174a5982c44")
+			(effects
+				(font
+					(size 0.45 0.45)
+					(thickness 0.07)
+				)
+			)
+		)
+		(fp_text user "IPEX"
+			(at -4.9 8.25 0)
+			(layer "F.Fab")
+			(uuid "0b6c5109-93a2-47a6-b6cf-e35b5f39d60b")
+			(effects
+				(font
+					(size 0.5 0.5)
+					(thickness 0.08)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "0d021f14-a69e-46ad-8712-b97e3d923e2c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd rect
+			(at 4.445 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net "/VCC")
+			(uuid "e9c90f2a-c101-42f6-85c4-c30d50546bb6")
+		)
+		(pad "2" smd roundrect
+			(at 3.175 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/CE")
+			(uuid "9a029729-8330-4758-9e23-ec9ad0ef7a12")
+		)
+		(pad "3" smd roundrect
+			(at 1.905 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/CSN")
+			(uuid "3d3f2c87-2984-4c26-b9ab-9f32917d5cb5")
+		)
+		(pad "4" smd roundrect
+			(at 0.635 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/SCK")
+			(uuid "e037d58a-638a-4361-b91b-39f96a1d8f19")
+		)
+		(pad "5" smd roundrect
+			(at -0.635 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/MOSI")
+			(uuid "56fe7191-4815-48a8-b2ca-8ad8d127728c")
+		)
+		(pad "6" smd roundrect
+			(at -1.905 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/MISO")
+			(uuid "b0510d18-c542-4da8-846a-e91c55075466")
+		)
+		(pad "7" smd roundrect
+			(at -3.175 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "/IRQ")
+			(uuid "bc434aa7-7c55-4063-846c-be9d1ca2777c")
+		)
+		(pad "8" smd roundrect
+			(at -4.445 -9.1)
+			(size 0.8 2.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "GND")
+			(uuid "74f638bc-4603-419c-a95c-2ca93753f369")
+		)
+		(pad "9" smd roundrect
+			(at -7.35 4)
+			(size 2.2 1.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "GND")
+			(uuid "71c77400-0483-4911-b172-b83bed772883")
+		)
+		(pad "10" smd roundrect
+			(at 7.35 4)
+			(size 2.2 1.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net "GND")
+			(uuid "7ea08d5a-4a51-466c-aae4-3cf54213e061")
+		)
+		(zone
+			(layers "F.Cu" "B.Cu")
+			(uuid "578eaa76-d179-4d40-96ed-e726a509a515")
+			(name "SP4 no tracks")
+			(hatch edge 0.5)
+			(connect_pads
+				(clearance 0)
+			)
+			(min_thickness 0.25)
+			(keepout
+				(tracks not_allowed)
+				(vias allowed)
+				(pads allowed)
+				(copperpour allowed)
+				(footprints allowed)
+			)
+			(placement
+				(enabled no)
+				(sheetname "")
+			)
+			(fill
+				(thermal_gap 0.5)
+				(thermal_bridge_width 0.5)
+				(island_removal_mode 0)
+			)
+			(polygon
+				(pts
+					(xy 92.75 92.2) (xy 107.25 92.2) (xy 107.25 109) (xy 92.75 109)
+				)
+			)
+		)
+		(embedded_fonts no)
+		(model "${KIPRJMOD}/../lib/teamc.3dshapes/E01-ML01SP4.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
 	(footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "492f65dc-bac3-4752-8c8f-0e71bad4828d")
@@ -706,387 +1096,6 @@
 				(xyz 0 0 0)
 			)
 		)
-	)
-	(footprint "teamc:E01-ML01SP4"
-		(layer "F.Cu")
-		(uuid "a21c2d77-9cad-4c1b-a7f3-6d8bd0df7a37")
-		(at 100 100)
-		(descr "Ebyte E01-ML01SP4 nRF24L01P + PA/LNA 2.4 GHz module, castellated SMD 14.5x18.0 mm, IPEX; per Ebyte E01-ML01SP4 user manual rev 1.7 sect. 3 p.4 (pads 1-8 P1.27 on the short edge, GND 9/10 on the long edges 13.0 mm from the pad edge); hand-solder lands (signal pads 1.2 mm outside the outline); top-layer keep-out for tracks under the module (manual sect. 4.1)")
-		(tags "Ebyte E01-ML01SP4 nRF24L01P nRF24L01+ PA LNA 2.4GHz castellated hand-solder")
-		(property "Reference" "U1"
-			(at 0 -11.6 0)
-			(layer "F.SilkS")
-			(uuid "99247ccb-f370-4126-9efe-5589b5c7d7da")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "E01-ML01SP4"
-			(at 0 10.4 0)
-			(layer "F.Fab")
-			(uuid "b1843780-b70c-4df3-9c6f-fa783fa91836")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" "https://www.cdebyte.com/products/E01-ML01SP4"
-			(at 0 0 0)
-			(unlocked yes)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "67c26b58-5a7c-4379-94df-f428555a15ef")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" "Ebyte nRF24L01P + PA/LNA 2.4 GHz module, SMD castellated 14.5x18 mm, IPEX"
-			(at 0 0 0)
-			(unlocked yes)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "14b10d03-ad88-459f-9e45-ebdf4d9063f8")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "MPN" "E01-ML01SP4"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "cc6514fb-b35d-41a2-9a76-c7877c97ef1b")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Manufacturer" "Ebyte"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "b90746c5-478b-4783-ab3e-6a8f5956fd70")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(path "/fefddb77-29ff-5542-b6ec-590538f11619")
-		(attr smd)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_line
-			(start -7.4 -9.15)
-			(end -7.4 2.94)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "c75727b0-ef19-4eff-bda0-1ea7add7ec0f")
-		)
-		(fp_line
-			(start -7.4 -9.15)
-			(end -5.15 -9.15)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "d17c827f-4576-4034-9436-87a947a0be00")
-		)
-		(fp_line
-			(start -7.4 5.06)
-			(end -7.4 9.15)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "42e327b6-db5c-4ede-b16b-754f924bbf75")
-		)
-		(fp_line
-			(start -7.4 9.15)
-			(end 7.4 9.15)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "95593654-1d5e-41f1-aa9a-748ead2d0aba")
-		)
-		(fp_line
-			(start 5.15 -9.15)
-			(end 7.4 -9.15)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "11bd3d36-46ef-4ce4-a688-49fc127c54ef")
-		)
-		(fp_line
-			(start 7.4 -9.15)
-			(end 7.4 2.94)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "33eead95-c9ee-48db-84a8-4085044c2c0c")
-		)
-		(fp_line
-			(start 7.4 5.06)
-			(end 7.4 9.15)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "1b6f7f6a-d463-4f5c-a077-955dda79e2c6")
-		)
-		(fp_circle
-			(center 5.6 -10)
-			(end 5.85 -10)
-			(stroke
-				(width 0)
-				(type solid)
-			)
-			(fill yes)
-			(layer "F.SilkS")
-			(uuid "191635da-c4fb-4145-9a42-34d3f3283c1a")
-		)
-		(fp_line
-			(start -8.7 -10.45)
-			(end 8.7 -10.45)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a7a0824d-a805-4cf4-95dd-2b7eff594203")
-		)
-		(fp_line
-			(start -8.7 9.25)
-			(end -8.7 -10.45)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a9e492fd-412b-4302-a696-c1d870973c55")
-		)
-		(fp_line
-			(start 8.7 -10.45)
-			(end 8.7 9.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "c28caf2e-339f-465f-a5bc-19a5bb150f84")
-		)
-		(fp_line
-			(start 8.7 9.25)
-			(end -8.7 9.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "28bf4de0-68f6-46e3-9e8c-31d110eb3750")
-		)
-		(fp_circle
-			(center -4.9 6.7)
-			(end -3.9 6.7)
-			(stroke
-				(width 0.1)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.Fab")
-			(uuid "dfd6aca2-1da8-47c6-a571-e1ed9c3cc62f")
-		)
-		(fp_poly
-			(pts
-				(xy -7.25 -9) (xy 6.25 -9) (xy 7.25 -8) (xy 7.25 9) (xy -7.25 9)
-			)
-			(stroke
-				(width 0.1)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.Fab")
-			(uuid "5fd98ae9-bfa6-49cf-bea5-8ffad37c49ff")
-		)
-		(fp_text user "IPEX"
-			(at -8.1 7 90)
-			(layer "F.SilkS")
-			(uuid "c58a03ca-5db3-4e2f-bf6a-edd3d4e28482")
-			(effects
-				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
-				)
-			)
-		)
-		(fp_text user "Ebyte manual rev1.7 p.4;\nmeasure a module (14.5 mm) before fab;\nIPEX position ±0.5 mm"
-			(at 0 -3 0)
-			(layer "Cmts.User")
-			(uuid "27c40151-5c2a-498c-bec0-a360fcbdd791")
-			(effects
-				(font
-					(size 0.45 0.45)
-					(thickness 0.07)
-				)
-			)
-		)
-		(fp_text user "IPEX"
-			(at -4.9 8.25 0)
-			(layer "F.Fab")
-			(uuid "63e775a3-f79c-41e5-8fd6-619cafadf78b")
-			(effects
-				(font
-					(size 0.5 0.5)
-					(thickness 0.08)
-				)
-			)
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "c902665f-36e8-4562-965e-e6fc70f56e43")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(pad "1" smd rect
-			(at 4.445 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(net "/VCC")
-			(uuid "81dd4a3b-9ff9-4267-8603-7f1bee8ada04")
-		)
-		(pad "2" smd roundrect
-			(at 3.175 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/CE")
-			(uuid "fc9a907a-23dc-47cf-80c0-1ce5b4d7684a")
-		)
-		(pad "3" smd roundrect
-			(at 1.905 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/CSN")
-			(uuid "91b2ce68-c44e-41c2-8f6b-7e180576efa7")
-		)
-		(pad "4" smd roundrect
-			(at 0.635 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/SCK")
-			(uuid "e4e20cce-cf26-41a5-b382-b76449b2dee4")
-		)
-		(pad "5" smd roundrect
-			(at -0.635 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/MOSI")
-			(uuid "4fa5a580-d428-40a0-aaa8-9cd34d3ad21e")
-		)
-		(pad "6" smd roundrect
-			(at -1.905 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/MISO")
-			(uuid "75599fbc-e818-4fa0-91ce-7213b3a5c87d")
-		)
-		(pad "7" smd roundrect
-			(at -3.175 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "/IRQ")
-			(uuid "6ce8f31e-85e2-418c-8257-4110a3464d3d")
-		)
-		(pad "8" smd roundrect
-			(at -4.445 -9.1)
-			(size 0.8 2.2)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "GND")
-			(uuid "6c5326c5-f154-463e-b7ef-75d5294522c0")
-		)
-		(pad "9" smd roundrect
-			(at -7.35 4)
-			(size 2.2 1.6)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "GND")
-			(uuid "7b1a9c5f-78f8-49fa-8116-59bb7c2cbd5b")
-		)
-		(pad "10" smd roundrect
-			(at 7.35 4)
-			(size 2.2 1.6)
-			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.25)
-			(net "GND")
-			(uuid "31bce19a-cb32-416f-8c10-a9f6d3b03af5")
-		)
-		(zone
-			(layer "F.Cu")
-			(uuid "dcf1274c-f13b-42ea-a547-442fe1330c75")
-			(name "SP4 no top tracks")
-			(hatch edge 0.5)
-			(connect_pads
-				(clearance 0)
-			)
-			(min_thickness 0.25)
-			(keepout
-				(tracks not_allowed)
-				(vias allowed)
-				(pads allowed)
-				(copperpour allowed)
-				(footprints allowed)
-			)
-			(placement
-				(enabled no)
-				(sheetname "")
-			)
-			(fill
-				(thermal_gap 0.5)
-				(thermal_bridge_width 0.5)
-				(island_removal_mode 0)
-			)
-			(polygon
-				(pts
-					(xy 92.75 92.2) (xy 107.25 92.2) (xy 107.25 109) (xy 92.75 109)
-				)
-			)
-		)
-		(embedded_fonts no)
 	)
 	(footprint "Capacitor_SMD:CP_Elec_6.3x5.4"
 		(layer "F.Cu")

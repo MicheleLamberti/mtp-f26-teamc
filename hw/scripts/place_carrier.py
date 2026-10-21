@@ -330,7 +330,7 @@ def main():
             o.Append(bu.MM(hx + HOLE_KEEPOUT_R * math.cos(t)), bu.MM(hy + HOLE_KEEPOUT_R * math.sin(t)))
         ra.SetZoneName("hole_keepout")
         board.Add(ra)
-    bu.text(board, "Team C Pi 3 A+ HAT - DRAFT for ET review - 19-Oct-26", 132.5, 66.0, layer=pcbnew.B_SilkS,
+    bu.text(board, "Team C Pi 3 A+ HAT - rev A for ET review - 21-Oct-26", 132.5, 66.0, layer=pcbnew.B_SilkS,
             size=1.0, thick=0.15)
     # review F6: the A+ has no reverse blocking on micro-USB; the boost would back-feed a supply plugged in there
     bu.text(board, "HAT ON: never plug the Pi's micro-USB", 132.5, 70.0, layer=pcbnew.B_SilkS, size=1.0, thick=0.15)

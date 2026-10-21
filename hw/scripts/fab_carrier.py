@@ -40,8 +40,9 @@ def main():
                         "Top" if r["Side"] == "top" else "Bottom", r["Rot"]])
     bu.run("kicad-cli", "pcb", "export", "pdf", "--layers", "F.Fab,F.SilkS,Edge.Cuts", "--mode-single",
            "--include-border-title", "-o", os.path.join(out, f"{NAME}_assembly.pdf"), PCB)
-    bu.run("kicad-cli", "pcb", "export", "pdf", "--layers", "F.Cu,B.Cu,Edge.Cuts", "--mode-separate",
-           "-o", os.path.join(out, "copper") + "/", PCB)
+    for layer in ("F.Cu", "B.Cu"):   # copper for review, one page per layer with the outline
+        bu.run("kicad-cli", "pcb", "export", "pdf", "--layers", f"{layer},Edge.Cuts", "--mode-single",
+               "--black-and-white", "-o", os.path.join(out, f"{NAME}_{layer.replace('.', '_')}.pdf"), PCB)
     bu.run("kicad-cli", "sch", "export", "pdf", "-o", os.path.join(DIR, f"{NAME}_schematic.pdf"), SCH)
     shutil.copy(os.path.join(os.path.dirname(DIR), "BOM.csv"), os.path.join(out, f"{NAME}-BOM.csv"))
     zipname = os.path.join(DIR, f"{NAME}_gerbers")

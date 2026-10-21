@@ -73,7 +73,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   republish to the same URL (v0.11 18-Oct: Pi 3 note, T0 Pi-noise check, T2 frame gap, Pi pins, Q22; v0.10 17-Oct: review fixes, conservative planning case, 37 hops / 30 ms, NM ch 77 + link to
   the NM spec, Q12–Q21; v0.9: options A/B, NM diagram).
 - Hardware proposal for electronics (artifact, private): https://claude.ai/artifact/81s3ZPuHznAvgXU9zWjaWb
-  — source `radio/hw_proposal.html` (**v0.6 19-Oct: the KiCad carrier (status table, renders, BoM-based parts ≈ €102, fab rules, asks to ET), SP4 14.5 mm, Ebyte flex antenna; v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
+  — source `radio/hw_proposal.html` (**v0.7 21-Oct: carrier rev A routed, DRC 0/0/0, gerbers ready, 3D renders
+  (top/iso/HAT on the Pi/bottom), 5 review points for ET**; v0.6 19-Oct: the KiCad carrier (status table, renders, BoM-based parts ≈ €102, fab rules, asks to ET), SP4 14.5 mm, Ebyte flex antenna; v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
@@ -83,12 +84,16 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   schematics, searches/downloads registry parts and runs ERC/DRC, but cannot place or route (use pcbnew scripts).
   **Built 19-Oct (DRAFT – for ET review), all in `hw/DESIGN_NOTES.md`:** `hw/sp4-breakout/` (single-sided, ERC/DRC 0,
   gerbers + 1:1 copper PDFs in `fab/` — ready for the lab); `hw/teamc-carrier/` (Pi 3 A+ HAT: 4 generated sheets
-  power/pi_header/radio/ui, ERC 0; placed in functional clusters; power + SPI/radio routed by script, DRC 0 errors;
-  the small signal nets are left for ET's interactive router; **designed for a JLCPCB-class fab: 0.2 mm clearance**,
-  0.25 mm signals); `hw/lib/teamc.*` (E01-ML01SP4 from the manual drawing with a no-tracks keep-out on both layers,
-  MAX17048, 2×20 socket with 1.5 mm pads); `hw/BOM.csv` (≈ €102/device); `hw/scripts/` (schgen.py sheets from Python, netlist2pcb.py, build_breakout.py,
-  build_carrier.py, place_carrier.py, route_carrier.py + gridroute.py A* router, build_bom.py). The `.kicad_sch` files
-  are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
+  power/pi_header/radio/ui, ERC 0; placed in functional clusters; **fully routed 21-Oct: DRC 0 violations / 0
+  unconnected / 0 parity, gerbers + drill + CPL in `fab/` and `teamc-carrier_gerbers.zip`, 3D renders incl. HAT on the
+  Pi** (rev A for ET review); **designed for a JLCPCB-class fab: 0.2 mm clearance**, 0.25 mm signals);
+  `hw/lib/teamc.*` (E01-ML01SP4 from the manual drawing with a no-tracks keep-out on both layers, MAX17048, 2×20
+  socket with 1.5 mm pads; `teamc.3dshapes/` VRML models: SP4, MAX17048, JST-VH, simplified Pi 3 A+);
+  `hw/BOM.csv` (≈ €102/device); `hw/scripts/` (schgen.py sheets from Python, netlist2pcb.py, build_breakout.py,
+  build_carrier.py, place_carrier.py, route_carrier.py + gridroute.py A* router, **autoroute_carrier.py (Freerouting
+  2.5 via DSN/SES; needs a portable Java 25 + the jar, not in the repo), finish_carrier.py, silk_carrier.py,
+  fab_carrier.py, render_board.py + fetch_3d.py** (stock 3D models into the ignored `hw/.3dmodels/`), build_bom.py).
+  The `.kicad_sch` files are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
@@ -217,6 +222,12 @@ TPS61022 MODE → VIN (forced PWM, layout), header pin 1 unused (3V3 from pin 17
 SP4 keep-out on both layers, SW1/J21/D1 removed (bench button → J10; 2nd cell paralleled in the harness; VBUS ESD on
 U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not route at the lab-safe 0.3 mm).
 
+**21-Oct-26: carrier rev A routed.** DRC 0 violations / 0 unconnected / 0 parity (all severities); gerbers, drill,
+JLCPCB CPL, assembly PDF in `hw/teamc-carrier/fab/` + `teamc-carrier_gerbers.zip`; 3D renders. Freerouting for the
+signal nets, a scripted finishing pass for the boxed-in pins (U5/U6 GND pins tied to their EPs, L2 turned 90°, C15
+180°, a 3V3_RADIO via moved; all DNP-side except the EP ties and the FG_ALRT escape). Net classes fixed (a `/power/*`
+pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, then orders.
+
 **Next up (17-Oct, roughly in order):**
 - [x] **Ordered 19-Oct (Santiago): 2 × Pi 3 A+, 4 × E01-ML01SP4 from ebyteiot.com** (2 + TX2400-FPC-2509 = box
       antennas, 2 + TX2400-JKS-IPX20 = bench pigtails/reference rods). 2 boxes + 2 spare SP4s (the rod-kit ones); no spare flex antenna (Molex if one breaks). microSD: SanDisk Ultra 32 GB A1 twin
@@ -234,9 +245,9 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
 - [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
-- [ ] ET: finish the carrier in the KiCad GUI (`hw/DESIGN_NOTES.md` "State of the carrier board on 19-Oct": the
-      small signal nets + 3 GND islands, ~1 h with the interactive router), then gerbers for a JLCPCB-class fab
-      (0.2 mm rules); check stock (TPS61022, Si2333DDS, fuse)
+- [ ] ET: review the routed carrier rev A (`hw/DESIGN_NOTES.md` "State of the carrier board on 21-Oct": 5 review
+      points, DRC 0/0/0, gerbers in `hw/teamc-carrier/fab/`), then order from a JLCPCB-class fab (0.2 mm rules) by
+      early Nov; check stock (TPS61022, Si2333DDS, fuse); box dimensions + one SP4 measured first
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
@@ -276,6 +287,25 @@ U12's spare channel), carrier rules → JLCPCB-class 0.2 mm (the board does not 
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-21 — carrier routed to DRC 0/0/0; gerbers; 3D renders; hw page v0.7
+- Santiago: finish the hw project for the ET team. Started from the `kicad-carrier` worktree (76 unconnected).
+- Root cause of the stalled routing: the `/power/*` net-class pattern put the power sheet's gate/LED/status nets in
+  the 1 mm Power class, and FinePitch was 0.4 mm wide → classes rewritten (`build_carrier.NET_CLASSES`, `--rules-only`).
+- Freerouting 2.5 (portable Java 25 + jar in the job dir, not in the repo) via `autoroute_carrier.py`: power copper
+  fixed, GND class ignored, DSN clearances padded (Freerouting rounds 4 µm under), neck-downs widened, merge of the
+  autorouted nets only (its session drops fixed copper). Best of ~10 variants: keep power only → 16 unconnected.
+- `finish_carrier.py`: the last pins by hand + grid router from existing copper (`complete_net`), GND passes on KiCad's
+  own connectivity (`GetConnectedItems`), anchors, dangling clean-up; 7 routing orders tried, 3 reach 0. pcbnew 10.0.6
+  quirks: `Remove()`/many deletions corrupt the track list (segfaults) → `Delete()` or text edits; ratsnest not exposed.
+- `silk_carrier.py` (59 refs on silk at 1.0/0.8 mm, 26 on F.Fab), `fab_carrier.py` (gerbers, drill, CPL, PDFs, zip).
+- Subagent: 3D (`fetch_3d.py` into `hw/.3dmodels/`, own VRML SP4/MAX17048/JST-VH/Pi 3 A+, `render_board.py --with-pi`);
+  breakout renders refreshed.
+- DESIGN_NOTES ("State of the carrier board on 21-Oct" + 5 review points), README, hw page v0.7 republished (same URL,
+  4 renders), PDF in `briefs/` + Windows folder (v0.6 removed).
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK; carrier ERC unchanged (schematic not touched).
+- **Start next session with:** ET owner for the review + order (early Nov)? box inside dimensions; SP4 measured;
+  breakout made? T0.
 
 ### 2026-10-19 (KiCad session) — SP4 breakout ready, Pi 3 A+ HAT carrier drafted
 - Ran `hw/KICAD_SESSION_PROMPT.md` v2 as lead with 7 subagents (research ×3: power, Pi/SP4/mechanics, UI/sensing;

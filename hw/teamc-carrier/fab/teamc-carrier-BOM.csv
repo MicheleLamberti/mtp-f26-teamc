@@ -1,0 +1,84 @@
+ref,qty,value / item,footprint,MPN,manufacturer,supplier / source,unit EUR excl. VAT,total EUR,purchased
+C1 C2 C11,3,10u 25V X5R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM21BR61E106KA73L,Murata,generic MLCC (LCSC),0.05,0.15,yes
+C10 C17 C18,3,100n 50V X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM21BR71H104KA01L,Murata,generic MLCC (LCSC),0.05,0.15,yes
+C12,1,1u 16V X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM21BR71C105KA01L,Murata,generic MLCC (LCSC),0.05,0.05,yes
+C13 C14 C15,0,10u 25V X5R (DNP),Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM21BR61E106KA73L,Murata,generic MLCC (LCSC),0.05,0.00,yes
+C16,0,100n 50V X7R (DNP),Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM21BR71H104KA01L,Murata,generic MLCC (LCSC),0.05,0.00,yes
+C3,1,100p 50V C0G,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,GRM2165C1H101JA01D,Murata,generic MLCC (LCSC),0.05,0.05,yes
+C4 C6 C7 C8,4,22u 25V X5R,Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,GRM31CR61E226KE15L,Murata,generic MLCC (LCSC),0.05,0.20,yes
+C5 C9,2,100u 16V,Capacitor_SMD:CP_Elec_6.3x5.4,EEE-FK1C101P,Panasonic,DigiKey.de,0.54,1.08,yes
+C50 C51 C52 C53,4,100n X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,CL21B104KBCNNNC,Samsung,generic MLCC (LCSC),0.05,0.20,yes
+C70,1,100u 10V,Capacitor_SMD:CP_Elec_6.3x5.4,"EEE-HA1A101WP (100 µF 10 V, 6.3 x 5.4 mm, 105 °C)",Panasonic,est.,0.50,0.50,yes
+C71,1,10u X5R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,CL21A106KAYNNNE (10 µF 25 V X5R 0805),Samsung,generic MLCC (LCSC),0.05,0.05,yes
+C72,1,100n X7R,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,CL21B104KBCNNNC (100 nF 50 V X7R 0805),Samsung,generic MLCC (LCSC),0.05,0.05,yes
+D10,1,green,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080VS75000,Würth Elektronik,DigiKey,0.15,0.15,yes
+D11,1,red,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080RS75000,Würth Elektronik,DigiKey,0.20,0.20,yes
+D2 D3,2,SMF5.0A,Diode_SMD:D_SMF,SMF5V0A-E3-08,Vishay,DigiKey.de,0.30,0.60,yes
+D4,1,red CHG,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080RS75000,Würth Elektronik,DigiKey,0.20,0.20,yes
+F1,1,5A fast,Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder,"0466005.NR (1206 fast, 5 A; verify)",Littelfuse,est. (Littelfuse 0466 1206 fast; verify part and stock),0.45,0.45,yes
+J1,1,RPi 3 A+ GPIO,teamc:PinSocket_2x20_P2.54mm_Vertical_Pad1.5mm,"M20-7832046 (2x20 female, 8.5 mm; 11 mm stack with M2.5x11 standoffs)",Harwin,DigiKey/Mouser (aggregator),3.50,3.50,yes
+J10,1,GO/STOP button,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,B2B-XH-A(LF)(SN),JST,LCSC C158012,0.05,0.05,yes
+J11,1,role toggle,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,B2B-XH-A(LF)(SN),JST,LCSC C158012,0.05,0.05,yes
+J12,1,mode toggle,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,B3B-XH-A(LF)(SN),JST,LCSC C144394,0.08,0.08,yes
+J13,1,UART console,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,61300311121 (1x03 2.54 mm pin header),Würth Elektronik,generic pin header,0.10,0.10,yes
+J2,1,USB-C charge,Connector_USB:USB_C_Receptacle_GCT_USB4125-xx-x-0190_6P_TopMnt_Horizontal,USB4125-GF-A-0190,GCT,DigiKey.de,0.54,0.54,yes
+J20,1,BATT 18650,Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical,B2P-VH,JST,est. (JST VH),0.25,0.25,yes
+J22,1,PWR toggle,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,B2B-XH-A,JST,LCSC C158012,0.05,0.05,yes
+L1,1,1u Isat 11.5A,Inductor_SMD:L_Wuerth_HCI-5040,744316100,Würth Elektronik,DigiKey.de,2.39,2.39,yes
+L2,0,2u2 (DNP),Inductor_SMD:L_Coilcraft_LPS4018,LPS4018-222MRB,Coilcraft,Coilcraft/Mouser est. (DNP),1.20,0.00,yes
+MH1 MH2 MH3 MH4,4,M2.5,MountingHole:MountingHole_2.7mm_M2.5,Würth 970110155 standoff M2.5x11 F/F nylon + M2.5x6 screws,Würth Elektronik,hole in the PCB (standoffs listed below),0.00,0.00,yes
+Q1 Q2,2,Si2333DDS,Package_TO_SOT_SMD:SOT-23,Si2333DDS-T1-GE3,Vishay,"DigiKey.de (stock 0 on 19-Oct, due Jan-27; AO3401A fallback)",0.68,1.36,yes
+Q3,1,2N7002,Package_TO_SOT_SMD:SOT-23,"2N7002,215",Nexperia,DigiKey.de,0.18,0.18,yes
+Q4,1,AO3401A,Package_TO_SOT_SMD:SOT-23,AO3401A,Alpha & Omega,DigiKey.de,0.46,0.46,yes
+R1 R7 R9 R12 R17,5,10k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0710KL,Yageo,generic 0805 1 % (LCSC),0.02,0.10,yes
+R10,1,750k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-07750KL,Yageo,generic 0805 1 % (LCSC),0.02,0.02,yes
+R13,1,47k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0747KL,Yageo,generic 0805 1 % (LCSC),0.02,0.02,yes
+R14,1,0R (fit),Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805JR-070RL,Yageo,generic 0805 1 % (LCSC),0.02,0.02,yes
+R15,0,100R (DNP),Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-07100RL,Yageo,generic 0805 1 % (LCSC),0.02,0.00,yes
+R16,0,0R (DNP),Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805JR-070RL,Yageo,generic 0805 1 % (LCSC),0.02,0.00,yes
+R2 R3,2,5k1 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-075K1L,Yageo,generic 0805 1 % (LCSC),0.02,0.04,yes
+R4,1,2k21 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-072K21L,Yageo,generic 0805 1 % (LCSC),0.02,0.02,yes
+R5,1,1k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-071KL,Yageo,generic 0805 1 % (LCSC),0.02,0.02,yes
+R54 R55 R56 R57,4,1k,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-071KL,Yageo,generic 0805 1 % (LCSC),0.02,0.08,yes
+R6 R8 R11,3,100k 1%,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-07100KL,Yageo,generic 0805 1 % (LCSC),0.02,0.06,yes
+R60 R61,2,330,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-07330RL,Yageo,generic 0805 1 % (LCSC),0.02,0.04,yes
+R50 R51 R52 R53 R80 R81,6,10k,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0710KL,Yageo,generic 0805 1 % (LCSC),0.02,0.12,yes
+R82 R83 R84,3,33,Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,RC0805FR-0733RL,Yageo,generic 0805 1 % (LCSC),0.02,0.06,yes
+TP1,1,VBAT,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+TP10,1,3V3_RADIO,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop or Keystone 5000,Keystone,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+TP2,1,5V_PI,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+TP3,1,GND,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+U1,1,MCP73831,Package_TO_SOT_SMD:SOT-23-5,MCP73831T-2ACI/OT,Microchip,DigiKey.de,0.67,0.67,yes
+U11 U12,2,SP0504BAHTG,Package_TO_SOT_SMD:SOT-23-5,SP0504BAHTG,Littelfuse,LCSC C10675,0.45,0.90,yes
+U2,1,TPS61022,Package_DFN_QFN:Texas_RWU0007A_VQFN-7_2x2mm_P0.5mm,TPS61022RWUR,Texas Instruments,DigiKey.de (stock 0 on 19-Oct: check Mouser/LCSC/TI),2.09,2.09,yes
+U3,1,BCM857BS,Package_TO_SOT_SMD:SOT-363_SC-70-6,"BCM857BS,115",Nexperia,DigiKey.de,0.45,0.45,yes
+U4,1,TLV75533,Package_TO_SOT_SMD:SOT-23-5,TLV75533PDBVR,Texas Instruments,DigiKey.de,0.37,0.37,yes
+U5,0,TPS63001 (DNP),Package_SON:Texas_DRC0010J,TPS63001DRCR,Texas Instruments,DigiKey.de (DNP),2.41,0.00,yes
+U6,1,MAX17048,teamc:MAX17048_TDFN-8-1EP_2x2mm,MAX17048G+T10,Analog Devices (Maxim),DigiKey.es (LCSC C2682616 ~EUR 2.0),4.05,4.05,yes
+U7,1,E01-ML01SP4,teamc:E01-ML01SP4,E01-ML01SP4,Ebyte,"ebyteiot.com, bundle with TX2400-FPC-2509 ($3.88) — ordered",3.60,3.60,yes
+(off-board),1,"Raspberry Pi 3 Model A+ (WiFi/BT disabled or removed, Atenea Q22)",,,,ordered 19-Oct (market price),27.00,27.00,yes
+(off-board),1,microSD SanDisk Ultra 32 GB A1 (half a twin pack),,,,ordered 19-Oct (est.),6.00,6.00,yes
+(off-board),1,Antenna Ebyte TX2400-FPC-2509 (in the SP4 bundle),,,,included in the SP4 line,0.00,0.00,yes
+(off-board),1,Protected 18650 Li-ion cell >= 3000 mAh,,,,est.,8.00,8.00,yes
+(off-board),1,"18650 holder MPD BH-18650-PC (THT, for protected cells), on the box floor",,,,DigiKey.de,2.94,2.94,yes
+(off-board),1,Panel pushbutton E-Switch PS1024ABLK (GO/STOP),,,,TME,1.17,1.17,yes
+(off-board),1,Panel toggle E-Switch 100SP1T1B1M1QEH (power ON/OFF),,,,TME,2.32,2.32,yes
+(off-board),1,"Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)",,,,TME,2.32,2.32,yes
+(off-board),1,Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM),,,,TME,2.89,2.89,yes
+(off-board),3,"JST XHP-2 housing (power, button, role leads)",,,,LCSC est.,0.03,0.09,yes
+(off-board),1,JST XHP-3 housing (mode lead),,,,LCSC est.,0.04,0.04,yes
+(off-board),1,JST VHR-2N housing (battery lead),,,,LCSC est.,0.10,0.10,yes
+(off-board),11,JST crimps SXH-001T-P0.6 (XH) x9 + SVH-21T-P1.1 (VH) x2,,,,LCSC est.,0.03,0.33,yes
+(off-board),1,"Hook-up wire (AWG24 leads, AWG20 battery lead), ~1 m",,,,lab stock (market price est.),0.50,0.50,no
+(off-board),4,Standoff Würth 970110155 M2.5 x 11 F/F nylon (HAT on the Pi),,,,est. (RS),0.35,1.40,yes
+(off-board),4,Standoff M2.5 x 5 F/F (Pi on the box base plate),,,,est.,0.25,1.00,yes
+(off-board),12,Screw M2.5 x 6 (ISO 7380),,,,est.,0.05,0.60,yes
+(off-board),1,IKEA 365+ food container 15 x 15 x 7 cm with lid,,,,IKEA (est.),3.00,3.00,yes
+(off-board),1,"Hot glue, Kapton tape (U.FL plug, microSD, XH housings), cable ties, foam",,,,lab stock (est.),1.00,1.00,no
+(off-board),1,"Solder, flux",,,,lab stock (est.),0.50,0.50,no
+(off-board),1,PCB: carrier made at the ETSETB lab (rules: counts EUR 15),,,,ETSETB lab,15.00,15.00,no
+
+"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,102.22,
+of which purchased by the team,,,,,,,,85.22,
+of which owned / lab stock / lab PCB (non-purchased),,,,,,,,17.00,
+"Cap per device (rules): EUR 150. DRAFT – for ET review; prices 19-Oct-26, verify before ordering"

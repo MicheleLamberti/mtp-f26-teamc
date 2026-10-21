@@ -63,7 +63,7 @@ node, protocol simulator, KiCad hardware designs and LaTeX reports.
 | `radio/*.html` | Sources of the four published pages (PDF exports in `briefs/`) |
 | `proto/` | Protocol code (link with resume, NM gossip + relay log, compression, USB stick I/O over FatFs) and the PC simulator. See [`proto/README.md`](proto/README.md) |
 | `proto/test_encoding_text/` | Python/C++ file layer and tests; C bridge used by the Linux node for verified caches and optional text decoding |
-| `hw/` | Carrier PCB (KiCad), starting with [`hw/KICAD_SESSION_PROMPT.md`](hw/KICAD_SESSION_PROMPT.md) |
+| `hw/` | KiCad: SP4 breakout (ready for the lab) and the Pi 3 A+ HAT carrier (rev A, routed, DRC clean, gerbers in `hw/teamc-carrier/fab/`); read [`hw/DESIGN_NOTES.md`](hw/DESIGN_NOTES.md) |
 | `docs/task_11_unicode/` | Team-authored Task 11 report, LaTeX sources, research tools and reproducible validation |
 | `docs/course_material/`, `docs/encoding_references/` | Local course originals and downloaded references; excluded from Git. See [`docs/README.md`](docs/README.md) |
 

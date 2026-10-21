@@ -121,11 +121,18 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
 <header class="col">
   <div class="eyebrow">MTP F26 · Team C · Radio Team → Electronics Team</div>
   <h1>Suggested hardware for the transceiver</h1>
-  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.6 · Mon 19 Oct 2026</span></div>
-  <div class="lede" style="margin:.7rem 0"><b>New in v0.6 (19 Oct): the carrier exists in KiCad.</b> Details in <a href="#s-carrier">The carrier board</a>.
+  <div class="meta"><span><b>From</b> Radio Team (Santiago, Andrian, Marcos)</span><span><b>To</b> Carlos, Michele, Bikash, Guillem</span><span><b>Version</b> 0.7 · Wed 21 Oct 2026</span></div>
+  <div class="lede" style="margin:.7rem 0"><b>New in v0.7 (21 Oct): the carrier is routed.</b> Details in <a href="#s-carrier">The carrier board</a>.
+    <ul class="tight">
+      <li><b>Pi 3 A+ HAT carrier, rev A:</b> every net is routed. DRC shows <b>0 violations, 0 unconnected, 0 schematic-parity issues</b>.</li>
+      <li><b>Fab files are ready</b> in <span class="mono">hw/teamc-carrier/fab/</span>: gerbers, drill, placement file for assembly, assembly PDF and BoM. The zip is ready to upload to a JLCPCB-class fab.</li>
+      <li><b>Real 3D renders</b> with every part body, including the HAT sitting on the Pi.</li>
+      <li><b>For you:</b> a short review list (5 points in <span class="mono">hw/DESIGN_NOTES.md</span>), then the order in early November.</li>
+    </ul></div>
+  <div class="lede" style="margin:.7rem 0"><b>v0.6 (19 Oct): the carrier existed in KiCad as a draft.</b>
     <ul class="tight">
       <li><b>SP4 breakout: ready for the lab.</b> Single-sided, 31 × 37.5 mm, DRC clean, gerbers and 1:1 copper PDFs in <span class="mono">hw/sp4-breakout/fab/</span>. It's needed for the first bench tests (T0/T2).</li>
-      <li><b>Pi 3 A+ HAT carrier: draft for you.</b> The schematic is complete and independently reviewed. The board is placed, the power path and SPI are routed, and DRC shows 0 errors. About 30 small signal nets are left for your interactive router (about an hour).</li>
+      <li><b>Pi 3 A+ HAT carrier: draft for you.</b> The schematic is complete and independently reviewed. The board was placed with the power path and SPI routed (the rest is now done, v0.7).</li>
       <li><b>Parts chosen:</b> TPS61022 boost, Si2333DDS FETs, the Pi 3B's ideal diode, MCP73831 charger, MAX17048 fuel gauge, TLV75533 radio LDO, SP0504 ESD arrays and a 5 A fuse. The controls are panel-mounted on JST-XH leads.</li>
       <li><b>Corrections:</b> the SP4 is <b>14.5 × 18 mm</b>, with 8 castellations on one edge plus 2 GND half-holes. The antenna is the <b>Ebyte TX2400-FPC-2509</b>, with the Molex as fallback.</li>
       <li><b>Fab:</b> the carrier is drawn for a <b>JLCPCB-class fab</b> (0.2 mm rules); the breakout stays lab-friendly.</li>
@@ -151,7 +158,7 @@ td.total{font-weight:600;border-top:2px solid var(--rule)}
   <ol>
     <li><b>Micro module: Raspberry Pi 3, Model A+ suggested</b> (Model B works if we already own them). It runs Linux on a microSD card and has native USB host ports. Its WiFi/BT chip is <b>disabled in software or desoldered</b>, which is our working assumption until Atenea Q22 is answered.</li>
     <li><b>Radio: one Ebyte E01-ML01SP4 per box</b>, unchanged: a genuine nRF24L01+ with PA and LNA, SMD <b>14.5 × 18 mm</b>, 8 castellations at 1.27 mm plus 2 GND half-holes, and an IPEX antenna socket. <b>VCC is 2.0–3.6 V only</b>, so it keeps its own 3.3 V regulator from the cell, never the Pi's 3V3 pin. The same module goes from the bench (on the breakout) to the final boxes.</li>
-    <li><b>Board: a 2-layer HAT carrier</b> on the Pi's 40-pin header, <b>drafted in KiCad</b> (<a href="#s-carrier">below</a>). It carries the SP4, the radio LDO, the 5.1 V boost that feeds the Pi, an ideal diode, the fuel gauge, the charger, ESD protection, and JST-XH leads to the panel controls. The antenna is the Ebyte TX2400-FPC-2509 flex, stuck on a box wall and plugged into the module, so there is no RF circuitry on our board.</li>
+    <li><b>Board: a 2-layer HAT carrier</b> on the Pi's 40-pin header, <b>routed in KiCad, rev A, DRC clean, gerbers ready</b> (<a href="#s-carrier">below</a>). It carries the SP4, the radio LDO, the 5.1 V boost that feeds the Pi, an ideal diode, the fuel gauge, the charger, ESD protection, and JST-XH leads to the panel controls. The antenna is the Ebyte TX2400-FPC-2509 flex, stuck on a box wall and plugged into the module, so there is no RF circuitry on our board.</li>
     <li><b>Power: one protected 18650 Li-ion cell</b> (3000 mAh or more) on the box floor, charged on board through a charge-only USB-C port. The Pi and radio draw about 2 W, so one cell lasts about 4–5 h with the A+. For longer, wire a second holder in parallel into the same battery lead.</li>
     <li><b>Cost: ≈ €102 per device</b> from the BoM (<span class="mono">hw/BOM.csv</span>), against the 150 € cap. That includes the Pi, the microSD, panel controls, mechanics and the lab PCB at €15.</li>
   </ol>
@@ -225,11 +232,13 @@ flowchart LR
 </section>
 
 <section aria-labelledby="s-carrier">
-  <div class="col"><h2 id="s-carrier">The carrier board (KiCad draft, 19 Oct)</h2>
-  <p>Drafted by the radio team as a starting point for you. Everything lives in the repo under <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw"><span class="mono">hw/</span></a>. Read <span class="mono">hw/DESIGN_NOTES.md</span> first. The schematic files are generated from <span class="mono">hw/teamc-carrier/sheets/*.py</span>, so edit those and run <span class="mono">python3 hw/scripts/build_carrier.py</span>.</p></div>
+  <div class="col"><h2 id="s-carrier">The carrier board (KiCad rev A, 21 Oct)</h2>
+  <p>Designed and routed by the radio team for you to review and order. Everything lives in the repo under <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw"><span class="mono">hw/</span></a>. Read <span class="mono">hw/DESIGN_NOTES.md</span> first; its section "State of the carrier board on 21-Oct" lists what to check. The schematic files are generated from <span class="mono">hw/teamc-carrier/sheets/*.py</span>, so edit those and run <span class="mono">python3 hw/scripts/build_carrier.py</span>.</p></div>
   <div class="grid2">
-    <figure class="card" style="margin:0"><img src="carrier_top.png" alt="Top view of the carrier HAT: boost top-left next to the header's 5 V pins, battery lead and USB-C on the left edge, panel leads along the bottom edge, SP4 radio bottom-right" loading="lazy"><figcaption class="sub">Carrier, top. Renders show pads only (no 3D models installed).</figcaption></figure>
-    <figure class="card" style="margin:0"><img src="carrier_iso.png" alt="Isometric view of the carrier HAT" loading="lazy"><figcaption class="sub">Carrier, isometric: 65 × 56 mm, the A+ outline and holes.</figcaption></figure>
+    <figure class="card" style="margin:0"><img src="carrier_top.png" alt="Top view of the routed carrier HAT with component bodies: boost and ideal diode top-left by the header's 5 V pins, battery lead and USB-C on the left edge, three panel leads along the bottom edge, the SP4 radio module bottom-right with its IPEX socket at the corner" loading="lazy"><figcaption class="sub">Carrier, top: 65 × 56 mm, the A+ outline and holes. DNP parts (the buck-boost option) show as bare pads.</figcaption></figure>
+    <figure class="card" style="margin:0"><img src="carrier_iso.png" alt="Isometric view of the routed carrier HAT with JST-XH panel leads, USB-C, electrolytics and the SP4 module" loading="lazy"><figcaption class="sub">Carrier, isometric.</figcaption></figure>
+    <figure class="card" style="margin:0"><img src="carrier_stack.png" alt="The HAT on a Raspberry Pi 3 A+: the 2 × 20 socket fills the 11 mm gap between the boards, the Pi's USB-A port at the edge" loading="lazy"><figcaption class="sub">On the Pi 3 A+ (simplified Pi model): 11 mm stack on the 8.5 mm socket.</figcaption></figure>
+    <figure class="card" style="margin:0"><img src="carrier_bottom.png" alt="Bottom view: the 2 × 20 socket, the ground pour with stitching vias, and the silkscreen note never to plug the Pi's micro-USB with the HAT on" loading="lazy"><figcaption class="sub">Carrier, bottom: the 2 × 20 socket and the ground pour.</figcaption></figure>
   </div>
   <div class="tbl"><table>
     <thead><tr><th>Item</th><th>State</th><th>Where / notes</th></tr></thead>
@@ -237,9 +246,11 @@ flowchart LR
       <tr><td><b>SP4 breakout</b></td><td class="verdict"><span class="pill p-ok">ready for the lab</span></td><td>Single-sided, 31 × 37.5 mm. 1 × 8 header in the usual nRF24 order plus a 1 × 2 bench-supply header; 10 µF + 100 nF + 100 µF. ERC/DRC 0. Gerbers, drill and 1:1 copper PDFs (plain and mirrored) in <span class="mono">hw/sp4-breakout/fab/</span>. Measure one module (14.5 mm) before etching.</td></tr>
       <tr><td>Carrier schematic</td><td class="verdict"><span class="pill p-ok">complete</span></td><td>4 sheets (power, pi_header, radio, ui), ERC 0 errors / 0 warnings, pin map checked against <span class="mono">ui.c</span>, the radio README and pinout.xyz. An independent review found no blockers; its fixes are in, with the table in DESIGN_NOTES. PDF: <span class="mono">hw/teamc-carrier/teamc-carrier_schematic.pdf</span>.</td></tr>
       <tr><td>Placement</td><td class="verdict"><span class="pill p-ok">done</span></td><td>Boost laid out as TI's example, next to header pins 2/4. Battery path J20 → fuse → Q1 → Q2 on the left edge, charger and USB-C below it. Panel leads on the bottom edge. SP4 bottom-right, ≥ 45 mm from the Pi's wireless can, no tracks under it on either layer.</td></tr>
-      <tr><td>Routing</td><td class="verdict"><span class="pill p-warn">power + SPI done</span></td><td>Routed by script with 0 DRC errors: the power path (copper areas around the boost), 5V_PI, 3V3_RADIO and all SPI and radio lines, plus GND pours on both layers. <b>About 30 small nets</b> (switches, LEDs, I2C, UART, pull-ups) and 3 small GND islands are left for <b>KiCad's interactive router, about an hour</b>. The list is in DESIGN_NOTES, "State of the carrier board".</td></tr>
+      <tr><td>Routing</td><td class="verdict"><span class="pill p-ok">done</span></td><td><b>DRC: 0 violations, 0 unconnected, 0 schematic-parity issues</b>, at all severities. The power path is routed by script with the boost copper areas and wide tracks. The rest was routed by Freerouting, and a short finishing pass handled the pins it could not reach. Ground pours are on both layers, with 71 GND vias. 696 tracks, 146 vias.</td></tr>
+      <tr><td>What the finishing pass changed</td><td class="verdict"><span class="pill p-warn">please review</span></td><td>The GND pins of the MAX17048 and the TPS63001 are tied to their exposed pads. In the DNP buck-boost option, L2 is turned 90° (TI's layout) and C15 180°, and one 3V3_RADIO via moved. Some ground pockets reach the main pour through short GND tracks. All of it is in DESIGN_NOTES, with 5 review points.</td></tr>
       <tr><td>Fab rules</td><td class="verdict"><span class="pill p-warn">fab, not lab</span></td><td>0.2 mm clearance, 0.25 mm signals, 0.15 mm at the two 0.5 mm-pitch chips, plated vias. That fits a JLCPCB-class 2-layer fab (≈ €1/board, 1–2 weeks). At the lab-safe 0.3 mm this board does not route.</td></tr>
-      <tr><td>Gerbers for the carrier</td><td class="verdict"><span class="pill p-mute">after routing</span></td><td>Once DRC shows 0 errors and 0 unconnected.</td></tr>
+      <tr><td>Gerbers for the carrier</td><td class="verdict"><span class="pill p-ok">ready</span></td><td><span class="mono">hw/teamc-carrier/teamc-carrier_gerbers.zip</span> (gerbers and drill) uploads as-is: 2 layers, 1.6 mm, HASL, 1 oz. In <span class="mono">fab/</span>: the placement file in JLCPCB's columns (DNP left out), the assembly PDF, and copper PDFs per layer.</td></tr>
+      <tr><td>Silkscreen and 3D</td><td class="verdict"><span class="pill p-ok">done</span></td><td>59 reference designators fit on the silkscreen at 1.0 or 0.8 mm. The other 26 have no room and are on the assembly drawing only. 3D models for every part, including the SP4 and the MAX17048 (our own).</td></tr>
     </tbody>
   </table></div>
   <div class="callout"><b>Rule for everyone:</b> with the HAT switched on, <b>never plug the Pi's micro-USB</b>. The A+ has no reverse blocking on that input, so our boost would push current into the supply. It is on the board's silkscreen too.</div>
@@ -351,7 +362,7 @@ flowchart LR
     <tbody>
       <tr><td>1 · Bench</td><td>Pi 3 + E01-ML01SP4 on the <b>SP4 breakout</b> (<span class="mono">hw/sp4-breakout/fab/</span>, ready) wired to the header, radio 3.3 V from a bench supply, Pi on its own 5 V supply</td><td>Radio tests T0 (output power, Pi noise in our band) and T2 (frame gap on Linux); USB-stick read/write on the Pi's port</td><td class="num">as soon as parts arrive</td></tr>
       <tr><td>2 · Quick Mode</td><td>Perfboard HAT, <b>same Pi model and module part numbers</b>, external power allowed</td><td>One error-free line from a file in &lt; 2 min, first attempt</td><td class="num">week 6–7</td></tr>
-      <tr><td>3 · PCB rev A</td><td>The KiCad carrier: finish the small nets, order from a JLCPCB-class fab (1–2 weeks), assemble, box, battery</td><td>Autonomous, drop-tested, range tests T4/T5</td><td class="num">order by early Nov · week 8–9</td></tr>
+      <tr><td>3 · PCB rev A</td><td>The KiCad carrier rev A (routed, gerbers ready): review, order from a JLCPCB-class fab (1–2 weeks), assemble, box, battery</td><td>Autonomous, drop-tested, range tests T4/T5</td><td class="num">order by early Nov · week 8–9</td></tr>
       <tr><td>4 · PCB rev B</td><td>Fixes from rev A</td><td>Pretest (4 Dec) fully packaged</td><td class="num">week 10–11</td></tr>
     </tbody>
   </table></div>
@@ -381,7 +392,7 @@ flowchart LR
 <section aria-labelledby="s-ask">
   <div class="col"><h2 id="s-ask">What we need from electronics</h2>
   <ol>
-    <li><b>An owner for the carrier:</b> route the ~30 small nets and fix the 3 GND islands in KiCad's interactive router (list in <span class="mono">hw/DESIGN_NOTES.md</span>), tidy the silkscreen, DRC to 0, then gerbers and the fab order. To keep the boards for week 8–9, order in early November.</li>
+    <li><b>An owner for the carrier:</b> review rev A in the KiCad GUI. The 5 points are in <span class="mono">hw/DESIGN_NOTES.md</span>: the ground links, the thermal copper at the charger, tidying Freerouting's longer tracks, the box dimensions and panel leads, and one SP4 measured. Then place the fab order. To have the boards in week 8–9, order in early November.</li>
     <li><b>Make the SP4 breakout in the lab</b> from <span class="mono">hw/sp4-breakout/fab/</span> for the first bench test, and measure one module first (14.5 mm).</li>
     <li><b>Review the carrier schematic and the part choices</b> (the PDF, and the review table in DESIGN_NOTES). Two to confirm: MODE tied to VIN (forced PWM), and the cell on the box floor with a second cell paralleled in the harness.</li>
     <li><b>Check stock</b> for TPS61022, Si2333DDS (AO3401A fallback), the 5 A 1206 fuse and MAX17048.</li>
@@ -392,7 +403,7 @@ flowchart LR
 
 <footer>
   <p>Radio details (interface pins, test plan, 20 dBm hopping in SRI/MRM): Team C Radio Brief v0.11. Firmware and USB: Team C Protocol Proposal v0.4.1. Pi 3 analysis: <a href="https://claude.ai/artifact/Q5EZxmB1HhcbiQhs2menMw">Team C Pi 3 Switch</a>. Rules quoted from <i>MTP F26 – Program Competition Rules – Network Upgrade III + Sustainability</i>.</p>
-  <p>KiCad files, BoM and design notes: <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw">github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw</a> (DRAFT – for ET review).</p>
+  <p>KiCad files, BoM and design notes: <a href="https://github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw">github.com/SantiBarrios2002/mtp-f26-teamc/tree/main/hw</a> (carrier rev A – for ET review).</p>
   <p>Sources checked 18 Oct 2026: <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/">Pi 3 A+</a> · <a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b/">Pi 3 B</a> · <a href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html">Pi power and USB documentation</a> · <a href="https://pidramble.com/node/27">measured Pi 3 current</a> · <a href="https://voltiq.ru/datasheets/ebyte/E01-ML01SP4.pdf">Ebyte E01-ML01SP4 manual</a> · <a href="https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf">nRF24L01+ Product Specification</a>.</p>
 </footer>
 </div>

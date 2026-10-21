@@ -3,8 +3,9 @@
     python3 hw/scripts/silk_carrier.py
 
 For each footprint (largest first) it tries positions around the courtyard (above, below, left, right, then shifted
-along each side, then inside the body for big parts) at 0.8 mm and then 0.6 mm text, and keeps the first that
-collides with nothing. A reference with no free spot moves to F.Fab (assembly drawing only) and is listed.
+along each side, a little further out, then inside the body for big parts) at 1.0 mm and then 0.8 mm text, and keeps
+the first that collides with nothing. A reference with no free spot moves to F.Fab (assembly drawing only) and is
+listed.
 """
 import os
 import sys
@@ -18,6 +19,7 @@ MM, TO = pcbnew.FromMM, pcbnew.ToMM
 PAD_GAP = 0.2      # silk to exposed copper (mask opening)
 SILK_GAP = 0.15    # silk to silk
 EDGE_GAP = 0.4
+SIZES = (1.0, 0.8)   # mm: the board rule's minimum is 0.8 (a JLCPCB-class fab wants 0.8-1.0 at 0.15 mm lines)
 
 
 class Rect:
@@ -78,15 +80,18 @@ def main():
         cx, cyy = (cy.x1 + cy.x2) / 2, (cy.y1 + cy.y2) / 2
         w, h = cy.x2 - cy.x1, cy.y2 - cy.y1
         ok = False
-        for size in (0.8, 0.7, 0.6):
+        for size in SIZES:
             ref.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size)))
-            ref.SetTextThickness(MM(0.12 if size > 0.65 else 0.1))
-            gap = size / 2 + 0.15
+            ref.SetTextThickness(MM(0.15))
             cands = []
-            for dx in (0, -0.25, 0.25, -0.5, 0.5, -1.0, 1.0):
-                cands += [(cx + dx * w, cy.y1 - gap, 0), (cx + dx * w, cy.y2 + gap, 0)]
-            for dy in (0, -0.25, 0.25, -0.5, 0.5):
-                cands += [(cy.x1 - gap, cyy + dy * h, 90), (cy.x2 + gap, cyy + dy * h, 90)]
+            for extra in (0.0, 0.5, 1.0):     # next to the courtyard, then a little further out
+                gap = size / 2 + 0.15 + extra
+                for dx in (0, -0.25, 0.25, -0.5, 0.5, -1.0, 1.0):
+                    cands += [(cx + dx * w, cy.y1 - gap, 0), (cx + dx * w, cy.y2 + gap, 0)]
+                for dy in (0, -0.25, 0.25, -0.5, 0.5):
+                    cands += [(cy.x1 - gap, cyy + dy * h, 90), (cy.x2 + gap, cyy + dy * h, 90)]
+                    half = len(f.GetReference()) * size * 0.35 + 0.15 + extra   # horizontal text beside it
+                    cands += [(cy.x1 - half, cyy + dy * h, 0), (cy.x2 + half, cyy + dy * h, 0)]
             for dx in (0, -0.3, 0.3):
                 for dy in (0, -0.3, 0.3):
                     cands.append((cx + dx * w, cyy + dy * h, 0))
