@@ -276,7 +276,13 @@ what's pending.
 ### 2026-10-22 — `.env` for the Pi 3 A+ setup
 - Santiago is setting up the two Pi 3 A+: added `.env.example` (tracked) and `.env` (ignored) with the Imager,
   WiFi (development only, disabled before QM), SD layout and teamc-node option values from the setup READMEs.
-- **Start next session with:** Pis flashed? `nrf24_probe init` + `timing --rt 3` results.
+- Pi **C2 up** (hostname = user `mtp-team-c2`, home WiFi, SSH key login): Pi 3 A+ Rev 1.1, Pi OS 13 trixie 64-bit
+  (desktop image, now boots to multi-user), 16 GB card (not the 32 GB A1). Configured: `dtparam=spi=on`,
+  `i2c_arm=on`, `disable-bt`, `core_freq=250`, `isolcpus=3`, bluetooth.service off (backups `*.bak-teamc` in
+  /boot/firmware); WiFi + Pi Connect left on for development. **`throttled=0x50005` = under-voltage on the
+  current supply → bench 5.1 V ≥ 2.5 A supply before any timing test.** C1 not plugged in yet.
+- **Start next session with:** proper supply on C2? C1 (same steps); then clone + `make -C radio/fw linux`,
+  `nrf24_probe init` + `timing --rt 3`.
 
 ### 2026-10-21 — carrier routed to DRC 0/0/0; gerbers; 3D renders; hw page v0.7
 - Santiago: finish the hw project for the ET team. Started from the `kicad-carrier` worktree (76 unconnected).
