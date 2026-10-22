@@ -129,7 +129,7 @@ for the next hop. Measure both on the Pi (T2) before trusting either.
 
 | Box | Hostname | User | State |
 |---|---|---|---|
-| C1 | `mtp-team-c1` (assumed) | `mtp-team-c1` | not set up yet |
+| C1 | `mtp-team-c1` | `mtp-team-c1` | step 1 done 22-Oct (as C2) |
 | C2 | `mtp-team-c2` | `mtp-team-c2` | step 1 done 22-Oct (SPI, I2C, BT off, `core_freq=250`, `isolcpus=3`, no desktop at boot) |
 
 Passwords are never in the repository: ask Santiago. Both Pis run Pi OS 13 (trixie, 64-bit).
@@ -148,8 +148,9 @@ Passwords are never in the repository: ask Santiago. Both Pis run Pi OS 13 (trix
 5. **Shut down before unplugging:** `sudo poweroff`, then wait until the green ACT LED stops flashing. Pulling the
    power while Linux runs can corrupt the SD card.
 
-Power: use a 5.1 V ≥ 2.5 A supply. `vcgencmd get_throttled` must print `throttled=0x0`; on 22-Oct C2 showed
-`0x50005` (under-voltage now and since boot) on the supply it had, and timing results taken like that are not valid.
+Power: use a 5.1 V ≥ 2.5 A supply. `vcgencmd get_throttled` must print `throttled=0x0`; on 22-Oct both Pis showed
+`0x50005` / `0x50000` (under-voltage now / since boot) on a laptop USB port, and timing results taken like that are
+not valid. The A+ micro-USB carries power only (no data): reach the Pi over WiFi.
 
 WiFi, Bluetooth and Pi Connect are for development only: the rules (p.6) ban an active WiFi/BT chip (Atenea
 Q22). Before QM or any test day, finish step 1 of "Pi setup" (`disable-wifi`, `rpi-connect` off); after that,

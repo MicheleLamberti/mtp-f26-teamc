@@ -280,9 +280,13 @@ what's pending.
   (desktop image, now boots to multi-user), 16 GB card (not the 32 GB A1). Configured: `dtparam=spi=on`,
   `i2c_arm=on`, `disable-bt`, `core_freq=250`, `isolcpus=3`, bluetooth.service off (backups `*.bak-teamc` in
   /boot/firmware); WiFi + Pi Connect left on for development. **`throttled=0x50005` = under-voltage on the
-  current supply → bench 5.1 V ≥ 2.5 A supply before any timing test.** C1 not plugged in yet.
-- **Start next session with:** proper supply on C2? C1 (same steps); then clone + `make -C radio/fw linux`,
-  `nrf24_probe init` + `timing --rt 3`.
+  current supply → bench 5.1 V ≥ 2.5 A supply before any timing test.**
+- Pi **C1 up** the same way (`mtp-team-c1`, re-flashed once: the first Imager WiFi entry never joined), same
+  configuration, `0x50000` on laptop USB. Teammates: `proto/port/linux/README.md` "Connecting to the team's Pis".
+  Scripted configuration lesson: never feed `sudo -S` and the command's own stdin from one pipe (it wrote the
+  password into C2's config.txt once; removed, checked 0 copies left).
+- **Start next session with:** proper supply on both? clone + `make -C radio/fw linux`, `nrf24_probe init` +
+  `timing --rt 3`.
 
 ### 2026-10-21 — carrier routed to DRC 0/0/0; gerbers; 3D renders; hw page v0.7
 - Santiago: finish the hw project for the ET team. Started from the `kicad-carrier` worktree (76 unconnected).
