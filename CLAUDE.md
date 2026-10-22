@@ -96,7 +96,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   The `.kicad_sch` files are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
 - `.env.example` (22-Oct) — per-box access to the Pis (hostname, user, password, IP); copy to `.env` (git-ignored,
   Santiago's has the passwords). WiFi and the Raspberry Pi Connect token are set in Raspberry Pi Imager. How
-  teammates connect: `proto/port/linux/README.md` "Connecting to the team's Pis". WiFi + Connect off before QM.
+  teammates connect, other WiFi, no network: `PI_ACCESS.md`. WiFi + Connect off before QM.
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
@@ -282,7 +282,7 @@ what's pending.
   /boot/firmware); WiFi + Pi Connect left on for development. **`throttled=0x50005` = under-voltage on the
   current supply → bench 5.1 V ≥ 2.5 A supply before any timing test.**
 - Pi **C1 up** the same way (`mtp-team-c1`, re-flashed once: the first Imager WiFi entry never joined), same
-  configuration, `0x50000` on laptop USB. Teammates: `proto/port/linux/README.md` "Connecting to the team's Pis".
+  configuration, `0x50000` on laptop USB. Teammates: `PI_ACCESS.md`.
   Scripted configuration lesson: never feed `sudo -S` and the command's own stdin from one pipe (it wrote the
   password into C2's config.txt once; removed, checked 0 copies left).
 - **Start next session with:** proper supply on both? clone + `make -C radio/fw linux`, `nrf24_probe init` +

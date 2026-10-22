@@ -127,38 +127,8 @@ for the next hop. Measure both on the Pi (T2) before trusting either.
 
 ## Connecting to the team's Pis
 
-| Box | Hostname | User | State |
-|---|---|---|---|
-| C1 | `mtp-team-c1` | `mtp-team-c1` | step 1 done 22-Oct (as C2) |
-| C2 | `mtp-team-c2` | `mtp-team-c2` | step 1 done 22-Oct (SPI, I2C, BT off, `core_freq=250`, `isolcpus=3`, no desktop at boot) |
-
-Passwords are never in the repository: ask Santiago. Both Pis run Pi OS 13 (trixie, 64-bit).
-
-1. **Be on the same network as the Pi.** For now the Pis only know Santiago's home WiFi. To use them elsewhere,
-   someone already logged in adds the network first (a phone hotspot is easiest; eduroam needs extra setup):
-   `sudo nmcli dev wifi connect "<SSID>" password "<password>"`. NetworkManager keeps both and joins whichever is
-   in range.
-2. **SSH** (Linux, macOS, Windows 10/11 PowerShell): `ssh mtp-team-c2@mtp-team-c2.local`. If the `.local` name does
-   not resolve (some networks and WSL2 block mDNS), use the IP from the router or the hotspot's device list.
-3. **Use a key instead of the password** (once): make one with `ssh-keygen -t ed25519` if you have none, then
-   `ssh-copy-id mtp-team-c2@mtp-team-c2.local` (on Windows: append your `~/.ssh/id_ed25519.pub` to
-   `~/.ssh/authorized_keys` on the Pi).
-4. **Raspberry Pi Connect** (browser shell, connect.raspberrypi.com) is signed in to Santiago's Raspberry Pi ID, so
-   only that account sees the Pis there; everyone else uses SSH.
-5. **Shut down before unplugging:** `sudo poweroff`, then wait until the green ACT LED stops flashing. Pulling the
-   power while Linux runs can corrupt the SD card.
-
-Power: use a 5.1 V ≥ 2.5 A supply. `vcgencmd get_throttled` must print `throttled=0x0`; on 22-Oct both Pis showed
-`0x50005` / `0x50000` (under-voltage now / since boot) on a laptop USB port, and timing results taken like that are
-not valid. The A+ micro-USB carries power only (no data): reach the Pi over WiFi.
-
-WiFi, Bluetooth and Pi Connect are for development only: the rules (p.6) ban an active WiFi/BT chip (Atenea
-Q22). Before QM or any test day, finish step 1 of "Pi setup" (`disable-wifi`, `rpi-connect` off); after that,
-reach the Pi with a keyboard + HDMI or a serial console. On trixie there is no `hciuart` unit (Bluetooth is
-`bluetooth.service` + `dtoverlay=disable-bt`), and disabling `wpa_supplicant` cuts the WiFi, so do that last.
-
-Each box's local details (IP, password) can go in a `.env` at the repo root, copied from `.env.example`; it is
-ignored by the repository.
+Hostnames, users, SSH (WSL, keys, one-line `sudo`), shutting down, adding another WiFi (team hotspot,
+eduroam) and what to do when a Pi reaches no network: [`PI_ACCESS.md`](../../../PI_ACCESS.md).
 
 ## Still to do on hardware
 

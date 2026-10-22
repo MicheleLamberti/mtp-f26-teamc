@@ -99,8 +99,8 @@ runs the radio/protocol suites, file/Unicode tests, node integration/reboot test
 ARM32/AArch64 compile checks for the file module and C bridge.
 Physical Pi, radio and USB tests remain pending.
 
-**The team's Pis** (C1, C2): hostnames, users, SSH, adding a WiFi network and shutting down are in
-[Connecting to the team's Pis](proto/port/linux/README.md#connecting-to-the-teams-pis). Passwords: ask Santiago.
+**The team's Pis** (C1, C2): hostnames, users, SSH, shutting down, another WiFi and a Pi with no network are in
+[`PI_ACCESS.md`](PI_ACCESS.md). Passwords: ask Santiago.
 
 Rebuilding the workbook needs `openpyxl` (`pip install openpyxl`); `make -C proto usb-xcheck PYTHON=<python with
 pyfatfs and "setuptools<81">` cross-checks the USB code against a second FAT implementation.
