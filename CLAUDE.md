@@ -285,6 +285,11 @@ what's pending.
   configuration, `0x50000` on laptop USB. Teammates: `PI_ACCESS.md`.
   Scripted configuration lesson: never feed `sudo -S` and the command's own stdin from one pipe (it wrote the
   password into C2's config.txt once; removed, checked 0 copies left).
+- Evening: `PI_ACCESS.md` (how to reach the Pis: find, SSH from WSL, `sudo -t`, other WiFi, eduroam, no network,
+  competition days). Team hotspot **`teamc-pi`** (WPA2, password outside the repo) added on both Pis by Santiago
+  with `nmtui`; round trip tested on both from his phone (joins in seconds, DHCP 10.72.203.x, DNS OK, back home).
+  `enable_uart=1` on both (serial getty on ttyAMA0). C2 once booted on a weak laptop port without joining WiFi;
+  phone charger also under-voltage → official supply. Pi OS `sudo` uses `timestamp_type=global` (15 min cache).
 - **Start next session with:** proper supply on both? clone + `make -C radio/fw linux`, `nrf24_probe init` +
   `timing --rt 3`.
 

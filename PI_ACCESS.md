@@ -6,22 +6,26 @@ WiFi, and when they cannot reach any network. Setup of a fresh card: [`proto/por
 
 | Box | Hostname | User | State |
 |---|---|---|---|
-| C1 | `mtp-team-c1` | `mtp-team-c1` | Pi setup step 1 done 22-Oct |
-| C2 | `mtp-team-c2` | `mtp-team-c2` | Pi setup step 1 done 22-Oct |
+| C1 | `mtp-team-c1` | `mtp-team-c1` | Pi setup step 1 + team hotspot + serial console, 22-Oct |
+| C2 | `mtp-team-c2` | `mtp-team-c2` | Pi setup step 1 + team hotspot + serial console, 22-Oct |
 
 Both run Pi OS 13 (trixie, 64-bit; desktop image that boots to the console). Step 1 = SPI, I2C, Bluetooth off,
-`core_freq=250`, `isolcpus=3`, no desktop at boot; backups of the originals in `/boot/firmware/*.bak-teamc`.
+`core_freq=250`, `isolcpus=3`, no desktop at boot; plus `enable_uart=1` (serial console). Backups of the original
+`config.txt` / `cmdline.txt` in `/boot/firmware/*.bak-teamc`.
 **Passwords are never in the repository: ask Santiago.** Keep your own copy in a `.env` at the repo root
 (`cp .env.example .env`; the repository ignores it).
 
-**WiFi known to both Pis today: Santiago's home network only.** Anywhere else, read [Another WiFi](#another-wifi)
-first.
+**WiFi known to both Pis (22-Oct): Santiago's home network and the team hotspot `teamc-pi`** (WPA2; password: ask
+Santiago). Anywhere else, start a phone hotspot named `teamc-pi` ([team hotspot](#team-hotspot-teamc-pi)) or read
+[Another WiFi](#another-wifi) first.
 
 ## 1. Power it
 
-- Use a 5.1 V ≥ 2.5 A supply into the micro-USB. A laptop USB port boots it, but both Pis report under-voltage
-  there (`throttled=0x50005` / `0x50000` on 22-Oct): fine for SSH, not for radio or timing tests. Check with
-  `vcgencmd get_throttled`; it must print `throttled=0x0`.
+- Use a 5.1 V ≥ 2.5 A supply into the micro-USB (the official Pi supply). A laptop USB port and a phone charger
+  both boot it, but both Pis reported under-voltage on them (`throttled=0x50005` / `0x50000` on 22-Oct): fine for
+  SSH, not for radio or timing tests. Check with `vcgencmd get_throttled`; it must print `throttled=0x0`.
+- On a weak laptop port C2 once booted (red on, green blinking) but **never joined the WiFi**; it came up at once
+  on a phone charger. If a Pi does not show up after 2 minutes, try a stronger supply first.
 - The A+ micro-USB carries **power only, no data**: plugging it into a laptop gives no USB network or serial link.
   You reach the Pi over WiFi (or the options in [No network at all](#no-network-at-all)).
 - Boot to SSH takes about 1 minute (3–5 minutes the first time after flashing a card).
@@ -54,6 +58,9 @@ ssh mtp-team-c1@mtp-team-c1.local        # or ssh mtp-team-c1@<IP>
   mtp-team-c1@<IP>`. On Windows without `ssh-copy-id`: `type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh
   mtp-team-c1@<IP> "cat >> ~/.ssh/authorized_keys"`. Santiago's laptop key is on both Pis.
 - **One-line `sudo` needs `-t`** (it must ask for the password): `ssh -t mtp-team-c1@<IP> sudo poweroff`.
+- **`sudo` asks for the user's password**, but Pi OS sets `timestamp_type=global`: after one successful `sudo`,
+  no session of that user is asked again for 15 minutes, including a new SSH login. That is normal, not a
+  password-less account.
 - **Raspberry Pi Connect** (browser shell at connect.raspberrypi.com) is signed in to Santiago's Raspberry Pi ID:
   only that account sees the Pis there. It works on any network with internet access, including networks
   that block device-to-device traffic. Everyone else uses SSH.
@@ -90,13 +97,17 @@ Check and tidy: `nmcli connection show` (all known networks), `nmcli -f NAME,DEV
 If the network is in range right now, `sudo nmcli --ask dev wifi connect "<SSID>"` adds it and switches to it,
 asking for the password. Over SSH that drops your session; log in again on the new network.
 
-### Recommended: one team hotspot on both Pis
+### Team hotspot `teamc-pi`
 
-Pick a hotspot name and password for the team (for example SSID `teamc-pi`), add it to both Pis as above, and
-share the password outside the repository. Then **any** teammate's phone hotspot with that name and password
-works anywhere, campus included:
+Both Pis know the network `teamc-pi` (WPA2 Personal, added with `nmtui` on 22-Oct; the password is shared
+outside the repository: ask Santiago). So **any** teammate's phone hotspot with that name and password works
+anywhere, campus included. Tested 22-Oct with Santiago's phone on both Pis: each joined within seconds, got an
+address from the phone (10.72.203.x), name lookups worked (pings to 1.1.1.1 were dropped, as phone hotspots often
+do), and went back to the home network afterwards.
 
-- Phone: set the hotspot name and password; on an iPhone turn on "Maximize Compatibility" (2.4 GHz).
+- Phone: set the hotspot name `teamc-pi` and the password; on an iPhone turn on "Maximize Compatibility" (2.4 GHz).
+- If both the home network and `teamc-pi` are in range, the Pi stays on whichever it joined first. To move it
+  by hand: `sudo nmcli connection up teamc-pi` (your SSH session drops; log in again on the hotspot).
 - Connect your laptop to the same hotspot, read the Pi's IP in the phone's device list, `ssh` as usual.
 - Mobile data is only used for internet traffic (apt, git, Pi Connect); SSH between laptop and Pi stays local.
 - During radio bench tests, keep the hotspot (and the Pi's own WiFi) in mind: they are 2.4 GHz traffic next to
@@ -119,15 +130,14 @@ sudo nmcli connection add type wifi ifname wlan0 con-name eduroam ssid eduroam \
 
 The Pi is somewhere it knows no network and you cannot log in. Options, quickest first:
 
-1. **Make a network it knows.** Start a phone hotspot with the team hotspot's name and password, or with the same
-   name and password as a network the Pi already has.
+1. **Make a network it knows.** Start a phone hotspot named `teamc-pi` with the team password.
 2. **Keyboard + HDMI monitor** (full-size HDMI on the A+, keyboard in its USB-A port): log in on the console and run
    `sudo nmtui`.
 3. **USB-Ethernet adapter** in the USB-A port, cable to the router: the Pi gets an address by DHCP; find it as in
    step 2, SSH in, add the WiFi.
-4. **Serial console:** a 3.3 V USB-serial adapter on header pins 8 (TX), 10 (RX), 6 (GND), 115200 baud (with the carrier HAT on:
-   its 3-pin UART header J13); needs
-   `enable_uart=1` in `/boot/firmware/config.txt` (not set today, so add it while you can still log in).
+4. **Serial console:** a 3.3 V USB-serial adapter on header pins 8 (Pi TX), 10 (Pi RX), 6 (GND), 115200 baud
+   (with the carrier HAT on: its 3-pin UART header J13). Ready on both Pis since 22-Oct: `enable_uart=1`,
+   `/dev/serial0 → ttyAMA0` with a login prompt. Cross the wires: adapter RX to pin 8, adapter TX to pin 10.
 5. **Re-flash the card** with Raspberry Pi Imager (hostname, user, password, WiFi, Pi Connect token as before).
    This erases the Pi: redo Pi setup step 1 afterwards. C1 needed this once on 22-Oct: the first WiFi entry in
    Imager never joined.
@@ -140,5 +150,5 @@ the card in a laptop; only the boot (FAT) partition is visible there.
 WiFi, Bluetooth and Pi Connect are for development only: the rules (p.6) ban an active WiFi/BT chip (Atenea Q22).
 Before QM or any test day: `sudo systemctl disable --now rpi-connect`, then `dtoverlay=disable-wifi` (already
 `disable-bt`) in `/boot/firmware/config.txt`, reboot. From then on only options 2–4 of
-[No network at all](#no-network-at-all) reach the Pi, so set up `enable_uart=1` or have a keyboard and monitor
-ready first.
+[No network at all](#no-network-at-all) reach the Pi: bring a 3.3 V USB-serial adapter (the serial console is
+already on) or a keyboard and monitor.
