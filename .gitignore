@@ -24,3 +24,6 @@ __pycache__/
 
 # KiCad stock 3D models fetched by hw/scripts/fetch_3d.py
 hw/.3dmodels/
+
+# Local secrets (Pi login, WiFi password): template in .env.example
+.env

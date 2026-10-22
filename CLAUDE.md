@@ -94,6 +94,8 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   2.5 via DSN/SES; needs a portable Java 25 + the jar, not in the repo), finish_carrier.py, silk_carrier.py,
   fab_carrier.py, render_board.py + fetch_3d.py** (stock 3D models into the ignored `hw/.3dmodels/`), build_bom.py).
   The `.kicad_sch` files are generated: edit `hw/teamc-carrier/sheets/*.py`, then `python3 hw/scripts/build_carrier.py`.
+- `.env.example` (22-Oct) — Pi 3 A+ setup values (Imager hostnames C1/C2, user, SSH key, dev-only WiFi, data
+  partition, teamc-node options). Copy to `.env` (git-ignored: secrets); nothing reads it yet.
 - `proto/` — PT protocol code (`src/`: link ARQ+resume, NM Trickle gossip + relay log `nm_log.c`, codec, USB stick
   I/O `usb_msc.c` over FatFs R0.15a in `third_party/fatfs/`) and the PC simulator (`sim/`, `--fhss BUSY` = the SRI/MRM
   hopping radio layer): `make -C proto test` (21 scenarios incl. T18 = NM spec test vector and T19 = Pi 3 reboot, + 116 usb_msc checks, ~2 s; `--reboot-down S` sets the
@@ -269,6 +271,11 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-22 — `.env` for the Pi 3 A+ setup
+- Santiago is setting up the two Pi 3 A+: added `.env.example` (tracked) and `.env` (ignored) with the Imager,
+  WiFi (development only, disabled before QM), SD layout and teamc-node option values from the setup READMEs.
+- **Start next session with:** Pis flashed? `nrf24_probe init` + `timing --rt 3` results.
 
 ### 2026-10-21 — carrier routed to DRC 0/0/0; gerbers; 3D renders; hw page v0.7
 - Santiago: finish the hw project for the ET team. Started from the `kicad-carrier` worktree (76 unconnected).
