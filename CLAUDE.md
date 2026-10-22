@@ -149,6 +149,14 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
+- **22-Oct-26: both Pi 3 A+ (C1, C2) are up and configured** (Pi OS 13 trixie 64-bit; hostname = user
+  `mtp-team-c1` / `mtp-team-c2`; SSH key login from Santiago's laptop). Pi setup step 1 done on both: SPI, I2C,
+  Bluetooth off, `core_freq=250`, `isolcpus=3`, no desktop at boot, `enable_uart=1`. WiFi = Santiago's home network +
+  team hotspot **`teamc-pi`** (tested on both); WiFi + Pi Connect stay on for development only. How to reach them:
+  **`PI_ACCESS.md`**. Both under-voltage on laptop USB and on a phone charger → official 5.1 V ≥ 2.5 A supply before
+  any radio/timing test. Not yet: repo clone + build on the Pis (the team does it, Santiago 22-Oct), `/data`
+  partition, read-only root, SP4 wiring.
+
 - **20-Oct-26, Guillem: file/Unicode layer integrated into `teamc-node`.** C ABI links the C++17 module into the C node. Setup caches and sender reads check length/CRC; complete reception checks stream CRC and complete zlib decoding before SD/USB export. Encoding reports and strict UTF-8 views remain on the SD card; ambiguous/invalid text still transfers unchanged. `--text-encoding` and `--text-bom-policy` select view policy. Partial STOP and the existing resume store remain in place. CI includes whole-node encoding cases plus the existing SRI/MRM/reboot/NM e2e suite; physical Pi/USB validation is still pending. Root/protocol/node READMEs now describe the integrated path, dependencies, commands, cache files and LaTeX reports.
 
 - **20-Oct-26, Guillem: team-repository migration.** Write access is available. The encoding/file-stream work is incorporated into `SantiBarrios2002/mtp-f26-teamc`, retaining both its original commits and the team's newer hardware/export changes. Task 11's own report and validation are now versioned under `docs/task_11_unicode/`; external sources remain local. Continue work directly on this repository's `main`.
@@ -218,8 +226,8 @@ sim T19: MRM with a 30 s reboot still 90.8 s. PIO-USB + stick boost obsolete. Co
       interop test by 6-Nov (NM win gates the cost category)
 - [ ] D-R6 go/no-go for MRM hopping on Fri 20-Nov (T17, T18, 260 m transfer); else TEAM_250K, or option B on a Q11 yes
 - [ ] ET: micro — **2 × Raspberry Pi 3 A+ ordered 19-Oct** (WiFi/BT chip disabled or desoldered, Atenea Q22 before QM
-      6-Nov) — the pin map (Pi proposal on the Pi 3 page); microSD = SanDisk Ultra 32 GB A1 (Santiago 19-Oct); bench
-      5.1 V supply still to get
+      6-Nov) — the pin map (Pi proposal on the Pi 3 page); microSD = SanDisk Ultra 32 GB A1 (Santiago 19-Oct; the
+      cards in use on 22-Oct are 16 GB); **both Pis delivered and configured 22-Oct**; bench 5.1 V supply still to get
 
 **19-Oct-26: KiCad session (hw/).** SP4 breakout ready for the lab; carrier HAT drafted (schematic + placement +
 power/SPI routing) for ET. Choices approved by Santiago: panel-mount controls on JST-XH leads (power toggle drives a
@@ -258,7 +266,8 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
-- [ ] Pi 3 software: **written and e2e-tested 18-Oct** (`proto/port/linux/teamc-node`); on a real Pi: `nrf24_probe init`,
+- [ ] Pi 3 software: **written and e2e-tested 18-Oct** (`proto/port/linux/teamc-node`); Pis configured 22-Oct
+      (`PI_ACCESS.md`); team: clone + `make -C radio/fw linux` + `make -C proto linux` on a Pi; then `nrf24_probe init`,
       `timing --rt 3`, T0/T2, then two boxes; tune RADIO_GUARD_US + link timers from measurements. Was:
       SD-card store with fdatasync, `usbm_disk_t` on the raw stick, read-only root, boot ≤ 10 s; hop clock + acquisition
       (only in the simulator so far); measure frame gap/turnaround (T2)
@@ -273,25 +282,28 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
 
-### 2026-10-22 — `.env` for the Pi 3 A+ setup
-- Santiago is setting up the two Pi 3 A+: added `.env.example` (tracked) and `.env` (ignored) with the Imager,
-  WiFi (development only, disabled before QM), SD layout and teamc-node option values from the setup READMEs.
-- Pi **C2 up** (hostname = user `mtp-team-c2`, home WiFi, SSH key login): Pi 3 A+ Rev 1.1, Pi OS 13 trixie 64-bit
-  (desktop image, now boots to multi-user), 16 GB card (not the 32 GB A1). Configured: `dtparam=spi=on`,
-  `i2c_arm=on`, `disable-bt`, `core_freq=250`, `isolcpus=3`, bluetooth.service off (backups `*.bak-teamc` in
-  /boot/firmware); WiFi + Pi Connect left on for development. **`throttled=0x50005` = under-voltage on the
-  current supply → bench 5.1 V ≥ 2.5 A supply before any timing test.**
-- Pi **C1 up** the same way (`mtp-team-c1`, re-flashed once: the first Imager WiFi entry never joined), same
-  configuration, `0x50000` on laptop USB. Teammates: `PI_ACCESS.md`.
-  Scripted configuration lesson: never feed `sudo -S` and the command's own stdin from one pipe (it wrote the
-  password into C2's config.txt once; removed, checked 0 copies left).
-- Evening: `PI_ACCESS.md` (how to reach the Pis: find, SSH from WSL, `sudo -t`, other WiFi, eduroam, no network,
-  competition days). Team hotspot **`teamc-pi`** (WPA2, password outside the repo) added on both Pis by Santiago
-  with `nmtui`; round trip tested on both from his phone (joins in seconds, DHCP 10.72.203.x, DNS OK, back home).
-  `enable_uart=1` on both (serial getty on ttyAMA0). C2 once booted on a weak laptop port without joining WiFi;
-  phone charger also under-voltage → official supply. Pi OS `sudo` uses `timestamp_type=global` (15 min cache).
-- **Start next session with:** proper supply on both? clone + `make -C radio/fw linux`, `nrf24_probe init` +
-  `timing --rt 3`.
+### 2026-10-22 — Pi 3 A+ bring-up (C1, C2); `.env`; `PI_ACCESS.md`; team hotspot
+- Santiago flashed both Pis with Raspberry Pi Imager (WiFi, user/password per Pi, Pi Connect token set there).
+  `.env.example` (tracked, per box: hostname, user, password, IP) + `.env` (ignored, Santiago's has the passwords).
+- Found by mDNS through Windows (WSL cannot resolve `.local`); MAC filtering does not work (no `b8:27:eb` prefix).
+  Both: Pi 3 A+ Rev 1.1, Pi OS 13 trixie 64-bit **desktop** image (Lite was the plan), 16 GB cards. C1 re-flashed once
+  (its first WiFi entry never joined); C2 once booted on a weak laptop port without joining WiFi.
+- Configured both (Pi setup step 1): `dtparam=spi=on`, `i2c_arm=on`, `disable-bt`, `core_freq=250`, `enable_uart=1`,
+  `isolcpus=3`, bluetooth.service off, `multi-user.target`, Santiago's SSH key; verified after reboots
+  (`/dev/spidev0.0`, `/dev/i2c-1`, core 3 isolated, serial getty on ttyAMA0). Backups `/boot/firmware/*.bak-teamc`.
+- Team hotspot `teamc-pi` added by Santiago with `nmtui` on both (password outside the repo); round trip tested on
+  both from his phone (joined in seconds, DHCP 10.72.203.x, DNS OK, back to the home WiFi).
+- `PI_ACCESS.md` (root): power, find, SSH (WSL, keys, `ssh -t` for one-line sudo), Pi Connect (Santiago's account
+  only), shutdown, another WiFi (`nmtui` / `nmcli connection add`), team hotspot, eduroam (untested), no network,
+  competition days. Linked from README and the node README.
+- Power: under-voltage on laptop USB and on a phone charger (`0x50005` / `0x50000`) → official supply.
+- Lessons: never feed `sudo -S` and the command's own stdin from one pipe (it once wrote C2's password into
+  config.txt; removed, 0 copies left; Santiago may change it); Pi OS sudo has `timestamp_type=global` (15 min
+  cache, no NOPASSWD); systemd-run scripts need a shebang.
+- Santiago: the team clones and builds the repo on the Pis later.
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK (docs-only changes).
+- **Start next session with:** official supply on both? repo cloned + built on a Pi? SP4 breakout wired →
+  `nrf24_probe init`, `timing --rt 3`.
 
 ### 2026-10-21 — carrier routed to DRC 0/0/0; gerbers; 3D renders; hw page v0.7
 - Santiago: finish the hw project for the ET team. Started from the `kicad-carrier` worktree (76 unconnected).
