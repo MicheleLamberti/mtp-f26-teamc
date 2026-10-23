@@ -77,6 +77,12 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   (top/iso/HAT on the Pi/bottom), 5 review points for ET**; v0.6 19-Oct: the KiCad carrier (status table, renders, BoM-based parts ≈ €102, fab rules, asks to ET), SP4 14.5 mm, Ebyte flex antenna; v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
+- **`hw/teamc-carrier-lab/` = carrier rev B for the UPC lab mill (23-Oct, SET UP, not placed/routed):** single-sided,
+  hand-soldered modules (Pololu U3V70F5 boost, Pololu #5388 ideal diode, Adafruit MAX17048 #5580), AP2112K radio LDO,
+  2×20 IDC ribbon to the Pi (not a HAT), the SP4 breakout plugs into a 1×8 socket, TP4056 USB-C charger off-board.
+  `python3 hw/scripts/build_carrier_lab.py` = footprints (`teamc_lib/gen_lab.py`, `gen_modules.py` from
+  `sheets/modules.py`, makers' CAD) + 4 sheets + ERC 0 + unplaced board with lab rules. Decisions/parts/lab rules:
+  **`hw/REVB_LAB_PLAN.md`**; the place/route/DRC/fab loop: **`hw/REVB_LOOP_PROMPT.md`** (Santiago runs it later).
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
   agent with ~8 subagents**: research of power / Pi + SP4 footprint / UI parts with verified symbols and footprints,
   SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
@@ -148,6 +154,14 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   the team's own Task 11 report and reproducible validation are tracked. Put PDF exports of the pages in `briefs/` too.
 
 ## Status (keep current)
+
+- **23-Oct-26: the carrier goes to the UPC lab mill → rev B with hand-soldered modules (set up, loop pending).**
+  Meeting with Prof. Chávez: lab rules = track > 0.3 (better > 0.5) mm, via hole ≥ 0.7 mm, **no plated holes**, no
+  mask/silk (Chávez slides + Jiménez guide; memory `upc-lab-pcb-milling`); gerbers by email to Chávez, pick-up C5-114.
+  Rev A cannot be milled (and TPS61022 / Si2333DDS are out of stock until Jan-27 / Dec-26); it stays as the
+  external-fab option. Santiago's choices: modules only, TP4056 charger (charge with the box off), IDC ribbon to the Pi,
+  breakout plugged in. **SP4 breakout updated for the lab (2.0 mm header pads, C1 no-pour) → ready to email.**
+  Next: box inside dimensions, then `hw/REVB_LOOP_PROMPT.md`; order the modules soon (Botland lots 13–39 pcs).
 
 - **22-Oct-26: both Pi 3 A+ (C1, C2) are up and configured** (Pi OS 13 trixie 64-bit; hostname = user
   `mtp-team-c1` / `mtp-team-c2`; SSH key login from Santiago's laptop). Pi setup step 1 done on both: SPI, I2C,
@@ -260,9 +274,12 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] Andrian: campus 2.4 GHz survey (T14): WiFi load per hop channel and on the NM channel 77
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
-- [ ] ET: review the routed carrier rev A (`hw/DESIGN_NOTES.md` "State of the carrier board on 21-Oct": 5 review
-      points, DRC 0/0/0, gerbers in `hw/teamc-carrier/fab/`), then order from a JLCPCB-class fab (0.2 mm rules) by
-      early Nov; check stock (TPS61022, Si2333DDS, fuse); box dimensions + one SP4 measured first
+- [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
+- [ ] Carrier rev B (lab): box inside dimensions → run `hw/REVB_LOOP_PROMPT.md` (place, route single-sided, DRC 0,
+      fab zip) → email to Chávez; order U3V70F5, #5388, MAX17048 #5580, TP4056 USB-C, AP2112K, DMP2035U, 0466005 fuse,
+      IDC box header + 40-way F-F ribbon, 1×8 socket (`hw/REVB_LAB_PLAN.md`)
+- [ ] (Fallback only) carrier rev A at a JLCPCB-class fab: TPS61022 has no stock until Jan-27 (re-footprint to
+      TPS61033/TPS61023), Si2333DDS → DMP2035U-7, 22 µF → CL31A226KAHNNNE
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
       T13 lab booking with T17 (RPD trip level) + T18 (hop pattern) — gates for TEAM_FHSS outdoors
 - [ ] Field: T4/T5 attenuate to failure (planning case MRM +0.9, NM −3.1 dB); antenna as high as the box allows
@@ -281,6 +298,23 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-23 — meeting with Prof. Chávez (ET): lab PCB rules; breakout pads; carrier rev B set up
+- Santiago (in the meeting) asked for a PCB overview, the BoM, the trace sizes; the lab wants track > 0.3/0.5 mm and
+  via holes ≥ 0.7 mm. Read the Chávez slides and the Jiménez milling guide (Windows Downloads): no plated holes, no
+  mask/silk, OSP; process = email gerbers, pick-up C5-114. Memory `upc-lab-pcb-milling`.
+- Stock check (subagent): TPS61022 0 until Jan-27 (no RWU drop-in), Si2333DDS 0 until Dec-26 (DMP2035U-7 instead),
+  GRM31CR61E226KE15L obsolete (CL31A226KAHNNNE); everything else in stock.
+- SP4 breakout: header pads 1.7 → 2.0 mm, no pour between C1's pads (FR10), lab floor restored; DRC 0 (03eebba).
+- Santiago: use the breakout, redesign the carrier with hand-soldered modules only, bigger board OK; then picked the
+  simpler options (TP4056, IDC ribbon) and the plugged-in breakout; "set up the design, I'll run the loop later".
+- Module research (2 subagents): U3V70F5 / #5388 / Adafruit #5580 chosen, pads from Pololu DXFs and the Adafruit .brd
+  (`hw/teamc-carrier-lab/sheets/modules.py`). The #5388 needs ~3.9 V to start: fine on the 5 V side only.
+- Built the rev B set-up: `build_carrier_lab.py`, `gen_lab.py`, `gen_modules.py`, sheets power/pi_link/radio/ui,
+  ERC 0/0, board with every footprint unplaced; `hw/REVB_LAB_PLAN.md`, `hw/REVB_LOOP_PROMPT.md`.
+- Left uncommitted in the main checkout: KiCad 10 default keys added to the two rev A/breakout `.kicad_pro` files
+  (14:38; Santiago keeps or discards).
+- **Start next session with:** box inside dimensions → `hw/REVB_LOOP_PROMPT.md`; breakout emailed? modules ordered?
 
 ### 2026-10-22 — Pi 3 A+ bring-up (C1, C2); `.env`; `PI_ACCESS.md`; team hotspot
 - Santiago flashed both Pis with Raspberry Pi Imager (WiFi, user/password per Pi, Pi Connect token set there).
