@@ -62,7 +62,7 @@ def power(board):
     """Hand-routed power path (seen from the copper side; see place_carrier_lab.py for the floorplan).
 
     Cell end: J20 (+ right, - left) -> F1 up -> Q1 (drain left, source up) -> VBAT riser along the right edge ->
-    VBAT line at y = VL over U2's cell end -> U2 pads 1/2, C5, D3, TP1, J23, R8. Ground of the boost loop: a trunk
+    VBAT line at y = VL over U2's cell end -> U2 pads 1/2, C5, D3, TP1, J23 (charger), R8. Ground of the boost loop: a trunk
     under U2 (x = GX) from its cell-end GND pads to its 5 V-end GND pads, with C5, D3 and J20 tied straight to it
     (star at the trunk, J20 next to it). 5 V: U2 pads 6/7 -> U3 pads 1/2; U3 pads 5/6 -> J1 pins 4/2, C9, C10, D2.
     """
@@ -101,11 +101,13 @@ def power(board):
         T([g, (gx, g[1])], PW, "GND")
     j2 = P("J20", 2)
     T([j2, (gx, j2[1])], PW, "GND")
-    # charger lead J23 below J20: BAT_IN and GND straight from the cell lead; R1 returns to J23's GND pin
+    # charger lead J23 on VBAT behind F1/Q1 (review 23-Oct): VBAT pin straight up to the VBAT line, GND pin down to
+    # C5's ground pad (on the trunk). R1 returns below the cell lead to J20's GND pin.
     c1, c2 = P("J23", 1), P("J23", 2)
-    T([j1, (j1[0], j1[1] + 5.0), (c1[0], j1[1] + 6.5), c1], PW, "/power/BAT_IN")
-    T([j2, c2], PW, "GND")
-    T([r1n, (r1n[0], c2[1] + 3.5), (c2[0], c2[1] + 3.5), c2], 1.0, "GND")
+    T([c1, (c1[0], vl)], PW, "VBAT")
+    c5g = P("C5", 2)
+    T([c2, (c2[0], c2[1] + 2.5), (c5g[0], c2[1] + 2.5), c5g], 1.0, "GND")
+    T([r1n, (r1n[0], j1[1] + 3.5), (j2[0], j1[1] + 3.5), j2], 1.0, "GND")
     # -- EN and the toggle cluster
     T([P("Q2", 3), (P("U2", 5)[0] - 1.5, P("Q2", 3)[1]), P("U2", 5)], SIG, "/power/PWR_EN")
     T([P("R8", 2), P("Q2", 1)], SIG, "/power/PWR_G")

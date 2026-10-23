@@ -33,15 +33,15 @@ U2,1,Pololu U3V70F5 5V boost,teamc:Pololu_U3V70F5_Headers,2891 (U3V70F5),Pololu,
 U3,1,Pololu ideal diode 20A,teamc:Pololu_IdealDiode_5388_Headers,5388 (rvp01b),Pololu,Botland (25 pcs on 23-Oct),5.90,5.90,yes
 U4,1,AP2112K-3.3,Package_TO_SOT_SMD:SOT-23-5,AP2112K-3.3TRG1,Diodes Inc.,TME (1231 pcs on 23-Oct),0.22,0.22,yes
 U6,1,Adafruit MAX17048 fuel gauge,teamc:Adafruit_MAX17048_5580_Headers,5580 (Rev B),Adafruit,Botland (21 pcs on 23-Oct; Kiwi EUR 6.88),8.00,8.00,yes
-W1,1,wire link 34.5 mm,teamc:WireLink_L34.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W2,1,wire link 8.0 mm,teamc:WireLink_L8.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W3,1,wire link 8.5 mm,teamc:WireLink_L8.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W4,1,wire link 13.0 mm,teamc:WireLink_L13.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W5,1,wire link 19.5 mm,teamc:WireLink_L19.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W6 W10,2,wire link 5.0 mm,teamc:WireLink_L5.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.04,yes
-W7,1,wire link 18.5 mm,teamc:WireLink_L18.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W8,1,wire link 15.0 mm,teamc:WireLink_L15.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
-W9,1,wire link 10.5 mm,teamc:WireLink_L10.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W1,1,wire link 34.5 mm,teamc:WireLink_L34.5mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W2,1,wire link 8.0 mm,teamc:WireLink_L8.0mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W3,1,wire link 8.5 mm,teamc:WireLink_L8.5mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W4,1,wire link 13.0 mm,teamc:WireLink_L13.0mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W5,1,wire link 19.5 mm,teamc:WireLink_L19.5mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W6 W10,2,wire link 5.0 mm,teamc:WireLink_L5.0mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.06,yes
+W7,1,wire link 18.5 mm,teamc:WireLink_L18.5mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W8,1,wire link 15.0 mm,teamc:WireLink_L15.0mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
+W9,1,wire link 10.5 mm,teamc:WireLink_L10.5mm,"22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)",,lab stock (insulated solid hook-up wire) est.,0.03,0.03,yes
 (off-board),1,"Raspberry Pi 3 Model A+ (WiFi/BT disabled or removed, Atenea Q22)",,,,ordered 19-Oct (market price),27.00,27.00,yes
 (off-board),1,microSD SanDisk Ultra 32 GB A1 (half a twin pack),,,,ordered 19-Oct (est.),6.00,6.00,yes
 (off-board),1,Ebyte E01-ML01SP4 + TX2400-FPC-2509 flex antenna (bundle),,,,"ebyteiot.com, ordered 19-Oct",3.60,3.60,yes
@@ -67,7 +67,7 @@ W9,1,wire link 10.5 mm,teamc:WireLink_L10.5mm,"0.6 mm (22 AWG) tinned copper wir
 (off-board),1,"Solder, flux",,,,lab stock (est.),0.50,0.50,no
 (off-board),1,PCB: carrier rev B milled at the UPC lab (rules: counts EUR 15),,,,UPC lab,15.00,15.00,no
 
-"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,138.91,
-of which purchased by the team,,,,,,,,105.91,
+"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,139.01,
+of which purchased by the team,,,,,,,,106.01,
 of which owned / lab stock / lab PCB (non-purchased),,,,,,,,33.00,
 "Cap per device (rules): EUR 150. DRAFT – for ET review; prices 19-Oct-26, verify before ordering"

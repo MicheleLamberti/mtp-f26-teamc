@@ -3876,16 +3876,17 @@
 		)
 		(uuid "b82026a0-c485-5cef-8033-080f56dc276b")
 	)
-	(label "BAT_IN"
+	(global_label "VBAT"
+		(shape passive)
 		(at 152.4 38.1 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify right)
 		)
-		(uuid "92b21cbe-9190-5690-a349-828d3c4e2969")
+		(uuid "282b12c5-5723-5637-b650-d6cfc7d5dc22")
 	)
 	(wire
 		(pts
@@ -7870,7 +7871,7 @@
 		)
 		(uuid "ee65e8bc-bb64-5717-ba8b-4c0082f55110")
 	)
-	(text "Protected 18650 (PCM inside, trip >= 3 A) in a holder on the box floor, JST-VH lead to J20.\nQ1: body diode conducts for a correct cell, then VGS = -VBAT turns it on; a reversed cell is blocked.\nDMP2035U <= 45 mΩ at -2.5 V (AO3401A ~85 mΩ: ~0.25 V at 3 A). C5: bulk at the boost input (Pololu asks\nfor >= 33 uF when the cell is on a lead). Charger (J23): rev B on BAT_IN, beside J20 (the cell lead)."
+	(text "Protected 18650 (PCM inside, trip >= 3 A) in a holder on the box floor, JST-VH lead to J20.\nQ1: body diode conducts for a correct cell, then VGS = -VBAT turns it on; a reversed cell is blocked.\nDMP2035U <= 45 mΩ at -2.5 V (AO3401A ~85 mΩ: ~0.25 V at 3 A). C5: bulk at the boost input (Pololu asks\nfor >= 33 uF when the cell is on a lead). Charger (J23) on VBAT, behind F1 and Q1 (review 23-Oct): a\nreversed cell never reaches the TP4056, and a short in the charger lead is fused. Q1 conducts both ways once on."
 		(exclude_from_sim no)
 		(at 15.24 91.44 0)
 		(effects

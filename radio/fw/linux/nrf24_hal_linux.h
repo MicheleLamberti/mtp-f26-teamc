@@ -19,13 +19,14 @@
 
 typedef struct {
     const char *spidev;     /* "/dev/spidev0.0" */
-    uint32_t spi_hz;        /* 8 MHz requested; 7.8 MHz on a Pi 3 with core_freq=250 */
+    uint32_t spi_hz;        /* 4 MHz requested (3.9 MHz on a Pi 3 with core_freq=250); was 8 MHz until the
+                               rev B ribbon review (23-Oct): its SPI return uses pins 6/9/14 only. Raise after T2. */
     const char *gpiochip;   /* "/dev/gpiochip0" = the BCM2837 GPIO bank on a Pi 3 */
     unsigned ce_gpio;       /* 22 */
     int irq_gpio;           /* 24, or -1 to poll only */
 } nrf24_linux_cfg_t;
 
-#define NRF24_LINUX_CFG_DEFAULT {"/dev/spidev0.0", 8000000u, "/dev/gpiochip0", 22u, 24}
+#define NRF24_LINUX_CFG_DEFAULT {"/dev/spidev0.0", 4000000u, "/dev/gpiochip0", 22u, 24}
 
 typedef struct {
     int spi_fd, ce_fd, irq_fd;

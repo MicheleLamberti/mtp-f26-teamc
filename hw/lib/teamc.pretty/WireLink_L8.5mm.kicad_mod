@@ -3,12 +3,12 @@
 	(generator "pcbnew")
 	(generator_version "10.0")
 	(layer "F.Cu")
-	(descr "Wire link 8.5 mm: bare 0.6 mm tinned copper wire on the component side between two unplated 1.0 mm holes (Team C rev B, single-sided UPC lab board)")
+	(descr "Wire link 8.5 mm: insulated 22 AWG solid tinned wire on the component side between two unplated 1.0 mm holes (Team C rev B, single-sided UPC lab board)")
 	(tags "wire link jumper Team C lab")
 	(property "Reference" "W**"
 		(at 0 0 0)
 		(layer "F.SilkS")
-		(uuid "1673c256-2cce-4061-9e3a-33ad132f8a1a")
+		(uuid "c61adfbe-5610-4d95-b49f-ef61fddcadd6")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -18,7 +18,7 @@
 	(property "Value" "WireLink_L8.5mm"
 		(at 0 0 0)
 		(layer "F.Fab")
-		(uuid "c45e3dc5-a6a8-4a3c-a45a-96e8e3eae090")
+		(uuid "ab90d4f3-5d8d-42ce-8147-eba7cf45fba7")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -29,7 +29,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "980dcb62-d245-4dce-b56d-5ff7c572dd75")
+		(uuid "916f6bae-f3d3-4c4f-87f9-bc1d1edbb8bc")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -40,7 +40,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "b9da11a3-f557-4b93-a08e-d198b008668c")
+		(uuid "33a1cbcd-9e9e-4658-91c7-17bac8e82830")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -57,7 +57,7 @@
 			(type default)
 		)
 		(layer "F.CrtYd")
-		(uuid "27b559bf-d362-4994-b8b2-f4a1d236564f")
+		(uuid "abdba242-b091-4251-8b6f-0d0613ef604a")
 	)
 	(fp_line
 		(start -1.25 1.25)
@@ -67,7 +67,7 @@
 			(type default)
 		)
 		(layer "F.CrtYd")
-		(uuid "1933a29e-83f2-478c-bca5-4f138f1bb879")
+		(uuid "961b6b98-2653-459f-a9cb-3844ac97e5fb")
 	)
 	(fp_line
 		(start 9.75 -1.25)
@@ -77,7 +77,7 @@
 			(type default)
 		)
 		(layer "F.CrtYd")
-		(uuid "74b10779-830e-4a64-8b71-daa84c477c22")
+		(uuid "95439fda-1473-4b5a-a236-167103e37165")
 	)
 	(fp_line
 		(start 9.75 1.25)
@@ -87,7 +87,7 @@
 			(type default)
 		)
 		(layer "F.CrtYd")
-		(uuid "fdad16b3-4b84-4de6-ba90-3d86ce5d0c17")
+		(uuid "15426ef0-6d62-4f60-b918-97072ca0036c")
 	)
 	(fp_line
 		(start 0 0)
@@ -97,7 +97,7 @@
 			(type default)
 		)
 		(layer "F.Fab")
-		(uuid "d74a4eeb-e1da-4ca5-8271-5d21c5258baf")
+		(uuid "534eae64-bc11-4989-a5c9-42d2cc53a98f")
 	)
 	(pad "1" thru_hole circle
 		(at 0 0)
@@ -105,7 +105,7 @@
 		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "1f4e3e77-97dc-4b76-82f4-0de34e7012d7")
+		(uuid "96c65728-1371-4420-8f0a-04d48b54477b")
 	)
 	(pad "1" thru_hole circle
 		(at 8.5 0)
@@ -113,7 +113,7 @@
 		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "8bd0e6ed-dec2-4f89-9791-bbef7c6f4819")
+		(uuid "2f9bd2b7-24de-41ca-a8ff-04ed22e928a5")
 	)
 	(embedded_fonts no)
 )

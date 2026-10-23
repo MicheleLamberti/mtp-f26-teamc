@@ -51,7 +51,10 @@ def build():
            "carrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\n"
            "would still share the Pi). 3V3_PI = the Pi's own 3.3 V, rev B from pin 1 (next to the fuel gauge; pin 17 is unused): the fuel gauge's\n"
            "VIN and the radio LDO's EN only. Rev B ground: the carrier ties the Pi's GND on pins 6, 9 and 14; pin 25\n"
-           "is the LEDs' return (LED_RTN); pins 20/30/34/39 sit in pockets of the one-layer escape tracks, unused.",
+           "is the LEDs' return (LED_RTN); pins 20/30/34/39 sit in the pocket of J1's one-layer escape tracks, unused.\n"
+           "Review 23-Oct: 20/25 (the ribbon grounds beside the SPI lines) cannot reach the pour - no legal wire link\n"
+           "leaves that pocket - so the SPI return crosses the ribbon on pins 6/9/14: teamc-node runs SPI at 4 MHz\n"
+           "(--spi-hz; was 8 MHz), confirm at T2 before raising it.",
            at=(25.4, 27.94))
 
     nets = {str(p): HEADER[p][0] for p in HEADER}

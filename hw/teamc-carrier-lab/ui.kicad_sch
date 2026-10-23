@@ -4337,7 +4337,7 @@
 		)
 		(uuid "3f32b9f8-430f-52f7-ba06-cf1be4792aaa")
 	)
-	(text "D10 activity (GPIO 5), D11 status (GPIO 6).\n(3.3 − ~2.0 V) / 330 Ω ≈ 4 mA, well under the\nPi's 16 mA per pin. No InGaN (blue/white: Vf too high).\nRev B: the cathodes return on LED_RTN = J1 pin 25 (a Pi GND pin) - on one copper layer the LEDs sit\nin a pocket of J1's escape tracks, away from the carrier's pour."
+	(text "D10 activity (GPIO 5), D11 status (GPIO 6).\n(3.3 − ~2.0 V) / 330 Ω ≈ 4 mA, well under the\nPi's 16 mA per pin. No InGaN (blue/white: Vf too high).\nRev B: the cathodes return on LED_RTN = J1 pin 25 (a Pi GND pin) - on one copper layer the LEDs sit\nin a pocket of J1's escape tracks that no wire link can leave (review 23-Oct: tying it to the pour was\ntried; the inner pocket has no legal link)."
 		(exclude_from_sim no)
 		(at 208.28 233.68 0)
 		(effects

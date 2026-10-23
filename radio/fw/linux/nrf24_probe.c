@@ -7,7 +7,7 @@
  *   nrf24_probe rx       [--seconds S] [--profile P]           counts frames and losses (T0 step 4, T2)
  *   nrf24_probe timing   [--n N]                   delay and wake-up jitter of this machine, no radio
  *
- *   Board options: --spidev /dev/spidev0.0 --hz 8000000 --chip /dev/gpiochip0 --ce 22 --irq 24 (-1 = poll)
+ *   Board options: --spidev /dev/spidev0.0 --hz 4000000 --chip /dev/gpiochip0 --ce 22 --irq 24 (-1 = poll)
  *   --rt CPU   run as SCHED_FIFO pinned to CPU (needs root; isolcpus=CPU on the kernel command line)
  *
  * tx and rx use the 10 mW profiles only (TEAM_250K, TEAM_1M, NM_COMMON): the 20 dBm profiles need

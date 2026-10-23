@@ -102,13 +102,15 @@ def add_links(sheets):
         n = count.get(sheet, 0)
         count[sheet] = n + 1
         if n == 0:
-            s.note("WIRE LINKS (rev B, single copper layer): bare 0.6 mm tinned copper wire on the component side\n"
-                   "between two unplated 1.0 mm holes, soldered on the copper side; the board's crossings.\n"
-                   "Positions and lengths: hw/teamc-carrier-lab/links.json.", at=(25.4, 262.89), size=1.27)
+            s.note("WIRE LINKS (rev B, single copper layer): INSULATED 22 AWG (0.64 mm) solid tinned copper wire on the\n"
+                   "component side between two unplated 1.0 mm holes, ends stripped ~3 mm, soldered on the copper side;\n"
+                   "lay it flat and glue long ones (drop test). Insulated, not bare (review 23-Oct): it crosses tracks'\n"
+                   "pads' neighbours, loose leads and module pins. Positions and lengths: hw/teamc-carrier-lab/links.json.",
+                   at=(25.4, 262.89), size=1.27)
         length = link_length(lk)
         s.add("Connector_Generic:Conn_01x01", f"W{i}", f"wire link {length:.1f} mm", at=(30.48 + n * 20.32, 276.86),
               fp=f"teamc:WireLink_L{length:.1f}mm", nets={"1": local},
-              mpn="0.6 mm (22 AWG) tinned copper wire, bare")
+              mpn="22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)")
     return len(links)
 
 

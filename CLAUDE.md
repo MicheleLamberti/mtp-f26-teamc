@@ -164,12 +164,16 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 - **23-Oct-26 (evening): carrier rev B placed and routed on ONE copper layer** (`hw/teamc-carrier-lab/`): ERC 0, DRC 0
   violations / 0 unconnected / 0 parity (all severities), tracks ≥ 0.5 mm, pads ≥ hole + 0.7, pour clearance 0.4,
-  FR10 no-fill areas, **10 bare-wire links** (138 mm; J1's pin order forces the crossings), fab zip ready, BoM ≈ €139.
+  FR10 no-fill areas, **10 wire links** (insulated 22 AWG solid, 138 mm; J1's pin order forces the crossings), fab
+  zip ready, BoM ≈ €139.
   Outline 100 × 80 mm **assumed** (box 15 × 15 × 7 cm outside, not measured). Schematic changes to make one layer work
   (all DRAFT, for ET): 1206 R/C; no UI pull-ups (ui.c uses the Pi's); 4 × SMF5.0A instead of the SP0504; R80 to
   3V3_RADIO, no R81 (HAL pull-up); no C71/TP10/TP2 (C12 = 10 µF); 3V3_PI from J1 pin 1 (pin 17 unused); FG_ALRT not
   routed (software polls); U6 header GND not connected (BAT_GND); LEDs return on J1 pin 25 (LED_RTN); J1 GND pins
-  20/30/34/39 unused (Pi ground on 6/9/14); J23 charger on BAT_IN beside J20. Details: `hw/DESIGN_NOTES.md`.
+  20/30/34/39 unused (Pi ground on 6/9/14). Details: `hw/DESIGN_NOTES.md`.
+  **Review fixes (23-Oct, night):** J23 charger back on VBAT behind F1/Q1 (moved above C5); links insulated, not bare;
+  ribbon grounds 20/25 cannot reach the pour (no legal wire link out of J1's inner pocket) → **SPI default 4 MHz**
+  (`teamc-node --spi-hz`, HAL default; was 8 MHz) until T2 is clean over the ribbon.
 - **23-Oct-26: the carrier goes to the UPC lab mill → rev B with hand-soldered modules (set up, loop pending).**
   Meeting with Prof. Chávez: lab rules = track > 0.3 (better > 0.5) mm, via hole ≥ 0.7 mm, **no plated holes**, no
   mask/silk (Chávez slides + Jiménez guide; memory `upc-lab-pcb-milling`); gerbers by email to Chávez, pick-up C5-114.
@@ -315,6 +319,19 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-23 (night) — review of the rev B layout; review fixes
+- Santiago: pull the other session's rev B (4f65e84) after a review. Reviewed and pulled: DRC/ERC 0 rerun, one F.Cu
+  layer, no vias, tracks ≥ 0.5 mm, pads ≥ hole + 0.7, breakout mating (J30 order, H30) exact, the 10 links cross
+  nothing, rev A BoM unchanged; the schematic changes checked against ui.c/HAL (pull-ups requested in software).
+- Santiago: fix the review points. Done: **J23 on VBAT** behind F1/Q1 (placed above C5, GND via C5, R1 to J20's GND);
+  **insulated 22 AWG solid link wire** (schematic note, W MPN, footprint text, BoM, shopping list). **Ribbon grounds:**
+  tying J1 20/25 to the pour was tried (LEDs on GND at 25, pin 20 on GND): the outer pockets cost 3 more wire links and
+  the inner pocket (LEDs, 20, 25) has no legal link (J1's body, the band links) → reverted; **SPI default 4 MHz**
+  instead (`teamc-node --spi-hz`, `NRF24_LINUX_CFG_DEFAULT`; was 8 MHz), flying-wire fallback documented.
+  Outline: still waits for the box dimensions.
+- Pipeline rerun twice (stable): ERC 0, DRC 0/0/0, 10 links, fab zip + renders regenerated, BoM €139.01.
+- **Start next session with:** box inside dimensions → rerun place/route/finish/fab; ET review; email the zip.
 
 ### 2026-10-23 (evening) — carrier rev B placed and routed on one copper layer
 - Santiago: read `hw/REVB_LOOP_PROMPT.md` and start designing. Box inside dimensions unknown → **outline kept at the

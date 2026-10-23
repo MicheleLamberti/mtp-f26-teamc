@@ -112,7 +112,8 @@ def build():
            "(3.3 − ~2.0 V) / 330 Ω ≈ 4 mA, well under the\n"
            "Pi's 16 mA per pin. No InGaN (blue/white: Vf too high).\n"
            "Rev B: the cathodes return on LED_RTN = J1 pin 25 (a Pi GND pin) - on one copper layer the LEDs sit\n"
-           "in a pocket of J1's escape tracks, away from the carrier's pour.",
+           "in a pocket of J1's escape tracks that no wire link can leave (review 23-Oct: tying it to the pour was\n"
+           "tried; the inner pocket has no legal link).",
            at=(X_SER - 12.7, 233.68), size=1.27)
 
     standalone_flags(s, ["GND"], at=(101.6, 254.0))

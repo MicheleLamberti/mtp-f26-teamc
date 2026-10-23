@@ -9,7 +9,7 @@ the outline, y down); they are shifted by ORIGIN into KiCad's page.
 
 Floorplan (seen from the copper side, as KiCad shows F.Cu):
   top right    power: U3 ideal diode at J1 pins 2/4, U2 boost below it (5 V end left, cell end right), J20 cell lead,
-               F1/Q1/C5 under U2's cell end, J23 charger lead and J22 power toggle on the right edge;
+               F1/Q1/C5 under U2's cell end, J23 charger lead (on VBAT, above C5) and J22 power toggle;
   centre       J1 2x20 IDC box header, odd pins (left column) escape left, even pins (right column) escape right;
   top left     U6 fuel gauge, its header row facing J1 (SDA/SCL on J1 pins 3/5);
   left edge    J10 GO/STOP and J11 role leads between U6 and the breakout;
@@ -125,9 +125,9 @@ def place_all(board):
     put(board, "U2", "6", 80.0, 53.0, True, lambda p: p["6"][1] - p["1"][1] > 20)
     # cell lead in the right-edge column: BAT_IN up through F1/Q1, GND left to the trunk
     put(board, "J20", "1", 96.0, 47.0, True, first_left("2", "1"))
-    # charger lead on the cell side, below J20 (BAT_IN from J20 pin 1, GND from J20 pin 2); power toggle left of
-    # U2's EN
-    put(board, "J23", "1", 94.5, 56.0, True, first_left("2", "1"))
+    # charger lead on VBAT, behind F1/Q1 (review 23-Oct: a reversed cell must not reach the TP4056): in the gap
+    # between the VBAT line and C5, VBAT pin under the line, GND pin to C5's ground pad. Power toggle left of U2's EN
+    put(board, "J23", "1", 95.5, 20.0, True, first_left("2", "1"))
     put(board, "J22", "1", 57.0, 23.0, True, first_left("1", "2"))
     # fuel gauge bottom left, header row facing J1 (SDA/SCL level with J1 pins 3/5)
     put(board, "U6", "4", jx - 10.0, row(3), True,

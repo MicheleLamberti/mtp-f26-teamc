@@ -68,13 +68,14 @@ def build():
     s.note("Protected 18650 (PCM inside, trip >= 3 A) in a holder on the box floor, JST-VH lead to J20.\n"
            "Q1: body diode conducts for a correct cell, then VGS = -VBAT turns it on; a reversed cell is blocked.\n"
            "DMP2035U <= 45 mΩ at -2.5 V (AO3401A ~85 mΩ: ~0.25 V at 3 A). C5: bulk at the boost input (Pololu asks\n"
-           "for >= 33 uF when the cell is on a lead). Charger (J23): rev B on BAT_IN, beside J20 (the cell lead).",
+           "for >= 33 uF when the cell is on a lead). Charger (J23) on VBAT, behind F1 and Q1 (review 23-Oct): a\n"
+           "reversed cell never reaches the TP4056, and a short in the charger lead is fused. Q1 conducts both ways once on.",
            at=(15.24, 91.44), size=1.27)
 
     # ===== 2. charger lead =========================================================================================
     s.note("2  CHARGER LEAD (TP4056 USB-C module at the box wall)", at=(137.16, 20.32), size=2.0)
     s.add("Connector_Generic:Conn_01x02", "J23", "TP4056 B+/B-", at=(160.02, 38.1), fp=LAB["XH2"],
-          nets={"1": "BAT_IN", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST")
+          nets={"1": "VBAT", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST")
     s.note("TP4056 USB-C module with protection (HW-373), off-board where the USB-C is reachable:\n"
            "its B+/B- to this lead (1 A charge; XH is rated 3 A). OUT+/OUT- unused.\n"
            "No power path: charge with the box switched OFF. Check its CC resistors with a C-to-C cable.",

@@ -43,7 +43,7 @@ def lab_copy(lib, stock, size, suffix):
 
 
 def wire_link(length):
-    """teamc:WireLink_L<length>mm: a bare tinned wire on the component side between two unplated 1.0 mm holes
+    """teamc:WireLink_L<length>mm: an insulated 22 AWG solid wire on the component side between two unplated 1.0 mm holes
     (2.0 mm pads, soldered on the copper side), `length` mm centre to centre along +x.
 
     Both pads are pad 1 and the footprint declares duplicate pad numbers as jumpers, so KiCad's connectivity (and
@@ -79,7 +79,7 @@ def wire_link(length):
     for a, b in (((-c, -c), (length + c, -c)), ((length + c, -c), (length + c, c)), ((length + c, c), (-c, c)),
                  ((-c, c), (-c, -c))):
         seg(pcbnew.F_CrtYd, a, b, 0.05)
-    f.SetLibDescription(f"Wire link {length:.1f} mm: bare 0.6 mm tinned copper wire on the component side between two "
+    f.SetLibDescription(f"Wire link {length:.1f} mm: insulated 22 AWG solid tinned wire on the component side between two "
                         f"unplated 1.0 mm holes (Team C rev B, single-sided UPC lab board)")
     f.SetKeywords("wire link jumper Team C lab")
     f.SetValue(name)

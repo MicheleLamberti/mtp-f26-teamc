@@ -652,7 +652,7 @@ static void usage(void)
 {
     fprintf(stderr, "usage: teamc-node [--radio nrf24|udp:PORT:PEER[,PEER]] [--stick DEV] [--stick-out DEV] [--data DIR]\n"
                     "  [--box NAME] [--sri-profile P] [--mrm-profile P] [--out-name NAME] [--rt CPU] [--i2c DEV]\n"
-                    "  [--spidev DEV] [--gpiochip DEV] [--ce N] [--irq N]\n"
+                    "  [--spidev DEV] [--spi-hz HZ] [--gpiochip DEV] [--ce N] [--irq N]\n"
                     "  [--text-encoding auto|none|utf-8|utf-16-le|utf-16-be|utf-32-le|utf-32-be]\n"
                     "  [--text-bom-policy strict|longest] (decoded UTF-8 copies stay on the SD card)\n"
                     "  tests: [--sim-ui tx|rx sri|mrm|nm] [--go-after S] [--stop-after S] [--exit-after-save]\n"
@@ -672,7 +672,9 @@ static int parse(opts_t *o, int argc, char **argv)
     o->i2c = "/dev/i2c-1";
     o->sri = &NRF24_PROFILE_TEAM_250K;
     o->mrm = &NRF24_PROFILE_TEAM_FHSS;
-    o->nrf = (phy_nrf24_opts_t){"/dev/spidev0.0", "/dev/gpiochip0", 8000000u, 22u, 24};
+    /* SPI at 4 MHz (3.9 MHz with core_freq=250): rev B's ribbon returns the SPI current on pins 6/9/14 only
+       (hw/teamc-carrier-lab, review 23-Oct); a 32-byte frame still moves in ~70 us. --spi-hz after T2. */
+    o->nrf = (phy_nrf24_opts_t){"/dev/spidev0.0", "/dev/gpiochip0", 4000000u, 22u, 24};
     o->udp.seed = 1;
     o->rt_cpu = -1;
     for (int i = 1; i < argc; i++) {
@@ -712,6 +714,11 @@ static int parse(opts_t *o, int argc, char **argv)
             o->rt_cpu = atoi(v);
         } else if (!strcmp(a, "--spidev")) {
             o->nrf.spidev = v;
+        } else if (!strcmp(a, "--spi-hz")) {
+            unsigned long hz = strtoul(v, NULL, 0);
+            if (hz < 100000ul || hz > 10000000ul)   /* nRF24L01+: SPI up to 10 MHz */
+                return -1;
+            o->nrf.spi_hz = (uint32_t)hz;
         } else if (!strcmp(a, "--gpiochip")) {
             o->gpiochip = v;
             o->nrf.gpiochip = v;

@@ -28,7 +28,7 @@ the micro. This sheet lists what the micro and board must provide.
 | 1 | VCC | supply | **2.0–3.6 V, abs. max 3.6 V.** Never the battery rail (Li-ion reaches 4.2 V). ~120 mA peak in TX, 26 mA in RX |
 | 2 | CE | out | High = RX on / pulse ≥ 10 µs = send one frame |
 | 3 | CSN | out | SPI chip select, active low |
-| 4 | SCK | out | **SPI mode 0**, MSB first, ≤ 10 MHz (8 MHz is plenty: 250 kbps = 31 kB/s) |
+| 4 | SCK | out | **SPI mode 0**, MSB first, ≤ 10 MHz (4 MHz default since 23-Oct for the rev B ribbon; plenty: 250 kbps = 31 kB/s) |
 | 5 | MOSI | out | |
 | 6 | MISO | in | |
 | 7 | IRQ | in (optional) | Active low: TX done / RX ready. The driver polls today |

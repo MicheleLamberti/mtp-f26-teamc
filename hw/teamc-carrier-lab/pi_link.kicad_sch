@@ -3420,7 +3420,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 30.48 276.86 0)
 			(effects
 				(font
@@ -3561,7 +3561,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 50.8 276.86 0)
 			(effects
 				(font
@@ -3702,7 +3702,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 71.12 276.86 0)
 			(effects
 				(font
@@ -3798,7 +3798,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 91.44 276.86 0)
 			(effects
 				(font
@@ -3894,7 +3894,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 111.76 276.86 0)
 			(effects
 				(font
@@ -3990,7 +3990,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 132.08 276.86 0)
 			(effects
 				(font
@@ -4086,7 +4086,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 152.4 276.86 0)
 			(effects
 				(font
@@ -4182,7 +4182,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 172.72 276.86 0)
 			(effects
 				(font
@@ -4278,7 +4278,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 193.04 276.86 0)
 			(effects
 				(font
@@ -4374,7 +4374,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated (ends stripped)"
 			(at 213.36 276.86 0)
 			(effects
 				(font
@@ -4485,7 +4485,7 @@
 		)
 		(uuid "7e251f55-169c-5946-bdcc-291a697277c5")
 	)
-	(text "DRAFT – for ET review. Rev B is not a HAT: on the lab's unplated holes a socket under a HAT would have to be\nsoldered on the top side while the modules solder on the bottom. J1 is a shrouded 2x20 box header soldered\non the copper side like every other THT part; odd pins leave to one side, even pins to the other.\nNo ID EEPROM: pins 27/28 stay unconnected. The Pi's WiFi/BT chip is disabled or desoldered (Atenea Q22).\n5V_PI comes from the power sheet's ideal diode. Rule as in rev A: never plug the Pi's micro-USB while the\ncarrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\nwould still share the Pi). 3V3_PI = the Pi's own 3.3 V, rev B from pin 1 (next to the fuel gauge; pin 17 is unused): the fuel gauge's\nVIN and the radio LDO's EN only. Rev B ground: the carrier ties the Pi's GND on pins 6, 9 and 14; pin 25\nis the LEDs' return (LED_RTN); pins 20/30/34/39 sit in pockets of the one-layer escape tracks, unused."
+	(text "DRAFT – for ET review. Rev B is not a HAT: on the lab's unplated holes a socket under a HAT would have to be\nsoldered on the top side while the modules solder on the bottom. J1 is a shrouded 2x20 box header soldered\non the copper side like every other THT part; odd pins leave to one side, even pins to the other.\nNo ID EEPROM: pins 27/28 stay unconnected. The Pi's WiFi/BT chip is disabled or desoldered (Atenea Q22).\n5V_PI comes from the power sheet's ideal diode. Rule as in rev A: never plug the Pi's micro-USB while the\ncarrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\nwould still share the Pi). 3V3_PI = the Pi's own 3.3 V, rev B from pin 1 (next to the fuel gauge; pin 17 is unused): the fuel gauge's\nVIN and the radio LDO's EN only. Rev B ground: the carrier ties the Pi's GND on pins 6, 9 and 14; pin 25\nis the LEDs' return (LED_RTN); pins 20/30/34/39 sit in the pocket of J1's one-layer escape tracks, unused.\nReview 23-Oct: 20/25 (the ribbon grounds beside the SPI lines) cannot reach the pour - no legal wire link\nleaves that pocket - so the SPI return crosses the ribbon on pins 6/9/14: teamc-node runs SPI at 4 MHz\n(--spi-hz; was 8 MHz), confirm at T2 before raising it."
 		(exclude_from_sim no)
 		(at 25.4 27.94 0)
 		(effects
@@ -5002,7 +5002,7 @@
 		)
 		(uuid "2725859d-1b2e-5b38-9553-56558123b6b1")
 	)
-	(text "WIRE LINKS (rev B, single copper layer): bare 0.6 mm tinned copper wire on the component side\nbetween two unplated 1.0 mm holes, soldered on the copper side; the board's crossings.\nPositions and lengths: hw/teamc-carrier-lab/links.json."
+	(text "WIRE LINKS (rev B, single copper layer): INSULATED 22 AWG (0.64 mm) solid tinned copper wire on the\ncomponent side between two unplated 1.0 mm holes, ends stripped ~3 mm, soldered on the copper side;\nlay it flat and glue long ones (drop test). Insulated, not bare (review 23-Oct): it crosses tracks'\npads' neighbours, loose leads and module pins. Positions and lengths: hw/teamc-carrier-lab/links.json."
 		(exclude_from_sim no)
 		(at 25.4 262.89 0)
 		(effects

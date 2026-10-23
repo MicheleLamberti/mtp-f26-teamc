@@ -309,8 +309,9 @@ Build it again, in order (all deterministic):
 
 - **Copper side (F.Cu) = SMD parts; component side = every THT part** (modules on male headers, the 2×20 box header,
   JST leads, the socket, test loops) soldered from the copper side, as on the SP4 breakout. No copper on B.Cu.
-- **Floorplan** (copper-side view): power on the right (U2 boost upright, cell end at the top; J20 cell lead, J23
-  charger lead, F1/Q1 in a column on the right edge; U3 ideal diode below, next to J1 pins 2/4); J1 in the middle (odd
+- **Floorplan** (copper-side view): power on the right (U2 boost upright, cell end at the top; J20 cell lead and
+  F1/Q1 in a column on the right edge, J23 charger lead on VBAT between the VBAT line and C5; U3 ideal diode below,
+  next to J1 pins 2/4); J1 in the middle (odd
   pins escape left, even right); J13 UART straight out of J1 pins 6/8/10; the SP4 socket J30 along the top-left edge
   (the breakout lies over the top-left quarter, its IPEX end mid-board, H30 = its M3 standoff); the four UI leads on
   the left edge; U6 fuel gauge bottom-left with its row level with J1's SDA/SCL; the LEDs beside J1's top.
@@ -319,8 +320,8 @@ Build it again, in order (all deterministic):
   2.7 on 1.7); pour clearance 0.4 mm with thermal reliefs (≥ 1 spoke); no pour between the pads of any SMD part
   (35 rule areas); no copper within 3.2 mm of the M3 holes (screw heads / standoffs).
 - **Power path** hand-routed (`route_carrier_lab.power`): J20 → F1 → Q1 (1.5 mm) → VBAT riser on the right edge →
-  VBAT line over U2's cell end (U2, C5, D3, TP1, R8); the boost loop's ground is a 1.5 mm trunk under U2 joining both
-  ends, with C5, D3, J20 and J23 tied straight to it; 5 V: U2 → U3 → J1 pins 2/4 (1.5 mm), C9 between U3's rows,
+  VBAT line over U2's cell end (U2, C5, D3, TP1, J23, R8); the boost loop's ground is a 1.5 mm trunk under U2 joining
+  both ends, with C5, D3 and J20 tied straight to it (J23's ground via C5's ground pad; R1 to J20's ground pin); 5 V: U2 → U3 → J1 pins 2/4 (1.5 mm), C9 between U3's rows,
   D2/C10 at J1; **the Pi's 5 V return** (J1 pins 6/14 via J13's ground pin) is a 1.5 mm track to the boost's 5 V-end
   ground; U3's two ground rows are tied under the module.
 - **SCK swap**: SCK leaves J1 north of MISO/MOSI but must land between CE and MOSI on the socket; it drops south
@@ -330,9 +331,10 @@ Build it again, in order (all deterministic):
 ### Wire links (W1–W10)
 
 On one layer the header's pin order cannot reach the radio, the mode switch and the fuel gauge without crossings
-(both J1 and the breakout sit on the component side, so their relative handedness is fixed). **10 bare 0.6 mm tinned
-wires** on the component side, between two unplated 1.0 mm holes with 2.0 mm pads, soldered on the copper side
-(138 mm of wire in all). In KiCad each is a one-pin `Conn_01x01` W part on its net with a
+(both J1 and the breakout sit on the component side, so their relative handedness is fixed). **10 insulated 22 AWG
+(0.64 mm) solid tinned wires** (PVC/PTFE hook-up wire, ends stripped ~3 mm; review 23-Oct: not bare - they lie
+among the module pins, loose leads and the drop test) on the component side, between two unplated 1.0 mm holes with
+2.0 mm pads, soldered on the copper side (138 mm of wire in all); lay them flat, glue W1 (34.5 mm) and W5 (19.5 mm). In KiCad each is a one-pin `Conn_01x01` W part on its net with a
 `teamc:WireLink_L<len>mm` footprint whose two pads are both pad 1 and are declared jumpers ("duplicate pad numbers
 are jumpers"), so connectivity and DRC treat the wire as copper; its courtyard (1.25 mm each side) keeps it out from
 under any part. Positions: `hw/teamc-carrier-lab/links.json` and the assembly drawing (component side).
@@ -360,8 +362,8 @@ under any part. Positions: `hw/teamc-carrier-lab/links.json` and the assembly dr
 | 3V3_PI from **J1 pin 1** (pin 17 unused) | pin 1 is next to the fuel gauge; same Pi rail |
 | U6 (MAX17048 module): INT not routed; header GND pin not connected | software polls SOC over I2C (flying wire INT → J1 pin 22 if ever needed); the module's ground is its JP2 BAT_GND pin (same copper), tied to the carrier |
 | LED cathodes on **LED_RTN = J1 pin 25** | a Pi GND pin; the LEDs sit in a pocket of J1's escape tracks |
-| J1 pins 20/30/34/39 (GND) not connected | each sits alone in a pocket; the carrier ties the Pi's GND on pins 6, 9 and 14 (the 5 V return, see above) |
-| J23 (charger) on **BAT_IN**, beside J20 | its ground and + then come straight from the cell lead; the charger no longer passes Q1 |
+| J1 pins 20/30/34/39 (GND) not connected | they sit in the pocket inside J1's escape ring; the carrier ties the Pi's GND on pins 6, 9 and 14 (the 5 V return, see above). Review 23-Oct: tying 20/25 (the ribbon grounds beside the SPI lines) to the pour was tried — 3 more wire links for the outer pockets, and the inner pocket (LEDs, pins 20/25) has no legal link at all (J1's body, the band links). Instead **SPI runs at 4 MHz** (`teamc-node --spi-hz`, HAL default; was 8 MHz): raise it only after T2 is clean over the ribbon |
+| J23 (charger) on **VBAT**, behind F1 and Q1 (review 23-Oct; the first routing had it on BAT_IN) | a reversed cell never reaches the TP4056 and the charger lead is fused; Q1 conducts both ways once on |
 
 ### Assembly order (suggested)
 
@@ -380,7 +382,9 @@ under any part. Positions: `hw/teamc-carrier-lab/links.json` and the assembly dr
   with the software). Fewer would need a different GPIO assignment for the mode switch / IRQ (software change) or a
   second copper layer.
 - Pi ground through 3 ribbon conductors (pins 6, 9, 14): ≈ 10 mΩ return at 10 cm; check 5V_PI at the Pi under load
-  (bench) — the boost gives 5.0 V ± 4 %, the Pi throttles at 4.63 V.
+  (bench) — the boost gives 5.0 V ± 4 %, the Pi throttles at 4.63 V. The SPI return shares them (pins 20/25 not
+  tied): SPI at 4 MHz until T2 shows no errors over the ribbon; an insulated flying wire from J1 pin 20's pad to
+  J13 pin 1 (GND) on the copper side is the bench fallback.
 - The breakout's IPEX end is mid-board (above the left half), not at an edge: route the U.FL pigtail up to the box
   wall; glue the plug (drop test).
 - Lab review (Prof. Chávez): one F.Cu gerber + Edge.Cuts + one Excellon (all holes unplated).

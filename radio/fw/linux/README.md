@@ -13,7 +13,7 @@ Started 18-Oct-26 (D-H1). The protocol's environment (`proto/src/proto_env.h` on
 dtparam=spi=on
 dtoverlay=disable-wifi
 dtoverlay=disable-bt
-core_freq=250        # the Pi 3 SPI clock follows the core clock: fix it (8 MHz asked -> 7.8 MHz)
+core_freq=250        # the Pi 3 SPI clock follows the core clock: fix it (4 MHz asked -> 3.9 MHz; 8 MHz -> 7.8)
 ```
 
 Then `sudo systemctl disable --now hciuart bluetooth wpa_supplicant` and `sudo rfkill block all`, and reboot.

@@ -4,7 +4,9 @@ Status 23-Oct-26 (evening): **placed and routed on one copper layer** — ERC 0,
 0 schematic parity (all severities), 10 wire links, gerbers + 1:1 copper PDFs in `hw/teamc-carrier-lab/fab/` and
 `teamc-carrier-lab_gerbers.zip`, BoM `hw/BOM_revB.csv` (≈ €139/box). Outline 100 × 80 mm is **provisional** until the
 box is measured. How it is built, the wire links and the **schematic changes for one copper layer** (pull-ups, TVS,
-3V3 from J1 pin 1, LED return, unused GND pins, J23 on BAT_IN, no TP2/TP10/C71/R81, FG_ALRT not routed):
+3V3 from J1 pin 1, LED return, unused GND pins, no TP2/TP10/C71/R81, FG_ALRT not routed) and the **review fixes of
+23-Oct** (J23 charger back on VBAT behind F1/Q1; insulated link wire; SPI at 4 MHz because the ribbon grounds 20/25
+cannot reach the pour):
 `hw/DESIGN_NOTES.md`, "Carrier rev B". Next: box dimensions → re-run place/route/finish/fab; ET review; email the
 zip to Prof. Chávez.
 

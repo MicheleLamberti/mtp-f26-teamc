@@ -63,7 +63,7 @@ PRICE = {
     "2x20 2.54 mm shrouded box header, straight": (0.60, "generic (Botland / Amazon.es) est."),
     "1x08 2.54 mm female socket, 8.5 mm": (0.40, "generic est."),
     "1x03 2.54 mm pin header": (0.10, "generic pin header"),
-    "0.6 mm": (0.02, "lab stock (bare tinned copper wire) est."),
+    "22 AWG solid tinned copper hook-up wire, PVC/PTFE insulated": (0.03, "lab stock (insulated solid hook-up wire) est."),
 }
 PASSIVE = {"Resistor_SMD": (0.02, "generic 0805/1206 1 % (LCSC)"), "Capacitor_SMD": (0.05, "generic MLCC (LCSC)"),
            "TestPoint": (0.05, "wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30"),
