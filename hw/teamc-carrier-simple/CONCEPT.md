@@ -1,7 +1,7 @@
 # Carrier rev C ("simple") — concept for checkpoint 1
 
-Team C, MTP F26 · 23-Oct-26 · **DRAFT, a proposal for Santiago's checkpoint 1** (brief: `hw/REVC_SIMPLE_PROMPT.md`).
-Nothing here is decided until Santiago approves it. Rev A (`hw/teamc-carrier/`), rev B (`hw/teamc-carrier-lab/`)
+Team C, MTP F26 · 23-Oct-26 · **approved by Santiago at checkpoint 1 (24-Oct), see "Checkpoint 1 decisions" at the end**
+(brief: `hw/REVC_SIMPLE_PROMPT.md`). Rev A (`hw/teamc-carrier/`), rev B (`hw/teamc-carrier-lab/`)
 and the SP4 breakout (`hw/sp4-breakout/`) are untouched.
 
 ## In one paragraph
@@ -18,7 +18,7 @@ charger module sits at the box wall on a 2-wire lead. **No GPIO changes are need
 
 ```mermaid
 flowchart LR
-  CELL["18650 protected cell<br/>holder ON the board<br/>(MPD BH-18650-PC)"] --> F1["Fuse F1<br/>4 A axial<br/>(0251004.MRT1L)"]
+  CELL["18650 protected cell<br/>holder ON the board<br/>(MPD BH-18650-PC)"] --> F1["Fuse F1<br/>5x20 mm 4 A fast<br/>in two clips"]
   F1 --> VB(("VBAT"))
   D1["Crowbar diode D1, 1N5822<br/>VBAT to GND<br/>(cell in backwards: fuse blows)"] --- VB
   CHG["USB-C charger module<br/>TP4056 HW-373, at the wall<br/>2-wire lead from BAT+/BAT−"] --> VB
@@ -49,7 +49,7 @@ Stock/prices checked 23-Oct-26 (read from the shop page unless "est."). **Re-che
 | (b) 3.3 V for the radio | **MCP1700-3302E/TO** (TO-92, 3 legs) **fed from 5V_PI**, 1 µF ceramic in and out | Always exactly 3.3 V (from the cell it would sag to ≈ 2.9 V at a 3.0 V cell and the PA power with it); on only when the Pi's 5 V is on, so the radio can never back-power a switched-off Pi through its pins; no enable wiring. Costs ≈ 1–2 % more battery; 0.22 W at TX peak is fine for a TO-92 | TME 1214 pcs · ≈ €0.40 est. · [link](https://www.tme.eu/en/details/mcp1700-3302e_to/ldo-voltage-regulators-unregulated/microchip-technology/) (fallback MCP1702-3302E/TO) | stock `Package_TO_SOT_THT:TO-92_Inline` · stock 3D |
 | (c) charger | **TP4056 USB-C module with protection (HW-373)** at the box wall, its BAT+/BAT− to a 2-pin JST-XH on VBAT (after the fuse) | Off-board where the USB-C is reachable; 1 A = 0.33 C for a 3000 mAh cell (~3.5 h). Wired to BAT+/BAT−, not OUT+/OUT−, so the box current never goes through its little protection FETs; the cell has its own protection. Rule: **charge with the box OFF**. Many of these boards lack USB-C CC resistors → **use a USB-A-to-C cable** | Botland "in stock" (rev B saw 319) · €1.00 · [link](https://botland.store/li-ion-battery-chargers/16979-li-ion-charger-hw-373-v121-tp4056-1s-37v-usb-type-c-with-protection-5904422326708.html). Alternative: Adafruit #4410 (0.5 A, documented), DigiKey.es €6.32, 966 pcs | lead only: stock `JST_XH_B2B-XH-A` (lab copy with 2.0 mm pads exists) · stock 3D |
 | (d) battery level | **Adafruit MAX17048 #5580** — same as rev B, verified | Same chip and address (0x36) as the software expects; chip runs from the cell, its VIN (= the Pi's 3.3 V, pin 1) only feeds the I2C pull-ups | Kiwi 41 pcs · €6.88 · [link](https://www.kiwi-electronics.com/en/adafruit-max17048-lipoly-liion-fuel-gauge-battery-monitor-11061) | rev B's `teamc:Adafruit_MAX17048_5580_Headers` (from Adafruit's Eagle file) · generated box model |
-| (e) fuse | **Littelfuse 0251004.MRT1L**, 4 A very fast, axial (THT) | One small leaded part; 20 mΩ (40 mV at 2 A); opens in milliseconds on a short; 4 A keeps margin over the 1.8 A drawn at a 3.0 V cell | TME 976 pcs · $1.22 · [link](https://www.tme.eu/en/details/0251004.mrt1l/axial-fuses-super-fast/littelfuse/) | stock `Resistor_THT` axial footprint (fuse body 2.8 × 7.1 mm) · stock axial 3D |
+| (e) fuse | **5×20 mm 4 A fast ceramic fuse (Littelfuse 0216004.MXP) in two Keystone 3517 clips** (changed at checkpoint 1 from the axial 0251004.MRT1L) | Replaceable by hand without soldering after a reversed cell; opens in milliseconds on a short; 4 A keeps margin over the 1.8 A drawn at a 3.0 V cell; a spare fuse is in the BoM | DigiKey.es 4517 pcs · €1.85; clips TME 2170 pcs · $0.31 | stock `Fuse:Fuseholder_Clip-5x20mm_Keystone_3517…` (pads 2.7 on 1.7 = hole + 1.0) · stock 3D |
 | (e) reverse cell | **1N5822** Schottky (THT) across VBAT after the fuse ("crowbar") | An open holder accepts a cell either way round. Backwards, this diode shorts it, so the fuse blows or the cell's own protection cuts — no part sees a large reverse voltage. No voltage drop in normal use (unlike a series diode, ≈ 0.4 V). Simpler to understand than rev B's P-FET | TME 221 pcs · $0.26 · [link](https://www.tme.eu/en/details/1n5822-st/tht-schottky-diodes/stmicroelectronics/1n5822/) | stock `Diode_THT:D_DO-201AD_P15.24mm_Horizontal` · stock 3D |
 | (e) power switch | **Panel toggle on a 2-pin lead between the boost's EN pin and GND** (closed = OFF) | The switch carries microamps, not 2 A: no voltage drop, no inrush, no current rating to worry about. A lead that breaks in the drop test leaves the box **running** (the boost's own 100 kΩ pull-up), which is the better failure in a competition. Off-drain ≈ 40 µA (pull-up) + 23 µA (gauge): years | E-Switch 100SP1T1B1M1QEH (TME, rev B) · ≈ €2.32 | stock `JST_XH_B2B-XH-A` lead |
 | cell + holder | **MPD BH-18650-PC** soldered on the board + one protected 18650 ≥ 3000 mAh (Keeppower P1835J 3500 mAh or Nitecore NL1835) | No battery lead or connector to mis-wire; a cable tie around cell and board for the drop test | holder DigiKey.es 9726 pcs · €2.94 · [link](https://www.digikey.es/en/products/detail/mpd-memory-protection-devices/BH-18650-PC/3029216); cell ≈ €8–10 (EU stock not confirmed) | stock `Battery:BatteryHolder_MPD_BH-18650-PC` · stock 3D (to confirm) |
@@ -96,7 +96,7 @@ cell; 1.0 A at 5 V → 1.24 / 1.46 / 1.81 A. Radio adds ≈ 0.04 A (RX) to 0.18 
 | Pololu U3V70F5 boost | 18.90 |
 | Pololu #5388 ideal diode (recommended, Q4) | 5.90 |
 | Adafruit #5580 fuel gauge | 6.88 |
-| MCP1700-3302E/TO, 0251004.MRT1L fuse, 1N5822 | 1.75 |
+| MCP1700-3302E/TO, 5×20 fuse + 2 clips, 1N5822 | 1.75 |
 | BH-18650-PC holder | 2.94 |
 | 2×20 box header, 1×8 socket, 6 JST-XH headers + housings/crimps, 1×3 header, male strip | 2.35 |
 | ~10 axial resistors, 2 × 100 µF, 2 × 1 µF, 5 × 100 nF, 4 test loops (est.) | 3.00 |
@@ -109,7 +109,7 @@ cell; 1.0 A at 5 V → 1.24 / 1.46 / 1.81 A. Radio adds ≈ 0.04 A (RX) to 0.18 
 | Box, standoffs (M3 + M2.5), wire, glue, solder | 8.40 |
 | **Total per box** | **≈ 139 (cap 150)**; without the #5388 ≈ 133 |
 
-The full BoM with supplier links, stock dates, footprints and 3D sources comes at checkpoint 2 (`hw/BOM_revC.csv`).
+Superseded at checkpoint 2 by `hw/BOM_revC.csv` (supplier links, stock as read, footprints, 3D sources): ≈ €145 per box excl. VAT, with every price excl. VAT (the Pi too) and qty-10 price breaks for the 3-box order.
 
 ## Risks to measure on the bench
 
@@ -141,3 +141,17 @@ pages give only outside dimensions). E01-ML01SP4 supply 2.0–3.6 V (Ebyte manua
    recommended) / toggle in series with the battery current (broken lead = box off; needs a ≥ 3 A DC switch and lead).
 6. **Reverse cell:** 1N5822 crowbar + 4 A fuse (recommended) / rev B's SOT-23 P-FET (the only SMD part) / nothing.
 7. **GPIOs:** none changed (confirm).
+
+## Checkpoint 1 decisions (Santiago, 24-Oct-26)
+
+All the recommended options:
+1. Box inside dimensions and the lab's largest blank: not known yet — keep the defaults (125 × 125 mm floor, ≥ 55 mm
+   inside height, board within 160 × 100 mm); ask again at checkpoint 2, before the layout.
+2. Cell holder ON the carrier; carrier ≈ 120 × 63 mm along one wall; the Pi on the floor beside it; antenna high on the
+   opposite wall; one panel wall with the toggles, LEDs, USB-C charger and the Pi's USB-A.
+3. Keep the Pololu #5388 ideal diode.
+4. Power toggle on the boost's ENABLE (sleep, fail-on).
+5. 1N5822 across the cell + 4 A fuse. The fuse is what blows on a reversed cell, so it must be easy to replace: rev C
+   uses a 5×20 mm fuse in two clips (pull out, push in), with a spare in the BoM.
+6. No GPIO changes.
+Also: slots for a strap / cable tie over the 18650 in its holder (drop test); bench check of the 1N5822 leakage.
