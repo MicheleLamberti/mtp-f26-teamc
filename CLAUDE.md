@@ -82,7 +82,7 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   2×20 IDC ribbon to the Pi (not a HAT), the SP4 breakout plugs into a 1×8 socket, TP4056 USB-C charger off-board.
   `python3 hw/scripts/build_carrier_lab.py` = footprints (`teamc_lib/gen_lab.py`, `gen_modules.py` from
   `sheets/modules.py`, makers' CAD) + 4 sheets + ERC 0 + unplaced board with lab rules. Decisions/parts/lab rules:
-  **`hw/REVB_LAB_PLAN.md`**; the place/route/DRC/fab loop: **`hw/REVB_LOOP_PROMPT.md`** (Santiago runs it later).
+  **`hw/REVB_LAB_PLAN.md`**; the place/route/DRC/fab loop: **`hw/REVB_LOOP_PROMPT.md`** (Santiago runs it later); what to buy (2 boxes + 1 spare, stock 23-Oct): **`hw/REVB_SHOPPING.md`**.
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
   agent with ~8 subagents**: research of power / Pi + SP4 footprint / UI parts with verified symbols and footprints,
   SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
