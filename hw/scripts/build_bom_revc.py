@@ -62,15 +62,20 @@ SUPPLY = {
     "61204021621": (1.01, "DigiKey.es 732-5401-ND (Würth)", DK + "61204021621", "1,700 (24-Oct)"),
     "PPTC081LFBN-RC": (0.51, "DigiKey.es S7006-ND (Sullins)", DK + "PPTC081LFBN-RC", "84,501 (24-Oct)"),
     "1x03 male pin header": (0.10, "cut from the 1x40 strip (off-board line)", "", "-"),
+    "22 AWG solid tinned copper hook-up wire, PVC insulated": (0.03, "lab stock (insulated solid hook-up wire, ~2 cm per link)",
+                                                                "", "-"),
     "M3 x 10 mm nylon standoff": (0.00, "counted in the off-board mechanics line", "", "-"),
     "M3 x 11 mm nylon standoff F/F": (0.00, "counted in the off-board mechanics line", "", "-"),
 }
 
 # 3D model source by footprint library (stock models: kicad-packages3D via hw/scripts/fetch_3d.py)
 MODEL_3D = {
-    "teamc:Pololu_U3V70F5_Headers": "box model generated from Pololu's drawing (layout phase); Pololu STEP www.pololu.com/file/0J1561",
-    "teamc:Pololu_IdealDiode_5388_Headers": "box model generated from Pololu's drawing (layout phase); Pololu STEP www.pololu.com/file/0J2101",
-    "teamc:Adafruit_MAX17048_5580_Headers": "box model generated from Adafruit's board file (layout phase)",
+    "teamc:RevC_Pololu_U3V70F5_Headers": "hw/lib/teamc.3dshapes/RevC_Pololu_U3V70F5.wrl (gen_3d_revc.py, from Pololu's "
+                                          "drawing); Pololu STEP www.pololu.com/file/0J1561",
+    "teamc:RevC_Pololu_IdealDiode_5388_Headers": "hw/lib/teamc.3dshapes/RevC_Pololu_IdealDiode_5388.wrl (gen_3d_revc.py); "
+                                                 "Pololu STEP www.pololu.com/file/0J2101",
+    "teamc:RevC_Adafruit_MAX17048_5580_Headers": "hw/lib/teamc.3dshapes/RevC_Adafruit_MAX17048_5580.wrl (gen_3d_revc.py, "
+                                                 "from Adafruit's board file)",
 }
 
 OFF_BOARD = [   # (item, qty, unit EUR excl. VAT, supplier, link, stock as read, purchased)
@@ -125,6 +130,8 @@ OFF_BOARD = [   # (item, qty, unit EUR excl. VAT, supplier, link, stock as read,
 def model_source(fp):
     if fp in MODEL_3D:
         return MODEL_3D[fp]
+    if fp.startswith("teamc:RevC_WireLink"):
+        return "hw/lib/teamc.3dshapes/RevC_WireLink_unit.wrl, scaled to the link (gen_3d_revc.py)"
     if fp.startswith("teamc:"):
         return "stock kicad-packages3D model of the footprint it copies (fetch_3d.py)"
     return "stock kicad-packages3D (fetch_3d.py)" if fp else ""

@@ -75,7 +75,7 @@ def build():
            at=(320.04, 71.12), size=1.27)
 
     s.note("MOUNTING (M3, unplated, no copper around)", at=(320.04, 99.06), size=2.0)
-    for i, ref in enumerate(("MH1", "MH2", "MH3", "MH4")):
+    for i, ref in enumerate(("MH1", "MH2", "MH3")):
         s.add("Mechanical:MountingHole", ref, "M3", at=(325.12 + (i % 2) * 25.4, 116.84 + (i // 2) * 17.78),
               fp=FP["M3"], nets={}, mpn="M3 x 10 mm nylon standoff + M3 x 6 nylon screws (to the box floor)")
     return s

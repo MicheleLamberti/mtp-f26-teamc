@@ -1,0 +1,130 @@
+(footprint "RevC_WireLink_L4.0mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Wire link 4.0 mm: insulated 22 AWG solid tinned wire on the component side between two unplated 1.0 mm holes (Team C rev C, single-sided UPC lab board)")
+	(tags "wire link jumper Team C lab")
+	(property "Reference" "W**"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(uuid "5f5fb0ce-d718-4c81-9389-f922066982c4")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "RevC_WireLink_L4.0mm"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "ea76850a-ef27-490a-9410-b5dbd15ab0af")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4b6fa8b4-bc29-4621-be12-e868740fa927")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "fa518c60-f557-4756-a964-a8234f6da10b")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers yes)
+	(fp_line
+		(start -1.25 -1.25)
+		(end 5.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "9f6c03b0-0f99-4af6-9379-4d3eda95f8b0")
+	)
+	(fp_line
+		(start -1.25 1.25)
+		(end -1.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "63e563ef-2029-4928-b4d2-8e67ebec2e60")
+	)
+	(fp_line
+		(start 5.25 -1.25)
+		(end 5.25 1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "bc5c5fb2-44c6-4337-8d5e-9bf7b2a59d31")
+	)
+	(fp_line
+		(start 5.25 1.25)
+		(end -1.25 1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "2cff8b33-de14-460a-a574-e8a76ecd48cc")
+	)
+	(fp_line
+		(start 0 0)
+		(end 4 0)
+		(stroke
+			(width 0.6)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "38b4c54a-2dfb-4f30-af22-cd168b499f3c")
+	)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 2 2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "e06558db-67d0-4af1-8a8b-aa28c65cd76c")
+	)
+	(pad "1" thru_hole circle
+		(at 4 0)
+		(size 2 2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "94cf78c5-7797-47f9-8e5d-33045097af92")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/../lib/teamc.3dshapes/RevC_WireLink_unit.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 4 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

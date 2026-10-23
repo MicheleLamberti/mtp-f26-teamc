@@ -1,0 +1,5 @@
+link,net,"hole A (x, y mm, copper-side view)",hole B,hole to hole (mm),cut the insulated 22 AWG wire to (mm)
+W1,GND,"7.6, 10.2","11.6, 10.2",4.0,15
+W2,GND,"56.3, 33.0","56.3, 40.2",7.2,18
+W3,GND,"77.0, 3.4","77.0, 9.4",6.0,17
+W4,RADIO_IRQ,"58.3, 10.8","64.0, 10.8",5.7,17

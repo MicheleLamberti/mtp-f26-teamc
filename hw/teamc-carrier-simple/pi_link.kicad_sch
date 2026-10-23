@@ -1559,6 +1559,135 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic:Conn_01x01"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x01"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x01_1_1"
+				(rectangle
+					(start -1.27 1.27)
+					(end 1.27 -1.27)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:GND"
 			(power global)
 			(pin_numbers
@@ -3445,35 +3574,46 @@
 			)
 		)
 	)
+	(wire
+		(pts
+			(xy 25.4 276.86)
+			(xy 22.86 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80a0d5ea-5c01-586c-be69-bf04d4f3b6b8")
+	)
 	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 350.52 134.62 0)
+		(lib_id "power:GND")
+		(at 22.86 276.86 270)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "2fbf7462-c61b-5165-8f6d-fcd12f58b532")
-		(property "Reference" "MH4"
-			(at 353.06 133.35 0)
+		(uuid "78cb1cca-cc18-5491-a389-c0c9ce4df3ad")
+		(property "Reference" "#PWR2010"
+			(at 22.86 280.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(hide yes)
 			)
 		)
-		(property "Value" "M3"
-			(at 353.06 135.89 0)
+		(property "Value" "GND"
+			(at 22.86 280.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(hide yes)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
-			(at 350.52 134.62 0)
+		(property "Footprint" ""
+			(at 22.86 276.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3482,7 +3622,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 350.52 134.62 0)
+			(at 22.86 276.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3490,28 +3630,464 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Mounting Hole without connection"
-			(at 350.52 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "M3 x 10 mm nylon standoff + M3 x 6 nylon screws (to the box floor)"
-			(at 350.52 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
+		(pin "1"
+			(uuid "ef969894-a9fb-5152-85c5-410546f06102")
 		)
 		(instances
 			(project "teamc-carrier-simple"
 				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
-					(reference "MH4")
+					(reference "#PWR2010")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 30.48 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f95c7c59-75a5-57bb-abf6-69057d6e9907")
+		(property "Reference" "W1"
+			(at 30.48 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 4.0 mm"
+			(at 30.48 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:RevC_WireLink_L4.0mm"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC insulated (ends stripped)"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0ce76a00-39ff-53fa-8fcf-15a248014fb6")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "W1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 45.72 276.86)
+			(xy 43.18 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "565f9dd8-da05-55bb-8668-d5d5015b38e9")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 43.18 276.86 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6ea3b4a7-ba36-50ee-bace-2012cfe32e4d")
+		(property "Reference" "#PWR2011"
+			(at 43.18 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 43.18 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bb9583d0-2106-5394-bc97-52c97c4da67d")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "#PWR2011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 50.8 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "cd87d127-67c8-5426-aefa-5a02a21bdaf0")
+		(property "Reference" "W2"
+			(at 50.8 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 7.2 mm"
+			(at 50.8 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:RevC_WireLink_L7.2mm"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC insulated (ends stripped)"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a92bfbf5-14f6-5ada-aa5c-a65327b6a39c")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "W2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 66.04 276.86)
+			(xy 63.5 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "237e9170-32b1-587d-8eb1-1b975e8c4000")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 276.86 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "69c28303-9469-557a-b110-7985f2a4eb6a")
+		(property "Reference" "#PWR2012"
+			(at 63.5 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 63.5 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ea7c377d-b475-5c4c-8eeb-08fa8818dc4a")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "#PWR2012")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 71.12 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8101a113-be82-51a5-8759-7a6c611872fa")
+		(property "Reference" "W3"
+			(at 71.12 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 6.0 mm"
+			(at 71.12 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:RevC_WireLink_L6.0mm"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC insulated (ends stripped)"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7c568950-bbdc-565a-bcd2-0fad9f4cb01e")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "W3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 86.36 276.86)
+			(xy 83.82 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "278b7cfd-e1af-5587-a967-d3d4ff179547")
+	)
+	(global_label "RADIO_IRQ"
+		(shape passive)
+		(at 83.82 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "d565ebbd-396c-597a-8ed8-67dca17c6655")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 91.44 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4b9acc66-2bf7-5640-9ce7-9c61e27d1834")
+		(property "Reference" "W4"
+			(at 91.44 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 5.7 mm"
+			(at 91.44 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:RevC_WireLink_L5.7mm"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "22 AWG solid tinned copper hook-up wire, PVC insulated (ends stripped)"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a3c5bdd7-4b85-516e-ac74-5c7f21f08fb7")
+		)
+		(instances
+			(project "teamc-carrier-simple"
+				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
+					(reference "W4")
 					(unit 1)
 				)
 			)
@@ -3526,7 +4102,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0b287ea5-09e6-51e3-b117-842a0ba3c0a0")
-		(property "Reference" "#FLG2010"
+		(property "Reference" "#FLG2013"
 			(at 179.07 92.71 0)
 			(effects
 				(font
@@ -3567,7 +4143,7 @@
 		(instances
 			(project "teamc-carrier-simple"
 				(path "/55bfa18e-fcd3-548d-9db1-2eb018a8fab7/57387de8-2b33-5116-a767-491650ba14fb"
-					(reference "#FLG2010")
+					(reference "#FLG2013")
 					(unit 1)
 				)
 			)
@@ -4123,6 +4699,17 @@
 			(justify left top)
 		)
 		(uuid "2725859d-1b2e-5b38-9553-56558123b6b1")
+	)
+	(text "WIRE LINKS (one copper layer): INSULATED 22 AWG solid tinned copper wire on the component side between\ntwo unplated 1.0 mm holes, ends stripped ~3 mm, soldered on the copper side; lay it flat, glue it for the\ndrop test. Positions and lengths: hw/teamc-carrier-simple/links.json and the assembly drawing."
+		(exclude_from_sim no)
+		(at 25.4 262.89 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "eed77799-d111-5a61-9632-2be22e995655")
 	)
 	(embedded_fonts no)
 )

@@ -15,7 +15,7 @@ GLOBAL_NETS = [
 REF_RANGES = {
     "power": "BT1 (cell holder), F1 (fuse clips), D1 (crowbar), J22 (power toggle), J23 (charger lead), U2 (boost), "
              "U3 (ideal diode), U4 (radio LDO), U6 (fuel gauge), C1-C19, R9, TP1-TP4",
-    "pi_link": "J1 (2x20 box header), J13 (UART), MH1-MH4",
+    "pi_link": "J1 (2x20 box header), J13 (UART), MH1-MH3",
     "ui": "J10-J12, J14 (LED lead), C50-C53, R54-R57, R60-R61",
     "radio": "J30 (SP4 breakout socket), H30, R80, R82-R84",
 }
@@ -35,11 +35,11 @@ DS = {
 # gen_lab.py (rev B), stock ones where the stock pads already meet the rule. 3D models: the stock model each
 # footprint names (fetched by hw/scripts/fetch_3d.py), the modules' models from hw/lib/teamc.3dshapes.
 FP = {
-    "R": "teamc:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_Pad1.8mm",
+    "R": "teamc:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal_Pad1.8mm",   # 0.25 W body 6.3 mm, legs bent at 7.62
     "C": "teamc:C_Disc_D5.0mm_W2.5mm_P5.00mm_Pad1.8mm",   # 100 nF Vishay K104K10 / 1 uF TDK FG28: 5.0 mm leads
     "CP": "teamc:CP_Radial_D6.3mm_P2.50mm_Pad1.8mm",
     "TO92": "teamc:TO-92_Inline_Wide_Pad1.8mm",
-    "D201": "Diode_THT:D_DO-201AD_P15.24mm_Horizontal",
+    "D201": "Diode_THT:D_DO-201AD_P12.70mm_Horizontal",
     "FUSE": "Fuse:Fuseholder_Clip-5x20mm_Keystone_3517_Inline_P23.11x6.76mm_D1.70mm_Horizontal",
     "CELL": "Battery:BatteryHolder_MPD_BH-18650-PC",
     "TP": "TestPoint:TestPoint_Keystone_5010-5014_Multipurpose",

@@ -2842,7 +2842,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AD_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT:D_DO-201AD_P12.70mm_Horizontal"
 			(at 86.36 50.8 0)
 			(effects
 				(font
@@ -3507,7 +3507,7 @@
 				)
 			)
 		)
-		(property "Footprint" "teamc:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_Pad1.8mm"
+		(property "Footprint" "teamc:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal_Pad1.8mm"
 			(at 325.12 38.1 0)
 			(effects
 				(font
@@ -3578,7 +3578,7 @@
 		)
 		(uuid "95ac0a7b-9db4-5e03-ae55-a54755959cf3")
 	)
-	(label "PWR_EN"
+	(label "PWR_SW_J"
 		(at 339.09 50.8 180)
 		(fields_autoplaced yes)
 		(effects
@@ -4155,7 +4155,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "teamc:Pololu_U3V70F5_Headers"
+		(property "Footprint" "teamc:RevC_Pololu_U3V70F5_Headers"
 			(at 55.88 147.32 0)
 			(effects
 				(font
@@ -4627,7 +4627,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "teamc:Pololu_IdealDiode_5388_Headers"
+		(property "Footprint" "teamc:RevC_Pololu_IdealDiode_5388_Headers"
 			(at 190.5 147.32 0)
 			(effects
 				(font
@@ -5876,7 +5876,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "teamc:Adafruit_MAX17048_5580_Headers"
+		(property "Footprint" "teamc:RevC_Adafruit_MAX17048_5580_Headers"
 			(at 190.5 231.14 0)
 			(effects
 				(font
@@ -7010,7 +7010,7 @@
 		)
 		(uuid "09eb512e-3986-5ad8-a405-b303e744de2c")
 	)
-	(text "Toggle CLOSED = ENABLE pulled to GND = boost asleep = box OFF (the battery current never goes through\nthe switch). Toggle OPEN = the module's own 100 k pull-up wakes it = box ON. A lead that breaks in the drop\ntest therefore leaves the box running. Mount the toggle so that 'down' (closed) is marked OFF.\nR9 + C18: the same 1 k + 100 nF filter as every panel lead (noise and a zap from the metal lever).\nWith the toggle closed: EN = VBAT x 1k / 101k = 0.04 V (< 0.4 V needed). Off drain: ~40 uA in the pull-up."
+	(text "Toggle CLOSED = ENABLE pulled to GND = boost asleep = box OFF (the battery current never goes through\nthe switch). Toggle OPEN = the module's own 100 k pull-up wakes it = box ON. A lead that breaks in the drop\ntest therefore leaves the box running. Mount the toggle so that 'down' (closed) is marked OFF.\nC18 + R9: 100 nF at the lead, then 1 k to ENABLE: a zap on the lever goes into C18, R9 limits what reaches\nthe module (C18 sits at the connector since checkpoint 3: room on the board).\nWith the toggle closed: EN = VBAT x 1k / 101k = 0.04 V (< 0.4 V needed). Off drain: ~40 uA in the pull-up."
 		(exclude_from_sim no)
 		(at 287.02 63.5 0)
 		(effects

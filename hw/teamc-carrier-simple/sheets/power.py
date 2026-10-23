@@ -37,7 +37,7 @@ def module(s, ref, key, at, nets_by_name, **kw):
         if p["name"] not in nets_by_name:
             raise ValueError(f"{ref} ({key}): no net for pad {p['name']}")
         nets[str(i)] = nets_by_name[p["name"]]
-    return s.add(f"Connector_Generic:Conn_01x{len(m['pins']):02d}", ref, m["value"], fp="teamc:" + m["footprint"],
+    return s.add(f"Connector_Generic:Conn_01x{len(m['pins']):02d}", ref, m["value"], fp="teamc:RevC_" + m["footprint"],
                  at=at, nets=nets, mpn=m["mpn"], mfr=m["mfr"], ds=m["url"], **kw)
 
 
@@ -87,11 +87,12 @@ def build():
           nets={"1": "PWR_SW_J", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST",
           Panel="E-Switch 100SP1T1B1M1QEH, wired common + one throw; closed = OFF")
     R(s, "R9", "1k", (325.12, 38.1), "PWR_SW_J", "PWR_EN")
-    C(s, "C18", "100n", (345.44, 50.8), "PWR_EN", "GND")
+    C(s, "C18", "100n", (345.44, 50.8), "PWR_SW_J", "GND")
     s.note("Toggle CLOSED = ENABLE pulled to GND = boost asleep = box OFF (the battery current never goes through\n"
            "the switch). Toggle OPEN = the module's own 100 k pull-up wakes it = box ON. A lead that breaks in the drop\n"
            "test therefore leaves the box running. Mount the toggle so that 'down' (closed) is marked OFF.\n"
-           "R9 + C18: the same 1 k + 100 nF filter as every panel lead (noise and a zap from the metal lever).\n"
+           "C18 + R9: 100 nF at the lead, then 1 k to ENABLE: a zap on the lever goes into C18, R9 limits what reaches\n"
+           "the module (C18 sits at the connector since checkpoint 3: room on the board).\n"
            "With the toggle closed: EN = VBAT x 1k / 101k = 0.04 V (< 0.4 V needed). Off drain: ~40 uA in the pull-up.",
            at=(287.02, 63.5), size=1.27)
 

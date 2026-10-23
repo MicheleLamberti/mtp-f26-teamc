@@ -77,6 +77,41 @@ def new_project():
         board.Save(PCB)
 
 
+def link_length(lk):
+    return round(((lk["a"][0] - lk["b"][0]) ** 2 + (lk["a"][1] - lk["b"][1]) ** 2) ** 0.5, 1)
+
+
+def add_links(sheets):
+    """W1, W2, ... from links.json (written by route/finish_carrier_simple.py): one Conn_01x01 per wire link on the
+    sheet that owns its net (global nets and GND on pi_link), footprint teamc:RevC_WireLink_L<len>mm."""
+    path = os.path.join(DIR, "links.json")
+    if not os.path.exists(path):
+        return 0
+    with open(path, encoding="utf-8") as f:
+        links = json.load(f).get("links", [])
+    by_name = {s.name: s for s in sheets}
+    count = {}
+    for i, lk in enumerate(links, 1):
+        net = lk["net"]
+        if net.startswith("/"):
+            sheet, local = net.strip("/").split("/", 1)
+        else:
+            sheet, local = "pi_link", net
+        s = by_name[sheet]
+        n = count.get(sheet, 0)
+        count[sheet] = n + 1
+        if n == 0:
+            s.note("WIRE LINKS (one copper layer): INSULATED 22 AWG solid tinned copper wire on the component side between\n"
+                   "two unplated 1.0 mm holes, ends stripped ~3 mm, soldered on the copper side; lay it flat, glue it for the\n"
+                   "drop test. Positions and lengths: hw/teamc-carrier-simple/links.json and the assembly drawing.",
+                   at=(25.4, 262.89), size=1.27)
+        length = link_length(lk)
+        s.add("Connector_Generic:Conn_01x01", f"W{i}", f"wire link {length:.1f} mm", at=(30.48 + n * 20.32, 276.86),
+              fp=f"teamc:RevC_WireLink_L{length:.1f}mm", nets={"1": local},
+              mpn="22 AWG solid tinned copper hook-up wire, PVC insulated (ends stripped)")
+    return len(links)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-board", action="store_true")
@@ -87,6 +122,7 @@ def main():
     bu.set_project_rules(PRO, rules=LAB_C, classes=NET_CLASSES)
     lab_floor(PRO)
     sheets = [importlib.import_module(n).build() for n in SHEETS]
+    print(f"{add_links(sheets)} wire links")
     Project(NAME, sheets, title="Team C carrier rev C – simple, UPC lab, through-hole + modules (DRAFT)").write(DIR)
     rpt = os.path.join(DIR, "build", "erc.rpt")
     print(bu.run("kicad-cli", "sch", "erc", "--severity-all", "-o", rpt, SCH))

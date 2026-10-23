@@ -45,7 +45,7 @@ def build():
         mpn, mfr = MPN["33"]
         s.add("Device:R", ref, "33", at=(63.5, y), rot=90, fp=FP["R"], nets={"1": a, "2": b}, mpn=mpn, mfr=mfr)
     s.note("33 Ω in SCK, MOSI and MISO soften the fast edges that travel down the 15 cm ribbon (less ringing).\n"
-           "On this one-layer board their legs are 10 mm apart, so another track may pass under a resistor body\n"
+           "On this one-layer board their legs are 7.6 mm apart, so another track may pass under a resistor body\n"
            "between its legs: the board drawing says which. A 0 Ω wire link can replace one if the bench shows no need.",
            at=(25.4, 144.78), size=1.27)
 
