@@ -162,6 +162,13 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
+- **23-Oct-26 (late): Santiago wants a SIMPLER carrier → rev C.** Rev B works on paper but is too subtle for the team
+  (ribbon-ground limits, SMD details, 10 links in a dense layout). Rev C = modules + THT parts, every part easy to buy
+  in the EU with a footprint and a 3D model, all header GND pins on the carrier ground, bigger board / more wire links
+  allowed, a plain-language build guide. Prompt for a new **Opus lead session with Haiku/Sonnet research subagents**
+  and the KiCad MCP: **`hw/REVC_SIMPLE_PROMPT.md`** (3 checkpoints with Santiago; output in `hw/teamc-carrier-simple/`).
+  Rev A, rev B and the SP4 breakout stay as they are.
+
 - **23-Oct-26 (evening): carrier rev B placed and routed on ONE copper layer** (`hw/teamc-carrier-lab/`): ERC 0, DRC 0
   violations / 0 unconnected / 0 parity (all severities), tracks ≥ 0.5 mm, pads ≥ hole + 0.7, pour clearance 0.4,
   FR10 no-fill areas, **10 wire links** (insulated 22 AWG solid, 138 mm; J1's pin order forces the crossings), fab
@@ -332,6 +339,9 @@ what's pending.
   Outline: still waits for the box dimensions.
 - Pipeline rerun twice (stable): ERC 0, DRC 0/0/0, 10 links, fab zip + renders regenerated, BoM €139.01.
 - **Start next session with:** box inside dimensions → rerun place/route/finish/fab; ET review; email the zip.
+- Later: Santiago asked for a simpler design he can follow ("it's a university project"): wrote
+  `hw/REVC_SIMPLE_PROMPT.md` for a new Opus lead session (rev C, modules + THT, Haiku scouts / Sonnet analysts,
+  KiCad MCP + pcbnew scripts, checkpoints, plain-language guide). **Start next session with:** that prompt.
 
 ### 2026-10-23 (evening) — carrier rev B placed and routed on one copper layer
 - Santiago: read `hw/REVB_LOOP_PROMPT.md` and start designing. Box inside dimensions unknown → **outline kept at the
