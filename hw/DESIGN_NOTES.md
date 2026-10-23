@@ -11,9 +11,9 @@ toggle drives a P-FET), TPS61022 boost.
 
 | What | Where | State |
 |---|---|---|
-| SP4 breakout (bench, T0/T2) | `hw/sp4-breakout/` | **Ready for the lab**: single-sided F.Cu, 31 × 37.5 mm, ERC 0, DRC 0 (all severities), gerbers + drill + 1:1 copper PDFs (plain and mirrored) in `fab/` and `sp4-breakout_gerbers.zip` |
+| SP4 breakout (bench, T0/T2) | `hw/sp4-breakout/` | **Ready for the lab**: single-sided F.Cu, 31 × 37.5 mm, ERC 0, DRC 0 (all severities), gerbers + drill + 1:1 copper PDFs (plain and mirrored) in `fab/` and `sp4-breakout_gerbers.zip`. Header pads J1/J2 2.0 mm on a 1.0 mm drill (stock 1.7) and no pour between C1's pads, for the UPC lab rules (23-Oct-26) |
 | Pi 3 A+ HAT carrier | `hw/teamc-carrier/` | **Rev A, routed (21-Oct), for ET review before the fab order**: schematic ERC 0/0; board DRC **0 violations, 0 unconnected, 0 schematic-parity issues** (all severities); gerbers + drill + placement + assembly PDF in `fab/`, `teamc-carrier_gerbers.zip`; 3D renders `teamc-carrier_render_{top,bottom,iso,stack}.png` |
-| Project library | `hw/lib/teamc.kicad_sym`, `hw/lib/teamc.pretty/` | E01-ML01SP4 (symbol + footprint from the manual's drawing), MAX17048 (from the registry part, checked against the datasheet pinout), 2×20 socket with 1.5 mm pads |
+| Project library | `hw/lib/teamc.kicad_sym`, `hw/lib/teamc.pretty/` | E01-ML01SP4 (symbol + footprint from the manual's drawing), MAX17048 (from the registry part, checked against the datasheet pinout), 2×20 socket with 1.5 mm pads, 1×08 and 1×02 pin headers with 2.0 mm pads (breakout, written by `build_breakout.py`) |
 | BoM | `hw/BOM.csv` | per device, from the netlist + off-board items; ≈ €102 (cap €150) |
 | Generators | `hw/scripts/` | see below; the `.kicad_sch` files are generated: edit the sheet `.py`, not the schematic |
 

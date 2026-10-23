@@ -7,6 +7,7 @@ side; the 1 x 8 header and the 1 x 2 bench-supply header go in from the back (pi
 Header order = the common nRF24 module order: 1 GND, 2 VCC, 3 CE, 4 CSN, 5 SCK, 6 MOSI, 7 MISO, 8 IRQ.
 """
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -26,6 +27,30 @@ NET = os.path.join(DIR, "build", NAME + ".net")
 SP4_DS = "https://www.cdebyte.com/products/E01-ML01SP4"
 CX, CY = 100.0, 100.0          # SP4 centre on the board
 SIG_W = 0.5
+# UPC lab milling rules (23-Oct-26): unplated THT pad >= hole + 0.7 mm, preferably + 1.0..1.5 mm. The stock headers
+# have 1.7 mm pads on a 1.0 mm drill; 2.0 mm leaves 0.54 mm copper-to-copper at the 2.54 mm pitch (rules: 0.3 mm).
+HDR_PAD = 2.0
+HDR_SRC = "/usr/share/kicad/footprints/Connector_PinHeader_2.54mm.pretty"
+TEAMC_PRETTY = os.path.join(bu.HW, "lib", "teamc.pretty")
+
+
+def header_fp(pins):
+    """teamc:PinHeader_1xNN_P2.54mm_Vertical_Pad2.0mm from the stock header (drill 1.0 kept, pin 1 stays square).
+
+    A library copy (as teamc_lib/gen_socket.py does for the carrier socket) rather than a pad override on the board,
+    so DRC's library-parity check stays clean."""
+    stock = f"PinHeader_1x{pins:02d}_P2.54mm_Vertical"
+    name = f"{stock}_Pad{HDR_PAD:.1f}mm"
+    f = pcbnew.FootprintLoad(HDR_SRC, stock)
+    for p in f.Pads():
+        p.SetSize(pcbnew.F_Cu, bu.v(HDR_PAD, HDR_PAD))
+    f.SetFPID(pcbnew.LIB_ID("teamc", name))
+    f.SetLibDescription(f"1x{pins:02d} 2.54 mm pin header, vertical, {HDR_PAD:.1f} mm pads on the 1.0 mm drill (from "
+                        f"the KiCad {stock}; larger pads for the UPC lab's unplated, hand-soldered holes)")
+    f.SetKeywords("pin header 2.54 mm Team C lab")
+    f.SetValue(name)
+    pcbnew.FootprintSave(TEAMC_PRETTY, f)
+    return "teamc:" + name
 
 
 def schematic():
@@ -35,10 +60,10 @@ def schematic():
           nets={"1": "VCC", "2": "CE", "3": "CSN", "4": "SCK", "5": "MOSI", "6": "MISO", "7": "IRQ",
                 "8": "GND", "9": "GND", "10": "GND"})
     s.add("Connector_Generic:Conn_01x08", "J1", "nRF24 header", at=(63.5, 88.9),
-          fp="Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical", mpn="1x08 2.54 mm pin header",
+          fp=header_fp(8), mpn="1x08 2.54 mm pin header",
           nets={"1": "GND", "2": "VCC", "3": "CE", "4": "CSN", "5": "SCK", "6": "MOSI", "7": "MISO", "8": "IRQ"})
     s.add("Connector_Generic:Conn_01x02", "J2", "3V3 bench supply", at=(63.5, 119.38),
-          fp="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical", mpn="1x02 2.54 mm pin header",
+          fp=header_fp(2), mpn="1x02 2.54 mm pin header",
           nets={"1": "VCC", "2": "GND"})
     s.add("Device:C_Polarized", "C1", "100u 10V", at=(165.1, 81.28), fp="Capacitor_SMD:CP_Elec_6.3x5.4",
           mpn="EEE-FK1A101P (or any 100 uF >= 6.3 V, 6.3 x 5.4 mm SMD)", mfr="Panasonic",
@@ -133,6 +158,24 @@ def layout():
     # ground pour over the whole copper side (also under the module, as Ebyte asks)
     m = 0.5
     bu.zone(board, "GND", pcbnew.F_Cu, [(x1 + m, y1 + m), (x2 - m, y1 + m), (x2 - m, y2 - m), (x1 + m, y2 - m)])
+    # UPC lab rule FR10: no pour between the pads of an SMD part. Only C1's 2.1 mm pad gap is wide enough for the
+    # pour to get in (the SP4 castellations and the 0805 gaps are too narrow at 0.4 mm clearance) -> a no-fill area.
+    bb1, bb2 = bu.pad(board, "C1", 1).GetBoundingBox(), bu.pad(board, "C1", 2).GetBoundingBox()
+    gx1, gx2 = pcbnew.ToMM(min(bb1.GetLeft(), bb2.GetLeft())), pcbnew.ToMM(max(bb1.GetRight(), bb2.GetRight()))
+    # pads one above the other: the gap runs from the upper pad's bottom edge to the lower pad's top edge
+    gy1, gy2 = pcbnew.ToMM(min(bb1.GetBottom(), bb2.GetBottom())), pcbnew.ToMM(max(bb1.GetTop(), bb2.GetTop()))
+    ka = pcbnew.ZONE(board)
+    ka.SetIsRuleArea(True)
+    ka.SetZoneName("C1_no_pour")
+    ka.SetLayer(pcbnew.F_Cu)
+    ka.SetDoNotAllowZoneFills(True)
+    for setter in (ka.SetDoNotAllowTracks, ka.SetDoNotAllowVias, ka.SetDoNotAllowPads, ka.SetDoNotAllowFootprints):
+        setter(False)
+    o = ka.Outline()
+    o.NewOutline()
+    for x, y in ((gx1, gy1), (gx2, gy1), (gx2, gy2), (gx1, gy2)):
+        o.Append(bu.MM(x), bu.MM(y))
+    board.Add(ka)
 
     # silkscreen (F side = module side)
     names = {1: "GND", 2: "VCC", 3: "CE", 4: "CSN", 5: "SCK", 6: "MOSI", 7: "MISO", 8: "IRQ"}
@@ -176,6 +219,16 @@ def fab():
     print("fab files in", out, "and", zipname + ".zip")
 
 
+def lab_floor(pro_path):
+    """Board minimums back to the lab's 0.3 mm and two thermal spokes per pad. set_project_rules lowers the floor to
+    0.15/0.2 mm and one spoke for the carrier's fine-pitch packages (19-Oct); the breakout has none of those."""
+    with open(pro_path, encoding="utf-8") as f:
+        p = json.load(f)
+    p["board"]["design_settings"]["rules"].update(min_clearance=0.3, min_track_width=0.3, min_resolved_spokes=2)
+    with open(pro_path, "w", encoding="utf-8") as f:
+        json.dump(p, f, indent=2)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fab", action="store_true")
@@ -183,6 +236,7 @@ def main():
     os.makedirs(os.path.join(DIR, "build"), exist_ok=True)
     bu.write_lib_tables(DIR)
     bu.set_project_rules(PRO, classes=[("Power", 0.6, ["VCC"])])
+    lab_floor(PRO)
     schematic()
     print(bu.run("kicad-cli", "sch", "erc", "--severity-all", "-o", os.path.join(DIR, "build", "erc.rpt"), SCH))
     bu.run("kicad-cli", "sch", "export", "netlist", "-o", NET, SCH)
