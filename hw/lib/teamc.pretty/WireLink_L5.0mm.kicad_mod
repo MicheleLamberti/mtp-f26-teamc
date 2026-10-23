@@ -1,0 +1,119 @@
+(footprint "WireLink_L5.0mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Wire link 5.0 mm: bare 0.6 mm tinned copper wire on the component side between two unplated 1.0 mm holes (Team C rev B, single-sided UPC lab board)")
+	(tags "wire link jumper Team C lab")
+	(property "Reference" "W**"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(uuid "057b5373-919d-412c-bb7c-406fce428758")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "WireLink_L5.0mm"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "a0d44342-aeca-4fca-8ed5-af2835513a65")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b99d9972-fb89-4999-a7fd-360fe32cc2eb")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b5a1276b-bedc-4901-9f76-14c5ac8c4a41")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers yes)
+	(fp_line
+		(start -1.25 -1.25)
+		(end 6.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "459a0cf7-05a6-40cf-b5bb-dc2b3b030a6c")
+	)
+	(fp_line
+		(start -1.25 1.25)
+		(end -1.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "62b297ff-a188-44cc-87d8-81c00c4cb38d")
+	)
+	(fp_line
+		(start 6.25 -1.25)
+		(end 6.25 1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "ebce7ade-a09d-4515-a3dc-9a25dff11fac")
+	)
+	(fp_line
+		(start 6.25 1.25)
+		(end -1.25 1.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "8e0725bf-5ed8-44c9-aede-f3bdd1467857")
+	)
+	(fp_line
+		(start 0 0)
+		(end 5 0)
+		(stroke
+			(width 0.6)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "079234f8-2c30-4ebd-aba9-89d253e83ab5")
+	)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 2 2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "fd463004-a6c8-47e3-b8f8-920c1d72df26")
+	)
+	(pad "1" thru_hole circle
+		(at 5 0)
+		(size 2 2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "d4542dec-fa11-4e24-91be-4dc7b8d7abe1")
+	)
+	(embedded_fonts no)
+)

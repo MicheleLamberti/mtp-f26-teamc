@@ -44,13 +44,19 @@ OUTLINE = (50.0, 50.0, 150.0, 130.0)
 
 def lab_floor(pro_path):
     """Board minimums for the lab: 0.3 mm tracks only on short necks, 0.2 mm clearance at most where unavoidable,
-    0.7 mm holes, pads >= hole + 0.7 mm, two thermal spokes."""
+    0.7 mm holes, pads >= hole + 0.7 mm, at least one thermal spoke (a pad in a narrow strip of pour - the sense
+    ground of U6, the socket's ground - gets one 0.5 mm spoke, plenty for their currents).
+
+    The lab board has no silkscreen and no solder mask (Chavez slides, Jimenez guide), so the silkscreen and mask
+    checks are off; the references live on the Fab layers (assembly drawing)."""
     with open(pro_path, encoding="utf-8") as f:
         p = json.load(f)
     p["board"]["design_settings"]["rules"].update(
         min_clearance=0.2, min_track_width=0.3, min_through_hole_diameter=0.7, min_via_diameter=1.7,
-        min_via_annular_width=0.35, min_hole_clearance=0.3, min_hole_to_hole=0.5, min_resolved_spokes=2,
+        min_via_annular_width=0.35, min_hole_clearance=0.3, min_hole_to_hole=0.5, min_resolved_spokes=1,
         min_copper_edge_clearance=LAB_B["edge"])
+    p["board"]["design_settings"]["rule_severities"].update(
+        silk_edge_clearance="ignore", silk_over_copper="ignore", silk_overlap="ignore", solder_mask_bridge="ignore")
     with open(pro_path, "w", encoding="utf-8") as f:
         json.dump(p, f, indent=2)
 
@@ -72,6 +78,40 @@ def new_project():
         board.Save(PCB)
 
 
+def link_length(lk):
+    return round(((lk["a"][0] - lk["b"][0]) ** 2 + (lk["a"][1] - lk["b"][1]) ** 2) ** 0.5, 1)
+
+
+def add_links(sheets):
+    """W1, W2, ... from links.json (written by finish_carrier_lab.py): one Conn_01x01 per wire link on the sheet
+    that owns its net (global nets and GND on pi_link), footprint teamc:WireLink_L<len>mm (gen_lab.wire_link)."""
+    path = os.path.join(DIR, "links.json")
+    if not os.path.exists(path):
+        return 0
+    with open(path, encoding="utf-8") as f:
+        links = json.load(f).get("links", [])
+    by_name = {s.name: s for s in sheets}
+    count = {}
+    for i, lk in enumerate(links, 1):
+        net = lk["net"]
+        if net.startswith("/"):
+            sheet, local = net.strip("/").split("/", 1)
+        else:
+            sheet, local = "pi_link", net
+        s = by_name[sheet]
+        n = count.get(sheet, 0)
+        count[sheet] = n + 1
+        if n == 0:
+            s.note("WIRE LINKS (rev B, single copper layer): bare 0.6 mm tinned copper wire on the component side\n"
+                   "between two unplated 1.0 mm holes, soldered on the copper side; the board's crossings.\n"
+                   "Positions and lengths: hw/teamc-carrier-lab/links.json.", at=(25.4, 262.89), size=1.27)
+        length = link_length(lk)
+        s.add("Connector_Generic:Conn_01x01", f"W{i}", f"wire link {length:.1f} mm", at=(30.48 + n * 20.32, 276.86),
+              fp=f"teamc:WireLink_L{length:.1f}mm", nets={"1": local},
+              mpn="0.6 mm (22 AWG) tinned copper wire, bare")
+    return len(links)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-board", action="store_true")
@@ -83,6 +123,7 @@ def main():
     bu.set_project_rules(PRO, rules=LAB_B, classes=NET_CLASSES)
     lab_floor(PRO)
     sheets = [importlib.import_module(n).build() for n in SHEETS]
+    print(f"{add_links(sheets)} wire links")
     Project(NAME, sheets, title="Team C carrier rev B – UPC lab, hand-soldered modules (DRAFT)").write(DIR)
     rpt = os.path.join(DIR, "build", "erc.rpt")
     print(bu.run("kicad-cli", "sch", "erc", "--severity-all", "-o", rpt, SCH))

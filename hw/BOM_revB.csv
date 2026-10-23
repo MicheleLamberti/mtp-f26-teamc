@@ -1,0 +1,73 @@
+ref,qty,value / item,footprint,MPN,manufacturer,supplier / source,unit EUR excl. VAT,total EUR,purchased
+C10 C18,2,100n X7R,Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,CL31B104KBCNNNC,,generic MLCC (LCSC),0.05,0.10,yes
+C11 C12,2,10u X5R,Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,CL31A106KAHNNNE,,generic MLCC (LCSC),0.05,0.10,yes
+C5 C9,2,100u 16V,Capacitor_SMD:CP_Elec_6.3x5.4,EEE-FK1C101P,Panasonic,DigiKey.de,0.54,1.08,yes
+C50 C51 C52 C53,4,100n X7R,Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,CL31B104KBCNNNC,Samsung,generic MLCC (LCSC),0.05,0.20,yes
+D10,1,green,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080VS75000,Würth Elektronik,DigiKey,0.15,0.15,yes
+D11,1,red,LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder,150080RS75000,Würth Elektronik,DigiKey,0.20,0.20,yes
+D2 D3 D12 D13 D14 D15,6,SMF5.0A,Diode_SMD:D_SMF,SMF5V0A-E3-08,Vishay,DigiKey.de,0.30,1.80,yes
+F1,1,5A fast,Fuse:Fuse_1206_3216Metric_Pad1.42x1.75mm_HandSolder,"0466005.NR (1206, 5 A, very fast; or 0466005.NRHF)",Littelfuse,est. (Littelfuse 0466 1206 fast; verify part and stock),0.45,0.45,yes
+H30,1,M3,MountingHole:MountingHole_3.2mm_M3,M3 x 11 mm F/F nylon standoff + 2 x M3 x 6 screws,,hole in the PCB (standoffs listed below),0.00,0.00,yes
+J1,1,RPi GPIO ribbon,teamc:IDC-Header_2x20_P2.54mm_Vertical_Pad2.0mm,"2x20 2.54 mm shrouded box header, straight (e.g. Würth 61204021621 / generic) + 40-way F-F ribbon",,generic (Botland / Amazon.es) est.,0.60,0.60,yes
+J10,1,GO/STOP button,teamc:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_Pad2.0x2.4mm,B2B-XH-A(LF)(SN),JST,LCSC C158012,0.05,0.05,yes
+J11,1,role toggle,teamc:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_Pad2.0x2.4mm,B2B-XH-A(LF)(SN),JST,LCSC C158012,0.05,0.05,yes
+J12,1,mode toggle,teamc:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical_Pad2.0x2.4mm,B3B-XH-A(LF)(SN),JST,LCSC C144394,0.08,0.08,yes
+J13,1,UART console,teamc:PinHeader_1x03_P2.54mm_Vertical_Pad2.0mm,1x03 2.54 mm pin header,Würth Elektronik,generic pin header,0.10,0.10,yes
+J20,1,BATT 18650,Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical,B2P-VH,JST,est. (JST VH),0.25,0.25,yes
+J22,1,PWR toggle,teamc:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_Pad2.0x2.4mm,B2B-XH-A,JST,LCSC C158012,0.05,0.05,yes
+J23,1,TP4056 B+/B-,teamc:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_Pad2.0x2.4mm,B2B-XH-A(LF)(SN),JST,LCSC C158012,0.05,0.05,yes
+J30,1,SP4 breakout,teamc:PinSocket_1x08_P2.54mm_Vertical_Pad2.0mm,"1x08 2.54 mm female socket, 8.5 mm (e.g. Samtec SSW-108-01-T-S / generic)",,generic est.,0.40,0.40,yes
+MH1 MH2 MH3 MH4,4,M3,MountingHole:MountingHole_3.2mm_M3,M3 nylon standoff + screws (to the box base plate or above the Pi),,hole in the PCB (standoffs listed below),0.00,0.00,yes
+Q1,1,DMP2035U,Package_TO_SOT_SMD:SOT-23,DMP2035U-7 (AO3401A fallback),Diodes Inc.,Mouser est. (1544 pcs on 23-Oct),0.35,0.35,yes
+Q2,1,2N7002,Package_TO_SOT_SMD:SOT-23,"2N7002,215",Nexperia,DigiKey.de,0.18,0.18,yes
+R1,1,10k 1%,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-0710KL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.02,yes
+R54 R55 R56 R57,4,1k,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-071KL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.08,yes
+R60 R61,2,330,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-07330RL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.04,yes
+R8,1,100k 1%,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-07100KL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.02,yes
+R80,1,10k,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-0710KL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.02,yes
+R82 R83 R84,3,33,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-0733RL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.06,yes
+R9,1,1k 1%,Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,RC1206FR-071KL,Yageo,generic 0805/1206 1 % (LCSC),0.02,0.02,yes
+TP1,1,VBAT,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+TP3,1,GND,TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm,wire loop (or Keystone 5000/5001),,wire loop (lab stock) or Keystone 5000/5001 ~EUR 0.30,0.05,0.05,yes
+U2,1,Pololu U3V70F5 5V boost,teamc:Pololu_U3V70F5_Headers,2891 (U3V70F5),Pololu,Botland (39 pcs on 23-Oct),18.90,18.90,yes
+U3,1,Pololu ideal diode 20A,teamc:Pololu_IdealDiode_5388_Headers,5388 (rvp01b),Pololu,Botland (25 pcs on 23-Oct),5.90,5.90,yes
+U4,1,AP2112K-3.3,Package_TO_SOT_SMD:SOT-23-5,AP2112K-3.3TRG1,Diodes Inc.,TME (1231 pcs on 23-Oct),0.22,0.22,yes
+U6,1,Adafruit MAX17048 fuel gauge,teamc:Adafruit_MAX17048_5580_Headers,5580 (Rev B),Adafruit,Botland (21 pcs on 23-Oct; Kiwi EUR 6.88),8.00,8.00,yes
+W1,1,wire link 34.5 mm,teamc:WireLink_L34.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W2,1,wire link 8.0 mm,teamc:WireLink_L8.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W3,1,wire link 8.5 mm,teamc:WireLink_L8.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W4,1,wire link 13.0 mm,teamc:WireLink_L13.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W5,1,wire link 19.5 mm,teamc:WireLink_L19.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W6 W10,2,wire link 5.0 mm,teamc:WireLink_L5.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.04,yes
+W7,1,wire link 18.5 mm,teamc:WireLink_L18.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W8,1,wire link 15.0 mm,teamc:WireLink_L15.0mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+W9,1,wire link 10.5 mm,teamc:WireLink_L10.5mm,"0.6 mm (22 AWG) tinned copper wire, bare",,lab stock (bare tinned copper wire) est.,0.02,0.02,yes
+(off-board),1,"Raspberry Pi 3 Model A+ (WiFi/BT disabled or removed, Atenea Q22)",,,,ordered 19-Oct (market price),27.00,27.00,yes
+(off-board),1,microSD SanDisk Ultra 32 GB A1 (half a twin pack),,,,ordered 19-Oct (est.),6.00,6.00,yes
+(off-board),1,Ebyte E01-ML01SP4 + TX2400-FPC-2509 flex antenna (bundle),,,,"ebyteiot.com, ordered 19-Oct",3.60,3.60,yes
+(off-board),1,"SP4 breakout: lab PCB (rules EUR 15) + 100 uF, 10 uF, 100 nF, 1x08 + 1x02 headers",,,,UPC lab + generic (hw/sp4-breakout),16.00,16.00,no
+(off-board),1,"TP4056 USB-C charger module with protection (HW-373), at the box wall",,,,Botland (319 pcs on 23-Oct),1.00,1.00,yes
+(off-board),1,40-way female-female GPIO ribbon <= 10 cm (carrier J1 to the Pi),,,,generic est.,1.50,1.50,yes
+(off-board),1,"2.54 mm male header strip (module pins), about 30 pins",,,,generic est.,0.30,0.30,yes
+(off-board),1,"Protected 18650 Li-ion cell >= 3000 mAh, PCM trips >= 3 A",,,,est.,8.00,8.00,yes
+(off-board),1,"18650 holder MPD BH-18650-PC (THT, for protected cells), on the box floor",,,,DigiKey.de,2.94,2.94,yes
+(off-board),1,Panel pushbutton E-Switch PS1024ABLK (GO/STOP),,,,TME,1.17,1.17,yes
+(off-board),1,Panel toggle E-Switch 100SP1T1B1M1QEH (power ON/OFF),,,,TME,2.32,2.32,yes
+(off-board),1,"Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)",,,,TME,2.32,2.32,yes
+(off-board),1,Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM),,,,TME,2.89,2.89,yes
+(off-board),4,"JST XHP-2 housing (power, button, role, charger leads)",,,,TME/LCSC est.,0.03,0.12,yes
+(off-board),1,JST XHP-3 housing (mode lead),,,,TME/LCSC est.,0.04,0.04,yes
+(off-board),1,JST VHR-2N housing (battery lead),,,,TME/LCSC est.,0.10,0.10,yes
+(off-board),13,JST crimps SXH-001T-P0.6 (XH) x11 + SVH-21T-P1.1 (VH) x2,,,,TME/Mouser est.,0.03,0.39,yes
+(off-board),1,"Hook-up wire (AWG24 leads, AWG20 battery lead), ~1 m",,,,lab stock (market price est.),0.50,0.50,no
+(off-board),5,"M3 x 11 mm F/F nylon standoff (carrier to the box x4, breakout x1) + M3 x 6 screws x10",,,,est.,0.40,2.00,yes
+(off-board),1,M2.5 standoffs x4 + screws x8 (the Pi above the carrier),,,,est.,1.40,1.40,yes
+(off-board),1,IKEA 365+ food container 15 x 15 x 7 cm with lid,,,,IKEA (est.),3.00,3.00,yes
+(off-board),1,"Hot glue, Kapton tape (U.FL plug, microSD, XH housings), cable ties, foam",,,,lab stock (est.),1.00,1.00,no
+(off-board),1,"Solder, flux",,,,lab stock (est.),0.50,0.50,no
+(off-board),1,PCB: carrier rev B milled at the UPC lab (rules: counts EUR 15),,,,UPC lab,15.00,15.00,no
+
+"TOTAL per device (all items at market price, lab PCB EUR 15)",,,,,,,,138.91,
+of which purchased by the team,,,,,,,,105.91,
+of which owned / lab stock / lab PCB (non-purchased),,,,,,,,33.00,
+"Cap per device (rules): EUR 150. DRAFT – for ET review; prices 19-Oct-26, verify before ordering"

@@ -1559,6 +1559,135 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic:Conn_01x01"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x01"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x01_1_1"
+				(rectangle
+					(start -1.27 1.27)
+					(end 1.27 -1.27)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:GND"
 			(power global)
 			(pin_numbers
@@ -1800,9 +1929,28 @@
 			(embedded_fonts no)
 		)
 	)
-	(no_connect
-		(at 204.47 124.46)
-		(uuid "552c6074-72f5-5d2e-96e5-70cc2dc46fc8")
+	(wire
+		(pts
+			(xy 204.47 124.46)
+			(xy 201.93 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b30e9fb6-e72e-5965-85f1-d65ceab9d8c7")
+	)
+	(global_label "3V3_PI"
+		(shape passive)
+		(at 201.93 124.46 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "ea35cfa8-2515-5f3d-b480-8621a72731ac")
 	)
 	(wire
 		(pts
@@ -2246,28 +2394,9 @@
 		)
 		(uuid "45d15739-834b-503b-aae4-a0f6259b0f7d")
 	)
-	(wire
-		(pts
-			(xy 204.47 144.78)
-			(xy 201.93 144.78)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "143d8d57-0899-5057-b4d1-6307ae95d5a2")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 201.93 144.78 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "c6a77b12-a552-5b0d-8165-eb40708357cb")
+	(no_connect
+		(at 204.47 144.78)
+		(uuid "12cdb830-6e7a-52c0-9f25-953027a084eb")
 	)
 	(wire
 		(pts
@@ -2315,73 +2444,9 @@
 		)
 		(uuid "c828a098-a3cd-50b6-b859-fd39f2f06a65")
 	)
-	(wire
-		(pts
-			(xy 217.17 147.32)
-			(xy 219.71 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7f485bc7-9bbc-595a-a550-be4274cafdb3")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 219.71 147.32 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "814d0730-2064-5aad-9cbc-810591321995")
-		(property "Reference" "#PWR2004"
-			(at 219.71 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 219.71 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 219.71 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 219.71 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9ec9061b-6b99-58ed-94c1-10fe5c1b78a0")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2004")
-					(unit 1)
-				)
-			)
-		)
+	(no_connect
+		(at 217.17 147.32)
+		(uuid "e4289a2c-477e-5551-992d-8d1f1c31845f")
 	)
 	(wire
 		(pts
@@ -2406,28 +2471,9 @@
 		)
 		(uuid "552744a2-cea5-5603-a7e6-44d3061e08e2")
 	)
-	(wire
-		(pts
-			(xy 217.17 149.86)
-			(xy 219.71 149.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ce4330a7-1e18-5069-9817-eb587b763711")
-	)
-	(global_label "FG_ALRT"
-		(shape passive)
-		(at 219.71 149.86 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "4f8a8cdc-95be-57ef-8981-6a032e78201e")
+	(no_connect
+		(at 217.17 149.86)
+		(uuid "197a4cf7-5cc6-549e-b67b-0568394b3f7b")
 	)
 	(wire
 		(pts
@@ -2486,62 +2532,17 @@
 		)
 		(uuid "2201493f-a0b6-533e-b61d-856395538ac4")
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 201.93 154.94 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "ae1e0fb1-b0a6-5046-a684-74405e1fe203")
-		(property "Reference" "#PWR2005"
-			(at 201.93 158.75 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+	(global_label "LED_RTN"
+		(shape passive)
+		(at 201.93 154.94 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify right)
 		)
-		(property "Value" "GND"
-			(at 201.93 158.75 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 201.93 154.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 201.93 154.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "14c02bb3-3247-53bb-9cca-84ddf1a6e199")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2005")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "1acf0f1b-c03b-5815-9e32-a203d5b3291d")
 	)
 	(no_connect
 		(at 217.17 154.94)
@@ -2578,73 +2579,9 @@
 		)
 		(uuid "e47aff36-13c7-5d6e-852f-f2f34a9fa454")
 	)
-	(wire
-		(pts
-			(xy 217.17 160.02)
-			(xy 219.71 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8c59c7db-f140-5ce3-9521-2ea0abe8134a")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 219.71 160.02 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "82244810-7946-5232-b17f-8bc59da712c8")
-		(property "Reference" "#PWR2006"
-			(at 219.71 163.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 219.71 163.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 219.71 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 219.71 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e82eb357-9112-5ca8-9d3a-5cab2a663055")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2006")
-					(unit 1)
-				)
-			)
-		)
+	(no_connect
+		(at 217.17 160.02)
+		(uuid "8c53b087-e946-571b-9866-e0f3d3748eea")
 	)
 	(wire
 		(pts
@@ -2677,73 +2614,9 @@
 		(at 204.47 165.1)
 		(uuid "b6412580-1ead-569f-8941-d74a1c82b32d")
 	)
-	(wire
-		(pts
-			(xy 217.17 165.1)
-			(xy 219.71 165.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d8b9ceb4-41c9-5ba1-a268-87a5e58b129e")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 219.71 165.1 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f13a676b-e4c9-5c63-a907-755dc041d886")
-		(property "Reference" "#PWR2007"
-			(at 219.71 168.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 219.71 168.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 219.71 165.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 219.71 165.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3528f630-e727-5fc2-86e5-530d694733df")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2007")
-					(unit 1)
-				)
-			)
-		)
+	(no_connect
+		(at 217.17 165.1)
+		(uuid "f0de59c4-4ff4-553e-9642-30c078d1f0d1")
 	)
 	(no_connect
 		(at 204.47 167.64)
@@ -2780,73 +2653,9 @@
 		(at 217.17 170.18)
 		(uuid "86327c19-615f-532e-9a9e-f92c6c0b1c18")
 	)
-	(wire
-		(pts
-			(xy 204.47 172.72)
-			(xy 201.93 172.72)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ff64e433-5016-5b88-af41-840b0053ac61")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 201.93 172.72 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "5b59d150-4de5-5f08-accb-49525a9a2e8b")
-		(property "Reference" "#PWR2008"
-			(at 201.93 176.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 201.93 176.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 201.93 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 201.93 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a6e34459-9285-50a6-837e-a334141e1c2d")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2008")
-					(unit 1)
-				)
-			)
-		)
+	(no_connect
+		(at 204.47 172.72)
+		(uuid "6b4902ae-0136-5815-851a-e76d372a6319")
 	)
 	(no_connect
 		(at 217.17 172.72)
@@ -3064,7 +2873,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f04f779b-f5b8-56af-b80b-e7083a31760e")
-		(property "Reference" "#PWR2009"
+		(property "Reference" "#PWR2004"
 			(at 330.2 59.69 0)
 			(effects
 				(font
@@ -3106,7 +2915,7 @@
 		(instances
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#PWR2009")
+					(reference "#PWR2004")
 					(unit 1)
 				)
 			)
@@ -3536,6 +3345,1056 @@
 			)
 		)
 	)
+	(wire
+		(pts
+			(xy 25.4 276.86)
+			(xy 22.86 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80a0d5ea-5c01-586c-be69-bf04d4f3b6b8")
+	)
+	(global_label "3V3_PI"
+		(shape passive)
+		(at 22.86 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "9c9b75a3-d947-5a50-97a9-9a83e139e9a5")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 30.48 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f95c7c59-75a5-57bb-abf6-69057d6e9907")
+		(property "Reference" "W1"
+			(at 30.48 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 34.5 mm"
+			(at 30.48 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L34.5mm"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 30.48 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0ce76a00-39ff-53fa-8fcf-15a248014fb6")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 45.72 276.86)
+			(xy 43.18 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "565f9dd8-da05-55bb-8668-d5d5015b38e9")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 43.18 276.86 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6ea3b4a7-ba36-50ee-bace-2012cfe32e4d")
+		(property "Reference" "#PWR2005"
+			(at 43.18 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 43.18 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bb9583d0-2106-5394-bc97-52c97c4da67d")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "#PWR2005")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 50.8 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "cd87d127-67c8-5426-aefa-5a02a21bdaf0")
+		(property "Reference" "W2"
+			(at 50.8 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 8.0 mm"
+			(at 50.8 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L8.0mm"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 50.8 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a92bfbf5-14f6-5ada-aa5c-a65327b6a39c")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 66.04 276.86)
+			(xy 63.5 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "237e9170-32b1-587d-8eb1-1b975e8c4000")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 276.86 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "69c28303-9469-557a-b110-7985f2a4eb6a")
+		(property "Reference" "#PWR2006"
+			(at 63.5 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 63.5 280.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ea7c377d-b475-5c4c-8eeb-08fa8818dc4a")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "#PWR2006")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 71.12 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8101a113-be82-51a5-8759-7a6c611872fa")
+		(property "Reference" "W3"
+			(at 71.12 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 8.5 mm"
+			(at 71.12 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L8.5mm"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 71.12 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7c568950-bbdc-565a-bcd2-0fad9f4cb01e")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 86.36 276.86)
+			(xy 83.82 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "278b7cfd-e1af-5587-a967-d3d4ff179547")
+	)
+	(global_label "RADIO_CSN"
+		(shape passive)
+		(at 83.82 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "d565ebbd-396c-597a-8ed8-67dca17c6655")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 91.44 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4b9acc66-2bf7-5640-9ce7-9c61e27d1834")
+		(property "Reference" "W4"
+			(at 91.44 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 13.0 mm"
+			(at 91.44 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L13.0mm"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 91.44 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a3c5bdd7-4b85-516e-ac74-5c7f21f08fb7")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 106.68 276.86)
+			(xy 104.14 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e5d0cc27-7798-5050-9861-09ba3ec750e6")
+	)
+	(global_label "RADIO_IRQ"
+		(shape passive)
+		(at 104.14 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4faaf015-05c7-521f-8b8c-604bed4aabc0")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 111.76 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "603b1ef7-edb3-5cd1-bec3-255fd6521b4f")
+		(property "Reference" "W5"
+			(at 111.76 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 19.5 mm"
+			(at 111.76 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L19.5mm"
+			(at 111.76 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 111.76 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 111.76 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "90a96e9f-2ed3-5273-9ee9-1da195240121")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 127 276.86)
+			(xy 124.46 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2567ba6a-2cf5-5115-87b9-f671ba56eecc")
+	)
+	(global_label "RADIO_IRQ"
+		(shape passive)
+		(at 124.46 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "ed2dc83c-e20a-5d98-a447-dfa106806e6f")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 132.08 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8f4a8b09-db44-5316-962b-33e99d1f7c82")
+		(property "Reference" "W6"
+			(at 132.08 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 5.0 mm"
+			(at 132.08 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L5.0mm"
+			(at 132.08 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 132.08 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 132.08 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e27cdd91-cf9f-50d8-81a6-83d10015d55c")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 147.32 276.86)
+			(xy 144.78 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c328f901-4b05-536f-adbb-9eeaac10b911")
+	)
+	(global_label "SW_MODE_MRM"
+		(shape passive)
+		(at 144.78 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "294b9b66-6750-5514-9d8a-7e15d3ecbe32")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 152.4 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "650a55f4-7a2d-5388-8e8e-7f9afe596117")
+		(property "Reference" "W7"
+			(at 152.4 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 18.5 mm"
+			(at 152.4 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L18.5mm"
+			(at 152.4 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 152.4 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 152.4 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b658ee3a-6a20-55f5-9e4c-f391b635d4fe")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 167.64 276.86)
+			(xy 165.1 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bf8618b5-0f99-5a65-93a8-4c9abc65a5a9")
+	)
+	(global_label "SW_MODE_NM"
+		(shape passive)
+		(at 165.1 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7a47efd0-890f-57c2-9f26-e45321a32d3a")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 172.72 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e307cbce-07ba-58c6-baaf-26ca1df585df")
+		(property "Reference" "W8"
+			(at 172.72 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 15.0 mm"
+			(at 172.72 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L15.0mm"
+			(at 172.72 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 172.72 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 172.72 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 172.72 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fe828122-2519-57c7-8268-938181dc020b")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 187.96 276.86)
+			(xy 185.42 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "960873f4-02ad-503a-be51-0e1595acfd43")
+	)
+	(global_label "SW_MODE_NM"
+		(shape passive)
+		(at 185.42 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "e50c0360-253e-52cb-bfeb-a4d78721c5a0")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 193.04 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2db6601a-9076-5098-8110-b04d27853cf3")
+		(property "Reference" "W9"
+			(at 193.04 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 10.5 mm"
+			(at 193.04 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L10.5mm"
+			(at 193.04 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 193.04 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 193.04 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 193.04 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ce0a38cd-85ca-50ca-9bf5-0efa233ea9e3")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 208.28 276.86)
+			(xy 205.74 276.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dbd82cfa-945e-529d-bb68-bd1992fdae82")
+	)
+	(global_label "SW_MODE_NM"
+		(shape passive)
+		(at 205.74 276.86 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "83537492-8d74-5234-b6e4-d65d98365007")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 213.36 276.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "028e77f1-0982-5e64-a9bc-490ae4384e2e")
+		(property "Reference" "W10"
+			(at 213.36 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "wire link 5.0 mm"
+			(at 213.36 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "teamc:WireLink_L5.0mm"
+			(at 213.36 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 213.36 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 213.36 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0.6 mm (22 AWG) tinned copper wire, bare"
+			(at 213.36 276.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "99d0cebd-9e12-561d-aadf-328108dccd0e")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
+					(reference "W10")
+					(unit 1)
+				)
+			)
+		)
+	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
 		(at 179.07 96.52 0)
@@ -3545,7 +4404,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0b287ea5-09e6-51e3-b117-842a0ba3c0a0")
-		(property "Reference" "#FLG2010"
+		(property "Reference" "#FLG2007"
 			(at 179.07 92.71 0)
 			(effects
 				(font
@@ -3586,7 +4445,7 @@
 		(instances
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/9e5cce3b-c1f4-5de3-8055-6ea94b4d8dd5"
-					(reference "#FLG2010")
+					(reference "#FLG2007")
 					(unit 1)
 				)
 			)
@@ -3626,7 +4485,7 @@
 		)
 		(uuid "7e251f55-169c-5946-bdcc-291a697277c5")
 	)
-	(text "DRAFT – for ET review. Rev B is not a HAT: on the lab's unplated holes a socket under a HAT would have to be\nsoldered on the top side while the modules solder on the bottom. J1 is a shrouded 2x20 box header soldered\non the copper side like every other THT part; odd pins leave to one side, even pins to the other.\nNo ID EEPROM: pins 27/28 stay unconnected. The Pi's WiFi/BT chip is disabled or desoldered (Atenea Q22).\n5V_PI comes from the power sheet's ideal diode. Rule as in rev A: never plug the Pi's micro-USB while the\ncarrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\nwould still share the Pi). 3V3_PI = the Pi's own 3.3 V (pin 17): pull-ups and the radio LDO's EN only."
+	(text "DRAFT – for ET review. Rev B is not a HAT: on the lab's unplated holes a socket under a HAT would have to be\nsoldered on the top side while the modules solder on the bottom. J1 is a shrouded 2x20 box header soldered\non the copper side like every other THT part; odd pins leave to one side, even pins to the other.\nNo ID EEPROM: pins 27/28 stay unconnected. The Pi's WiFi/BT chip is disabled or desoldered (Atenea Q22).\n5V_PI comes from the power sheet's ideal diode. Rule as in rev A: never plug the Pi's micro-USB while the\ncarrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\nwould still share the Pi). 3V3_PI = the Pi's own 3.3 V, rev B from pin 1 (next to the fuel gauge; pin 17 is unused): the fuel gauge's\nVIN and the radio LDO's EN only. Rev B ground: the carrier ties the Pi's GND on pins 6, 9 and 14; pin 25\nis the LEDs' return (LED_RTN); pins 20/30/34/39 sit in pockets of the one-layer escape tracks, unused."
 		(exclude_from_sim no)
 		(at 25.4 27.94 0)
 		(effects
@@ -3637,7 +4496,7 @@
 		)
 		(uuid "25c3b05d-abd0-5d4e-b19c-7afc8dd5ff4e")
 	)
-	(text " 1  3V3 (unused: pin 17 feeds the pull-ups)"
+	(text " 1  3V3 (rev B: pin 1 feeds 3V3_PI)"
 		(exclude_from_sim no)
 		(at 147.32 123.82 0)
 		(effects
@@ -3813,7 +4672,7 @@
 		)
 		(uuid "06f0857b-a87a-5171-90b6-8c121a543499")
 	)
-	(text "17  3V3"
+	(text "17  3V3 (rev B: unused, pin 1 instead)"
 		(exclude_from_sim no)
 		(at 147.32 144.14 0)
 		(effects
@@ -3846,7 +4705,7 @@
 		)
 		(uuid "aed68f00-ce94-5cd5-953f-f6cbbb1980ea")
 	)
-	(text "20  GND"
+	(text "20  GND (rev B: not used on the carrier)"
 		(exclude_from_sim no)
 		(at 246.38 146.68 0)
 		(effects
@@ -3868,7 +4727,7 @@
 		)
 		(uuid "0c733196-a575-54e3-b038-cacc75daa08a")
 	)
-	(text "22  GPIO 25"
+	(text "22  GPIO 25 (rev A FG_ALRT; not routed in rev B)"
 		(exclude_from_sim no)
 		(at 246.38 149.22 0)
 		(effects
@@ -3901,7 +4760,7 @@
 		)
 		(uuid "6bc10aee-7199-5569-b8f2-a2550df8c696")
 	)
-	(text "25  GND"
+	(text "25  GND (rev B: the LEDs' return only)"
 		(exclude_from_sim no)
 		(at 147.32 154.3 0)
 		(effects
@@ -3956,7 +4815,7 @@
 		)
 		(uuid "5f2b876d-2f89-53c2-8456-036b3564cef8")
 	)
-	(text "30  GND"
+	(text "30  GND (rev B: not used on the carrier)"
 		(exclude_from_sim no)
 		(at 246.38 159.38 0)
 		(effects
@@ -4000,7 +4859,7 @@
 		)
 		(uuid "e9ca1c16-a5db-563f-8877-2634bbe60d96")
 	)
-	(text "34  GND"
+	(text "34  GND (rev B: not used on the carrier)"
 		(exclude_from_sim no)
 		(at 246.38 164.46 0)
 		(effects
@@ -4055,7 +4914,7 @@
 		)
 		(uuid "283eb448-3772-5649-af43-dca1601a82c6")
 	)
-	(text "39  GND"
+	(text "39  GND (rev B: not used on the carrier)"
 		(exclude_from_sim no)
 		(at 147.32 172.08 0)
 		(effects
@@ -4142,6 +5001,17 @@
 			(justify left top)
 		)
 		(uuid "2725859d-1b2e-5b38-9553-56558123b6b1")
+	)
+	(text "WIRE LINKS (rev B, single copper layer): bare 0.6 mm tinned copper wire on the component side\nbetween two unplated 1.0 mm holes, soldered on the copper side; the board's crossings.\nPositions and lengths: hw/teamc-carrier-lab/links.json."
+		(exclude_from_sim no)
+		(at 25.4 262.89 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "eed77799-d111-5a61-9632-2be22e995655")
 	)
 	(embedded_fonts no)
 )

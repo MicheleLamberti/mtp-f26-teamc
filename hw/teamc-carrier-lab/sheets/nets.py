@@ -5,9 +5,9 @@ GND is the power:GND symbol; any other net name is local to its sheet.
 """
 
 GLOBAL_NETS = [
-    "VBAT", "5V_BOOST", "5V_PI", "3V3_RADIO", "3V3_PI",
+    "VBAT", "5V_BOOST", "5V_PI", "3V3_RADIO", "3V3_PI", "LED_RTN",
     "SPI_SCK", "SPI_MOSI", "SPI_MISO", "RADIO_CSN", "RADIO_CE", "RADIO_IRQ",
-    "I2C_SDA", "I2C_SCL", "FG_ALRT", "BTN_TXRX", "SW_ROLE", "SW_MODE_NM", "SW_MODE_MRM",
+    "I2C_SDA", "I2C_SCL", "BTN_TXRX", "SW_ROLE", "SW_MODE_NM", "SW_MODE_MRM",
     "LED_ACT", "LED_STATUS", "UART_TX", "UART_RX",
 ]
 
@@ -16,8 +16,9 @@ REF_RANGES = {
     "power": "J20 (cell), J22 (power toggle), J23 (charger lead), F1, Q1-Q9, U2 (boost), U3 (ideal diode), "
              "U4 (radio LDO), U6 (fuel gauge), D1-D9, C1-C49, R1-R49, TP1-TP9",
     "pi_link": "J1 (2x20 IDC box header), J13 (UART), MH1-MH4",
-    "ui": "J10-J12, U11, D10-D19, C50-C69, R50-R79",
+    "ui": "J10-J12, D10-D19 (D12-D15 = lead TVS), C50-C69, R50-R79",
     "radio": "J30 (SP4 breakout socket), H30, C70-C79, R80-R89, TP10-TP19",
+    "links": "W1, W2, ... wire links (build_carrier_lab.add_links, from links.json; on pi_link or the net's sheet)",
 }
 
 DS = {
@@ -28,8 +29,8 @@ DS = {
 }
 
 LAB = {   # footprints: lab copies (hw/scripts/teamc_lib/gen_lab.py) and hand-solder SMD
-    "R": "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder",
-    "C": "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder",
+    "R": "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder",
+    "C": "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder",
     "C1206": "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder",
     "CP": "Capacitor_SMD:CP_Elec_6.3x5.4",
     "LED": "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder",

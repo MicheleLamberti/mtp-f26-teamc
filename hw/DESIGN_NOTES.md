@@ -13,7 +13,7 @@ toggle drives a P-FET), TPS61022 boost.
 |---|---|---|
 | SP4 breakout (bench, T0/T2) | `hw/sp4-breakout/` | **Ready for the lab**: single-sided F.Cu, 31 × 37.5 mm, ERC 0, DRC 0 (all severities), gerbers + drill + 1:1 copper PDFs (plain and mirrored) in `fab/` and `sp4-breakout_gerbers.zip`. Header pads J1/J2 2.0 mm on a 1.0 mm drill (stock 1.7) and no pour between C1's pads, for the UPC lab rules (23-Oct-26) |
 | Pi 3 A+ HAT carrier | `hw/teamc-carrier/` | **Rev A, routed (21-Oct), for ET review before the fab order**: schematic ERC 0/0; board DRC **0 violations, 0 unconnected, 0 schematic-parity issues** (all severities); gerbers + drill + placement + assembly PDF in `fab/`, `teamc-carrier_gerbers.zip`; 3D renders `teamc-carrier_render_{top,bottom,iso,stack}.png`. **Not millable at the UPC lab (23-Oct): kept as the external-fab option** |
-| Carrier rev B (UPC lab) | `hw/teamc-carrier-lab/` | **Set up 23-Oct, not placed/routed**: hand-soldered modules (Pololu U3V70F5, Pololu #5388, Adafruit MAX17048 #5580), AP2112K, IDC ribbon to the Pi, SP4 breakout plugged into a 1×8 socket; ERC 0/0; plan `hw/REVB_LAB_PLAN.md`, loop `hw/REVB_LOOP_PROMPT.md` |
+| Carrier rev B (UPC lab) | `hw/teamc-carrier-lab/` | **Placed and routed 23-Oct on one copper layer, DRAFT for ET review**: hand-soldered modules (Pololu U3V70F5, Pololu #5388, Adafruit MAX17048 #5580), AP2112K, IDC ribbon to the Pi, SP4 breakout plugged into a 1×8 socket; ERC 0; DRC 0 violations / 0 unconnected / 0 parity; 10 wire links; gerbers + 1:1 copper PDFs in `fab/`, `teamc-carrier-lab_gerbers.zip`; see "Carrier rev B" below; plan `hw/REVB_LAB_PLAN.md` |
 | Project library | `hw/lib/teamc.kicad_sym`, `hw/lib/teamc.pretty/` | E01-ML01SP4 (symbol + footprint from the manual's drawing), MAX17048 (from the registry part, checked against the datasheet pinout), 2×20 socket with 1.5 mm pads, 1×08 and 1×02 pin headers with 2.0 mm pads (breakout, written by `build_breakout.py`) |
 | BoM | `hw/BOM.csv` | per device, from the netlist + off-board items; ≈ €102 (cap €150) |
 | Generators | `hw/scripts/` | see below; the `.kicad_sch` files are generated: edit the sheet `.py`, not the schematic |
@@ -31,7 +31,8 @@ Scripts (run from the repo root):
 | `silk_carrier.py` | reference designators placed clear of pads, vias and other silk (1.0/0.8 mm); no room → F.Fab |
 | `fab_carrier.py` | `fab/`: gerbers, Excellon drill + maps, placement (KiCad CSV + JLCPCB CPL, DNP left out), assembly + copper PDFs, BoM; the zip |
 | `render_board.py BOARD [--with-pi] [--apply-models]` | 3D renders with bodies (top, bottom, iso, HAT on the Pi); `fetch_3d.py` fetches the stock models into `hw/.3dmodels/` (git-ignored), `teamc_lib/gen_3d.py` writes `hw/lib/teamc.3dshapes/` |
-| `build_bom.py` | `hw/BOM.csv` |
+| `build_bom.py [--rev b]` | `hw/BOM.csv` (rev A), `hw/BOM_revB.csv` (rev B) |
+| `build_carrier_lab.py`, `place_carrier_lab.py`, `route_carrier_lab.py`, `linkroute.py`, `finish_carrier_lab.py`, `fab_carrier_lab.py` | carrier rev B (UPC lab), see "Carrier rev B" |
 | `teamc_lib/gen_fp.py`, `gen_sym.py`, `gen_socket.py` | the project library |
 | `schgen.py`, `sexpr.py`, `boardutil.py`, `netlist2pcb.py` | shared: schematic writer, s-expression reader, board helpers, "update PCB from schematic" |
 
@@ -285,3 +286,101 @@ the header map vs `ui.c` / the radio README / pinout.xyz, boot states (CE low, C
 - Stock: TPS61022 (DigiKey 0 on 19-Oct; Mouser/LCSC/TI), Si2333DDS (0 until Jan-27; AO3401A fallback), fuse part number.
 - Box inside dimensions and panel-hole positions (Santiago to measure) before freezing the outline/connector edges.
 - Atenea Q22 (Pi wireless chip), Q6 (foil at the USB port), Q8 (role switch).
+
+## Carrier rev B for the UPC lab mill (23-Oct, DRAFT – for ET review)
+
+`hw/teamc-carrier-lab/`: **placed and routed on ONE copper layer (F.Cu), ERC 0, DRC 0 violations / 0 unconnected /
+0 schematic-parity issues (all severities)**, gerbers + drill + 1:1 copper PDFs in `fab/` and
+`teamc-carrier-lab_gerbers.zip`, renders `teamc-carrier-lab_render_{top,bottom,iso}.png`. Decisions and parts:
+`hw/REVB_LAB_PLAN.md`; BoM `hw/BOM_revB.csv` (≈ €139/box, cap €150). Outline **100 × 80 mm, provisional** (the
+IKEA 365+ box, 15 × 15 × 7 cm outside, is not measured yet; the 18650 holder fits beside the board).
+
+Build it again, in order (all deterministic):
+
+| Step | Script | Does |
+|---|---|---|
+| 1 | `build_carrier_lab.py` | footprints (`teamc_lib/gen_lab.py`, `gen_modules.py`, wire links from `links.json`), 4 sheets, ERC, netlist, board update |
+| 2 | `place_carrier_lab.py` | outline, every part at a fixed position (floorplan in its docstring), breakout outline on Dwgs.User |
+| 3 | `route_carrier_lab.py [--search]` | hand-coded power path, SCK swap and left half; the rest with `linkroute.LinkRouter` (one layer + wire links); `--search` tries every order of the four "band" nets at three link costs |
+| 4 | `finish_carrier_lab.py` | GND pour, FR10 no-fill areas between SMD pads, M3 keep-outs; joins ground islands; turns the links into W parts (schematic + footprints); DRC |
+| 5 | `fab_carrier_lab.py` | `fab/` + zip; `render_board.py` for the renders; `build_bom.py --rev b` |
+
+### Board
+
+- **Copper side (F.Cu) = SMD parts; component side = every THT part** (modules on male headers, the 2×20 box header,
+  JST leads, the socket, test loops) soldered from the copper side, as on the SP4 breakout. No copper on B.Cu.
+- **Floorplan** (copper-side view): power on the right (U2 boost upright, cell end at the top; J20 cell lead, J23
+  charger lead, F1/Q1 in a column on the right edge; U3 ideal diode below, next to J1 pins 2/4); J1 in the middle (odd
+  pins escape left, even right); J13 UART straight out of J1 pins 6/8/10; the SP4 socket J30 along the top-left edge
+  (the breakout lies over the top-left quarter, its IPEX end mid-board, H30 = its M3 standoff); the four UI leads on
+  the left edge; U6 fuel gauge bottom-left with its row level with J1's SDA/SCL; the LEDs beside J1's top.
+- **Rules met**: tracks 0.5 mm (signals), 0.8 mm (3V3_RADIO, VBAT branches, ground joins), 1.0/1.5 mm (power), no
+  neck under 0.5 mm; clearance ≥ 0.3 mm; holes 0.95–3.2 mm; every THT pad ≥ hole + 0.7 mm (2.0 mm pads on 1.0 mm,
+  2.7 on 1.7); pour clearance 0.4 mm with thermal reliefs (≥ 1 spoke); no pour between the pads of any SMD part
+  (35 rule areas); no copper within 3.2 mm of the M3 holes (screw heads / standoffs).
+- **Power path** hand-routed (`route_carrier_lab.power`): J20 → F1 → Q1 (1.5 mm) → VBAT riser on the right edge →
+  VBAT line over U2's cell end (U2, C5, D3, TP1, R8); the boost loop's ground is a 1.5 mm trunk under U2 joining both
+  ends, with C5, D3, J20 and J23 tied straight to it; 5 V: U2 → U3 → J1 pins 2/4 (1.5 mm), C9 between U3's rows,
+  D2/C10 at J1; **the Pi's 5 V return** (J1 pins 6/14 via J13's ground pin) is a 1.5 mm track to the boost's 5 V-end
+  ground; U3's two ground rows are tied under the module.
+- **SCK swap**: SCK leaves J1 north of MISO/MOSI but must land between CE and MOSI on the socket; it drops south
+  between the pads of R84 (MISO 33 Ω) and R83 (MOSI 33 Ω) — both are 1206, and every 1206 R/C on the board can bridge
+  one 0.5 mm track the same way.
+
+### Wire links (W1–W10)
+
+On one layer the header's pin order cannot reach the radio, the mode switch and the fuel gauge without crossings
+(both J1 and the breakout sit on the component side, so their relative handedness is fixed). **10 bare 0.6 mm tinned
+wires** on the component side, between two unplated 1.0 mm holes with 2.0 mm pads, soldered on the copper side
+(138 mm of wire in all). In KiCad each is a one-pin `Conn_01x01` W part on its net with a
+`teamc:WireLink_L<len>mm` footprint whose two pads are both pad 1 and are declared jumpers ("duplicate pad numbers
+are jumpers"), so connectivity and DRC treat the wire as copper; its courtyard (1.25 mm each side) keeps it out from
+under any part. Positions: `hw/teamc-carrier-lab/links.json` and the assembly drawing (component side).
+
+| Net | Links | Why |
+|---|---|---|
+| SW_MODE_NM | W8–W10 (15.0, 10.5, 5.0 mm) | J1 pin 16 (even row) to the mode lead on the left edge: over the band of even-row lines, then over the radio lanes |
+| SW_MODE_MRM | W7 (18.5 mm) | J1 pin 36 (even row) over the radio lanes |
+| RADIO_IRQ | W5, W6 (19.5, 5.0 mm) | the inherent crossing of the radio: with CE/MOSI/MISO landing on the socket's south side, IRQ (pin 8) and CSN (pin 4, north side) cannot both arrive in copper |
+| RADIO_CSN | W4 (13.0 mm) | to R80/pin 4 north of the socket, over the radio lanes |
+| 3V3_PI | W1 (34.5 mm) | from J1 pin 1 (bottom left) past the UI rows to the radio LDO's EN (top left) |
+| GND | W2, W3 (8.0, 8.5 mm) | the LDO/socket ground and a pocket next to the UI rows, into the main pour |
+
+### Schematic changes for one copper layer (rev B vs rev A; each noted on its sheet)
+
+| Change | Why it is safe |
+|---|---|
+| All R/C 1206 (were 0805) | easier to hand-solder; a track fits between their pads (the SCK swap, router bridges) |
+| UI: no external 10 kΩ pull-ups (R50–R53) | ui.c requests the Pi's pull-ups before it reads the inputs; a 3V3 bus to the leads would cut the pour into islands. Boot-time pull-down only matters before teamc-node starts |
+| UI: four SMF5.0A TVS (D12–D15) instead of the SP0504 array | one SOT-23-5 cannot touch four parallel lead lines on one layer; same part as D2/D3 |
+| R80 (CSN pull-up) to 3V3_RADIO, not 3V3_PI | both rails rise together (the LDO's EN is 3V3_PI) and fall together |
+| No IRQ pull-up (rev A R81) | the HAL requests the Pi's pull-up on GPIO 24 (IRQ: falling edge, open drain) |
+| No C71 (socket cap) and no TP10; C12 = 10 µF | C12 sits 6 mm from the socket, the breakout has 110 µF at the SP4; probe 3V3_RADIO on C12 |
+| No TP2 (5V_PI loop) | probe D2's cathode pad |
+| 3V3_PI from **J1 pin 1** (pin 17 unused) | pin 1 is next to the fuel gauge; same Pi rail |
+| U6 (MAX17048 module): INT not routed; header GND pin not connected | software polls SOC over I2C (flying wire INT → J1 pin 22 if ever needed); the module's ground is its JP2 BAT_GND pin (same copper), tied to the carrier |
+| LED cathodes on **LED_RTN = J1 pin 25** | a Pi GND pin; the LEDs sit in a pocket of J1's escape tracks |
+| J1 pins 20/30/34/39 (GND) not connected | each sits alone in a pocket; the carrier ties the Pi's GND on pins 6, 9 and 14 (the 5 V return, see above) |
+| J23 (charger) on **BAT_IN**, beside J20 | its ground and + then come straight from the cell lead; the charger no longer passes Q1 |
+
+### Assembly order (suggested)
+
+1. Wire links W1–W10 first (they sit under the modules' and the breakout's height): bend, insert from the
+   component side, solder on the copper side, check continuity.
+2. SMD parts on the copper side (1206/0805/SOT-23/SMF, the two 6.3 mm electrolytics).
+3. Low THT: test loops, J13, the JST leads, J30 socket, J1 box header (key toward the board edge as marked on the
+   assembly drawing; red wire = pin 1).
+4. Modules on male headers: U3, U6, U2 last. Then the breakout on its M3 standoff at H30.
+
+### Open points (rev B)
+
+- **Box inside dimensions** → final outline, M3 hole positions, which edges the leads face. Everything is placed
+  relative to J1 and the edges; moving the outline means re-running steps 2–5.
+- **10 wire links** is more than the prompt's "handful": the crossings are forced by J1's pin order (pin map shared
+  with the software). Fewer would need a different GPIO assignment for the mode switch / IRQ (software change) or a
+  second copper layer.
+- Pi ground through 3 ribbon conductors (pins 6, 9, 14): ≈ 10 mΩ return at 10 cm; check 5V_PI at the Pi under load
+  (bench) — the boost gives 5.0 V ± 4 %, the Pi throttles at 4.63 V.
+- The breakout's IPEX end is mid-board (above the left half), not at an edge: route the U.FL pigtail up to the box
+  wall; glue the plug (drop test).
+- Lab review (Prof. Chávez): one F.Cu gerber + Edge.Cuts + one Excellon (all holes unplated).

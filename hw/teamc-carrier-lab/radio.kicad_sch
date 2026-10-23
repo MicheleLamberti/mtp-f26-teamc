@@ -444,163 +444,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:C"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "C"
-				(at 0.635 2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "C"
-				(at 0.635 -2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" ""
-				(at 0.9652 -3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Unpolarized capacitor"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "cap capacitor"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "C_*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "C_0_1"
-				(polyline
-					(pts
-						(xy -2.032 0.762)
-						(xy 2.032 0.762)
-					)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.032 -0.762)
-						(xy 2.032 -0.762)
-					)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "C_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 2.794)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 2.794)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:R"
 			(pin_numbers
 				(hide yes)
@@ -731,129 +574,6 @@
 						)
 					)
 					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Connector:TestPoint"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0.762)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "TP"
-				(at 0 6.858 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "TestPoint"
-				(at 0 5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 5.08 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 5.08 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "test point"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "test point tp"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Pin* Test*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "TestPoint_0_1"
-				(circle
-					(center 0 3.302)
-					(radius 0.762)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "TestPoint_1_1"
-				(pin passive line
-					(at 0 0 90)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1379,182 +1099,6 @@
 	)
 	(wire
 		(pts
-			(xy 267.97 116.84)
-			(xy 265.43 116.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2fece06b-6132-5b24-9d74-f303ce0aed0d")
-	)
-	(global_label "3V3_RADIO"
-		(shape passive)
-		(at 265.43 116.84 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "ad0c52e3-0ef3-56fc-a138-ff53841c9332")
-	)
-	(wire
-		(pts
-			(xy 275.59 116.84)
-			(xy 278.13 116.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c0a3083f-f64e-5752-9830-7425ad9d49e1")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 278.13 116.84 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f35bd069-8383-5839-9654-6f30a4d685fe")
-		(property "Reference" "#PWR3002"
-			(at 278.13 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 278.13 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 278.13 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 278.13 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f5b5b406-e58b-53ae-8156-54385b32cb17")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1dcb034c-95c9-54ed-ae35-826ca4db9f84"
-					(reference "#PWR3002")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C")
-		(at 271.78 116.84 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f7534cc7-114b-5df0-a2d3-1130a82cfaed")
-		(property "Reference" "C71"
-			(at 271.78 109.22 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10u X5R"
-			(at 271.78 111.76 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
-			(at 271.78 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 271.78 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Unpolarized capacitor"
-			(at 271.78 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "CL21A106KAYNNNE (10 uF 25 V X5R 0805)"
-			(at 271.78 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Samsung"
-			(at 271.78 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1b3be954-bd63-5090-9c58-7e23ad90f925")
-		)
-		(pin "2"
-			(uuid "9a2ae73b-f9fd-5e7b-94f7-05b55f651f00")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1dcb034c-95c9-54ed-ae35-826ca4db9f84"
-					(reference "C71")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
 			(xy 59.69 99.06)
 			(xy 57.15 99.06)
 		)
@@ -1623,7 +1167,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 63.5 99.06 0)
 			(effects
 				(font
@@ -1650,7 +1194,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-0733RL"
+		(property "MPN" "RC1206FR-0733RL"
 			(at 63.5 99.06 0)
 			(effects
 				(font
@@ -1753,7 +1297,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 63.5 116.84 0)
 			(effects
 				(font
@@ -1780,7 +1324,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-0733RL"
+		(property "MPN" "RC1206FR-0733RL"
 			(at 63.5 116.84 0)
 			(effects
 				(font
@@ -1883,7 +1427,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 63.5 134.62 0)
 			(effects
 				(font
@@ -1910,7 +1454,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-0733RL"
+		(property "MPN" "RC1206FR-0733RL"
 			(at 63.5 134.62 0)
 			(effects
 				(font
@@ -1954,7 +1498,7 @@
 		)
 		(uuid "0118ced1-cef1-5a51-b505-eff4a713152f")
 	)
-	(global_label "3V3_PI"
+	(global_label "3V3_RADIO"
 		(shape passive)
 		(at 57.15 190.5 180)
 		(fields_autoplaced yes)
@@ -2014,7 +1558,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 63.5 190.5 0)
 			(effects
 				(font
@@ -2041,7 +1585,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-0710KL"
+		(property "MPN" "RC1206FR-0710KL"
 			(at 63.5 190.5 0)
 			(effects
 				(font
@@ -2074,244 +1618,6 @@
 			)
 		)
 	)
-	(wire
-		(pts
-			(xy 59.69 208.28)
-			(xy 57.15 208.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e37c8c40-a582-5155-b97d-9a6c9aacf12a")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 57.15 208.28 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "aa86c410-29d8-5c8d-b070-fc96d76f84bf")
-	)
-	(wire
-		(pts
-			(xy 67.31 208.28)
-			(xy 69.85 208.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b5957351-8d69-5de1-9df3-7348a895b11e")
-	)
-	(global_label "RADIO_IRQ"
-		(shape passive)
-		(at 69.85 208.28 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "81732390-32b4-54f2-9d16-3af3ad0f9b91")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 63.5 208.28 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "59502f8f-f990-5bc5-aca6-3a6eca694e4e")
-		(property "Reference" "R81"
-			(at 63.5 201.93 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 63.5 204.47 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 63.5 208.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 63.5 208.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 63.5 208.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "RC0805FR-0710KL"
-			(at 63.5 208.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 63.5 208.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "2fb43307-84d1-5dd2-95e9-db9c68d064b7")
-		)
-		(pin "2"
-			(uuid "3ac08b30-4827-5087-b00f-e2cba294198b")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1dcb034c-95c9-54ed-ae35-826ca4db9f84"
-					(reference "R81")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 271.78 187.96)
-			(xy 271.78 190.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c23b529e-56a6-5145-a38a-dccc2be9afc9")
-	)
-	(global_label "3V3_RADIO"
-		(shape passive)
-		(at 271.78 190.5 270)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "85999834-731d-5073-a641-0e6b517d7eaa")
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 271.78 187.96 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1819ce8d-78dd-5a88-af19-7b49d3b08eb7")
-		(property "Reference" "TP10"
-			(at 274.32 184.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "3V3_RADIO"
-			(at 274.32 186.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm"
-			(at 271.78 187.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 271.78 187.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "test point"
-			(at 271.78 187.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "wire loop or Keystone 5000"
-			(at 271.78 187.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Keystone"
-			(at 271.78 187.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "5fb7db7a-6a84-5847-b79e-9e9ff340c86b")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1dcb034c-95c9-54ed-ae35-826ca4db9f84"
-					(reference "TP10")
-					(unit 1)
-				)
-			)
-		)
-	)
 	(text "RADIO – socket for the lab-made E01-ML01SP4 breakout"
 		(exclude_from_sim no)
 		(at 25.4 20.32 0)
@@ -2323,7 +1629,7 @@
 		)
 		(uuid "077c7ce9-e30f-5e77-bebd-1c48da6b6717")
 	)
-	(text "DRAFT – for ET review.\nVCC 2.0–3.6 V, ABS. MAX 3.6 V: only 3V3_RADIO from the AP2112K on the power sheet (enabled by the Pi's 3V3,\nso the radio is off whenever the Pi is off). Never the cell, never the Pi's 3V3 pin.\nThe breakout has the module's 100 uF + 10 uF + 100 nF; C71 here only decouples the socket end of the track.\nPlace J30 so the breakout's IPEX end faces the board edge, far from the boost module; M3 standoff at the\nbreakout's H1 (H30 here, ~11 mm standoff = socket + header height). Antenna: TX2400-FPC-2509 flex on a box\nwall on the U.FL (glue the plug, drop test)."
+	(text "DRAFT – for ET review.\nVCC 2.0–3.6 V, ABS. MAX 3.6 V: only 3V3_RADIO from the AP2112K on the power sheet (enabled by the Pi's 3V3,\nso the radio is off whenever the Pi is off). Never the cell, never the Pi's 3V3 pin.\nThe breakout has the module's 100 uF + 10 uF + 100 nF. Rev B: no socket-end cap (rev A C71) and no test loop\n(rev A TP10): C12 (10 uF) at the LDO is 6 mm from the socket, and 3V3_RADIO is probed on C12's pad.\nPlace J30 so the breakout's IPEX end faces the board edge, far from the boost module; M3 standoff at the\nbreakout's H1 (H30 here, ~11 mm standoff = socket + header height). Antenna: TX2400-FPC-2509 flex on a box\nwall on the U.FL (glue the plug, drop test)."
 		(exclude_from_sim no)
 		(at 25.4 27.94 0)
 		(effects
@@ -2367,7 +1673,7 @@
 		)
 		(uuid "f1e92a25-3c08-542d-b42d-dd9243acb907")
 	)
-	(text "PULL-UPS TO 3V3_PI"
+	(text "PULL-UP TO 3V3_RADIO"
 		(exclude_from_sim no)
 		(at 25.4 172.72 0)
 		(effects
@@ -2378,7 +1684,7 @@
 		)
 		(uuid "cebe15ef-320c-5d1e-94b2-e02e12d490da")
 	)
-	(text "R80: CSN high = radio deselected while the Pi boots. R81: IRQ idle level.\n3V3_RADIO and 3V3_PI come up together (the LDO's EN is 3V3_PI): no back-feed either way."
+	(text "R80: CSN high = radio deselected while the Pi boots.\nRev B: to 3V3_RADIO (rev A: 3V3_PI), so it sits at the socket without a 3V3_PI track there on the single\ncopper layer. 3V3_RADIO comes up with 3V3_PI (the LDO's EN is 3V3_PI): CSN is still high from the first\nmilliseconds of the Pi's boot, and both rails are off together.\nNo IRQ pull-up in rev B (rev A R81): the Linux HAL requests the Pi's pull-up on GPIO 24 (IRQ is open drain,\nfalling edge only; radio/fw/linux/nrf24_hal_linux.c), and on one copper layer 3V3 does not reach pin 8."
 		(exclude_from_sim no)
 		(at 25.4 218.44 0)
 		(effects
@@ -2388,17 +1694,6 @@
 			(justify left top)
 		)
 		(uuid "8968db0e-5803-5308-aa00-760372fce685")
-	)
-	(text "TEST POINT"
-		(exclude_from_sim no)
-		(at 254 172.72 0)
-		(effects
-			(font
-				(size 2 2)
-			)
-			(justify left top)
-		)
-		(uuid "ce683e31-a3c5-5803-a4bb-a99028af531f")
 	)
 	(embedded_fonts no)
 )

@@ -11,7 +11,7 @@ from schgen import Sheet
 from nets import GLOBAL_NETS, DS, LAB
 from modules import MODULES
 
-RES = {"10k": "RC0805FR-0710KL", "100k": "RC0805FR-07100KL", "1k": "RC0805FR-071KL"}
+RES = {"10k": "RC1206FR-0710KL", "100k": "RC1206FR-07100KL", "1k": "RC1206FR-071KL"}
 
 
 def R(s, ref, val, at, n1, n2):
@@ -68,13 +68,13 @@ def build():
     s.note("Protected 18650 (PCM inside, trip >= 3 A) in a holder on the box floor, JST-VH lead to J20.\n"
            "Q1: body diode conducts for a correct cell, then VGS = -VBAT turns it on; a reversed cell is blocked.\n"
            "DMP2035U <= 45 mΩ at -2.5 V (AO3401A ~85 mΩ: ~0.25 V at 3 A). C5: bulk at the boost input (Pololu asks\n"
-           "for >= 33 uF when the cell is on a lead). Charger (J23) on VBAT: Q1 conducts both ways once on.",
+           "for >= 33 uF when the cell is on a lead). Charger (J23): rev B on BAT_IN, beside J20 (the cell lead).",
            at=(15.24, 91.44), size=1.27)
 
     # ===== 2. charger lead =========================================================================================
     s.note("2  CHARGER LEAD (TP4056 USB-C module at the box wall)", at=(137.16, 20.32), size=2.0)
     s.add("Connector_Generic:Conn_01x02", "J23", "TP4056 B+/B-", at=(160.02, 38.1), fp=LAB["XH2"],
-          nets={"1": "VBAT", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST")
+          nets={"1": "BAT_IN", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST")
     s.note("TP4056 USB-C module with protection (HW-373), off-board where the USB-C is reachable:\n"
            "its B+/B- to this lead (1 A charge; XH is rated 3 A). OUT+/OUT- unused.\n"
            "No power path: charge with the box switched OFF. Check its CC resistors with a C-to-C cable.",
@@ -86,7 +86,7 @@ def build():
           nets={"1": "PWR_SW_J", "2": "GND"}, mpn="B2B-XH-A", mfr="JST")
     R(s, "R9", "1k", (304.8, 38.1), "PWR_SW_J", "PWR_G")
     R(s, "R8", "100k", (304.8, 55.88), "VBAT", "PWR_G")
-    C(s, "C18", "100n X7R", (304.8, 73.66), "PWR_G", "GND", mpn="CL21B104KBCNNNC")
+    C(s, "C18", "100n X7R", (304.8, 73.66), "PWR_G", "GND", mpn="CL31B104KBCNNNC")
     s.add("Transistor_FET:2N7002", "Q2", "2N7002", fp=LAB["SOT23"], at=(335.28, 55.88),
           nets={"1": "PWR_G", "2": "GND", "3": "PWR_EN"}, mpn="2N7002,215", mfr="Nexperia", ds="")
     s.note("Toggle closed: PWR_G = 0 → Q2 off → the module's own 100 k pull-up holds EN high → boost ON.\n"
@@ -108,7 +108,7 @@ def build():
     s.note("5  BACK-POWER IDEAL DIODE (Pololu #5388) & 5V_PI AT THE IDC HEADER", at=(137.16, 119.38), size=2.0)
     module(s, "U3", "IDEAL_DIODE", (172.72, 147.32), {"VIN": "5V_BOOST", "VOUT": "5V_PI", "GND": "GND"})
     CP(s, "C9", (231.14, 139.7), "5V_PI")
-    C(s, "C10", "100n X7R", (231.14, 157.48), "5V_PI", "GND", mpn="CL21B104KBCNNNC")
+    C(s, "C10", "100n X7R", (231.14, 157.48), "5V_PI", "GND", mpn="CL31B104KBCNNNC")
     TVS(s, "D2", (231.14, 175.26), "5V_PI")
     s.note("< 3 mΩ: the Pi sees 5.0 V - ribbon (~0.03 V at 1 A) > 4.63 V throttle. A Schottky here would not do.\n"
            "LM74700 inside: needs ~3.9 V to start (runs down to 3.2 V) - fine here on the 5 V side, never on the cell.\n"
@@ -119,10 +119,11 @@ def build():
     s.add("Regulator_Linear:AP2112K-3.3", "U4", "AP2112K-3.3", fp=LAB["SOT23_5"], at=(55.88, 223.52),
           nets={"1": "VBAT", "2": "GND", "3": "3V3_PI", "4": None, "5": "3V3_RADIO"},
           mpn="AP2112K-3.3TRG1", mfr="Diodes Inc.", ds=DS["AP2112"])
-    C(s, "C11", "10u X5R", (106.68, 215.9), "VBAT", "GND", mpn="CL21A106KAYNNNE")
-    C(s, "C12", "1u X7R", (106.68, 231.14), "3V3_RADIO", "GND", mpn="CL21B105KBFNNNE")
+    C(s, "C11", "10u X5R", (106.68, 215.9), "VBAT", "GND", mpn="CL31A106KAHNNNE")
+    C(s, "C12", "10u X5R", (106.68, 231.14), "3V3_RADIO", "GND", mpn="CL31A106KAHNNNE")
     s.note("~0.1 V dropout at 150 mA (600 mA part). EN from 3V3_PI: the radio is off whenever the Pi is off\n"
-           "(else the SP4 in RX drains ~26 mA from the cell with the box 'off'). The breakout adds 110 uF at the module.",
+           "(else the SP4 in RX drains ~26 mA from the cell with the box 'off'). The breakout adds 110 uF at the module.\n"
+           "C12 10 uF (rev A 1 uF + 10 uF C71 at the socket): the socket is 6 mm away on the lab board; AP2112 needs >= 1 uF.",
            at=(15.24, 241.3), size=1.27)
 
     # ===== 7. fuel gauge module ====================================================================================
@@ -132,7 +133,8 @@ def build():
 
     # ===== 8. test points & flags ==================================================================================
     s.note("8  TEST POINTS", at=(256.54, 203.2), size=2.0)
-    for ref, net, x in (("TP1", "VBAT", 261.62), ("TP2", "5V_PI", 281.94), ("TP3", "GND", 302.26)):
+    s.note("Rev B: no 5V_PI loop (rev A TP2): probe D2's cathode pad.", at=(256.54, 226.06), size=1.27)
+    for ref, net, x in (("TP1", "VBAT", 261.62), ("TP3", "GND", 302.26)):
         s.add("Connector:TestPoint", ref, net, fp=LAB["TP"], at=(x, 215.9), nets={"1": net},
               mpn="wire loop (or Keystone 5000/5001)")
     # nets driven only through passive pins (connector, fuse, FET, module headers)

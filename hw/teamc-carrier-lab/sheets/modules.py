@@ -47,11 +47,15 @@ MODULES = {
             {"name": "BAT", "x": 11.43, "y": 11.43}, {"name": "BAT_GND", "x": 13.97, "y": 11.43},   # JP2
         ],
         # its 2.5 mm plated holes (2.54, 2.54)/(22.86, 2.54) are not used: no carrier holes there
-        "nets": {"VIN": "3V3_PI", "GND": "GND", "SCL": "I2C_SCL", "SDA": "I2C_SDA", "INT": "FG_ALRT",
+        "nets": {"VIN": "3V3_PI", "GND": None, "SCL": "I2C_SCL", "SDA": "I2C_SDA", "INT": None,
                  "QSTART": None, "BAT": "VBAT", "BAT_GND": "GND"},
         "note": "The chip runs from the cell (SJ2 bridged VDD-Bat as shipped); header VIN only feeds its 10 k pull-ups on\n"
-                "SCL/SDA/INT and the LED (cut SJ1 to save ~0.1 mA): VIN = 3V3_PI. Cell sense through the JP2 Bat/GND\n"
+                "SCL/SDA/INT and the LED (cut SJ1 to save ~0.1 mA): VIN = 3V3_PI (rev B: from J1 pin 1). Cell sense through the JP2 Bat/GND\n"
                 "pair (2-pin header, Kelvin track from Q1's source), not a JST-PH lead. QSTART unused (10 k to GND on\n"
-                "the module). No level shifting needed at 3.3 V. Software: never set MODE.EnSleep.",
+                "the module). INT (alert) not routed in rev B: the software polls SOC over I2C and on the single\n"
+                "copper layer the line would need a long wire link; a flying wire INT -> J1 pin 22 (GPIO 25) adds it.\n"
+                "The module's INT pull-up stays on its board. Rev B: the header GND pin is not connected - the module's\n"
+                "ground is the JP2 BAT_GND pin (same copper on the Adafruit board), tied to the carrier ground.\n"
+                "No level shifting needed at 3.3 V. Software: never set MODE.EnSleep.",
     },
 }

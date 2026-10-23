@@ -77,12 +77,19 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   (top/iso/HAT on the Pi/bottom), 5 review points for ET**; v0.6 19-Oct: the KiCad carrier (status table, renders, BoM-based parts ≈ €102, fab rules, asks to ET), SP4 14.5 mm, Ebyte flex antenna; v0.5.1 18-Oct: block diagram with the HAT boundary, microSD and GPIO numbers; v0.5: Raspberry Pi 3 (A+ suggested) + SP4 HAT, 5.1 V boost ≥ 2.5 A, MAX17048,
   BoM ~70–90 €, Pi options table**; v0.4.4 17-Oct: TX/RX role switch (Atenea Q8), U.FL secured for the drop test, Mac/Windows
   sticks; v0.4.3: Pico 2 + one E01-ML01SP4 + flex omni, radio LDO, breakout, BoM, low-battery countermeasures).
-- **`hw/teamc-carrier-lab/` = carrier rev B for the UPC lab mill (23-Oct, SET UP, not placed/routed):** single-sided,
+- **`hw/teamc-carrier-lab/` = carrier rev B for the UPC lab mill (23-Oct: PLACED + ROUTED on one copper layer, ERC 0,
+  DRC 0/0/0, 10 wire links, gerbers + 1:1 PDFs in `fab/` + zip, BoM `hw/BOM_revB.csv` ≈ €139; outline 100 × 80 mm
+  provisional until the box is measured; DRAFT for ET):** single-sided,
   hand-soldered modules (Pololu U3V70F5 boost, Pololu #5388 ideal diode, Adafruit MAX17048 #5580), AP2112K radio LDO,
   2×20 IDC ribbon to the Pi (not a HAT), the SP4 breakout plugs into a 1×8 socket, TP4056 USB-C charger off-board.
   `python3 hw/scripts/build_carrier_lab.py` = footprints (`teamc_lib/gen_lab.py`, `gen_modules.py` from
   `sheets/modules.py`, makers' CAD) + 4 sheets + ERC 0 + unplaced board with lab rules. Decisions/parts/lab rules:
-  **`hw/REVB_LAB_PLAN.md`**; the place/route/DRC/fab loop: **`hw/REVB_LOOP_PROMPT.md`** (Santiago runs it later); what to buy (2 boxes + 1 spare, stock 23-Oct): **`hw/REVB_SHOPPING.md`**.
+  **`hw/REVB_LAB_PLAN.md`**; the loop prompt **`hw/REVB_LOOP_PROMPT.md`** (steps 2–6 done); what to buy (2 boxes + 1 spare, stock 23-Oct): **`hw/REVB_SHOPPING.md`**.
+  Pipeline (all scripts, deterministic): `build_carrier_lab.py` → `place_carrier_lab.py` → `route_carrier_lab.py
+  [--search]` (hand-coded power/SCK swap/left half + `linkroute.py`, a one-layer grid router whose second "layer" is
+  straight wire links) → `finish_carrier_lab.py` (pour, FR10 rule areas, ground-island joins, links → W parts with
+  `teamc:WireLink_L<len>mm` footprints, jumper pads, `links.json`) → `fab_carrier_lab.py`. Single-layer schematic
+  changes and the link list: **`hw/DESIGN_NOTES.md` "Carrier rev B"**.
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
   agent with ~8 subagents**: research of power / Pi + SP4 footprint / UI parts with verified symbols and footprints,
   SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
@@ -155,6 +162,14 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
+- **23-Oct-26 (evening): carrier rev B placed and routed on ONE copper layer** (`hw/teamc-carrier-lab/`): ERC 0, DRC 0
+  violations / 0 unconnected / 0 parity (all severities), tracks ≥ 0.5 mm, pads ≥ hole + 0.7, pour clearance 0.4,
+  FR10 no-fill areas, **10 bare-wire links** (138 mm; J1's pin order forces the crossings), fab zip ready, BoM ≈ €139.
+  Outline 100 × 80 mm **assumed** (box 15 × 15 × 7 cm outside, not measured). Schematic changes to make one layer work
+  (all DRAFT, for ET): 1206 R/C; no UI pull-ups (ui.c uses the Pi's); 4 × SMF5.0A instead of the SP0504; R80 to
+  3V3_RADIO, no R81 (HAL pull-up); no C71/TP10/TP2 (C12 = 10 µF); 3V3_PI from J1 pin 1 (pin 17 unused); FG_ALRT not
+  routed (software polls); U6 header GND not connected (BAT_GND); LEDs return on J1 pin 25 (LED_RTN); J1 GND pins
+  20/30/34/39 unused (Pi ground on 6/9/14); J23 charger on BAT_IN beside J20. Details: `hw/DESIGN_NOTES.md`.
 - **23-Oct-26: the carrier goes to the UPC lab mill → rev B with hand-soldered modules (set up, loop pending).**
   Meeting with Prof. Chávez: lab rules = track > 0.3 (better > 0.5) mm, via hole ≥ 0.7 mm, **no plated holes**, no
   mask/silk (Chávez slides + Jiménez guide; memory `upc-lab-pcb-milling`); gerbers by email to Chávez, pick-up C5-114.
@@ -275,9 +290,11 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
 - [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
-- [ ] Carrier rev B (lab): box inside dimensions → run `hw/REVB_LOOP_PROMPT.md` (place, route single-sided, DRC 0,
-      fab zip) → email to Chávez; order U3V70F5, #5388, MAX17048 #5580, TP4056 USB-C, AP2112K, DMP2035U, 0466005 fuse,
-      IDC box header + 40-way F-F ribbon, 1×8 socket (`hw/REVB_LAB_PLAN.md`)
+- [ ] Carrier rev B (lab): **routed 23-Oct (provisional outline)**. Santiago: box inside dimensions → re-run
+      place/route/finish/fab (see `hw/DESIGN_NOTES.md`); ET reviews the single-layer schematic changes and the 10 wire
+      links → email `hw/teamc-carrier-lab/teamc-carrier-lab_gerbers.zip` to Chávez; order U3V70F5, #5388, MAX17048
+      #5580, TP4056 USB-C, AP2112K, DMP2035U, 0466005 fuse, IDC box header + 40-way F-F ribbon, 1×8 socket, 1206 R/C,
+      SMF5V0A x6 per box (`hw/REVB_SHOPPING.md`)
 - [ ] (Fallback only) carrier rev A at a JLCPCB-class fab: TPS61022 has no stock until Jan-27 (re-footprint to
       TPS61033/TPS61023), Si2333DDS → DMP2035U-7, 22 µF → CL31A226KAHNNNE
 - [ ] Bench, once modules arrive: T0 at all four RF_PWR steps and at 3.6/3.3/3.0 V (pigtail, ≥ 30 dB pad), then T2;
@@ -298,6 +315,26 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-23 (evening) — carrier rev B placed and routed on one copper layer
+- Santiago: read `hw/REVB_LOOP_PROMPT.md` and start designing. Box inside dimensions unknown → **outline kept at the
+  provisional 100 × 80 mm** (box 15 × 15 × 7 cm outside, cell holder beside the board); step 1 still open.
+- Placement (`place_carrier_lab.py`): power right (U2 upright, J20/F1/Q1 column on the right edge, U3 at J1 pins 2/4),
+  J1 centre, J13 straight out of pins 6/8/10, SP4 socket on the top-left edge (back-side handedness of J1 and the
+  breakout is fixed: pin 1 of J1 at the bottom with odd pins left; breakout pins left→right ⇒ body down), UI leads on
+  the left edge, U6 bottom-left level with SDA/SCL, LEDs at J1's top.
+- Routing: no single-layer autorouter → `linkroute.py` (A* on F.Cu + straight wire links as macro moves, priced in mm);
+  power, the SCK swap under R84/R83 (1206 bridges) and the left half hand-coded; the "band" nets (MRM, CSN, IRQ, NM)
+  searched over orders/link costs. Findings: J1's pin order forces crossings (IRQ/CSN inherent for the radio; the
+  even-row mode lines must cross the radio lanes); a 3V3 bus to UI pull-ups and the TVS array cut the pour into ~15
+  islands → schematic changes (see Status) brought it to 1 main pour + 2 ground links. Wire links are W parts:
+  one-pin symbol + footprint with two pad-1 pads declared jumpers (KiCad 10 connectivity treats them as copper; tested).
+- Result: ERC 0, DRC 0/0/0 (silk/mask checks off: the lab board has neither), 10 links (138 mm), gerbers/drill/1:1
+  PDFs/assembly/schematic PDFs + zip, renders, `hw/BOM_revB.csv` (`build_bom.py --rev b`, ≈ €139). Docs: DESIGN_NOTES
+  "Carrier rev B", REVB_LAB_PLAN, REVB_LOOP_PROMPT, REVB_SHOPPING.
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK (nothing outside hw/ changed).
+- **Start next session with:** box inside dimensions → re-run place/route/finish/fab; ET review of the schematic
+  changes and the links; email the zip to Chávez; modules ordered?
 
 ### 2026-10-23 — meeting with Prof. Chávez (ET): lab PCB rules; breakout pads; carrier rev B set up
 - Santiago (in the meeting) asked for a PCB overview, the BoM, the trace sizes; the lab wants track > 0.3/0.5 mm and

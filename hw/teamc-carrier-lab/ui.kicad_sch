@@ -655,8 +655,12 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Power_Protection:SP0504BAHT"
+		(symbol "Diode:SMF5V0A"
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
+				(offset 1.016)
 				(hide yes)
 			)
 			(exclude_from_sim no)
@@ -665,41 +669,27 @@
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "D"
-				(at 7.62 2.54 0)
+				(at 0 2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Value" "SP0504BAHT"
-				(at 7.62 0.635 0)
+			(property "Value" "SMF5V0A"
+				(at 0 -2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
-				(at 7.62 -1.27 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Datasheet" "http://www.littelfuse.com/~/media/files/littelfuse/technical%20resources/documents/data%20sheets/sp05xxba.pdf"
-				(at 3.175 3.175 0)
+			(property "Footprint" "Diode_SMD:D_SMF"
+				(at 0 -5.08 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -709,7 +699,18 @@
 					)
 				)
 			)
-			(property "Description" "TVS Diode Array, 5.5V Standoff, 4 Channels, SOT-23-5 package"
+			(property "Datasheet" "https://www.vishay.com/doc?85881"
+				(at -1.27 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -720,7 +721,7 @@
 					)
 				)
 			)
-			(property "ki_keywords" "usb esd protection suppression transient"
+			(property "ki_keywords" "diode TVS voltage suppressor"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -731,7 +732,7 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "SOT?23*"
+			(property "ki_fp_filters" "D*SMF*"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -742,279 +743,30 @@
 					)
 				)
 			)
-			(symbol "SP0504BAHT_0_0"
-				(pin passive line
-					(at 0 -5.08 90)
-					(length 2.54)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
+			(symbol "SMF5V0A_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27)
+						(xy -1.27 1.27)
+						(xy -1.27 -1.27)
 					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "SP0504BAHT_0_1"
-				(rectangle
-					(start -4.445 2.54)
-					(end 6.985 -2.54)
 					(stroke
 						(width 0.254)
 						(type default)
 					)
 					(fill
-						(type background)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.302 1.016)
-						(xy -3.302 1.27)
-						(xy -1.778 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
 						(type none)
 					)
 				)
 				(polyline
 					(pts
-						(xy -2.54 2.54)
-						(xy -2.54 1.27)
+						(xy 1.27 1.27)
+						(xy 1.27 -1.27)
+						(xy -1.27 0)
+						(xy 1.27 1.27)
 					)
 					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27)
-						(xy -2.54 -1.27)
-						(xy 2.54 -1.27)
-						(xy 2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27)
-						(xy -1.905 0)
-						(xy -3.175 0)
-						(xy -2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54)
-						(xy 0 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -1.27)
-						(xy 0 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -1.27)
-						(xy 0 -2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 -1.27)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.635 0)
-						(xy -0.635 0)
-						(xy 0 1.27)
-						(xy 0.635 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 1.27)
-						(xy -0.762 1.27)
-						(xy -0.762 1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.778 1.016)
-						(xy 1.778 1.27)
-						(xy 3.175 1.27)
-						(xy 3.302 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 2.54)
-						(xy 2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27)
-						(xy 1.905 0)
-						(xy 3.175 0)
-						(xy 2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 2.54 -1.27)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 4.318 1.016)
-						(xy 4.318 1.27)
-						(xy 5.715 1.27)
-						(xy 5.842 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.08 2.54)
-						(xy 5.08 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.08 1.27)
-						(xy 5.08 -1.27)
-						(xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.08 1.27)
-						(xy 4.445 0)
-						(xy 5.715 0)
-						(xy 5.08 1.27)
-					)
-					(stroke
-						(width 0)
+						(width 0.254)
 						(type default)
 					)
 					(fill
@@ -1022,11 +774,11 @@
 					)
 				)
 			)
-			(symbol "SP0504BAHT_1_1"
+			(symbol "SMF5V0A_1_1"
 				(pin passive line
-					(at -2.54 5.08 270)
+					(at -3.81 0 0)
 					(length 2.54)
-					(name "K"
+					(name "A1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1042,52 +794,16 @@
 					)
 				)
 				(pin passive line
-					(at 0 5.08 270)
+					(at 3.81 0 180)
 					(length 2.54)
-					(name "K"
+					(name "A2"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 5.08 270)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 5.08 270)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2014,136 +1730,6 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 99.06)
-			(xy 148.59 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8f019ea3-2ea9-5cef-be03-cf971c262ed1")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 148.59 99.06 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3d1752c4-f240-55dc-9a65-1553070c355b")
-	)
-	(wire
-		(pts
-			(xy 158.75 99.06)
-			(xy 161.29 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "798a98ac-05ed-5c84-85f5-2442c7b4d504")
-	)
-	(label "BTN_TXRX_J"
-		(at 161.29 99.06 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "19ef6cb2-d6fa-54e4-9b9e-bdc721938e30")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 154.94 99.06 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e1655c3c-f2c4-5173-9036-a9a08a8cda2d")
-		(property "Reference" "R50"
-			(at 154.94 92.71 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 154.94 95.25 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 154.94 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 154.94 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 154.94 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "RC0805FR-0710KL"
-			(at 154.94 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 154.94 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "203c3ac1-fd56-5230-b381-0683f3f0d7f1")
-		)
-		(pin "2"
-			(uuid "2abc2ab3-70f4-55dc-b11a-b09742ef7742")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "R50")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
 			(xy 217.17 99.06)
 			(xy 214.63 99.06)
 		)
@@ -2212,7 +1798,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 99.06 0)
 			(effects
 				(font
@@ -2239,7 +1825,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-071KL"
+		(property "MPN" "RC1206FR-071KL"
 			(at 220.98 99.06 0)
 			(effects
 				(font
@@ -2388,7 +1974,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder"
 			(at 287.02 99.06 0)
 			(effects
 				(font
@@ -2415,7 +2001,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21B104KBCNNNC"
+		(property "MPN" "CL31B104KBCNNNC"
 			(at 287.02 99.06 0)
 			(effects
 				(font
@@ -2443,136 +2029,6 @@
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
 					(reference "C50")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 151.13 119.38)
-			(xy 148.59 119.38)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18a55923-488b-5b61-b7c9-7f04bba82932")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 148.59 119.38 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "13828703-5c9a-5f35-a063-edfb2833378c")
-	)
-	(wire
-		(pts
-			(xy 158.75 119.38)
-			(xy 161.29 119.38)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18f5ed6a-a962-5db0-a735-a2d54bcc5cea")
-	)
-	(label "SW_ROLE_J"
-		(at 161.29 119.38 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b87b2c71-4def-5940-95a8-8a698a782ba2")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 154.94 119.38 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c80e4654-e258-5502-aeda-a117045027bb")
-		(property "Reference" "R51"
-			(at 154.94 113.03 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 154.94 115.57 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 154.94 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 154.94 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 154.94 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "RC0805FR-0710KL"
-			(at 154.94 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 154.94 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "91836a97-bb82-5f54-a5f9-ed876aa1ce7f")
-		)
-		(pin "2"
-			(uuid "23d067cd-5426-5d82-aa40-9d99768566bb")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "R51")
 					(unit 1)
 				)
 			)
@@ -2648,7 +2104,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 119.38 0)
 			(effects
 				(font
@@ -2675,7 +2131,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-071KL"
+		(property "MPN" "RC1206FR-071KL"
 			(at 220.98 119.38 0)
 			(effects
 				(font
@@ -2824,7 +2280,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder"
 			(at 287.02 119.38 0)
 			(effects
 				(font
@@ -2851,7 +2307,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21B104KBCNNNC"
+		(property "MPN" "CL31B104KBCNNNC"
 			(at 287.02 119.38 0)
 			(effects
 				(font
@@ -2879,136 +2335,6 @@
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
 					(reference "C51")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 151.13 139.7)
-			(xy 148.59 139.7)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62c629bd-c45d-5297-a4c7-4d0a8fdc0c3e")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 148.59 139.7 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "8cb7c079-2786-52ba-838f-6ef4369f369d")
-	)
-	(wire
-		(pts
-			(xy 158.75 139.7)
-			(xy 161.29 139.7)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "306f15e7-21b2-57f8-acd7-9ddea6c92a51")
-	)
-	(label "SW_MODE_NM_J"
-		(at 161.29 139.7 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "57a27e86-cf48-544b-8f1e-0ca63c2db37a")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 154.94 139.7 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "084bf616-6a9b-55da-9c7f-0e4d5b2068be")
-		(property "Reference" "R52"
-			(at 154.94 133.35 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 154.94 135.89 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 154.94 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 154.94 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 154.94 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "RC0805FR-0710KL"
-			(at 154.94 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 154.94 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "57723d95-25da-5057-b925-9c9bf482ad2e")
-		)
-		(pin "2"
-			(uuid "771cf11d-a49f-51ce-81be-bc05a41ce64b")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "R52")
 					(unit 1)
 				)
 			)
@@ -3084,7 +2410,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 139.7 0)
 			(effects
 				(font
@@ -3111,7 +2437,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-071KL"
+		(property "MPN" "RC1206FR-071KL"
 			(at 220.98 139.7 0)
 			(effects
 				(font
@@ -3260,7 +2586,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder"
 			(at 287.02 139.7 0)
 			(effects
 				(font
@@ -3287,7 +2613,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21B104KBCNNNC"
+		(property "MPN" "CL31B104KBCNNNC"
 			(at 287.02 139.7 0)
 			(effects
 				(font
@@ -3315,136 +2641,6 @@
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
 					(reference "C52")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 151.13 160.02)
-			(xy 148.59 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0a1d757f-8edc-57df-a67c-ab9d2f4dd5c7")
-	)
-	(global_label "3V3_PI"
-		(shape passive)
-		(at 148.59 160.02 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "ff4a0a8b-c6f7-5c88-b5ee-5544d45deac2")
-	)
-	(wire
-		(pts
-			(xy 158.75 160.02)
-			(xy 161.29 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8b21d281-a9e8-5a92-bd1d-0e827bf803ff")
-	)
-	(label "SW_MODE_MRM_J"
-		(at 161.29 160.02 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "d9724374-926c-52c9-bdf6-12ca93409dad")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 154.94 160.02 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c5d8771d-c60c-55ac-82aa-63dbd6b28167")
-		(property "Reference" "R53"
-			(at 154.94 153.67 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 154.94 156.21 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 154.94 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 154.94 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 154.94 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "RC0805FR-0710KL"
-			(at 154.94 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 154.94 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a270024f-00fd-5927-ad24-cf1fb4111ed2")
-		)
-		(pin "2"
-			(uuid "927144cb-6457-5160-a667-66aa83bb7ae9")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "R53")
 					(unit 1)
 				)
 			)
@@ -3520,7 +2716,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 160.02 0)
 			(effects
 				(font
@@ -3547,7 +2743,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-071KL"
+		(property "MPN" "RC1206FR-071KL"
 			(at 220.98 160.02 0)
 			(effects
 				(font
@@ -3696,7 +2892,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder"
 			(at 287.02 160.02 0)
 			(effects
 				(font
@@ -3723,7 +2919,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21B104KBCNNNC"
+		(property "MPN" "CL31B104KBCNNNC"
 			(at 287.02 160.02 0)
 			(effects
 				(font
@@ -3758,26 +2954,48 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 203.2)
-			(xy 162.56 203.2)
+			(xy 130.81 203.2)
+			(xy 128.27 203.2)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d5ba1ae6-1578-5567-8e48-400b48d85ed6")
+		(uuid "a6d869fc-ce99-57e8-b869-f85e7a575eeb")
+	)
+	(label "BTN_TXRX_J"
+		(at 128.27 203.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "da6ee49a-a0b6-5a24-b058-dda033b0b8c9")
+	)
+	(wire
+		(pts
+			(xy 138.43 203.2)
+			(xy 140.97 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "65e39e14-0e34-5f17-8bbe-2c2e71b60643")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 162.56 203.2 90)
+		(at 140.97 203.2 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1daf9784-9213-5623-9741-f7a25ae1fc1e")
+		(uuid "a6ef1997-71b5-546f-bbb4-9e0813388206")
 		(property "Reference" "#PWR4008"
-			(at 162.56 207.01 0)
+			(at 140.97 207.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3786,7 +3004,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 162.56 207.01 0)
+			(at 140.97 207.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3795,7 +3013,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 162.56 203.2 0)
+			(at 140.97 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3804,7 +3022,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 162.56 203.2 0)
+			(at 140.97 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3813,7 +3031,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "382d958e-d9cd-5c8d-b57f-deffc3d7a877")
+			(uuid "38b23a24-507b-5f37-9a5c-06a63c18cced")
 		)
 		(instances
 			(project "teamc-carrier-lab"
@@ -3824,132 +3042,33 @@
 			)
 		)
 	)
-	(wire
-		(pts
-			(xy 149.86 205.74)
-			(xy 147.32 205.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d3e838bb-6f1a-5398-b8bf-a1829857f6ec")
-	)
-	(label "BTN_TXRX_J"
-		(at 147.32 205.74 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "eccdc59b-ebec-5837-8ea5-6b805b22e026")
-	)
-	(wire
-		(pts
-			(xy 149.86 203.2)
-			(xy 147.32 203.2)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "011ca427-fbc2-5862-bf13-77c5d488ca30")
-	)
-	(label "SW_ROLE_J"
-		(at 147.32 203.2 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "51651019-2462-5068-a370-e0bb079a12ff")
-	)
-	(wire
-		(pts
-			(xy 149.86 200.66)
-			(xy 147.32 200.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "163c8bb2-52b0-5955-9f10-6c9469f0b671")
-	)
-	(label "SW_MODE_NM_J"
-		(at 147.32 200.66 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "be2d8db0-a4cf-5613-a2c7-4e595995ed2b")
-	)
-	(wire
-		(pts
-			(xy 149.86 198.12)
-			(xy 147.32 198.12)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "449e5c5d-166d-5002-aa9f-bb8112f48403")
-	)
-	(label "SW_MODE_MRM_J"
-		(at 147.32 198.12 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "cd45805c-1e5f-59da-9ac8-d0ac0d73c75d")
-	)
 	(symbol
-		(lib_id "Power_Protection:SP0504BAHT")
-		(at 154.94 203.2 90)
+		(lib_id "Diode:SMF5V0A")
+		(at 134.62 203.2 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "3575f495-39b8-5bd8-99e2-177d1248c27c")
-		(property "Reference" "U11"
-			(at 151.13 191.77 90)
+		(uuid "4fa2851f-08f4-5744-9118-a1216222e6b4")
+		(property "Reference" "D12"
+			(at 134.62 196.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
 			)
 		)
-		(property "Value" "SP0504BAHTG"
-			(at 151.13 194.31 90)
+		(property "Value" "SMF5.0A"
+			(at 134.62 199.39 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
-			(at 154.94 203.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://www.littelfuse.com/~/media/files/littelfuse/technical%20resources/documents/data%20sheets/sp05xxba.pdf"
-			(at 154.94 203.2 0)
+		(property "Footprint" "Diode_SMD:D_SMF"
+			(at 134.62 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3957,8 +3076,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "TVS Diode Array, 5.5V Standoff, 4 Channels, SOT-23-5 package"
-			(at 154.94 203.2 0)
+		(property "Datasheet" "https://www.vishay.com/doc?85881"
+			(at 134.62 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3966,8 +3085,8 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "SP0504BAHTG"
-			(at 154.94 203.2 0)
+		(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
+			(at 134.62 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3975,8 +3094,8 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "Littelfuse"
-			(at 154.94 203.2 0)
+		(property "MPN" "SMF5V0A-E3-08"
+			(at 134.62 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3984,25 +3103,550 @@
 				(hide yes)
 			)
 		)
-		(pin "2"
-			(uuid "ef65ffeb-bbcb-54a4-b0d5-0fea794aacd6")
+		(property "Manufacturer" "Vishay"
+			(at 134.62 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
 		)
 		(pin "1"
-			(uuid "ef5c779c-30df-57e8-a774-9ed8b5470237")
+			(uuid "afbccf73-381a-5c95-84d5-213ed23506d5")
 		)
-		(pin "3"
-			(uuid "9f2f74f8-23ac-5962-b2cf-be7b96bf7271")
-		)
-		(pin "4"
-			(uuid "20df6ed8-1bad-563c-9ab3-11af33ebe61d")
-		)
-		(pin "5"
-			(uuid "79e57daf-9756-5bef-b377-60cb059b595f")
+		(pin "2"
+			(uuid "1f670265-7ac3-55bb-aa2c-b4f8c68dfa73")
 		)
 		(instances
 			(project "teamc-carrier-lab"
 				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "U11")
+					(reference "D12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 151.13 203.2)
+			(xy 148.59 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ef9323ed-45bf-588d-a934-cddc868b909a")
+	)
+	(label "SW_ROLE_J"
+		(at 148.59 203.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "fba292f3-660d-5bec-8cb0-cfab7590f2aa")
+	)
+	(wire
+		(pts
+			(xy 158.75 203.2)
+			(xy 161.29 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05d54a9f-6264-5289-ab8c-2eb88df11006")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 161.29 203.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "bb66b3b1-4dbe-55c3-9bb7-9c11d7876687")
+		(property "Reference" "#PWR4009"
+			(at 161.29 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 161.29 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 161.29 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 161.29 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c3f26080-a68a-5dea-b4d6-e32393fd83a4")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "#PWR4009")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:SMF5V0A")
+		(at 154.94 203.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3e8f22c5-72f4-5955-a566-d011a1cf2aaa")
+		(property "Reference" "D13"
+			(at 154.94 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SMF5.0A"
+			(at 154.94 199.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMF"
+			(at 154.94 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/doc?85881"
+			(at 154.94 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
+			(at 154.94 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SMF5V0A-E3-08"
+			(at 154.94 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Vishay"
+			(at 154.94 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4f141d03-7af2-5bc3-8314-10bcf7f03021")
+		)
+		(pin "2"
+			(uuid "36cc3056-4998-5b25-88e8-522cfd2d3c05")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "D13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 171.45 203.2)
+			(xy 168.91 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "55596551-5ce6-58c6-b550-0867a57fd277")
+	)
+	(label "SW_MODE_NM_J"
+		(at 168.91 203.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "cdb5f7eb-f85c-5750-8447-557fca5b12c8")
+	)
+	(wire
+		(pts
+			(xy 179.07 203.2)
+			(xy 181.61 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a1af9c6-5e09-5e7d-a394-6c7346d4691c")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 181.61 203.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e0e330bc-6c0b-5da6-9801-d37d19c8adc7")
+		(property "Reference" "#PWR4010"
+			(at 181.61 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 181.61 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 181.61 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 181.61 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0cb70481-5cb7-5c15-89cf-5e4e04a5b8a7")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "#PWR4010")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:SMF5V0A")
+		(at 175.26 203.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "63d05ab7-2f78-51f6-8cde-578241fb385b")
+		(property "Reference" "D14"
+			(at 175.26 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SMF5.0A"
+			(at 175.26 199.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMF"
+			(at 175.26 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/doc?85881"
+			(at 175.26 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
+			(at 175.26 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SMF5V0A-E3-08"
+			(at 175.26 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Vishay"
+			(at 175.26 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "18f86da8-e6e5-59af-be94-44f360a3cca4")
+		)
+		(pin "2"
+			(uuid "b6d14828-1d64-5646-807a-820d2cbe832f")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "D14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 191.77 203.2)
+			(xy 189.23 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b20b9e3f-cfdf-539f-a9e8-6135e293d450")
+	)
+	(label "SW_MODE_MRM_J"
+		(at 189.23 203.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e17db5b3-02fa-5c11-b657-fb1d2a872942")
+	)
+	(wire
+		(pts
+			(xy 199.39 203.2)
+			(xy 201.93 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b550c0d5-c699-5ac8-82df-9e3dbfe6095d")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 201.93 203.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6155894a-131f-575b-99b5-a9fea8a9f3a3")
+		(property "Reference" "#PWR4011"
+			(at 201.93 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 201.93 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 201.93 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 201.93 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "57a63c4d-6c8b-5aa0-829f-7c239757f169")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "#PWR4011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:SMF5V0A")
+		(at 195.58 203.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6713d357-10c4-5b35-b65a-9ca30732fb7f")
+		(property "Reference" "D15"
+			(at 195.58 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SMF5.0A"
+			(at 195.58 199.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMF"
+			(at 195.58 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/doc?85881"
+			(at 195.58 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
+			(at 195.58 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SMF5V0A-E3-08"
+			(at 195.58 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Vishay"
+			(at 195.58 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "40873079-4d5f-5988-9ba3-7c2423ffd15d")
+		)
+		(pin "2"
+			(uuid "214de7c8-ee9e-5d3e-b50a-264c0dfc43a4")
+		)
+		(instances
+			(project "teamc-carrier-lab"
+				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
+					(reference "D15")
 					(unit 1)
 				)
 			)
@@ -4078,7 +3722,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 198.12 0)
 			(effects
 				(font
@@ -4105,7 +3749,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-07330RL"
+		(property "MPN" "RC1206FR-07330RL"
 			(at 220.98 198.12 0)
 			(effects
 				(font
@@ -4149,62 +3793,17 @@
 		)
 		(uuid "74869d04-68a8-544a-bc5a-b2ffb1e10cfc")
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 293.37 198.12 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "2c858a3e-5361-5861-a55f-258fce7b8b52")
-		(property "Reference" "#PWR4009"
-			(at 293.37 201.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+	(global_label "LED_RTN"
+		(shape passive)
+		(at 293.37 198.12 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify left)
 		)
-		(property "Value" "GND"
-			(at 293.37 201.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 293.37 198.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 293.37 198.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "deb39a9b-93fb-52db-92a9-0fa72288dfe7")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "#PWR4009")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "384afb4f-f0f3-5672-bc84-199161f6bed0")
 	)
 	(wire
 		(pts
@@ -4383,7 +3982,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 220.98 215.9 0)
 			(effects
 				(font
@@ -4410,7 +4009,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "RC0805FR-07330RL"
+		(property "MPN" "RC1206FR-07330RL"
 			(at 220.98 215.9 0)
 			(effects
 				(font
@@ -4454,62 +4053,17 @@
 		)
 		(uuid "a7aaff3d-973f-53a0-9e18-daf474f25bad")
 	)
-	(symbol
-		(lib_id "power:GND")
-		(at 293.37 215.9 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "6d3939fe-e495-5b03-b6d4-7ba3020a14d6")
-		(property "Reference" "#PWR4010"
-			(at 293.37 219.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+	(global_label "LED_RTN"
+		(shape passive)
+		(at 293.37 215.9 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify left)
 		)
-		(property "Value" "GND"
-			(at 293.37 219.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 293.37 215.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 293.37 215.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "2e6a766a-4d6b-56b3-90ef-5758934a275d")
-		)
-		(instances
-			(project "teamc-carrier-lab"
-				(path "/ae3a70ad-66ab-5168-a3fd-8a7fd4bb596a/1623829d-9e26-51c7-a800-2d605aba4449"
-					(reference "#PWR4010")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "c16b0c3b-19e2-5f0e-abed-b1cc823db595")
 	)
 	(wire
 		(pts
@@ -4629,7 +4183,7 @@
 		)
 		(uuid "d6dd13b6-a4cd-595f-a96f-43be57186359")
 	)
-	(text "DRAFT – for ET review. Software: proto/port/linux/ui.c (inputs active low with the Pi's pull-ups; LEDs active high).\nMode switch (J12, ON-OFF-ON): GPIO 23 low = NM, else GPIO 16 low = MRM, else (centre) SRI. Role (J11): low = TX.\nExternal 10 kΩ pull-ups: the BCM2837 boot default on GPIO 16/17/23/27 is a PULL-DOWN, so an open toggle\nwould read 'active' until Linux sets the pull-up. 1 kΩ series: GPIO 16 may be driven by legacy firmware at boot\n(HAT design guide); 1 kΩ limits that to 3.3 mA into a closed switch. ESD array right at the connectors.\nPanel holes: Ø7.5 mm for the PS1024 button, Ø6.5 mm for the 100-series toggles.\nGlue the XH housings to the board and the leads to the box (drop test)."
+	(text "DRAFT – for ET review. Software: proto/port/linux/ui.c (inputs active low with the Pi's pull-ups; LEDs active high).\nMode switch (J12, ON-OFF-ON): GPIO 23 low = NM, else GPIO 16 low = MRM, else (centre) SRI. Role (J11): low = TX.\nPull-ups: the Pi's own (ui.c); rev A's external 10 kΩ are gone in rev B (one copper layer). 1 kΩ series: GPIO 16 may be driven by legacy firmware at boot\n(HAT design guide); 1 kΩ limits that to 3.3 mA into a closed switch. A TVS per lead right at the connectors.\nPanel holes: Ø7.5 mm for the PS1024 button, Ø6.5 mm for the 100-series toggles.\nGlue the XH housings to the board and the leads to the box (drop test)."
 		(exclude_from_sim no)
 		(at 25.4 27.94 0)
 		(effects
@@ -4662,7 +4216,7 @@
 		)
 		(uuid "5c5871aa-4313-5887-94c9-d0ea7d57b9ea")
 	)
-	(text "PULL-UP 10 kΩ (connector side)"
+	(text "NO EXTERNAL PULL-UPS IN REV B (R50-R53 of rev A)"
 		(exclude_from_sim no)
 		(at 134.62 81.28 0)
 		(effects
@@ -4673,6 +4227,17 @@
 		)
 		(uuid "156a044a-61ff-56fe-9e50-e01eb6e0f497")
 	)
+	(text "The inputs use the Pi's pull-ups, which ui.c requests (GPIO_V2_LINE_FLAG_BIAS_PULL_UP) before it reads\nthem. Until then (boot) the BCM2837 default pull-down makes an open toggle read 'active' - nothing reads\nthem then. On one copper layer a 3V3 bus to four pull-ups at the leads cuts the ground pour into islands."
+		(exclude_from_sim no)
+		(at 134.62 86.36 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "2fa92ac8-d3f9-5291-9fc6-eef91fb347f4")
+	)
 	(text "SERIES 1 kΩ"
 		(exclude_from_sim no)
 		(at 208.28 81.28 0)
@@ -4682,7 +4247,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "2fa92ac8-d3f9-5291-9fc6-eef91fb347f4")
+		(uuid "35d602d3-e420-5d70-9299-704446a8665e")
 	)
 	(text "100 nF AT THE GPIO"
 		(exclude_from_sim no)
@@ -4693,7 +4258,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "35d602d3-e420-5d70-9299-704446a8665e")
+		(uuid "88195ce2-0151-571b-98b3-f12a10a54978")
 	)
 	(text "GPIO 17, GO/STOP, low = pressed"
 		(exclude_from_sim no)
@@ -4704,7 +4269,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "88195ce2-0151-571b-98b3-f12a10a54978")
+		(uuid "4b796d66-966d-5b7c-98e1-a36e18d301e8")
 	)
 	(text "GPIO 27, role, low = TX"
 		(exclude_from_sim no)
@@ -4715,7 +4280,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "4b796d66-966d-5b7c-98e1-a36e18d301e8")
+		(uuid "3ee6f4c7-e880-56e5-a976-a2cd32a542a0")
 	)
 	(text "GPIO 23, low = NM"
 		(exclude_from_sim no)
@@ -4726,7 +4291,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "3ee6f4c7-e880-56e5-a976-a2cd32a542a0")
+		(uuid "d2f2006b-4579-5e72-85e6-5df7672f6931")
 	)
 	(text "GPIO 16, low = MRM (neither = SRI)"
 		(exclude_from_sim no)
@@ -4737,9 +4302,9 @@
 			)
 			(justify left top)
 		)
-		(uuid "d2f2006b-4579-5e72-85e6-5df7672f6931")
+		(uuid "4f3258f1-c7d1-54c3-9885-f14f28354d23")
 	)
-	(text "ESD (at the connectors)"
+	(text "ESD (one TVS per lead, at the connectors)"
 		(exclude_from_sim no)
 		(at 134.62 182.88 0)
 		(effects
@@ -4748,9 +4313,9 @@
 			)
 			(justify left top)
 		)
-		(uuid "4f3258f1-c7d1-54c3-9885-f14f28354d23")
+		(uuid "d03316a5-2530-554a-bb54-de034c35a220")
 	)
-	(text "4-line TVS array, 5.5 V standoff, 30 pF, ≤ 100 nA leakage\n(datasheet p.2), IEC 61000-4-2 20 kV contact.\nPin 2 = common → GND; 1/3/4/5 = lines (datasheet p.1)."
+	(text "Rev B: four SMF5.0A (5 V standoff, 200 W, pin 1 = cathode to the line), the part already used for D2/D3,\ninstead of rev A's SP0504 4-line array: on one copper layer a single SOT-23-5 cannot reach four parallel\nlead lines without a crossing. The TVS capacitance (~1 nF) sits before the 1 kΩ / 100 nF filter: harmless."
 		(exclude_from_sim no)
 		(at 134.62 215.9 0)
 		(effects
@@ -4759,7 +4324,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "d03316a5-2530-554a-bb54-de034c35a220")
+		(uuid "7bd11a36-7af7-53e2-8d0e-7aac7a371604")
 	)
 	(text "LEDs (active high, ≈ 4 mA from 3.3 V)"
 		(exclude_from_sim no)
@@ -4770,9 +4335,9 @@
 			)
 			(justify left top)
 		)
-		(uuid "7bd11a36-7af7-53e2-8d0e-7aac7a371604")
+		(uuid "3f32b9f8-430f-52f7-ba06-cf1be4792aaa")
 	)
-	(text "D10 activity (GPIO 5), D11 status (GPIO 6).\n(3.3 − ~2.0 V) / 330 Ω ≈ 4 mA, well under the\nPi's 16 mA per pin. No InGaN (blue/white: Vf too high)."
+	(text "D10 activity (GPIO 5), D11 status (GPIO 6).\n(3.3 − ~2.0 V) / 330 Ω ≈ 4 mA, well under the\nPi's 16 mA per pin. No InGaN (blue/white: Vf too high).\nRev B: the cathodes return on LED_RTN = J1 pin 25 (a Pi GND pin) - on one copper layer the LEDs sit\nin a pocket of J1's escape tracks, away from the carrier's pour."
 		(exclude_from_sim no)
 		(at 208.28 233.68 0)
 		(effects
@@ -4781,7 +4346,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "3f32b9f8-430f-52f7-ba06-cf1be4792aaa")
+		(uuid "5b74cf73-b954-51a8-86f7-7d8de6e9592f")
 	)
 	(embedded_fonts no)
 )

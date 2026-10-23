@@ -1,8 +1,16 @@
-# Carrier rev B (UPC lab, hand-soldered modules) — plan; set up, loop not started
+# Carrier rev B (UPC lab, hand-soldered modules) — plan; placed and routed, DRAFT for ET review
 
-Status 23-Oct-26: decisions taken with Santiago (meeting with Prof. Juan A. Chávez). **Set up:** `hw/teamc-carrier-lab/`
-(4 sheets, ERC 0/0, board with every footprint unplaced, lab rules in the .kicad_pro), built by
-`python3 hw/scripts/build_carrier_lab.py`. The place/route/DRC/fab loop is `hw/REVB_LOOP_PROMPT.md` (Santiago runs it).
+Status 23-Oct-26 (evening): **placed and routed on one copper layer** — ERC 0, DRC 0 violations / 0 unconnected /
+0 schematic parity (all severities), 10 wire links, gerbers + 1:1 copper PDFs in `hw/teamc-carrier-lab/fab/` and
+`teamc-carrier-lab_gerbers.zip`, BoM `hw/BOM_revB.csv` (≈ €139/box). Outline 100 × 80 mm is **provisional** until the
+box is measured. How it is built, the wire links and the **schematic changes for one copper layer** (pull-ups, TVS,
+3V3 from J1 pin 1, LED return, unused GND pins, J23 on BAT_IN, no TP2/TP10/C71/R81, FG_ALRT not routed):
+`hw/DESIGN_NOTES.md`, "Carrier rev B". Next: box dimensions → re-run place/route/finish/fab; ET review; email the
+zip to Prof. Chávez.
+
+Set-up (23-Oct, afternoon): decisions taken with Santiago (meeting with Prof. Juan A. Chávez), `hw/teamc-carrier-lab/`
+(4 sheets, lab rules in the .kicad_pro), built by `python3 hw/scripts/build_carrier_lab.py`; the loop was
+`hw/REVB_LOOP_PROMPT.md`.
 Rev A (`hw/teamc-carrier/`, JLCPCB-class HAT) stays as it is: external fab is still an allowed option (Chávez slides).
 
 ## Why
@@ -34,7 +42,7 @@ Rev A (`hw/teamc-carrier/`, JLCPCB-class HAT) stays as it is: external fab is st
 | Power switch | Panel toggle -> 2N7002 inverter -> U3V70F5 EN (closed = ON; a broken lead = OFF; ~40 uA) | — |
 | Fuse | Littelfuse 0251005.MRT1L PICO 5 A axial (~15 mOhm), or 0466005.NR(HF) 1206 | TME / LCSC |
 | Reverse cell | **DMP2035U-7** SOT-23 (<= 45 mOhm at -2.5 V; AO3401A fallback ~85 mOhm) | LCSC/Farnell/Mouser |
-| Keep from rev A | UI network (JST-XH, 10 k / 1 k / 100 nF, SP0504 SOT-23-5), LEDs, 33 Ohm SPI series, CSN/IRQ pull-ups, UART 1x3, JST-VH battery lead, test points, SMF5.0A TVS, 100 uF bulk at the boost input and at 5V_PI | — |
+| Keep from rev A | UI network (JST-XH, 1 k / 100 nF), LEDs, 33 Ohm SPI series, CSN pull-up, UART 1x3, JST-VH battery lead, test points TP1/TP3, SMF5.0A TVS, 100 uF bulk at the boost input and at 5V_PI. **Changed in the loop (one copper layer, 23-Oct):** 1206 R/C, SMF5.0A per lead instead of the SP0504, no UI pull-ups, no IRQ pull-up, no TP2/TP10/C71 — see `hw/DESIGN_NOTES.md` | — |
 Backups: boost S13V30F5 (Botland 14.50, ~1.8 A at 3.0 V); ideal diode #5382 (Pololu direct); LDO MCP1700 (TO-92).
 Rejected: PowerBoost 1000C / MT3608 / U3V16F5 (2 A switch, <= 1 A at 3 V), IP5306 (light-load cut-off), XL6009.
 Estimated box cost ~125-130 EUR (rev A 102); confirm in a new BoM. Cell: check the 18650 PCM trips above ~3 A.
@@ -58,5 +66,7 @@ the 5 V side; the MAX17048 board runs from the cell (SJ2 bridged as shipped) and
 pull-ups and LED → VIN = 3V3_PI, cell sense through its JP2 Bat/GND holes. Backup boost S13V30F5 idles at 10–20 mA
 (poor standby). TP4056 pad positions vary by seller: measure on arrival, it is wired off-board anyway.
 
-## Before the loop
-- Box inside dimensions (IKEA 365+), where the cell, panel switches, USB-C charger and antenna sit.
+## Still open
+- Box inside dimensions (IKEA 365+), where the cell, panel switches, USB-C charger and antenna sit: the outline,
+  the M3 holes and the lead edges follow from them (re-run `place_carrier_lab.py` → `route_carrier_lab.py` →
+  `finish_carrier_lab.py` → `fab_carrier_lab.py`).

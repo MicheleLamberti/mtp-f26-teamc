@@ -49,10 +49,12 @@ Backup boost S13V30F5 (Botland 14.50 EUR, 35 pcs) — idles at 10–20 mA, so on
 | **M3 x 11 mm nylon standoffs** F/F + M3 x 6 screws | 12 + 24 |
 | Protected **18650** >= 3000 mAh, PCM trips at **>= 3 A** | 3 |
 
-## Already on the rev A list (`hw/BOM.csv`), unchanged
-0805 resistors and capacitors, 100 uF 6.3 x 5.4 electrolytics (EEE-FK1C101P), SMF5V0A-E3-08, SP0504BAHTG,
-2N7002, 0805 LEDs, 18650 holder MPD BH-18650-PC (DigiKey). 22 uF 1206: order **CL31A226KAHNNNE** (the
-GRM31CR61E226KE15L is obsolete).
+## Small parts as in the routed rev B (`hw/BOM_revB.csv`, 23-Oct evening)
+**1206** resistors and capacitors (not 0805: the routing uses the gap between their pads), 100 uF 6.3 x 5.4
+electrolytics (EEE-FK1C101P) x2, **SMF5V0A-E3-08 x6** per box (D2, D3 and one per panel lead, D12–D15; the SP0504
+array is no longer used), 2N7002, 0805 LEDs, 18650 holder MPD BH-18650-PC (DigiKey), ~15 cm of bare 0.6 mm tinned
+copper wire per box (10 wire links). 22 uF 1206 for rev A only: **CL31A226KAHNNNE** (the GRM31CR61E226KE15L is
+obsolete).
 
 ## Cost
 Modules ~34 EUR per box; the whole box ~125–130 EUR (cap 150 EUR). Confirm in the rev B BoM after the design loop.

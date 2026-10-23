@@ -1,5 +1,9 @@
 # Carrier rev B (UPC lab) — design-loop prompt
 
+**Status 23-Oct-26: steps 2–6 done in one session** (outline still the provisional 100 × 80 mm: step 1 waits for the
+box dimensions). Result and how to re-run it: `hw/DESIGN_NOTES.md`, "Carrier rev B". What is left: step 1 with the
+real box, step 7 (email, order).
+
 Paste this into a Claude Code session in the repo (e.g. `/ralph-loop`, `/loop`, or a plain session). Each pass does
 one step of the list below, checks it, commits it, and says which step is next. Stop when the "Done when" list holds.
 

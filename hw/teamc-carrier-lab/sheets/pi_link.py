@@ -13,7 +13,7 @@ from nets import GLOBAL_NETS, LAB
 
 # header pin -> (net, BCM GPIO / function) ; None = not connected (no-connect flag)
 HEADER = {
-    1: (None, "3V3 (unused: pin 17 feeds the pull-ups)"), 2: ("5V_PI", "5V"),
+    1: ("3V3_PI", "3V3 (rev B: pin 1 feeds 3V3_PI)"), 2: ("5V_PI", "5V"),
     3: ("I2C_SDA", "GPIO 2 SDA1"), 4: ("5V_PI", "5V"),
     5: ("I2C_SCL", "GPIO 3 SCL1"), 6: ("GND", "GND"),
     7: (None, "GPIO 4"), 8: ("UART_TX", "GPIO 14 TXD0"),
@@ -21,18 +21,18 @@ HEADER = {
     11: ("BTN_TXRX", "GPIO 17"), 12: (None, "GPIO 18"),
     13: ("SW_ROLE", "GPIO 27"), 14: ("GND", "GND"),
     15: ("RADIO_CE", "GPIO 22"), 16: ("SW_MODE_NM", "GPIO 23"),
-    17: ("3V3_PI", "3V3"), 18: ("RADIO_IRQ", "GPIO 24"),
-    19: ("SPI_MOSI", "GPIO 10 MOSI0"), 20: ("GND", "GND"),
-    21: ("SPI_MISO", "GPIO 9 MISO0"), 22: ("FG_ALRT", "GPIO 25"),
+    17: (None, "3V3 (rev B: unused, pin 1 instead)"), 18: ("RADIO_IRQ", "GPIO 24"),
+    19: ("SPI_MOSI", "GPIO 10 MOSI0"), 20: (None, "GND (rev B: not used on the carrier)"),
+    21: ("SPI_MISO", "GPIO 9 MISO0"), 22: (None, "GPIO 25 (rev A FG_ALRT; not routed in rev B)"),
     23: ("SPI_SCK", "GPIO 11 SCLK0"), 24: ("RADIO_CSN", "GPIO 8 CE0"),
-    25: ("GND", "GND"), 26: (None, "GPIO 7 CE1"),
+    25: ("LED_RTN", "GND (rev B: the LEDs' return only)"), 26: (None, "GPIO 7 CE1"),
     27: (None, "ID_SD (GPIO 0): keep NC"), 28: (None, "ID_SC (GPIO 1): keep NC"),
-    29: ("LED_ACT", "GPIO 5"), 30: ("GND", "GND"),
+    29: ("LED_ACT", "GPIO 5"), 30: (None, "GND (rev B: not used on the carrier)"),
     31: ("LED_STATUS", "GPIO 6"), 32: (None, "GPIO 12"),
-    33: (None, "GPIO 13"), 34: ("GND", "GND"),
+    33: (None, "GPIO 13"), 34: (None, "GND (rev B: not used on the carrier)"),
     35: (None, "GPIO 19"), 36: ("SW_MODE_MRM", "GPIO 16"),
     37: (None, "GPIO 26 (rev A CHG_STAT; no charger status in rev B)"), 38: (None, "GPIO 20"),
-    39: ("GND", "GND"), 40: (None, "GPIO 21"),
+    39: (None, "GND (rev B: not used on the carrier)"), 40: (None, "GPIO 21"),
 }
 
 J1_AT = (209.55, 147.32)
@@ -49,7 +49,9 @@ def build():
            "No ID EEPROM: pins 27/28 stay unconnected. The Pi's WiFi/BT chip is disabled or desoldered (Atenea Q22).\n"
            "5V_PI comes from the power sheet's ideal diode. Rule as in rev A: never plug the Pi's micro-USB while the\n"
            "carrier is connected and switched on (the ideal diode blocks back-feed into the boost, but two 5 V sources\n"
-           "would still share the Pi). 3V3_PI = the Pi's own 3.3 V (pin 17): pull-ups and the radio LDO's EN only.",
+           "would still share the Pi). 3V3_PI = the Pi's own 3.3 V, rev B from pin 1 (next to the fuel gauge; pin 17 is unused): the fuel gauge's\n"
+           "VIN and the radio LDO's EN only. Rev B ground: the carrier ties the Pi's GND on pins 6, 9 and 14; pin 25\n"
+           "is the LEDs' return (LED_RTN); pins 20/30/34/39 sit in pockets of the one-layer escape tracks, unused.",
            at=(25.4, 27.94))
 
     nets = {str(p): HEADER[p][0] for p in HEADER}
