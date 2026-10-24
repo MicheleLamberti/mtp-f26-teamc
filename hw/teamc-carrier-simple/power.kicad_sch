@@ -7297,7 +7297,7 @@
 		)
 		(uuid "aef1e3ba-5628-566d-b419-ab1c973ae911")
 	)
-	(text "2  CHARGER LEAD (TP4056 USB-C module at the box wall)"
+	(text "2  CHARGER LEAD (Adafruit Micro-Lipo USB-C #4410 at the box wall)"
 		(exclude_from_sim no)
 		(at 160.02 20.32 0)
 		(effects
@@ -7308,7 +7308,7 @@
 		)
 		(uuid "82d9d7dd-1461-5f98-9258-d348c1089659")
 	)
-	(text "The TP4056 module (HW-373) sits at the box wall where its USB-C port is reachable; its BAT+/BAT- pads go\nto this 2-pin lead (OUT+/OUT- are not used). It charges the cell at 1 A (about 3.5 h).\nRules: charge with the box switched OFF; use a USB-A-to-USB-C cable (many of these boards lack the\nUSB-C CC resistors, so a C-to-C cable gives no power). J23 is behind F1: a reversed cell never reaches it."
+	(text "The Adafruit #4410 charger (24-Oct; the TP4056 boards were out of stock) sits at the box wall where its\nUSB-C port is reachable; its BAT and GND pads go to this 2-pin lead. Close its 500 mA solder jumper (default\n100 mA): a full 3500 mAh cell then takes ~7-8 h (overnight). Any USB-C cable or charger works.\nIt has no cell protection of its own: the protected 18650 has it. Charge with the box switched OFF.\nJ23 is behind F1: a reversed cell never reaches it."
 		(exclude_from_sim no)
 		(at 160.02 50.8 0)
 		(effects

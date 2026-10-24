@@ -143,9 +143,12 @@ the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the P
   through it. If its lead breaks, the box **stays on** (on purpose: a broken lead in the drop test must not stop the
   run). Before mounting the toggle, check with the meter which two lugs beep with the lever **down**, and wire those
   two to the J22 lead.
-- **Charging:** switch the box **OFF**, then plug a **USB-A-to-USB-C** cable into the charger at the box wall (many
-  of these TP4056 boards lack the USB-C resistors, so a C-to-C cable gives no power). Red LED = charging, the other
-  LED = full (~3.5 h from empty at 1 A).
+- **Charger (Adafruit Micro-Lipo USB-C #4410, at the box wall):** before fitting it, **close its 500 mA solder
+  jumper** with a blob of solder (it charges at only 100 mA otherwise). Wire its **BAT** and **GND** pads (not the
+  JST socket) to the J23 lead: BAT to J23 pin 1, GND to pin 2.
+- **Charging:** switch the box **OFF**, then plug any USB-C cable into the charger. Its charge LED lights while
+  charging, the other LED when full: ~7–8 h from empty at 500 mA (overnight). The charger has no cell protection of
+  its own; the protected 18650 has it, so only use protected cells.
 - Never plug the Pi's own micro-USB while the box is on (the ideal diode protects the boost, but do not rely on it).
 - Strap the cell: a cable tie through the slot and the notch, over the cell. Glue the JST housings and the U.FL
   antenna plug, tape the microSD, for the drop test.
@@ -167,4 +170,5 @@ the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the P
 | Test loop or regulator too tall | The breakout does not seat on its standoff. Bend the loop lower / push U4 down. |
 | Breakout with its J2 bench pins fitted | The pins hang down onto TP2/TP4: 5 V on the radio's 3.3 V, the SP4 dies. Remove J2 (or fit it pointing up) on box breakouts. |
 | Box "off" but the cell drains | D1 leakage (step 5), or the toggle wired to the wrong lugs (lever down = open = ON). |
-| Charging with a C-to-C cable | Nothing happens. Use USB-A to USB-C. |
+| Charger jumper left open | Charging takes ~35 h (100 mA). Close the 500 mA jumper on the #4410. |
+| Charging with the box ON | The charger never sees the end of charge (the Pi draws more than it gives). Switch OFF to charge. |

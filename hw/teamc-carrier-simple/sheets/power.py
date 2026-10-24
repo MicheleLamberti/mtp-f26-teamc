@@ -72,13 +72,14 @@ def build():
            at=(15.24, 71.12), size=1.27)
 
     # ===== 2. charger lead =========================================================================================
-    s.note("2  CHARGER LEAD (TP4056 USB-C module at the box wall)", at=(160.02, 20.32), size=2.0)
+    s.note("2  CHARGER LEAD (Adafruit Micro-Lipo USB-C #4410 at the box wall)", at=(160.02, 20.32), size=2.0)
     s.add("Connector_Generic:Conn_01x02", "J23", "charger BAT+/BAT-", at=(175.26, 38.1), fp=FP["XH2"],
           nets={"1": "VBAT", "2": "GND"}, mpn="B2B-XH-A(LF)(SN)", mfr="JST")
-    s.note("The TP4056 module (HW-373) sits at the box wall where its USB-C port is reachable; its BAT+/BAT- pads go\n"
-           "to this 2-pin lead (OUT+/OUT- are not used). It charges the cell at 1 A (about 3.5 h).\n"
-           "Rules: charge with the box switched OFF; use a USB-A-to-USB-C cable (many of these boards lack the\n"
-           "USB-C CC resistors, so a C-to-C cable gives no power). J23 is behind F1: a reversed cell never reaches it.",
+    s.note("The Adafruit #4410 charger (24-Oct; the TP4056 boards were out of stock) sits at the box wall where its\n"
+           "USB-C port is reachable; its BAT and GND pads go to this 2-pin lead. Close its 500 mA solder jumper (default\n"
+           "100 mA): a full 3500 mAh cell then takes ~7-8 h (overnight). Any USB-C cable or charger works.\n"
+           "It has no cell protection of its own: the protected 18650 has it. Charge with the box switched OFF.\n"
+           "J23 is behind F1: a reversed cell never reaches it.",
            at=(160.02, 50.8), size=1.27)
 
     # ===== 3. power toggle =========================================================================================

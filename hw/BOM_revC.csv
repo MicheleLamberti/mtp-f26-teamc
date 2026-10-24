@@ -37,15 +37,15 @@ W4,1,wire link 5.7 mm,teamc:RevC_WireLink_L5.7mm,"22 AWG solid tinned copper hoo
 (off-board),1,microSD SanDisk Ultra 32 GB A1 (half a twin pack),,,,bought 19-Oct (est.),,-,,6.00,6.00,yes
 (off-board),1,Ebyte E01-ML01SP4 + TX2400-FPC-2509 flex antenna (bundle),,,,"ebyteiot.com, bought 19-Oct",,-,,3.60,3.60,yes
 (off-board),1,"SP4 breakout: lab PCB (rules EUR 15) + 100 uF, 10 uF, 100 nF, 1x08 + 1x02 headers (hw/sp4-breakout)",,,,UPC lab + generic,,-,,16.00,16.00,no
-(off-board),1,"Protected 18650 Li-ion cell >= 3000 mAh, button top, ~69 mm (e.g. Keeppower P1835J, Nitecore NL1835)",,,,nkon.nl Keeppower P1835J 3500 mAh (EUR 8.22 excl.; alt. tinytronics.nl EUR 9.50),https://www.nkon.nl/en/keeppower-18650-3500-li-ion.html,in stock (24-Oct); fit in BH-18650-PC not verified,,9.00,9.00,yes
-(off-board),1,Spare 5x20 mm 4 A fast glass fuse Littelfuse 0217004.HXP (keep it in the box),,,,DigiKey.es,https://www.digikey.es/en/products/result?keywords=0217004.HXP,price listed,,0.53,0.53,yes
-(off-board),1,"USB-C charger module TP4056 with protection (HW-373), at the box wall (alternative: Adafruit #4410, DigiKey.es 1528-4410-ND EUR 5.22, 966 pcs, 0.5 A with its jumper)",,,,Amazon.es / AliExpress (est.; botland.store is now B2B only),,not verified,,1.00,1.00,yes
+(off-board),1,"Protected 18650 Li-ion cell >= 3000 mAh, button top, ~69 mm (e.g. Keeppower P1835J, Nitecore NL1835)",,,,nkon.nl Keeppower P1835J 3500 mAh (EUR 8.22 excl.; alt. tinytronics.nl EUR 9.50),https://www.nkon.nl/en/keeppower-18650-3500-li-ion.html,in stock (24-Oct); fit in BH-18650-PC not verified,,8.22,8.22,yes
+(off-board),1,Spare 5x20 mm 4 A fast glass fuse Littelfuse 0217004.HXP (keep it in the box),,,,DigiKey.es F2394-ND,https://www.digikey.es/en/products/result?keywords=0217004.HXP,"4,721 (24-Oct)",,0.44,0.44,yes
+(off-board),1,USB-C charger Adafruit Micro-Lipo #4410 at the box wall (500 mA jumper closed; TP4056 boards out of stock 24-Oct),,,,DigiKey.es 1528-4410-ND (also Kiwi),https://www.digikey.es/en/products/result?keywords=1528-4410-ND,966 (24-Oct),,5.22,5.22,yes
 (off-board),1,"40-way female-female GPIO ribbon, 15-20 cm (fallback: 2 x 3M 89140-0101 IDC sockets + 40-wire flat cable)",,,,Kiwi Electronics 1160 (40-pin rainbow GPIO cable 20 cm),https://www.kiwi-electronics.com/en/40-pins-rainbow-gpio-cable-20cm-1160,50 (24-Oct); F/F + keyed not stated,,2.79,2.79,yes
 (off-board),1,"2.54 mm male header strip 1x40, Sullins PRPC040SAAN-RC (module pins + UART header)",,,,DigiKey.es,https://www.digikey.es/en/products/result?keywords=PRPC040SAAN-RC,price listed,,1.08,1.08,yes
-(off-board),1,Panel pushbutton E-Switch PS1024ABLK (GO/STOP),,,,DigiKey.es EG2011-ND,https://www.digikey.es/en/products/result?keywords=PS1024ABLK,"5,531 (24-Oct)",,1.46,1.46,yes
-(off-board),1,Panel toggle E-Switch 100SP1T1B1M1QEH (power: closed = OFF),,,,DigiKey.es EG2350-ND,https://www.digikey.es/en/products/result?keywords=100SP1T1B1M1QEH,"8,552 (24-Oct)",,2.70,2.70,yes
-(off-board),1,"Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)",,,,DigiKey.es EG2350-ND,https://www.digikey.es/en/products/result?keywords=100SP1T1B1M1QEH,"8,552 (24-Oct)",,2.70,2.70,yes
-(off-board),1,Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM),,,,DigiKey.es EG2375-ND,https://www.digikey.es/en/products/result?keywords=100SP3T1B1M1QEH,"2,223 (24-Oct)",,4.75,4.75,yes
+(off-board),1,Panel pushbutton E-Switch PS1024ABLK (GO/STOP),,,,TME (USD price counted as EUR),https://www.tme.eu/en/details/ps1024ablk/push-button-switches/e-switch/,"1,379 (24-Oct)",,1.31,1.31,yes
+(off-board),1,Panel toggle E-Switch 100SP1T1B1M1QEH (power: closed = OFF),,,,"TME (qty-5 price, USD as EUR)",https://www.tme.eu/en/details/100sp1t1b1m1qeh/toggle-switches/e-switch/,654 (24-Oct),,2.44,2.44,yes
+(off-board),1,"Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)",,,,"TME (qty-5 price, USD as EUR)",https://www.tme.eu/en/details/100sp1t1b1m1qeh/toggle-switches/e-switch/,654 (24-Oct),,2.44,2.44,yes
+(off-board),1,Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM),,,,TME (USD price counted as EUR),https://www.tme.eu/en/details/100sp3t1b1m1qeh/toggle-switches/e-switch/,906 (24-Oct),,3.26,3.26,yes
 (off-board),1,5 mm LED green diffused Kingbright WP7113GD (activity),,,,DigiKey.es 754-1263-ND,https://www.digikey.es/en/products/result?keywords=WP7113GD,"91,488 (24-Oct)",,0.20,0.20,yes
 (off-board),1,5 mm LED red diffused Kingbright WP7113SURDK (status; WP7113ID out of stock until Dec),,,,DigiKey.es 754-WP7113SURDK-ND,https://www.digikey.es/en/products/result?keywords=WP7113SURDK,"11,546 (24-Oct)",,0.17,0.17,yes
 (off-board),2,5 mm LED panel clips (2),,,,DigiKey.es 754-RTC51-ND (Kingbright RTC51),https://www.digikey.es/en/products/result?keywords=RTC51,"1,047 (24-Oct)",,0.45,0.90,yes
@@ -54,14 +54,14 @@ W4,1,wire link 5.7 mm,teamc:RevC_WireLink_L5.7mm,"22 AWG solid tinned copper hoo
 (off-board),16,JST SXH-001T-P0.6 crimps (14 + spares),,,,DigiKey.es,https://www.digikey.es/en/products/result?keywords=SXH-001T-P0.6,price listed,,0.04,0.64,yes
 (off-board),1,"Hook-up wire 24 AWG for the panel leads, ~1 m",,,,lab stock (market price est.),,-,,0.50,0.50,no
 (off-board),1,M3 x 10 mm nylon standoffs F/F x4 (carrier to the floor) + M3 x 11 mm x1 (breakout) + M3 x 6 nylon screws x10,,,,DigiKey.es Keystone 25510 (M3x10) + Essentra MTS-11 (M3x11) + 50M030050P006 (M3x6 screws),https://www.digikey.es/en/products/result?keywords=25510,"19,042 / 12,230 / 61,147 (24-Oct)",,4.40,4.40,yes
-(off-board),1,"M2.5 standoffs x4 + screws x8 (the Pi on the box floor; screws DigiKey 50M025045P006, standoffs: kit, not on DigiKey)",,,,"DigiKey.es (screws) + Amazon.es kit (standoffs, est.)",https://www.digikey.es/en/products/result?keywords=50M025045P006,"screws 5,784 (24-Oct); standoffs not verified",,1.40,1.40,yes
+(off-board),1,"M2.5 nylon standoffs x4 + screws x8 (the Pi on the box floor), from one 380-piece kit for all boxes (share of EUR 9.99)",,,,Kiwi KW-2754 M2.5 black nylon screw + standoff set (380 pcs),https://www.kiwi-electronics.com/en/m2-5-screw-and-stand-off-set-black-nylon-380-pieces-10252,43 (24-Oct),,0.50,0.50,yes
 (off-board),1,Cable tie 3.6 mm through the board slots over the cell (drop test),,,,lab stock (est.),,-,,0.05,0.05,no
 (off-board),1,"IKEA 365+ food container 15 x 15 x 7 cm (plastic, 750 ml) with lid",,,,IKEA (est.),,-,,3.00,3.00,yes
 (off-board),1,"Hot glue, Kapton tape (U.FL plug, microSD, XH housings), foam",,,,lab stock (est.),,-,,1.00,1.00,no
 (off-board),1,"Solder, flux",,,,lab stock (est.),,-,,0.50,0.50,no
 (off-board),1,PCB: carrier rev C milled at the UPC lab (rules: counts EUR 15),,,,UPC lab,,-,,15.00,15.00,no
 
-"TOTAL per box (all items at market price excl. VAT, lab PCB EUR 15)",,,,,,,,,,,148.00,
-of which purchased by the team,,,,,,,,,,,114.95,
+"TOTAL per box (all items at market price excl. VAT, lab PCB EUR 15)",,,,,,,,,,,148.29,
+of which purchased by the team,,,,,,,,,,,115.24,
 of which owned / lab stock / lab PCB (non-purchased),,,,,,,,,,,33.05,
 Cap per box (rules): EUR 150. DRAFT rev C; stock and prices read 24-Oct-26 or as noted - re-check before ordering. Shopping list for 2 boxes + 1 spare: hw/REVC_SHOPPING.md (checkpoint 4).

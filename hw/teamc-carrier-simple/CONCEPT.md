@@ -162,3 +162,10 @@ Layout and the 4 wire links accepted, with two fixes: **P4KE10A through-hole TVS
 panel-lead connector (D12–D15 on the inputs, D16 on the power-toggle lead) — so rev C does have TVS protection after
 all, not only the 1 kΩ — and **low wire-loop test points** for TP2/TP3/TP4 (a Keystone 5010 is too tall under the
 breakout). To fit them the board grew to **120 × 68 mm**. Build guide: `hw/REVC_GUIDE.md`.
+
+## Ordering (24-Oct-26, later)
+- Charger changed to the **Adafruit Micro-Lipo USB-C #4410** (Santiago): no TP4056 USB-C board with protection was
+  orderable. 500 mA with its jumper closed (~7–8 h per charge); no protection IC — the protected 18650 has it; any
+  USB-C cable works.
+- Panel switches bought at TME (Santiago's budget lever) and the Pi's M2.5 standoffs from a Kiwi nylon kit: BoM
+  €148.29 per box. Order files: `order/` (DigiKey cart, other shops, check report).

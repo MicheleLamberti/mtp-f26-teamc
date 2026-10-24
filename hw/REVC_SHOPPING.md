@@ -1,32 +1,30 @@
 # Carrier rev C ("simple") — shopping list (2 boxes + 1 spare = 3 boards)
 
 24-Oct-26. Stock and prices read on the shop pages on 24-Oct-26, EUR excl. VAT. **Re-check before paying.** Build
-guide: `hw/REVC_GUIDE.md`. Per-box BoM (`hw/BOM_revC.csv`) **€148.00** (cap €150), of which €114.95 bought by the team.
+guide: `hw/REVC_GUIDE.md`. Per-box BoM (`hw/BOM_revC.csv`) **€148.29** (cap €150), of which €115.24 bought by the team.
 
-## How to order (for the team)
+## How to order (for the team) — four orders
 
 1. **DigiKey.es — one cart with almost everything:** log in at digikey.es → *BOM Manager* (or *Quick Add* → *Upload*)
    → upload **`hw/teamc-carrier-simple/order/digikey_cart.csv`** (columns: DigiKey part number, manufacturer part
-   number, quantity for 3 boards incl. spares, our reference). ≈ **€185.50 excl. / €224.46 incl. VAT**. Free delivery
-   to Spain above €50 (check at checkout). The two Pololu modules (2183-…) are DigiKey marketplace items and may
-   arrive in a separate parcel.
-2. **Kiwi Electronics:** 3 × Adafruit MAX17048 #5580 + 3 × 40-way GPIO ribbon (code 1160) — see
-   `hw/teamc-carrier-simple/order/other_shops.md`. ≈ €25.44 excl.
-3. **nkon.nl:** 3 × Keeppower P1835J protected 18650 (3500 mAh, 69.1 mm). ≈ €24.66 excl. + shipping.
-4. **Still to pick before ordering** (see "Open" below): the TP4056 USB-C charger modules and M2.5 standoffs for the Pi.
+   number, quantity for 3 boards incl. spares, our reference). ≈ **€164.45 excl. VAT**. Free delivery to Spain above
+   €50 (check at checkout). The two Pololu modules (2183-…) are DigiKey marketplace items and may arrive separately.
+   It includes the **charger, Adafruit #4410** (24-Oct: no TP4056 USB-C board with protection was orderable).
+2. **Kiwi Electronics:** 3 × Adafruit MAX17048 #5580, 3 × 40-way GPIO ribbon (code 1160), 1 × M2.5 nylon screw +
+   standoff set (KW-2754, the Pi standoffs) — ≈ €35.43 excl.
+3. **TME:** the panel switches and button (3 × PS1024ABLK, 6 × 100SP1T1B1M1QEH, 3 × 100SP3T1B1M1QEH) — ≈ €28.35.
+   Buying them at TME instead of DigiKey keeps the box under €150 (Santiago's budget lever).
+4. **nkon.nl:** 3 × Keeppower P1835J protected 18650 (3500 mAh, 69.1 mm) — ≈ €24.66 excl. + shipping.
 
-Full per-line check (part numbers, stock, prices, what changed and why): `hw/teamc-carrier-simple/order/order_check.md`.
-Grand total for 3 boards ≈ **€242 excl. / €293 incl. VAT** (excl. shipping outside DigiKey).
+Links, stock and prices for 2–4: `hw/teamc-carrier-simple/order/other_shops.md`. Full per-line check:
+`hw/teamc-carrier-simple/order/order_check.md`. Grand total for 3 boards ≈ **€253 excl. / €306 incl. VAT**
+(excl. shipping outside DigiKey).
 
-### Open (check before paying)
+### Check before paying
 - **Cell fit:** the MPD BH-18650-PC holder is made for protected cells, but its inside length was not verified
   against the 69.1 mm Keeppower — buy one cell first, or check the holder's datasheet. Also confirm nkon ships to Spain.
-- **TP4056 USB-C module with protection (DW01A), 3 + 1 spare:** pick a live Amazon.es listing (a 5-pack is ~€8 incl.);
-  Amazon could not be read automatically. In-stock fallback on the DigiKey cart: Adafruit #4410 (1528-4410-ND, €5.22) —
-  a different board (0.5 A, no DW01A protection): ask ET first.
 - **40-way ribbon (Kiwi 1160):** confirm on the page/photo that both ends are **female** and **keyed**; 20 cm is fine.
-- **M2.5 standoffs** (4 per Pi): not on DigiKey; any M2.5 nylon standoff kit (Amazon.es). The M2.5 screws are on the
-  DigiKey cart.
+- **Charger #4410:** on arrival close its **500 mA solder jumper** (default 100 mA); see the guide.
 
 ### Changes from the first list (24-Oct order check)
 - **C1/C9 100 µF:** KEMET **ESS107M016AE2EA** (6.3 mm, 2.50 mm leads, 8.5 mm tall). Panasonic EEU-FR1C101 is 5 mm with
@@ -63,19 +61,14 @@ Already bought or owned (not in this list): 2 × Raspberry Pi 3 A+, microSD card
 | Sullins **PRPC040SAAN-RC** 1×40 male strip | 1 | 3 | 1.08 | S1011EC-40-ND (45,098) |
 | JST **B2B-XH-A** / **B3B-XH-A** headers | 4 / 2 | 12 / 6 | 0.076 / 0.11 | 455-B2B-XH-A-ND, 455-2248-ND |
 | JST **XHP-2** / **XHP-3** housings, **SXH-001T-P0.6** crimps | 4 / 2 / 16 | 12 / 6 / 100 | 0.052 / 0.09 / 0.041 | 455-2266-ND, 455-2219-ND, 455-1135-100-ND |
-| E-Switch **PS1024ABLK** push button (GO/STOP) | 1 | 3 | 1.46 | EG2011-ND (5,531) |
-| E-Switch **100SP1T1B1M1QEH** toggle (power, role) | 2 | 6 | 2.70 | EG2350-ND (8,552) |
-| E-Switch **100SP3T1B1M1QEH** ON-OFF-ON toggle (mode) | 1 | 3 | 4.75 | EG2375-ND (2,223) |
+| Adafruit **Micro-Lipo USB-C charger #4410** (at the box wall) | 1 | 3 | 5.22 | 1528-4410-ND (966) |
 | Kingbright **WP7113GD** green / **WP7113SURDK** red 5 mm LEDs | 1 + 1 | 10 + 10 | 0.135 / 0.168 | 754-1263-ND, 754-WP7113SURDK-ND |
 | Kingbright **RTC51** LED panel clips | 2 | 6 | 0.45 | 754-RTC51-ND (1,047) |
 | Keystone **25510** M3 × 10 nylon standoff F/F (carrier) | 4 | 12 | 0.59 | 36-25510-ND (19,042) |
 | Essentra **MTS-11** M3 × 11 nylon standoff (breakout, H30) | 1 | 3 | 0.68 | RPC4425-ND (12,230) |
-| Essentra M3 × 6 nylon screws / M2.5 × 6 nylon screws (Pi) | — | 40 / 20 | 0.077 / 0.094 | RPC7002-ND, 145-50M025045P006-ND |
+| Essentra M3 × 6 nylon screws | — | 40 | 0.077 | RPC7002-ND (61,147) |
 
 If DigiKey runs out of the P4KE10A, any maker's P4KE10A in DO-41 fits (Vishay P4KE10A-E3/54, ST, onsemi).
-
-**Saving lever if the budget gets tight:** the E-Switch toggles and the button are cheaper at TME (about €2 per box);
-that needs a second order.
 
 ## 2. Other shops (details and links: `order/other_shops.md`)
 
@@ -83,9 +76,11 @@ that needs a second order.
 |---|---|---|---|
 | Adafruit **MAX17048** fuel gauge #5580 | Kiwi (ADA-5580, 41 in stock) | 3 | 5.69 |
 | 40-way GPIO ribbon 20 cm (verify female-female + keyed) | Kiwi (1160, 50 in stock) | 3 | 2.79 |
+| M2.5 black nylon screw + standoff set, 380 pcs (Pi standoffs) | Kiwi (KW-2754, 43 in stock) | 1 | 9.99 |
+| E-Switch **PS1024ABLK** push button (GO/STOP) | TME (1,379) | 3 | 1.31 |
+| E-Switch **100SP1T1B1M1QEH** toggle (power, role) | TME (654) | 6 | 2.44 |
+| E-Switch **100SP3T1B1M1QEH** ON-OFF-ON toggle (mode) | TME (906) | 3 | 3.26 |
 | Keeppower **P1835J** protected 18650 3500 mAh (button top, 69.1 mm) | nkon.nl (alt. tinytronics.nl €9.50) | 3 | 8.22 |
-| **TP4056 USB-C module with protection** | Amazon.es (pick a listing) | 4 | ~1.65 |
-| M2.5 nylon standoff kit | Amazon.es | 1 | ~4 |
 
 On arrival, check the jumper SJ2 on each MAX17048 (guide, step A4).
 

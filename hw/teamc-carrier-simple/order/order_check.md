@@ -71,3 +71,15 @@ No shipping was added for Kiwi, nkon or Amazon.es (not read). Totals above inclu
 - M2.5 standoffs (4 per Pi): not found on DigiKey; need a source (Amazon.es kit or similar).
 - 22 AWG solid hook-up wire and 3.6 mm cable ties: lab stock per BoM; TME FIX-S-3.6X200/BK exists (100 pcs, about EUR 0.02 each) but not worth a TME order.
 - 330R resistor PN and stock came from the search listing only (detail page URL for that MPN was not found).
+
+## Update 24-Oct-26 (later) — charger, Pi standoffs, switches
+- **Charger:** no TP4056 USB-C module with protection was orderable (TinyTronics 002151 out of stock 2-4 weeks,
+  Grobotronics out of stock, Amazon.es AZDelivery 3-pack apparently out of stock, AZ-Delivery shop stock not readable).
+  Santiago chose the **Adafruit #4410** (DigiKey 1528-4410-ND, EUR 5.22, 966 in stock) — added to the cart, 3 pcs.
+- **M2.5 standoffs:** Kiwi KW-2754 380-piece nylon set (EUR 9.99 excl., 43 in stock) for all Pis; the DigiKey M2.5
+  screws (145-50M025045P006-ND) are removed from the cart (the kit has them). Würth 970110155 (732-12996-ND, EUR 1.63)
+  was in stock too but costs ~EUR 6.5 per box.
+- **Switches to TME** (budget lever): EG2011-ND, EG2350-ND, EG2375-ND removed from the cart; TME PS1024ABLK 1.31,
+  100SP1T1B1M1QEH 2.44 (5+), 100SP3T1B1M1QEH 3.26 (USD shown, counted as EUR).
+- New totals for 3 boards (excl. VAT): DigiKey ≈ 164.45, Kiwi ≈ 35.43, TME ≈ 28.35, nkon ≈ 24.66 → **≈ 252.89 excl.
+  / ≈ 306.0 incl. 21 % VAT** (shipping outside DigiKey not included). BoM per box: **EUR 148.29**.

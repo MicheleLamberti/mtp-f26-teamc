@@ -312,8 +312,9 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
       Santiago: measure the IKEA 365+ inside dimensions
 - [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
 - [ ] Carrier rev C (simple): **order** — DigiKey cart `hw/teamc-carrier-simple/order/digikey_cart.csv` (upload in
-      BOM Manager), Kiwi + nkon per `hw/REVC_SHOPPING.md` "How to order"; still to pick: TP4056 listing, M2.5
-      standoff kit, confirm ribbon F/F + keyed and the cell fit (BoM €148.00/box); box
+      BOM Manager; includes the Adafruit #4410 charger), Kiwi (fuel gauge, ribbon, M2.5 kit), TME (switches), nkon
+      (cells) per `hw/REVC_SHOPPING.md` "How to order" (≈ €253 excl. for 3 boards); before paying: ribbon F/F +
+      keyed, cell fit in the holder (BoM €148.29/box); box
       inside dimensions → edit W/H in `place_carrier_simple.py`, re-run `layout_carrier_simple.py`; email
       `hw/teamc-carrier-simple/teamc-carrier-simple_gerbers.zip` to Chávez; first build with the guide's tests
 - [ ] Carrier rev B (lab): **routed 23-Oct (provisional outline)**. Santiago: box inside dimensions → re-run

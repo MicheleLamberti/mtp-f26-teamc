@@ -22,6 +22,7 @@ HW = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "
 NET = os.path.join(HW, "teamc-carrier-simple", "build", "teamc-carrier-simple.net")
 OUT = os.path.join(HW, "BOM_revC.csv")
 DK = "https://www.digikey.es/en/products/result?keywords="
+TME_PS = "https://www.tme.eu/en/details/"
 STOCK_DATE = "24-Oct-26"
 
 # MPN (as in the schematic, text before " (" / "+") -> (unit EUR excl. VAT, supplier, link, stock as read)
@@ -91,29 +92,30 @@ OFF_BOARD = [   # (item, qty, unit EUR excl. VAT, supplier, link, stock as read,
      "yes"),
     ("SP4 breakout: lab PCB (rules EUR 15) + 100 uF, 10 uF, 100 nF, 1x08 + 1x02 headers (hw/sp4-breakout)", 1, 16.00,
      "UPC lab + generic", "", "-", "no"),
-    ("Protected 18650 Li-ion cell >= 3000 mAh, button top, ~69 mm (e.g. Keeppower P1835J, Nitecore NL1835)", 1, 9.00,
+    ("Protected 18650 Li-ion cell >= 3000 mAh, button top, ~69 mm (e.g. Keeppower P1835J, Nitecore NL1835)", 1, 8.22,
      "nkon.nl Keeppower P1835J 3500 mAh (EUR 8.22 excl.; alt. tinytronics.nl EUR 9.50)",
      "https://www.nkon.nl/en/keeppower-18650-3500-li-ion.html", "in stock (24-Oct); fit in BH-18650-PC not verified",
      "yes"),
-    ("Spare 5x20 mm 4 A fast glass fuse Littelfuse 0217004.HXP (keep it in the box)", 1, 0.53, "DigiKey.es",
-     DK + "0217004.HXP", "price listed", "yes"),
-    ("USB-C charger module TP4056 with protection (HW-373), at the box wall (alternative: Adafruit #4410, "
-     "DigiKey.es 1528-4410-ND EUR 5.22, 966 pcs, 0.5 A with its jumper)", 1, 1.00,
-     "Amazon.es / AliExpress (est.; botland.store is now B2B only)", "", "not verified", "yes"),
+    ("Spare 5x20 mm 4 A fast glass fuse Littelfuse 0217004.HXP (keep it in the box)", 1, 0.44, "DigiKey.es F2394-ND",
+     DK + "0217004.HXP", "4,721 (24-Oct)", "yes"),
+    ("USB-C charger Adafruit Micro-Lipo #4410 at the box wall (500 mA jumper closed; TP4056 boards out of stock "
+     "24-Oct)", 1, 5.22, "DigiKey.es 1528-4410-ND (also Kiwi)", DK + "1528-4410-ND", "966 (24-Oct)", "yes"),
     ("40-way female-female GPIO ribbon, 15-20 cm (fallback: 2 x 3M 89140-0101 IDC sockets + 40-wire flat cable)", 1,
      2.79, "Kiwi Electronics 1160 (40-pin rainbow GPIO cable 20 cm)",
      "https://www.kiwi-electronics.com/en/40-pins-rainbow-gpio-cable-20cm-1160", "50 (24-Oct); F/F + keyed not stated",
      "yes"),
     ("2.54 mm male header strip 1x40, Sullins PRPC040SAAN-RC (module pins + UART header)", 1, 1.08, "DigiKey.es",
      DK + "PRPC040SAAN-RC", "price listed", "yes"),
-    ("Panel pushbutton E-Switch PS1024ABLK (GO/STOP)", 1, 1.46, "DigiKey.es EG2011-ND", DK + "PS1024ABLK",
-     "5,531 (24-Oct)", "yes"),
-    ("Panel toggle E-Switch 100SP1T1B1M1QEH (power: closed = OFF)", 1, 2.70, "DigiKey.es EG2350-ND",
-     DK + "100SP1T1B1M1QEH", "8,552 (24-Oct)", "yes"),
-    ("Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)", 1, 2.70,
-     "DigiKey.es EG2350-ND", DK + "100SP1T1B1M1QEH", "8,552 (24-Oct)", "yes"),
-    ("Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM)", 1, 4.75, "DigiKey.es EG2375-ND",
-     DK + "100SP3T1B1M1QEH", "2,223 (24-Oct)", "yes"),
+    # panel switches from TME (Santiago's budget lever, 24-Oct: the Adafruit charger put the box at EUR 150.45).
+    # TME showed USD to our reader; counted 1:1 as EUR (the EUR price is lower).
+    ("Panel pushbutton E-Switch PS1024ABLK (GO/STOP)", 1, 1.31, "TME (USD price counted as EUR)",
+     TME_PS + "ps1024ablk/push-button-switches/e-switch/", "1,379 (24-Oct)", "yes"),
+    ("Panel toggle E-Switch 100SP1T1B1M1QEH (power: closed = OFF)", 1, 2.44, "TME (qty-5 price, USD as EUR)",
+     TME_PS + "100sp1t1b1m1qeh/toggle-switches/e-switch/", "654 (24-Oct)", "yes"),
+    ("Panel toggle E-Switch 100SP1T1B1M1QEH (role TX/RX; may stay unfitted, Atenea Q8)", 1, 2.44,
+     "TME (qty-5 price, USD as EUR)", TME_PS + "100sp1t1b1m1qeh/toggle-switches/e-switch/", "654 (24-Oct)", "yes"),
+    ("Panel toggle E-Switch 100SP3T1B1M1QEH ON-OFF-ON (mode SRI/MRM/NM)", 1, 3.26, "TME (USD price counted as EUR)",
+     TME_PS + "100sp3t1b1m1qeh/toggle-switches/e-switch/", "906 (24-Oct)", "yes"),
     ("5 mm LED green diffused Kingbright WP7113GD (activity)", 1, 0.20, "DigiKey.es 754-1263-ND", DK + "WP7113GD",
      "91,488 (24-Oct)", "yes"),
     ("5 mm LED red diffused Kingbright WP7113SURDK (status; WP7113ID out of stock until Dec)", 1, 0.17,
@@ -127,9 +129,10 @@ OFF_BOARD = [   # (item, qty, unit EUR excl. VAT, supplier, link, stock as read,
     ("M3 x 10 mm nylon standoffs F/F x4 (carrier to the floor) + M3 x 11 mm x1 (breakout) + M3 x 6 nylon screws x10",
      1, 4.40, "DigiKey.es Keystone 25510 (M3x10) + Essentra MTS-11 (M3x11) + 50M030050P006 (M3x6 screws)",
      DK + "25510", "19,042 / 12,230 / 61,147 (24-Oct)", "yes"),
-    ("M2.5 standoffs x4 + screws x8 (the Pi on the box floor; screws DigiKey 50M025045P006, standoffs: kit, not on "
-     "DigiKey)", 1, 1.40, "DigiKey.es (screws) + Amazon.es kit (standoffs, est.)", DK + "50M025045P006",
-     "screws 5,784 (24-Oct); standoffs not verified", "yes"),
+    ("M2.5 nylon standoffs x4 + screws x8 (the Pi on the box floor), from one 380-piece kit for all boxes (share of "
+     "EUR 9.99)", 1, 0.50, "Kiwi KW-2754 M2.5 black nylon screw + standoff set (380 pcs)",
+     "https://www.kiwi-electronics.com/en/m2-5-screw-and-stand-off-set-black-nylon-380-pieces-10252",
+     "43 (24-Oct)", "yes"),
     ("Cable tie 3.6 mm through the board slots over the cell (drop test)", 1, 0.05, "lab stock (est.)", "", "-", "no"),
     ("IKEA 365+ food container 15 x 15 x 7 cm (plastic, 750 ml) with lid", 1, 3.00, "IKEA (est.)", "", "-", "yes"),
     ("Hot glue, Kapton tape (U.FL plug, microSD, XH housings), foam", 1, 1.00, "lab stock (est.)", "", "-", "no"),
