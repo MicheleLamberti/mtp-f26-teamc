@@ -311,7 +311,9 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
 - [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
-- [ ] Carrier rev C (simple): Santiago reviews the guide + shopping list → order (`hw/REVC_SHOPPING.md`); box
+- [ ] Carrier rev C (simple): **order** — DigiKey cart `hw/teamc-carrier-simple/order/digikey_cart.csv` (upload in
+      BOM Manager), Kiwi + nkon per `hw/REVC_SHOPPING.md` "How to order"; still to pick: TP4056 listing, M2.5
+      standoff kit, confirm ribbon F/F + keyed and the cell fit (BoM €148.00/box); box
       inside dimensions → edit W/H in `place_carrier_simple.py`, re-run `layout_carrier_simple.py`; email
       `hw/teamc-carrier-simple/teamc-carrier-simple_gerbers.zip` to Chávez; first build with the guide's tests
 - [ ] Carrier rev B (lab): **routed 23-Oct (provisional outline)**. Santiago: box inside dimensions → re-run
@@ -339,6 +341,13 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-24 (later) — rev C fixes after Santiago's questions; order-ready cart
+- Breakout J2 (bench pins, pointing down) sat over TP2 (5 V): TP2 moved, "no J2 on box breakouts" in the guide;
+  placement drawing `hw/teamc-carrier-simple/breakout_placement.png` (+ ribbon to the Pi, pin 1 marked).
+- Order check (Sonnet subagent): every DigiKey line verified; C1/C9 → KEMET ESS107M016AE2EA (EEU-FR1C101 did not
+  fit the footprint), red LED → WP7113SURDK; standoffs/screws/LED clips sourced at DigiKey. Cart + check report +
+  other shops in `hw/teamc-carrier-simple/order/`; ≈ €242 excl. for 3 boards. BoM €148.00/box. DRC 0/0/0.
 
 ### 2026-10-24 — carrier rev C: checkpoint-3 fixes, build guide, shopping list
 - Took over the rev C lead mid-task (worktree `agent-ac126a28c4ef25725`). Santiago's checkpoint-3 fixes: **P4KE10A

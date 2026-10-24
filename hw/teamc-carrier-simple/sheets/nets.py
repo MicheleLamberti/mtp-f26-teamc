@@ -58,6 +58,8 @@ MPN = {
     "33": ("MFR-25FBF52-33R", "Yageo"), "330": ("MFR-25FBF52-330R", "Yageo"),
     "1k": ("MFR-25FBF52-1K", "Yageo"), "10k": ("MFR-25FBF52-10K", "Yageo"),
     "100n": ("K104K10X7RF5UH5", "Vishay"), "1u": ("FG28X7R1E105KRT06", "TDK"),
-    "100u": ("EEU-FR1C101", "Panasonic"),
+    # 6.3 mm / 2.50 mm leads / 8.5 mm tall (24-Oct order check: EEU-FR1C101 is 5 mm / 2.0 mm and does not fit the
+    # footprint; the exact Panasonic EEU-FC1C101 is out of stock until Dec). C1/C9 sit outside the breakout area.
+    "100u": ("ESS107M016AE2EA", "KEMET"),
     "TVS": ("P4KE10A", "Littelfuse"),
 }

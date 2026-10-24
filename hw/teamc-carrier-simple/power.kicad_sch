@@ -3217,7 +3217,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "EEU-FR1C101"
+		(property "MPN" "ESS107M016AE2EA"
 			(at 111.76 50.8 0)
 			(effects
 				(font
@@ -3226,7 +3226,7 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "Panasonic"
+		(property "Manufacturer" "KEMET"
 			(at 111.76 50.8 0)
 			(effects
 				(font
@@ -5195,7 +5195,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "EEU-FR1C101"
+		(property "MPN" "ESS107M016AE2EA"
 			(at 241.3 139.7 0)
 			(effects
 				(font
@@ -5204,7 +5204,7 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "Panasonic"
+		(property "Manufacturer" "KEMET"
 			(at 241.3 139.7 0)
 			(effects
 				(font
