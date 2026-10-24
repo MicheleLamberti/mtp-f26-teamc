@@ -33,6 +33,10 @@ panel inputs high; there are no pull-up resistors on the board.
 
 ## 2. The board itself
 
+- **Where the SP4 breakout goes:** `hw/teamc-carrier-simple/breakout_placement.png` (component-side view + side
+  view; regenerate with `python3 hw/scripts/draw_breakout_placement.py . hw/teamc-carrier-simple/breakout_placement.png`).
+  It plugs into J30 (square pad = pin 1 = GND), SP4 module up, its far end on the M3 standoff at H30, 11 mm above
+  the board; one mounting hole of the carrier sits under it (an M3 screw head fits).
 - **120 × 68 mm, one copper layer**, milled at the UPC lab: no plated holes, no solder mask, no silkscreen.
 - **Every part sits on the plain (component) side and is soldered on the copper side.** Use the assembly drawing
   `fab/teamc-carrier-simple_assembly_component_side.pdf` to place parts (it is drawn as you see the component side);
