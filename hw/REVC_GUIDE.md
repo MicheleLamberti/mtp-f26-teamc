@@ -19,7 +19,7 @@ shows the right voltage.
 | One-way valve | U3, Pololu ideal diode #5388 | Lets 5 V go from the boost to the Pi but never back (if someone plugs the Pi's micro-USB while the box is on). |
 | 3.3 V for the radio | U4 MCP1700 (3-leg regulator) + C11, C12 | Turns the 5 V into a clean 3.3 V for the radio only. Never powered from the Pi's own 3.3 V pin. |
 | Battery level | U6, Adafruit MAX17048 #5580 | Tells the Pi the cell's charge over I2C (address 0x36). |
-| Pi link | J1 (2×20 box header) + 40-wire ribbon | Carries 5 V, ground and every signal to the Pi. Keyed: it only goes in one way. |
+| Pi link | J1 (2×20 box header) + 40-wire ribbon (female sockets at both ends) | Carries 5 V, ground and every signal to the Pi. **Do not trust a key:** many GPIO ribbons have no bump, so the plug can go in turned round. Always line up the cable's marked (coloured/white) edge wire with pin 1 at both ends. |
 | Radio | J30 (1×8 socket) + H30 standoff | The lab-made SP4 radio breakout plugs in here and sits ~11 mm above the board. R82–R84 (33 Ω) soften the SPI edges; R80 keeps the radio deselected while the Pi boots. |
 | Panel leads | J10 (GO/STOP), J11 (role), J12 (mode), J14 (LEDs), J22 (power toggle), J23 (charger) | 2- and 3-pin JST-XH plugs for everything on the box wall. |
 | Panel protection | D12–D16 (P4KE10A, small standing diodes) + R54–R57, R9 (1 kΩ) | A static zap on a metal lever goes into the diode at the connector, and the 1 kΩ limits what reaches the Pi. |
@@ -129,8 +129,14 @@ its limit, nothing else warms up. With a real cell this current is what blows F1
 **E. Breakout:** check it has **no J2 pins underneath** (section 2). Switch OFF, plug the SP4 breakout into J30
 (its pin 1 = GND on the square pad end) and screw it to the H30 standoff. Switch ON: TP4 still 3.2–3.4 V. Switch OFF.
 
-**F. Pi:** with the box OFF, connect the ribbon: **red wire = pin 1 at both ends**; on the Pi, pin 1 is the end of
-the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the Pi:
+**F. Pi:** with the box OFF, connect the ribbon with its **marked edge wire (red, white or the first colour of a
+rainbow cable) on pin 1 at both ends**, whether or not the plug has a bump:
+- at the Pi, pin 1 is at the end of the GPIO header nearest the microSD slot, in the row away from the board edge
+  (it is the pin with the **square solder pad** on the underside of the Pi);
+- at the carrier, pin 1 of J1 is the square pad, marked "J1 pin 1" in `hw/teamc-carrier-simple/breakout_placement.png`.
+Before switching on, check with the meter (box OFF, Pi not powered): **J1 pin 2 must beep to the Pi's pin 2 (5 V)**
+and J1 pin 6 to the Pi's pin 6 (GND). A cable turned round would put the 5 V on the Pi's pins 39/37 (GND/GPIO 26).
+Switch ON. The Pi boots. Then on the Pi:
 - `vcgencmd get_throttled` → `throttled=0x0` (no under-voltage). If not 0x0, measure 5 V at the Pi's pin 2 under load:
   it must stay ≥ 4.75 V.
 - `i2cdetect -y 1` shows **36** (fuel gauge).
@@ -164,7 +170,7 @@ the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the P
 | Electrolytic C1/C9 reversed | It gets hot or bulges. Replace it the right way round. |
 | MCP1700 turned round | TP4 anything but 3.2–3.4 V (it can even pass 5 V through). **Hard rule: never plug the breakout unless TP4 reads 3.2–3.4 V.** |
 | A wire link missing | W4: the radio never raises its interrupt (sends time out). W1–W3: odd faults on part of the board; the continuity check in step A1 catches it. |
-| Ribbon rotated or offset by one row | The key on J1 prevents rotation at the board; at the Pi, check red = pin 1 (microSD end). |
+| Ribbon turned round or offset by one row | The plug may have no key, so it can go in either way at J1 and at the Pi. Turned round, the 5 V lands on the wrong Pi pins (can kill the Pi). Always: marked wire on pin 1 at both ends, and the beep check in step F before switching on. |
 | A joint that only touches the pin | Unplated holes: no connection at all. Reflow with a little more solder so it wets the copper ring. |
 | SJ2 left open on the #5580 | The gauge reads nothing or 0 % (its chip has no supply). |
 | Test loop or regulator too tall | The breakout does not seat on its standoff. Bend the loop lower / push U4 down. |

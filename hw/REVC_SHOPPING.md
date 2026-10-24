@@ -23,7 +23,10 @@ Links, stock and prices for 2–4: `hw/teamc-carrier-simple/order/other_shops.md
 ### Check before paying
 - **Cell fit:** the MPD BH-18650-PC holder is made for protected cells, but its inside length was not verified
   against the 69.1 mm Keeppower — buy one cell first, or check the holder's datasheet. Also confirm nkon ships to Spain.
-- **40-way ribbon (Kiwi 1160):** confirm on the page/photo that both ends are **female** and **keyed**; 20 cm is fine.
+- **40-way ribbon (Kiwi 1160):** checked 24-Oct: the page says it plugs onto the Pi's 40-pin header (so female
+  sockets; Kiwi sells the male/female "extender" separately) but does not state female-female or keying in words —
+  every comparable 20 cm rainbow GPIO cable is female-female. Buy it (or ask Kiwi to confirm); **keying is not
+  needed**: the guide (step F) has you line up the marked wire with pin 1 at both ends and beep-check before power.
 - **Charger #4410:** on arrival close its **500 mA solder jumper** (default 100 mA); see the guide.
 
 ### Changes from the first list (24-Oct order check)
@@ -75,7 +78,7 @@ If DigiKey runs out of the P4KE10A, any maker's P4KE10A in DO-41 fits (Vishay P4
 | Item | Shop | Buy | Unit € excl. |
 |---|---|---|---|
 | Adafruit **MAX17048** fuel gauge #5580 | Kiwi (ADA-5580, 41 in stock) | 3 | 5.69 |
-| 40-way GPIO ribbon 20 cm (verify female-female + keyed) | Kiwi (1160, 50 in stock) | 3 | 2.79 |
+| 40-way GPIO ribbon 20 cm, female-female (keying not needed, see the guide step F) | Kiwi (1160, 50 in stock) | 3 | 2.79 |
 | M2.5 black nylon screw + standoff set, 380 pcs (Pi standoffs) | Kiwi (KW-2754, 43 in stock) | 1 | 9.99 |
 | E-Switch **PS1024ABLK** push button (GO/STOP) | TME (1,379) | 3 | 1.31 |
 | E-Switch **100SP1T1B1M1QEH** toggle (power, role) | TME (654) | 6 | 2.44 |

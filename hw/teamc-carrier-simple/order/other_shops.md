@@ -6,7 +6,7 @@ The DigiKey part is `digikey_cart.csv` (upload in BOM Manager). These are the ot
 | Part | Qty | Link | Stock 24-Oct | Unit |
 |---|---|---|---|---|
 | Adafruit MAX17048 #5580 fuel gauge (ADA-5580) | 3 | https://www.kiwi-electronics.com/en/adafruit-max17048-lipoly-liion-fuel-gauge-battery-monitor-11061 | 41 | 5.69 (6.88 incl.) |
-| 40 pins GPIO cable 20 cm (code 1160) — **check the photo: both ends female and keyed** | 3 | https://www.kiwi-electronics.com/en/40-pins-rainbow-gpio-cable-20cm-1160 | 50 | 2.79 |
+| 40 pins GPIO cable 20 cm (code 1160), female-female (page: "connects to the Pi's 40-pin GPIO header"; keying not needed, guide step F) | 3 | https://www.kiwi-electronics.com/en/40-pins-rainbow-gpio-cable-20cm-1160 | 50 | 2.79 |
 | M2.5 black nylon screw + stand-off set, 380 pcs (KW-2754): Pi standoffs + screws for all boxes | 1 | https://www.kiwi-electronics.com/en/m2-5-screw-and-stand-off-set-black-nylon-380-pieces-10252 | 43 | 9.99 (11.89 incl.) |
 
 ## TME (tme.eu) — ≈ €28.35 (prices were shown in USD to our reader; counted 1:1, the EUR price is lower)

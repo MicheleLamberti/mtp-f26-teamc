@@ -132,7 +132,7 @@ for x, y in pads(fp(br, "J2")).values():
 t = "black squares = the breakout's J2 bench pins: DO NOT FIT J2 on breakouts used in the box"
 d.text((box[2] - d.textlength(t, font=small), box[3] + 24), t, fill="black", font=small)
 
-# the 40-wire ribbon to the Pi: female sockets at both ends, one pushes into J1 (the shrouded box header, keyed),
+# the 40-wire ribbon to the Pi: female sockets at both ends, one pushes into J1 (the shrouded box header; the cable may be unkeyed),
 # the other onto the Pi's 40 male pins; red wire = pin 1 at both ends
 j1 = fp(cb, "J1")
 jx1, jy1, jx2, jy2 = bbox(j1, True)
@@ -152,9 +152,9 @@ for xx in (rl, rr):                                      # dashed: the plug goes
         d.line([xx, yy, xx, min(yy + 6, jtop)], fill="#607d8b", width=2)
 for i, t in enumerate(("its plug pushes into J1 (dashed);", "the cable rises out of J1 and", "folds over U3 / J13 to the Pi")):
     d.text((M, rtop - 62 + i * 16), t, fill="#607d8b", font=small)
-t = "40-wire ribbon cable, female-female, 15 cm  ->  Raspberry Pi 3 A+ (on the box floor beside the carrier)"
+t = "40-wire ribbon cable, female-female, 20 cm  ->  Raspberry Pi 3 A+ (on the box floor beside the carrier)"
 d.text(((rl + rr) / 2 - d.textlength(t, font=font) / 2, M + 12), t, fill="#37474f", font=font)
-t = "red wire = pin 1 at both ends (Pi: pin 1 is at the microSD-card end)  ·  the J1 shroud's notch keys it"
+t = "marked (red/white) wire = pin 1 at BOTH ends - the plug may have no key: line it up, beep-check before power"
 d.text(((rl + rr) / 2 - d.textlength(t, font=small) / 2, M + 34 + 8), t, fill="#b71c1c", font=small)
 px, py = P(*jp["1"])
 d.rectangle([px - 6, py - 6, px + 6, py + 6], outline="#d32f2f", width=3)
