@@ -155,3 +155,10 @@ All the recommended options:
    uses a 5×20 mm fuse in two clips (pull out, push in), with a spare in the BoM.
 6. No GPIO changes.
 Also: slots for a strap / cable tie over the 18650 in its holder (drop test); bench check of the 1N5822 leakage.
+
+## After checkpoint 3 (Santiago, 24-Oct-26)
+
+Layout and the 4 wire links accepted, with two fixes: **P4KE10A through-hole TVS diodes** (DO-41, standing) at each
+panel-lead connector (D12–D15 on the inputs, D16 on the power-toggle lead) — so rev C does have TVS protection after
+all, not only the 1 kΩ — and **low wire-loop test points** for TP2/TP3/TP4 (a Keystone 5010 is too tall under the
+breakout). To fit them the board grew to **120 × 68 mm**. Build guide: `hw/REVC_GUIDE.md`.

@@ -388,3 +388,23 @@ under any part. Positions: `hw/teamc-carrier-lab/links.json` and the assembly dr
 - The breakout's IPEX end is mid-board (above the left half), not at an edge: route the U.FL pigtail up to the box
   wall; glue the plug (drop test).
 - Lab review (Prof. Chávez): one F.Cu gerber + Edge.Cuts + one Excellon (all holes unplated).
+
+## Carrier rev C ("simple") for the UPC lab mill (24-Oct, DRAFT – first build)
+
+`hw/teamc-carrier-simple/`: every part through-hole or a module (Pololu U3V70F5 boost, Pololu #5388 ideal diode,
+Adafruit #5580 fuel gauge), the 18650 in a holder on the board, MCP1700 (TO-92) for the radio's 3.3 V from 5V_PI,
+5×20 fuse in clips + 1N5822 crowbar, panel leads on JST-XH with a P4KE10A TVS + 1 kΩ per input. **One copper layer,
+no vias, 4 wire links (3 GND, 1 RADIO_IRQ), tracks ≥ 0.8 mm, holes ≥ 0.8 mm, pads = hole + 1.0 mm; ERC 0/0, DRC 0
+violations / 0 unconnected / 0 parity (all severities).** Outline **120 × 68 mm, provisional** (box not measured).
+No GPIO changes. BoM `hw/BOM_revC.csv` ≈ €145.5/box.
+
+- **Build and test guide (plain language): `hw/REVC_GUIDE.md`**; shopping list: `hw/REVC_SHOPPING.md`; decisions:
+  `hw/teamc-carrier-simple/CONCEPT.md` (checkpoints 1–3 with Santiago).
+- Rebuild everything: `python3 hw/scripts/layout_carrier_simple.py` (schematic → placement → routing → pour/links →
+  DRC → fab + renders + BoM; floorplan and coordinates in `place_carrier_simple.py`'s docstring and tables).
+- After checkpoint 3 (Santiago): TVS D12–D16 at the panel-lead connectors; TP2/TP4 (under the breakout) and TP3 are
+  low wire loops; the board grew 66 → 68 mm so the ground pour keeps a ≥ 1.9 mm channel along the bottom edge (the
+  only copper path between its left and right halves, under the role line); R56 and the CSN line moved down a little
+  in the top band for D14.
+- Open: box inside dimensions (then edit W/H and the edge rows in `place_carrier_simple.py` and re-run), Atenea Q22
+  (Pi 3 wireless chip), first build + the guide's tests (SJ2 on the #5580, 1N5822 leakage, 5 V at the Pi under load).

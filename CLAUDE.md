@@ -90,6 +90,9 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   straight wire links) → `finish_carrier_lab.py` (pour, FR10 rule areas, ground-island joins, links → W parts with
   `teamc:WireLink_L<len>mm` footprints, jumper pads, `links.json`) → `fab_carrier_lab.py`. Single-layer schematic
   changes and the link list: **`hw/DESIGN_NOTES.md` "Carrier rev B"**.
+- **`hw/teamc-carrier-simple/` = carrier rev C ("simple", 24-Oct)**: THT + modules, one copper layer, 4 wire links,
+  DRC 0/0/0. Pipeline `hw/scripts/layout_carrier_simple.py` (build → place → route → finish → fab, all `*_simple.py`);
+  build guide `hw/REVC_GUIDE.md`, shopping `hw/REVC_SHOPPING.md`, BoM `hw/BOM_revC.csv`, decisions `CONCEPT.md`.
 - `hw/` — carrier PCB work. `hw/KICAD_SESSION_PROMPT.md` is the prompt for the KiCad session (**v2 19-Oct: a lead
   agent with ~8 subagents**: research of power / Pi + SP4 footprint / UI parts with verified symbols and footprints,
   SP4 breakout first, one owner per schematic sheet, adversarial datasheet review, 3 checkpoints with Santiago).
@@ -161,6 +164,13 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
   the team's own Task 11 report and reproducible validation are tracked. Put PDF exports of the pages in `briefs/` too.
 
 ## Status (keep current)
+
+- **24-Oct-26: carrier rev C ("simple") ready for the first build** (`hw/teamc-carrier-simple/`, DRAFT): THT parts +
+  Pololu U3V70F5 / #5388 / Adafruit #5580 modules, 18650 holder on the board, MCP1700 TO-92 radio LDO, 5×20 fuse +
+  1N5822, P4KE10A TVS per panel lead (added after checkpoint 3). One copper layer, no vias, 4 wire links, **ERC 0/0,
+  DRC 0/0/0**, 120 × 68 mm (provisional), BoM ≈ €145.5/box. Plain-language build/test guide **`hw/REVC_GUIDE.md`**,
+  shopping list `hw/REVC_SHOPPING.md` (DigiKey.es + Kiwi + Amazon; Botland is B2B only now). Rebuild after the box is
+  measured: `python3 hw/scripts/layout_carrier_simple.py`. Santiago approved checkpoints 1–3; merge pending.
 
 - **23-Oct-26 (late): Santiago wants a SIMPLER carrier → rev C.** Rev B works on paper but is too subtle for the team
   (ribbon-ground limits, SMD details, 10 links in a dense layout). Rev C = modules + THT parts, every part easy to buy
@@ -301,6 +311,9 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] ET/lab: make the SP4 breakout (`hw/sp4-breakout/fab/`, single-sided; measure one SP4 = 14.5 mm first);
       Santiago: measure the IKEA 365+ inside dimensions
 - [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
+- [ ] Carrier rev C (simple): Santiago reviews the guide + shopping list → order (`hw/REVC_SHOPPING.md`); box
+      inside dimensions → edit W/H in `place_carrier_simple.py`, re-run `layout_carrier_simple.py`; email
+      `hw/teamc-carrier-simple/teamc-carrier-simple_gerbers.zip` to Chávez; first build with the guide's tests
 - [ ] Carrier rev B (lab): **routed 23-Oct (provisional outline)**. Santiago: box inside dimensions → re-run
       place/route/finish/fab (see `hw/DESIGN_NOTES.md`); ET reviews the single-layer schematic changes and the 10 wire
       links → email `hw/teamc-carrier-lab/teamc-carrier-lab_gerbers.zip` to Chávez; order U3V70F5, #5388, MAX17048
@@ -326,6 +339,25 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 
 Newest first. One entry per session: what was done, what was decided (and by whom),
 what's pending.
+
+### 2026-10-24 — carrier rev C: checkpoint-3 fixes, build guide, shopping list
+- Took over the rev C lead mid-task (worktree `agent-ac126a28c4ef25725`). Santiago's checkpoint-3 fixes: **P4KE10A
+  TVS** (DO-41 standing, cathode on the line) at each panel-lead connector (D12–D15 inputs, D16 power toggle);
+  **TP2/TP3/TP4 → low wire loops** (TP2/TP4 sit under the breakout; a Keystone 5010 is too tall). UART J13 kept as rev
+  A/B (1 GND, 2 TX, 3 RX; an uncommitted swap was reverted, the routing never needed it); ui.py "no TVS" text fixed.
+- Layout: D12/D13 in a row under J10/J11 (J row up 0.6 mm, the 1 k row down), D14/D15 beside J12 in the top band
+  (R56 + the CSN line moved down a little), D16 between J23 and C18. The board grew **66 → 68 mm**: the role line
+  along the bottom edge had closed the only copper path between the left and right halves of the GND pour (found by
+  DRC; the old board had just a 1.1 mm sliver there, now ≥ 1.9 mm). Still 4 wire links. DO-41 3.81 mm vertical has no
+  upstream 3D model → own stand-in (`gen_3d_revc.py`, `fetch_3d.SUBSTITUTES`). ERC 0/0, DRC 0/0/0, renders resolved.
+- Stock: P4KE10A at DigiKey.es 1,543 pcs (€0.371 at qty 10); TME 0. BoM €145.51/box.
+- New `hw/REVC_GUIDE.md` (blocks, soldering order, polarity, tests before the Pi/breakout incl. SJ2 and the 1N5822
+  leakage, charging, common mistakes), `hw/REVC_SHOPPING.md`, DESIGN_NOTES "Carrier rev C", CONCEPT addendum.
+- Sonnet review: no blockers; fixed: fit the fuse before the first power test (the holder feeds the board only
+  through it), OFF-current expectation 0.05–0.3 mA (not a datasheet figure), reversed D16 = undefined ENABLE, MCP1700
+  check as a hard 3.2–3.4 V rule, C11/C12 pushed low under the breakout.
+- Checks: fw 318, proto all scenarios + 116 usb, phy_config all OK.
+- **Start next session with:** guide reviewed? box inside dimensions; order placed? gerbers to Chávez.
 
 ### 2026-10-23 (night) — review of the rev B layout; review fixes
 - Santiago: pull the other session's rev B (4f65e84) after a review. Reviewed and pulled: DRC/ERC 0 rerun, one F.Cu

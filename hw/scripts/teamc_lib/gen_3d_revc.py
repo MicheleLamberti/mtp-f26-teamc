@@ -9,8 +9,9 @@ Writes into hw/lib/teamc.3dshapes/ (next to gen_3d.py's models; nothing of rev A
   RevC_Pololu_IdealDiode_5388.wrl   17.78 x 11.05 mm board, MOSFET + controller
   RevC_Adafruit_MAX17048_5580.wrl   25.4 x 20.32 mm board, two JST-PH ports, chip
   RevC_WireLink_unit.wrl      an insulated wire 1 mm long (scaled to each link's length by its footprint)
-  RevC_BatteryHolder_MPD_BH-18650-PC.wrl, RevC_Fuseholder_Keystone_3517_5x20.wrl, RevC_TestPoint_Keystone_5010.wrl
-                              stand-ins for three stock footprints whose models kicad-packages3D does not have
+  RevC_BatteryHolder_MPD_BH-18650-PC.wrl, RevC_Fuseholder_Keystone_3517_5x20.wrl, RevC_TestPoint_Keystone_5010.wrl,
+  RevC_D_DO-41_P3.81mm_Vertical_CathodeUp.wrl
+                              stand-ins for four stock footprints whose models kicad-packages3D does not have
                               (fetch_3d.SUBSTITUTES points the stock refs here)
 Module sizes and pin positions: hw/teamc-carrier-simple/sheets/modules.py (from the makers' CAD). Origin = the
 footprint origin (module centre), +x right, +y up (= KiCad -y), +z up from the carrier's component side; KiCad's
@@ -140,6 +141,19 @@ def test_loop():
     return m
 
 
+def do41_vertical():
+    """P4KE10A TVS (DO-41) standing on its anode pad (pad 2, x = 3.81 mm), cathode band on top, the cathode lead bent
+    over and down into pad 1 (x = 0): kicad-packages3D has no model for the 3.81 mm vertical footprint. ~7.2 mm tall."""
+    m = Model()
+    m.box(3.81 - 1.35, -1.35, 3.81 + 1.35, 1.35, 0.6, 4.8, "black")        # body (square stand-in for the 2.7 mm cylinder)
+    m.box(3.81 - 1.36, -1.36, 3.81 + 1.36, 1.36, 4.8, 5.8, "marking")      # cathode band
+    m.box(3.81 - 0.4, -0.4, 3.81 + 0.4, 0.4, 5.8, 7.2, "silver")           # lead up out of the band
+    m.box(-0.4, -0.4, 3.81 + 0.4, 0.4, 6.4, 7.2, "silver")                 # over the top
+    m.box(-0.4, -0.4, 0.4, 0.4, 0.0, 7.2, "silver")                        # down into pad 1
+    m.box(3.81 - 0.4, -0.4, 3.81 + 0.4, 0.4, 0.0, 0.6, "silver")           # anode lead into pad 2
+    return m
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     for fn, mk, title in (("RevC_Pololu_U3V70F5.wrl", u3v70f5, "Pololu U3V70F5 on 2.54 mm headers (approximate)"),
@@ -148,5 +162,6 @@ if __name__ == "__main__":
                           ("RevC_WireLink_unit.wrl", wire_unit, "insulated wire link, 1 mm (scaled per link)"),
                           ("RevC_BatteryHolder_MPD_BH-18650-PC.wrl", holder_18650, "MPD BH-18650-PC + cell (approx.)"),
                           ("RevC_Fuseholder_Keystone_3517_5x20.wrl", fuse_clips, "2 x Keystone 3517 + 5x20 fuse"),
-                          ("RevC_TestPoint_Keystone_5010.wrl", test_loop, "Keystone 5010 test point (approx.)")):
+                          ("RevC_TestPoint_Keystone_5010.wrl", test_loop, "Keystone 5010 test point (approx.)"),
+                          ("RevC_D_DO-41_P3.81mm_Vertical_CathodeUp.wrl", do41_vertical, "DO-41 standing (approx.)")):
         mk().write(os.path.join(OUT, fn), title)

@@ -88,11 +88,16 @@ def build():
           Panel="E-Switch 100SP1T1B1M1QEH, wired common + one throw; closed = OFF")
     R(s, "R9", "1k", (325.12, 38.1), "PWR_SW_J", "PWR_EN")
     C(s, "C18", "100n", (345.44, 50.8), "PWR_SW_J", "GND")
+    mpn, mfr = MPN["TVS"]
+    s.add("Device:D_Zener", "D16", "P4KE10A TVS", fp=FP["TVS"], at=(370.84, 38.1), rot=0,
+          nets={"1": "PWR_SW_J", "2": "GND"}, mpn=mpn, mfr=mfr)
     s.note("Toggle CLOSED = ENABLE pulled to GND = boost asleep = box OFF (the battery current never goes through\n"
            "the switch). Toggle OPEN = the module's own 100 k pull-up wakes it = box ON. A lead that breaks in the drop\n"
            "test therefore leaves the box running. Mount the toggle so that 'down' (closed) is marked OFF.\n"
            "C18 + R9: 100 nF at the lead, then 1 k to ENABLE: a zap on the lever goes into C18, R9 limits what reaches\n"
-           "the module (C18 sits at the connector since checkpoint 3: room on the board).\n"
+           "the module (C18 sits at the connector since checkpoint 3: room on the board). D16: TVS at the lead (after\n"
+           "checkpoint 3), P4KE10A, stand-off 8.55 V > the cell's 4.2 V; its leakage (<= 10 uA even at 8.55 V, far less at\n"
+           "4.2 V) would drop at most 1 V across the 100 k pull-up, so ENABLE still reads high (box ON).\n"
            "With the toggle closed: EN = VBAT x 1k / 101k = 0.04 V (< 0.4 V needed). Off drain: ~40 uA in the pull-up.",
            at=(287.02, 63.5), size=1.27)
 
@@ -139,12 +144,15 @@ def build():
 
     # ===== 8. test points & flags ==================================================================================
     s.note("8  TEST POINTS (clip a multimeter here)", at=(287.02, 203.2), size=2.0)
-    for i, (ref, net, mpn) in enumerate((("TP1", "VBAT", "5010 (red)"), ("TP2", "5V_PI", "5010 (red)"),
-                                         ("TP4", "3V3_RADIO", "5010 (red)"), ("TP3", "GND", "5011 (black)"))):
-        s.add("Connector:TestPoint", ref, net, fp=FP["TP"], at=(292.1 + i * 20.32, 215.9), nets={"1": net},
-              mpn=mpn, mfr="Keystone")
+    for i, (ref, net, fp, mpn, mfr) in enumerate((
+            ("TP1", "VBAT", FP["TP"], "5010 (red)", "Keystone"),
+            ("TP2", "5V_PI", FP["LOOP"], "wire loop (bare tinned wire, ~3 mm high)", ""),
+            ("TP4", "3V3_RADIO", FP["LOOP"], "wire loop (bare tinned wire, ~3 mm high)", ""),
+            ("TP3", "GND", FP["LOOP"], "wire loop (bare tinned wire, ~3 mm high)", ""))):
+        s.add("Connector:TestPoint", ref, net, fp=fp, at=(292.1 + i * 20.32, 215.9), nets={"1": net}, mpn=mpn, mfr=mfr)
     s.note("TP1 VBAT 3.0-4.2 V · TP2 5V_PI 4.8-5.2 V · TP4 3V3_RADIO 3.2-3.4 V · TP3 GND (black).\n"
-           "Measure all of them BEFORE plugging in the ribbon (Pi) and the radio breakout.",
+           "Measure all of them BEFORE plugging in the ribbon (Pi) and the radio breakout. TP2/TP4 are low wire loops\n"
+           "(~5 mm) under the breakout's place (a Keystone 5010 is too tall there); TP3 (GND) is a loop too, beside TP1.",
            at=(287.02, 228.6), size=1.27)
     # nets driven only through passive pins (holder, fuse, connectors, module headers)
     for i, net in enumerate(("GND", "BAT_IN", "VBAT", "5V_BOOST", "5V_PI", "PWR_EN")):

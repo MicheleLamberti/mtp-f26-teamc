@@ -8,13 +8,14 @@ top-left corner of the outline, x right, y down); on the component side everythi
 
 THE BOX IS NOT MEASURED YET (Santiago, checkpoint 2): W, H, the holes, the slot and every position are in the tables
 below, measured from the outline's top-left corner, so a new outline is a matter of editing W/H (and the rows near the
-edges) and re-running place -> route -> finish -> fab. Defaults: board 120 x 66 mm for a 125 x 125 mm box floor with
+edges) and re-running place -> route -> finish -> fab. Defaults: board 120 x 68 mm for a 125 x 125 mm box floor with
 the Pi (65 x 56) beside it.
 
 Floorplan, copper-side view (the component side is the mirror image):
   top left     the SP4 breakout's socket J30; the breakout lies over the top-left 31 x 38 mm (H30 = its standoff);
-               under it only low parts: the radio regulator U4 + C11/C12, the CSN pull-up R80 over the socket, the
-               33 ohm SPI resistors R82-R84 upright in their lines (SCK passes between the legs of R84 and R83)
+               under it only low parts (all <= ~8 mm; the breakout sits ~11 mm up): the wire-loop test points
+               TP2/TP4, the radio regulator U4 + C11/C12, the CSN pull-up R80 over the socket, the 33 ohm SPI
+               resistors R82-R84 upright in their lines (SCK passes between the legs of R84 and R83)
   middle       J1 (2x20 box header, ribbon to the Pi): pin 1 at the right end of the bottom (odd) row
   top band     the mode lead J12 with R57/R56, the UART header J13, U3 ideal diode over J1's right end (5 V down to
                pins 2/4); C9/C10 between U3 and U2 (TP2, the 5 V test loop, is at the radio regulator)
@@ -22,7 +23,10 @@ Floorplan, copper-side view (the component side is the mirror image):
   band         under J1, left: the LED lead J14 + R60/R61 (inside the radio lines' loop); right: the fuel gauge U6, its
                header row right under J1's pins 1-5 (I2C straight down)
   bottom       the 18650 holder BT1 (+ at its right end); bottom right: F1 fuse clips, the GO/STOP and role leads
-               J10/J11 + R54/R55, the charger lead J23, C1; right strip: the power toggle lead J22, R9, C18, TP1, TP3
+               J10/J11 with their TVS D12/D13 right under them and R54/R55 below, the charger lead J23, C1; right
+               strip: the power toggle lead J22, its TVS D16 (left of C18), R9, C18, TP1, TP3 (wire loop)
+  TVS          P4KE10A standing (~8 mm tall), one per panel lead at its connector: D12-D15 (inputs), D16 (power
+               toggle); D14/D15 flank the mode lead J12 in the top band. None under the breakout.
 """
 import os
 import sys
@@ -35,7 +39,9 @@ import boardutil as bu  # noqa: E402
 DIR = os.path.join(bu.HW, "teamc-carrier-simple")
 PCB = os.path.join(DIR, "teamc-carrier-simple.kicad_pcb")
 ORIGIN = (50.0, 50.0)
-W, H = 120.0, 66.0                 # provisional outline (box inside dimensions still to measure)
+W, H = 120.0, 68.0                 # provisional outline (box inside dimensions still to measure); 66 -> 68 mm
+                                   # at the TVS change: keeps a >= 1.9 mm GND channel along the bottom edge under
+                                   # the role line, the only copper path between the left and right halves of the pour
 # The SP4 breakout relative to its socket's pin 1 (hw/sp4-breakout; same numbers as place_carrier_lab.BREAKOUT):
 # pins run along +u, the breakout's board spans u and w (w = the body side), its M3 hole H1 at h1
 BREAKOUT = {"u": (-8.7, 22.3), "w": (-7.0, 30.5), "h1": (-4.205, 26.6)}
@@ -119,8 +125,8 @@ PASSIVES = [
     # cell end of the boost
     ("D1", 100.6, 36.7, above("2", "1")),             # crowbar: anode (2) GND on top, cathode (1) VBAT at the bottom
     # bottom right, row C: the 1 k of GO/STOP and role, the 100 uF on VBAT
-    ("R54", 89.92, 61.8, left_of("2", "1")),          # GO/STOP 1 k: GPIO side (2) left, lead side (1) right
-    ("R55", 92.2, 61.8, left_of("1", "2")),           # role 1 k
+    ("R54", 89.92, 63.0, left_of("2", "1")),          # GO/STOP 1 k: GPIO side (2) left, lead side (1) right
+    ("R55", 92.2, 63.0, left_of("1", "2")),           # role 1 k
     ("C1", 103.45, 62.0, left_of("1", "2")),          # 100 uF on VBAT, + left
     # right strip: power toggle
     ("R9", 118.3, 50.8, above("2", "1")),             # power toggle 1 k: ENABLE side (2) on top, lead side below
@@ -130,7 +136,15 @@ PASSIVES = [
     ("R61", 49.5, 25.0, above("1", "2")),             # LED_STATUS
     # top band: the mode inputs' 1 k
     ("R57", 33.55, 5.58, above("1", "2")),            # MRM 1 k, upright west of J1: its legs straddle CSN and IRQ
-    ("R56", 57.68, 3.8, left_of("1", "2")),           # NM: lead side (1) left towards J12, GPIO side (2) right
+    ("R56", 57.68, 7.15, left_of("1", "2")),           # NM: lead side (1) left towards J12, GPIO side (2) right;
+                                                      # lowered at the TVS change so D14 fits above it
+    # panel-lead TVS (P4KE10A, DO-41 standing, cathode = pad 1 on the lead's line, anode = pad 2 into the GND pour)
+    ("D12", 84.2, 59.6, left_of("1", "2")),           # GO/STOP: under J10 pin 1, anode towards J10's GND pin
+    ("D13", 92.7, 59.6, left_of("1", "2")),           # role: under J11 pin 1
+    ("D14", 57.0, 4.0, left_of("1", "2")),            # mode NM: right of J12, over R56 (low enough that the GND
+                                                      # pour still passes above its pads, under the 5 V track)
+    ("D15", 42.5, 4.0, left_of("2", "1")),            # mode MRM: left of J12, over the MRM lead line (same)
+    ("D16", 108.7, 52.3, above("1", "2")),            # power toggle: between the charger lead J23 and C18
 ]
 TESTPOINTS = [("TP1", 110.3, 61.0), ("TP2", 9.0, 27.8), ("TP4", 13.2, 24.5), ("TP3", 116.8, 55.5)]
 
@@ -155,9 +169,9 @@ def place_all(board):
     # SCL right under J1 pin 5, SDA under pin 3)
     put(board, "U6", "3", j1_xy(5)[0] - 1.0, 25.2, lambda p: abs(p["1"][1] - p["6"][1]) < 0.1 and p["7"][1] > p["1"][1])
     # bottom right, row B: GO/STOP, role, charger leads
-    put(board, "J10", "1", 84.2, 55.6, left_of("1", "2"))         # GO/STOP: lead (1), GND (2)
-    put(board, "J11", "1", 92.7, 55.6, left_of("1", "2"))         # role
-    put(board, "J23", "1", 101.2, 55.6, left_of("1", "2"))        # charger lead: BAT+ (1), BAT- (2)
+    put(board, "J10", "1", 84.2, 55.0, left_of("1", "2"))         # GO/STOP: lead (1), GND (2)
+    put(board, "J11", "1", 92.7, 55.0, left_of("1", "2"))         # role
+    put(board, "J23", "1", 101.2, 55.0, left_of("1", "2"))        # charger lead: BAT+ (1), BAT- (2)
     # right strip: power toggle lead
     put(board, "J22", "1", 113.6, 44.6, left_of("2", "1"))        # toggle (1) right, GND (2)
     # ---- Pi side ------------------------------------------------------------------------------------------------

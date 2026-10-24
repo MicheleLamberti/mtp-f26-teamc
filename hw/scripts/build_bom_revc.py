@@ -43,9 +43,9 @@ SUPPLY = {
                                 "(EUR 0.53; ceramic 0216004.MXP EUR 1.85, 4,517 pcs)",
                                 DK + "0217004.HXP", "fuse price listed; clips TME 2,170 (23-Oct)"),
     # passives (qty-10 price breaks where the order for 3 boxes reaches them)
-    "K104K10X7RF5UH5": (0.155, "DigiKey.es (Vishay, 5 mm leads; price at qty 10, 18 needed for 3 boxes)",
+    "K104K10X7RF5UH5": (0.155, "DigiKey.es (Vishay, 5 mm leads; price at qty 10: 6 needed for 3 boxes, buy 10)",
                         DK + "K104K10X7RF5UH5", "186,026 (24-Oct)"),
-    "FG28X7R1E105KRT06": (0.183, "DigiKey.es 445-173583-1-ND (TDK, 5 mm leads; price at qty 10)",
+    "FG28X7R1E105KRT06": (0.183, "DigiKey.es 445-173583-1-ND (TDK, 5 mm leads; price at qty 10: 6 needed, buy 10)",
                           DK + "FG28X7R1E105KRT06", "85,335 (24-Oct)"),
     "EEU-FR1C101": (0.36, "DigiKey.es (Panasonic)", DK + "EEU-FR1C101", "price listed, stock not shown"),
     "MFR-25FBF52-33R": (0.04, "DigiKey.es (Yageo; qty-10 price, buy 10 per value)", DK + "MFR-25FBF52-33R", "price listed"),
@@ -54,6 +54,9 @@ SUPPLY = {
                        "46,691 (24-Oct)"),
     "MFR-25FBF52-10K": (0.04, "DigiKey.es (Yageo)", DK + "MFR-25FBF52-10K", "est. (same series as 1K)"),
     "5010": (0.30, "DigiKey.es (Keystone)", DK + "keystone%205010", "price listed"),
+    "wire loop": (0.02, "lab stock (bare tinned copper wire 0.8 mm, ~1.5 cm per loop)", "", "-"),
+    "P4KE10A": (0.371, "DigiKey.es (Littelfuse; price at qty 10, 15 needed for 3 boxes; TME P4KE10A-LF: 0 in stock)",
+                "https://www.digikey.es/en/products/detail/littelfuse-inc/P4KE10A/715501", "1,543 (24-Oct)"),
     "5011": (0.29, "DigiKey.es (Keystone)", DK + "keystone%205011", "price listed (TME: 6,460, MOQ 400)"),
     # connectors
     "B2B-XH-A(LF)(SN)": (0.09, "DigiKey.es (JST)", DK + "B2B-XH-A", "price listed (TME B3B: 18,622)"),

@@ -37,6 +37,8 @@ SUBSTITUTES = {
     "Fuse.3dshapes/Fuseholder_Clip-5x20mm_Keystone_3517_Inline_P23.11x6.76mm_D1.70mm_Horizontal.step":
         TEAMC_3D + "RevC_Fuseholder_Keystone_3517_5x20.wrl",
     "TestPoint.3dshapes/TestPoint_Keystone_5010-5014_Multipurpose.step": TEAMC_3D + "RevC_TestPoint_Keystone_5010.wrl",
+    "Diode_THT.3dshapes/D_DO-41_SOD81_P3.81mm_Vertical_CathodeUp.step":            # rev C TVS D12-D16
+        TEAMC_3D + "RevC_D_DO-41_P3.81mm_Vertical_CathodeUp.wrl",
     "Package_SON.3dshapes/Texas_DRC0010J.step":
         "${KICAD10_3DMODEL_DIR}/Package_SON.3dshapes/VSON-10-1EP_3x3mm_P0.5mm_EP1.65x2.4mm.step",  # same package
 }

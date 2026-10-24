@@ -14,9 +14,9 @@ GLOBAL_NETS = [
 # Same reference names as rev A/B where the part does the same job, so the docs keep their names.
 REF_RANGES = {
     "power": "BT1 (cell holder), F1 (fuse clips), D1 (crowbar), J22 (power toggle), J23 (charger lead), U2 (boost), "
-             "U3 (ideal diode), U4 (radio LDO), U6 (fuel gauge), C1-C19, R9, TP1-TP4",
+             "U3 (ideal diode), U4 (radio LDO), U6 (fuel gauge), D16 (toggle-lead TVS), C1-C19, R9, TP1-TP4",
     "pi_link": "J1 (2x20 box header), J13 (UART), MH1-MH3",
-    "ui": "J10-J12, J14 (LED lead), C50-C53, R54-R57, R60-R61",
+    "ui": "J10-J12, J14 (LED lead), D12-D15 (lead TVS), R54-R57, R60-R61",
     "radio": "J30 (SP4 breakout socket), H30, R80, R82-R84",
 }
 
@@ -42,7 +42,9 @@ FP = {
     "D201": "Diode_THT:D_DO-201AD_P12.70mm_Horizontal",
     "FUSE": "Fuse:Fuseholder_Clip-5x20mm_Keystone_3517_Inline_P23.11x6.76mm_D1.70mm_Horizontal",
     "CELL": "Battery:BatteryHolder_MPD_BH-18650-PC",
-    "TP": "TestPoint:TestPoint_Keystone_5010-5014_Multipurpose",
+    "TP": "TestPoint:TestPoint_Keystone_5010-5014_Multipurpose",   # 11.3 mm tall: only outside the breakout
+    "LOOP": "TestPoint:TestPoint_Loop_D2.50mm_Drill1.0mm",          # bent wire loop ~3 mm: under the breakout
+    "TVS": "Diode_THT:D_DO-41_SOD81_P3.81mm_Vertical_CathodeUp",    # P4KE10A standing, cathode lead on top
     "XH2": "teamc:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_Pad2.0x2.4mm",
     "XH3": "teamc:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical_Pad2.0x2.4mm",
     "IDC40": "teamc:IDC-Header_2x20_P2.54mm_Vertical_Pad2.0mm",
@@ -57,4 +59,5 @@ MPN = {
     "1k": ("MFR-25FBF52-1K", "Yageo"), "10k": ("MFR-25FBF52-10K", "Yageo"),
     "100n": ("K104K10X7RF5UH5", "Vishay"), "1u": ("FG28X7R1E105KRT06", "TDK"),
     "100u": ("EEU-FR1C101", "Panasonic"),
+    "TVS": ("P4KE10A", "Littelfuse"),
 }
