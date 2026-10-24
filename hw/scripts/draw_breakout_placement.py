@@ -32,8 +32,9 @@ def bbox(f, back):
 eb = cb.GetBoardEdgesBoundingBox()
 X0, Y0, X1, Y1 = T(eb.GetLeft()), T(eb.GetTop()), T(eb.GetRight()), T(eb.GetBottom())
 S, M = 9.0, 40          # px per mm, margin px
+TOP = 150               # room above the board for the ribbon cable to the Pi
 W = int((X1 - X0) * S) + 2 * M
-H_TOP = int((Y1 - Y0) * S) + 2 * M
+H_TOP = int((Y1 - Y0) * S) + 2 * M + TOP
 H = H_TOP + 330
 img = Image.new("RGB", (W, H), "white")
 d = ImageDraw.Draw(img)
@@ -47,7 +48,7 @@ except OSError:
 
 def P(x, y):
     """KiCad page mm -> pixel, seen from the COMPONENT side (mirror x)."""
-    return M + (X1 - x) * S, M + (y - Y0) * S
+    return M + (X1 - x) * S, M + TOP + (y - Y0) * S
 
 
 def rect(x1, y1, x2, y2, **kw):
@@ -130,6 +131,34 @@ for x, y in pads(fp(br, "J2")).values():
     d.rectangle([px - 6, py - 6, px + 6, py + 6], fill="black")
 t = "black squares = the breakout's J2 bench pins: DO NOT FIT J2 on breakouts used in the box"
 d.text((box[2] - d.textlength(t, font=small), box[3] + 24), t, fill="black", font=small)
+
+# the 40-wire ribbon to the Pi: female sockets at both ends, one pushes into J1 (the shrouded box header, keyed),
+# the other onto the Pi's 40 male pins; red wire = pin 1 at both ends
+j1 = fp(cb, "J1")
+jx1, jy1, jx2, jy2 = bbox(j1, True)
+jp = pads(j1)
+a, b = P(jx1, jy1), P(jx2, jy2)
+rl, rr, jtop = min(a[0], b[0]) + 6, max(a[0], b[0]) - 6, min(a[1], b[1])
+rtop = P(X0, Y0)[1] - 6                                   # the cable drawn above the board; it rises out of J1
+d.rectangle([rl, M + 34, rr, rtop], fill="#cfd8dc", outline="#607d8b", width=2)
+for i in range(1, 20):                                   # the ribbon's wires
+    xx = rl + (rr - rl) * i / 20
+    d.line([xx, M + 34, xx, rtop], fill="#90a4ae", width=1)
+p1x = P(*jp["1"])[0]
+red_x = rl if abs(p1x - rl) < abs(p1x - rr) else rr      # red wire on the pin-1 side
+d.line([red_x, M + 34, red_x, rtop], fill="#d32f2f", width=5)
+for xx in (rl, rr):                                      # dashed: the plug goes down into J1 (over U3 / J13)
+    for yy in range(int(rtop), int(jtop), 12):
+        d.line([xx, yy, xx, min(yy + 6, jtop)], fill="#607d8b", width=2)
+for i, t in enumerate(("its plug pushes into J1 (dashed);", "the cable rises out of J1 and", "folds over U3 / J13 to the Pi")):
+    d.text((M, rtop - 62 + i * 16), t, fill="#607d8b", font=small)
+t = "40-wire ribbon cable, female-female, 15 cm  ->  Raspberry Pi 3 A+ (on the box floor beside the carrier)"
+d.text(((rl + rr) / 2 - d.textlength(t, font=font) / 2, M + 12), t, fill="#37474f", font=font)
+t = "red wire = pin 1 at both ends (Pi: pin 1 is at the microSD-card end)  ·  the J1 shroud's notch keys it"
+d.text(((rl + rr) / 2 - d.textlength(t, font=small) / 2, M + 34 + 8), t, fill="#b71c1c", font=small)
+px, py = P(*jp["1"])
+d.rectangle([px - 6, py - 6, px + 6, py + 6], outline="#d32f2f", width=3)
+d.text((px + 10, py - 7), "J1 pin 1", fill="#d32f2f", font=small)
 
 d.text((M, 8), "Carrier rev C, seen from the COMPONENT side (parts up)  -  where the SP4 breakout goes",
        fill="black", font=big)
