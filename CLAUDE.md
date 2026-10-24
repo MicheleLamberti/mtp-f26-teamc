@@ -165,12 +165,14 @@ Classes and tutor meetings are on **Fridays**. Week 2 = Fri 2-Oct-26.
 
 ## Status (keep current)
 
-- **24-Oct-26: carrier rev C ("simple") ready for the first build** (`hw/teamc-carrier-simple/`, DRAFT): THT parts +
-  Pololu U3V70F5 / #5388 / Adafruit #5580 modules, 18650 holder on the board, MCP1700 TO-92 radio LDO, 5×20 fuse +
-  1N5822, P4KE10A TVS per panel lead (added after checkpoint 3). One copper layer, no vias, 4 wire links, **ERC 0/0,
-  DRC 0/0/0**, 120 × 68 mm (provisional), BoM ≈ €145.5/box. Plain-language build/test guide **`hw/REVC_GUIDE.md`**,
-  shopping list `hw/REVC_SHOPPING.md` (DigiKey.es + Kiwi + Amazon; Botland is B2B only now). Rebuild after the box is
-  measured: `python3 hw/scripts/layout_carrier_simple.py`. Santiago approved checkpoints 1–3; merge pending.
+- **24-Oct-26: carrier rev C ("simple") on `main`, ready to order and build** (`hw/teamc-carrier-simple/`, DRAFT): THT
+  parts + Pololu U3V70F5 / #5388 / Adafruit #5580 modules, 18650 holder on the board, MCP1700 TO-92 radio LDO, 5×20 fuse
+  + 1N5822, P4KE10A TVS per panel lead, Adafruit #4410 USB-C charger off-board. One copper layer, no vias, 4 wire
+  links, **ERC 0/0, DRC 0/0/0**, 120 × 68 mm (provisional), **BoM €148.29/box**. Build/test guide
+  **`hw/REVC_GUIDE.md`**, breakout + ribbon drawing `breakout_placement.png`, order **`hw/REVC_SHOPPING.md`** (DigiKey cart
+  `order/digikey_cart.csv` + Kiwi + TME + nkon, ≈ €253 excl. for 3 boards). Rules learned: do not fit the breakout's
+  J2 bench pins in the box (they hang over TP2/TP4); the ribbon may be unkeyed → marked wire on pin 1 at both ends +
+  beep check. Rebuild after the box is measured: `python3 hw/scripts/layout_carrier_simple.py`.
 
 - **23-Oct-26 (late): Santiago wants a SIMPLER carrier → rev C.** Rev B works on paper but is too subtle for the team
   (ribbon-ground limits, SMD details, 10 links in a dense layout). Rev C = modules + THT parts, every part easy to buy
@@ -313,8 +315,8 @@ pattern had put gate/LED nets at 1 mm). ET reviews 5 points in DESIGN_NOTES, the
 - [ ] Email `hw/sp4-breakout/sp4-breakout_gerbers.zip` to juan.antonio.chavez@upc.edu (lab mill)
 - [ ] Carrier rev C (simple): **order** — DigiKey cart `hw/teamc-carrier-simple/order/digikey_cart.csv` (upload in
       BOM Manager; includes the Adafruit #4410 charger), Kiwi (fuel gauge, ribbon, M2.5 kit), TME (switches), nkon
-      (cells) per `hw/REVC_SHOPPING.md` "How to order" (≈ €253 excl. for 3 boards); before paying: ribbon F/F +
-      keyed, cell fit in the holder (BoM €148.29/box); box
+      (cells) per `hw/REVC_SHOPPING.md` "How to order" (≈ €253 excl. for 3 boards); before paying: the cell fit in
+      the holder (69.1 mm Keeppower; buy one first) and nkon shipping to Spain (BoM €148.29/box); box
       inside dimensions → edit W/H in `place_carrier_simple.py`, re-run `layout_carrier_simple.py`; email
       `hw/teamc-carrier-simple/teamc-carrier-simple_gerbers.zip` to Chávez; first build with the guide's tests
 - [ ] Carrier rev B (lab): **routed 23-Oct (provisional outline)**. Santiago: box inside dimensions → re-run
@@ -349,6 +351,15 @@ what's pending.
 - Order check (Sonnet subagent): every DigiKey line verified; C1/C9 → KEMET ESS107M016AE2EA (EEU-FR1C101 did not
   fit the footprint), red LED → WP7113SURDK; standoffs/screws/LED clips sourced at DigiKey. Cart + check report +
   other shops in `hw/teamc-carrier-simple/order/`; ≈ €242 excl. for 3 boards. BoM €148.00/box. DRC 0/0/0.
+- Charger: no TP4056 USB-C board with protection was orderable (TinyTronics 2–4 weeks, Grobotronics/Electrokit out,
+  Amazon.es unreadable) → **Adafruit #4410** on the DigiKey cart (Santiago; 500 mA jumper, ~7–8 h; the protected
+  18650 has the protection). Box went to €150.45 → panel switches to TME (his lever) → **€148.29/box**. Pi M2.5
+  standoffs: Kiwi KW-2754 nylon kit. Four orders ≈ €253 excl. / €306 incl. for 3 boards.
+- Ribbon Kiwi 1160: female-female by its description, keying not stated anywhere → guide no longer relies on a key
+  (marked wire on pin 1 at both ends, J1 pin 2 ↔ Pi pin 2 beep check before power).
+- Checks at the end: fw, proto, phy_config (below). Amazon.es / RS / AZ-Delivery block automated reads (503/403/429).
+- **Start next session with:** cell fit (buy one), box inside dimensions → re-run `layout_carrier_simple.py`, email
+  the rev C gerbers to Chávez, place the four orders; first build with `hw/REVC_GUIDE.md`.
 
 ### 2026-10-24 — carrier rev C: checkpoint-3 fixes, build guide, shopping list
 - Took over the rev C lead mid-task (worktree `agent-ac126a28c4ef25725`). Santiago's checkpoint-3 fixes: **P4KE10A
