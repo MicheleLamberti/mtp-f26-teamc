@@ -64,7 +64,7 @@ def backbone(board):
     # the radio's 5 V: along the top edge to the radio regulator U4 (any other way crosses a row of J1's escapes)
     T([(84.0, 2.2), (84.0, 1.0), (9.54, 1.0), (9.54, 15.5)], 1.0, "5V_PI")
     T([(9.54, 15.5), (9.54, 18.5), (10.5, 19.5), (10.5, 20.5)], 1.0, "5V_PI")
-    T([(10.5, 20.5), (10.5, 25.5), (9.0, 27.0), (9.0, 27.8)], SIG, "5V_PI")                   # TP2
+    T([(10.5, 20.5), (10.5, 22.8), (8.8, 24.5), (7.5, 24.5)], SIG, "5V_PI")   # TP2 (no 5 V under the breakout's J2)
     # radio 3.3 V: U4 VOUT -> C12 -> socket pin 2 -> R80 (CSN pull-up); TP4
     T([(12.08, 15.5), (12.08, 13.0), (13.4, 11.8), (14.6, 11.8), (14.54, 7.0), (14.54, 3.6)], 1.0, "3V3_RADIO")
     T([(12.08, 15.5), (12.3, 16.5), (12.3, 21.0), (13.2, 22.5), (13.2, 24.5)], SIG, "3V3_RADIO")   # TP4

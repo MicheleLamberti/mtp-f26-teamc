@@ -37,6 +37,10 @@ panel inputs high; there are no pull-up resistors on the board.
   view; regenerate with `python3 hw/scripts/draw_breakout_placement.py . hw/teamc-carrier-simple/breakout_placement.png`).
   It plugs into J30 (square pad = pin 1 = GND), SP4 module up, its far end on the M3 standoff at H30, 11 mm above
   the board; one mounting hole of the carrier sits under it (an M3 screw head fits).
+- **Do not fit the breakout's own 2-pin bench header (its J2) on a breakout that goes in the box.** It points down
+  like the main header and its pins would end ~2.5 mm above the carrier, over TP2/TP4 (5 V / 3.3 V): one touch puts
+  5 V on the radio and kills it. In the box the breakout gets its 3.3 V through J30; keep J2 only on a bench breakout
+  (or fit it pointing up). TP2 was moved away from J2 on 24-Oct.
 - **120 × 68 mm, one copper layer**, milled at the UPC lab: no plated holes, no solder mask, no silkscreen.
 - **Every part sits on the plain (component) side and is soldered on the copper side.** Use the assembly drawing
   `fab/teamc-carrier-simple_assembly_component_side.pdf` to place parts (it is drawn as you see the component side);
@@ -122,8 +126,8 @@ now.** Best: a bench supply at 3.7 V (never above 5 V), current limit 0.3 A, cli
 fitted):** connect the supply backwards to the holder. The voltage should collapse to about −0.4 V (D1 conducting), the supply sits at
 its limit, nothing else warms up. With a real cell this current is what blows F1.
 
-**E. Breakout:** switch OFF, plug the SP4 breakout into J30 (its pin 1 = GND on the square pad end) and screw it to
-the H30 standoff. Switch ON: TP4 still 3.2–3.4 V. Switch OFF.
+**E. Breakout:** check it has **no J2 pins underneath** (section 2). Switch OFF, plug the SP4 breakout into J30
+(its pin 1 = GND on the square pad end) and screw it to the H30 standoff. Switch ON: TP4 still 3.2–3.4 V. Switch OFF.
 
 **F. Pi:** with the box OFF, connect the ribbon: **red wire = pin 1 at both ends**; on the Pi, pin 1 is the end of
 the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the Pi:
@@ -161,5 +165,6 @@ the GPIO header nearest the microSD slot. Switch ON. The Pi boots. Then on the P
 | A joint that only touches the pin | Unplated holes: no connection at all. Reflow with a little more solder so it wets the copper ring. |
 | SJ2 left open on the #5580 | The gauge reads nothing or 0 % (its chip has no supply). |
 | Test loop or regulator too tall | The breakout does not seat on its standoff. Bend the loop lower / push U4 down. |
+| Breakout with its J2 bench pins fitted | The pins hang down onto TP2/TP4: 5 V on the radio's 3.3 V, the SP4 dies. Remove J2 (or fit it pointing up) on box breakouts. |
 | Box "off" but the cell drains | D1 leakage (step 5), or the toggle wired to the wrong lugs (lever down = open = ON). |
 | Charging with a C-to-C cable | Nothing happens. Use USB-A to USB-C. |

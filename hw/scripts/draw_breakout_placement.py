@@ -124,6 +124,13 @@ d.ellipse([px - 14, py - 14, px + 14, py + 14], outline="#e65100", width=4, fill
 t = "H30: M3 standoff 11 mm"
 d.text((px - d.textlength(t, font=font) - 20, py - 8), t, fill="#e65100", font=font)
 
+# the breakout's own 1x2 bench-supply header J2 points DOWN like its J1: do not fit it on breakouts used in the box
+for x, y in pads(fp(br, "J2")).values():
+    px, py = P(*map_b(x, y))
+    d.rectangle([px - 6, py - 6, px + 6, py + 6], fill="black")
+t = "black squares = the breakout's J2 bench pins: DO NOT FIT J2 on breakouts used in the box"
+d.text((box[2] - d.textlength(t, font=small), box[3] + 24), t, fill="black", font=small)
+
 d.text((M, 8), "Carrier rev C, seen from the COMPONENT side (parts up)  -  where the SP4 breakout goes",
        fill="black", font=big)
 

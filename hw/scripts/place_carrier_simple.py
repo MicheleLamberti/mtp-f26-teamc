@@ -146,7 +146,9 @@ PASSIVES = [
     ("D15", 42.5, 4.0, left_of("2", "1")),            # mode MRM: left of J12, over the MRM lead line (same)
     ("D16", 108.7, 52.3, above("1", "2")),            # power toggle: between the charger lead J23 and C18
 ]
-TESTPOINTS = [("TP1", 110.3, 61.0), ("TP2", 9.0, 27.8), ("TP4", 13.2, 24.5), ("TP3", 116.8, 55.5)]
+# TP2 sits below C11, >= 3.7 mm from the breakout's own bench header J2 (pins at (8.8, 28.0)/(11.3, 28.0),
+# pointing down to ~2.5 mm above this board): it was right under them until 24-Oct (5 V onto the radio's 3.3 V)
+TESTPOINTS = [("TP1", 110.3, 61.0), ("TP2", 7.5, 24.5), ("TP4", 13.2, 24.5), ("TP3", 116.8, 55.5)]
 
 
 def place_all(board):
